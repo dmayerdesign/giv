@@ -7,7 +7,8 @@ import { UIHelper, Utilities } from './services/app.service';
 	selector: 'org-details',
 	template: `
 			<div class="item-details">
-				<img (click)="sendMessage($event)" src="{{org.coverImage}}" width="260">
+				<img [hidden]="coverImageLinkBroken" [src]="org.coverImage" (error)="badLink($event)" (success)="goodLink()" width="260">
+				<div [hidden]="!coverImageLinkBroken">Broken link :(</div>
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities]
 })
@@ -15,6 +16,7 @@ import { UIHelper, Utilities } from './services/app.service';
 export class OrgDetailsComponent implements OnInit {
 	@Input() org;
 	@Output() update = new EventEmitter();
+	private coverImageLinkBroken:boolean = false;
 
 	constructor(
 				private http: Http,
@@ -28,6 +30,14 @@ export class OrgDetailsComponent implements OnInit {
 
 	sendMessage($event) {
 		this.update.emit({body: "hello!", type: "info"});
+	}
+
+	badLink($event) {
+		this.coverImageLinkBroken = true;
+	}
+
+	goodLink() {
+		this.coverImageLinkBroken = false;
 	}
 
 }

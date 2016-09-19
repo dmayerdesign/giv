@@ -32,6 +32,8 @@ dotenv.load({ path: '.env' });
  * AWS S3 uploads
  */
 const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
+const initial_upload = multer({ dest: path.join(__dirname, 'uploads') });
+
 const upload = multer({
   storage: multerS3({
     s3: s3,
@@ -43,7 +45,7 @@ const upload = multer({
         callback(null, req.newPath);
     }
   }),
-  limits: { fileSize: 1000000 }
+  limits: { fileSize: 5000000 }
 });
 
 /**
@@ -144,6 +146,7 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/scripts', express.static(__dirname + '/../node_modules'));
 app.use('/bundle', express.static(path.join(__dirname, 'bundle')));
 app.use('/app', express.static(path.join(__dirname, 'app')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 /**
  * Primary app routes.
@@ -194,8 +197,8 @@ app.get('/api/paypal', apiController.getPayPal);
 app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/lob', apiController.getLob);
-app.get('/api/upload', apiController.getFileUpload);
-app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
+//app.get('/api/upload', apiController.getFileUpload);
+//app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
 app.get('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getPinterest);
 app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
 app.get('/api/google-maps', apiController.getGoogleMaps);
@@ -329,11 +332,22 @@ mongoose.connection.on('connected', () => {
     });
 
     // file uploads with multer-s3
-    app.post('/upload/cover-image/:orgId', upload.any(), function(req, res, next) {
+    app.post('edit-org/upload/cover-image/:orgId', upload.any(), function(req, res, next) {
       Org.findOne({_id: req.params.orgId}, function(err, obj) {
         if(err) return console.error(err);
         obj.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
         console.log(obj.coverImage);
+        obj.save(function(err, org) {
+          if(err) return console.error(err);
+          res.json(org);
+        }); 
+      });
+    });
+
+    app.post('/edit-org/coverImage/:orgId', function(req, res, next) {
+      Org.findOne({_id: req.params.orgId}, function(err, obj) {
+        if(err) return console.error(err);
+        obj.coverImage = req.body.value;
         obj.save(function(err, org) {
           if(err) return console.error(err);
           res.json(org);

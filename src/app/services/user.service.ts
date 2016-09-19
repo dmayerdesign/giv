@@ -1,10 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Subject } from 'rxjs/subject';
 
 @Injectable()
 /** Dummy version of an authenticated user service */
 export class UserService {
 	private user:any;
+
+	// Observable string sources
+  //private loginAnnouncedSource = new Subject<string>();
+  private loginConfirmedSource = new Subject<string>();
+  // Observable string streams
+  //loginAnnounced$ = this.loginAnnouncedSource.asObservable();
+  loginConfirmed$ = this.loginConfirmedSource.asObservable();
 
 	constructor(private http:Http) { }
 
@@ -28,6 +36,16 @@ export class UserService {
 				next("The logged in user couldn't be found");
 			}
 		});
-
   }
+
+  // Service message commands
+  // announceLogin(user) {
+  //   this.loginAnnouncedSource.next(user);
+  // }
+  confirmLogin(user) {
+  	console.log("Confirming login");
+  	console.log(user);
+    this.loginConfirmedSource.next(user);
+  }
+
 }

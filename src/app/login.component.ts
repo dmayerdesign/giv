@@ -13,14 +13,14 @@ import { UserService } from './services/user.service';
 
 export class LoginComponent implements OnInit {
 	private infoMsg = new InfoMessage();
-	private formModel:any;
+	private formModel = {email: null, password: null};
 	private user:any;
+  private isLoggedIn:boolean;
 
 	constructor(private http:Http,
 							private fb:FacebookService,
 							private router:Router,
-							private userService:UserService,
-							private zone:NgZone) {
+							private userService:UserService) {
 
 		if (localStorage['profile']) {
 			this.router.navigate(['/']);
@@ -34,17 +34,22 @@ export class LoginComponent implements OnInit {
     });
 	}
 
-
   ngOnInit() {
 	  this.checkLoginStatus();
   };
 
 
   login() {
-  	this.http.post('/login', this.formModel).subscribe(data => {
-  		localStorage.setItem('profile', JSON.stringify(data));
-    	console.log(data);
-    });
+    console.log(this.formModel);
+    if (this.formModel && this.formModel.email && this.formModel.password) {
+    	this.http.post('/login', this.formModel).subscribe(data => {
+    		localStorage.setItem('profile', JSON.stringify(data));
+        this.isLoggedIn = true;
+        this.userService.confirmLogin(data);
+      	console.log(data);
+        this.router.navigate(['/']);
+      });
+    }
   }
 
 
@@ -84,10 +89,11 @@ export class LoginComponent implements OnInit {
 					if (err) console.log(err);
 					else {
 						this.user = data;
+            this.isLoggedIn = true;
+            this.userService.confirmLogin(data);
+            this.router.navigate(['/']);
 					}
 				});
-      	this.zone.run(() => this.router.navigate(['/']));
-      	console.log(data);
       });
     });
   }

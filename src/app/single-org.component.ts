@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -12,28 +12,26 @@ import { UIHelper, Utilities } from './services/app.service';
 				<h4>{{org.name}}</h4>
 				<org-details [org]="org"></org-details>
 				<org-posts [org]="org"></org-posts>
-				<input type="file" 
-      		ngFileSelect
-		      [options]="uploadOptions"
-		      (onUpload)="handleUpload($event)">
+				<a href="/organization/manage/{{org._id}}">Manage</a>
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities]
 })
+
+// Tell users to go to compressjpeg.com if their images exceed 2 MB
+// __TO_DO__: add an external link option
 
 export class SingleOrgComponent implements OnInit {
 	private org;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 
-	uploadFile:any;
-  uploadOptions:Object;
-
 	constructor(
 				private router: Router,
 				private route: ActivatedRoute,
 				private orgService: OrgService,
 				private helper: UIHelper,
-				private utilities: Utilities) { }
+				private utilities: Utilities,
+				private zone: NgZone) { }
 
 	ngOnInit() {
 		this.sub = this.route.params.subscribe(params => {
@@ -42,11 +40,6 @@ export class SingleOrgComponent implements OnInit {
 				data => {
 					this.org = data;
 					this.isLoaded = true;
-					this.uploadOptions = {
-					  url: '/upload/cover-image/' + this.org._id,
-					  filterExtensions: true,
-					  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-					};
 				},
 				error => console.log(error)
 			);
@@ -56,12 +49,5 @@ export class SingleOrgComponent implements OnInit {
 	ngOnDestroy() {
 		this.sub.unsubscribe();
 	}
-
-  handleUpload(data:any):void {
-    if (data && data.response) {
-      data = JSON.parse(data.response);
-      this.org = data;
-    }
-  }
 
 }

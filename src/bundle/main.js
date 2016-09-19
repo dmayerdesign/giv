@@ -49915,18 +49915,19 @@
 	var forms_1 = __webpack_require__(419);
 	var ng2_uploader_1 = __webpack_require__(457);
 	var app_component_1 = __webpack_require__(461);
-	var login_component_1 = __webpack_require__(463);
-	var about_component_1 = __webpack_require__(467);
-	var library_component_1 = __webpack_require__(468);
-	var browse_orgs_component_1 = __webpack_require__(469);
-	var org_details_component_1 = __webpack_require__(473);
-	var org_posts_component_1 = __webpack_require__(474);
-	var single_org_component_1 = __webpack_require__(475);
-	var search_box_component_1 = __webpack_require__(472);
-	var contact_component_1 = __webpack_require__(476);
+	var login_component_1 = __webpack_require__(464);
+	var about_component_1 = __webpack_require__(468);
+	var library_component_1 = __webpack_require__(469);
+	var browse_orgs_component_1 = __webpack_require__(470);
+	var org_details_component_1 = __webpack_require__(474);
+	var org_posts_component_1 = __webpack_require__(475);
+	var single_org_component_1 = __webpack_require__(476);
+	var manage_org_page_component_1 = __webpack_require__(741);
+	var search_box_component_1 = __webpack_require__(473);
+	var contact_component_1 = __webpack_require__(477);
 	var user_service_1 = __webpack_require__(462);
-	var search_service_1 = __webpack_require__(471);
-	var ng2_click_outside_1 = __webpack_require__(478);
+	var search_service_1 = __webpack_require__(472);
+	var ng2_click_outside_1 = __webpack_require__(479);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -49936,6 +49937,7 @@
 	    { path: 'library', component: library_component_1.LibraryComponent },
 	    { path: 'contact', component: contact_component_1.ContactComponent },
 	    { path: 'organization/:id', component: single_org_component_1.SingleOrgComponent },
+	    { path: 'organization/manage/:id', component: manage_org_page_component_1.ManageOrgPageComponent },
 	    { path: '', component: browse_orgs_component_1.BrowseOrgsComponent }
 	]); // the order of this array matters
 	var AppModule = (function () {
@@ -49959,6 +49961,7 @@
 	                org_details_component_1.OrgDetailsComponent,
 	                org_posts_component_1.OrgPostsComponent,
 	                single_org_component_1.SingleOrgComponent,
+	                manage_org_page_component_1.ManageOrgPageComponent,
 	                about_component_1.AboutComponent,
 	                library_component_1.LibraryComponent,
 	                contact_component_1.ContactComponent,
@@ -64377,28 +64380,21 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var router_1 = __webpack_require__(336);
 	var http_1 = __webpack_require__(397);
 	var user_service_1 = __webpack_require__(462);
 	var AppComponent = (function () {
-	    function AppComponent(router, http, userService) {
+	    function AppComponent(http, userService, zone) {
 	        var _this = this;
-	        this.router = router;
 	        this.http = http;
 	        this.userService = userService;
+	        this.zone = zone;
 	        this.isLoggedIn = false;
-	        router.events.subscribe(function (event) {
-	            if (event instanceof router_1.NavigationEnd) {
-	                console.log(event);
-	                _this.userService.getLoggedInUser(function (err, data) {
-	                    if (err)
-	                        console.log(err);
-	                    else {
-	                        _this.user = data;
-	                        _this.isLoggedIn = true;
-	                    }
-	                });
-	            }
+	        // Updates the component upon redirect from login
+	        userService.loginConfirmed$.subscribe(function (user) {
+	            console.log("Login confirmed parent subscription");
+	            console.log(user);
+	            _this.user = user;
+	            _this.isLoggedIn = true;
 	        });
 	    }
 	    AppComponent.prototype.ngOnInit = function () {
@@ -64421,7 +64417,7 @@
 	            selector: 'app',
 	            templateUrl: 'app/app.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, http_1.Http, user_service_1.UserService])
+	        __metadata('design:paramtypes', [http_1.Http, user_service_1.UserService, core_1.NgZone])
 	    ], AppComponent);
 	    return AppComponent;
 	}());
@@ -64444,9 +64440,16 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
+	var subject_1 = __webpack_require__(463);
 	var UserService = (function () {
 	    function UserService(http) {
 	        this.http = http;
+	        // Observable string sources
+	        //private loginAnnouncedSource = new Subject<string>();
+	        this.loginConfirmedSource = new subject_1.Subject();
+	        // Observable string streams
+	        //loginAnnounced$ = this.loginAnnouncedSource.asObservable();
+	        this.loginConfirmed$ = this.loginConfirmedSource.asObservable();
 	    }
 	    UserService.prototype.getLoggedInUser = function (next) {
 	        if (localStorage['profile']
@@ -64470,6 +64473,15 @@
 	            }
 	        });
 	    };
+	    // Service message commands
+	    // announceLogin(user) {
+	    //   this.loginAnnouncedSource.next(user);
+	    // }
+	    UserService.prototype.confirmLogin = function (user) {
+	        console.log("Confirming login");
+	        console.log(user);
+	        this.loginConfirmedSource.next(user);
+	    };
 	    UserService = __decorate([
 	        core_1.Injectable(), 
 	        __metadata('design:paramtypes', [http_1.Http])
@@ -64481,6 +64493,171 @@
 
 /***/ },
 /* 463 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Observable_1 = __webpack_require__(70);
+	var Subscriber_1 = __webpack_require__(73);
+	var Subscription_1 = __webpack_require__(75);
+	var ObjectUnsubscribedError_1 = __webpack_require__(84);
+	var SubjectSubscription_1 = __webpack_require__(85);
+	var rxSubscriber_1 = __webpack_require__(82);
+	/**
+	 * @class SubjectSubscriber<T>
+	 */
+	var SubjectSubscriber = (function (_super) {
+	    __extends(SubjectSubscriber, _super);
+	    function SubjectSubscriber(destination) {
+	        _super.call(this, destination);
+	        this.destination = destination;
+	    }
+	    return SubjectSubscriber;
+	}(Subscriber_1.Subscriber));
+	exports.SubjectSubscriber = SubjectSubscriber;
+	/**
+	 * @class Subject<T>
+	 */
+	var Subject = (function (_super) {
+	    __extends(Subject, _super);
+	    function Subject() {
+	        _super.call(this);
+	        this.observers = [];
+	        this.closed = false;
+	        this.isStopped = false;
+	        this.hasError = false;
+	        this.thrownError = null;
+	    }
+	    Subject.prototype[rxSubscriber_1.$$rxSubscriber] = function () {
+	        return new SubjectSubscriber(this);
+	    };
+	    Subject.prototype.lift = function (operator) {
+	        var subject = new AnonymousSubject(this, this);
+	        subject.operator = operator;
+	        return subject;
+	    };
+	    Subject.prototype.next = function (value) {
+	        if (this.closed) {
+	            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+	        }
+	        if (!this.isStopped) {
+	            var observers = this.observers;
+	            var len = observers.length;
+	            var copy = observers.slice();
+	            for (var i = 0; i < len; i++) {
+	                copy[i].next(value);
+	            }
+	        }
+	    };
+	    Subject.prototype.error = function (err) {
+	        if (this.closed) {
+	            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+	        }
+	        this.hasError = true;
+	        this.thrownError = err;
+	        this.isStopped = true;
+	        var observers = this.observers;
+	        var len = observers.length;
+	        var copy = observers.slice();
+	        for (var i = 0; i < len; i++) {
+	            copy[i].error(err);
+	        }
+	        this.observers.length = 0;
+	    };
+	    Subject.prototype.complete = function () {
+	        if (this.closed) {
+	            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+	        }
+	        this.isStopped = true;
+	        var observers = this.observers;
+	        var len = observers.length;
+	        var copy = observers.slice();
+	        for (var i = 0; i < len; i++) {
+	            copy[i].complete();
+	        }
+	        this.observers.length = 0;
+	    };
+	    Subject.prototype.unsubscribe = function () {
+	        this.isStopped = true;
+	        this.closed = true;
+	        this.observers = null;
+	    };
+	    Subject.prototype._subscribe = function (subscriber) {
+	        if (this.closed) {
+	            throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+	        }
+	        else if (this.hasError) {
+	            subscriber.error(this.thrownError);
+	            return Subscription_1.Subscription.EMPTY;
+	        }
+	        else if (this.isStopped) {
+	            subscriber.complete();
+	            return Subscription_1.Subscription.EMPTY;
+	        }
+	        else {
+	            this.observers.push(subscriber);
+	            return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+	        }
+	    };
+	    Subject.prototype.asObservable = function () {
+	        var observable = new Observable_1.Observable();
+	        observable.source = this;
+	        return observable;
+	    };
+	    Subject.create = function (destination, source) {
+	        return new AnonymousSubject(destination, source);
+	    };
+	    return Subject;
+	}(Observable_1.Observable));
+	exports.Subject = Subject;
+	/**
+	 * @class AnonymousSubject<T>
+	 */
+	var AnonymousSubject = (function (_super) {
+	    __extends(AnonymousSubject, _super);
+	    function AnonymousSubject(destination, source) {
+	        _super.call(this);
+	        this.destination = destination;
+	        this.source = source;
+	    }
+	    AnonymousSubject.prototype.next = function (value) {
+	        var destination = this.destination;
+	        if (destination && destination.next) {
+	            destination.next(value);
+	        }
+	    };
+	    AnonymousSubject.prototype.error = function (err) {
+	        var destination = this.destination;
+	        if (destination && destination.error) {
+	            this.destination.error(err);
+	        }
+	    };
+	    AnonymousSubject.prototype.complete = function () {
+	        var destination = this.destination;
+	        if (destination && destination.complete) {
+	            this.destination.complete();
+	        }
+	    };
+	    AnonymousSubject.prototype._subscribe = function (subscriber) {
+	        var source = this.source;
+	        if (source) {
+	            return this.source.subscribe(subscriber);
+	        }
+	        else {
+	            return Subscription_1.Subscription.EMPTY;
+	        }
+	    };
+	    return AnonymousSubject;
+	}(Subject));
+	exports.AnonymousSubject = AnonymousSubject;
+
+
+/***/ },
+/* 464 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64496,17 +64673,17 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(464);
-	var dist_1 = __webpack_require__(465);
+	var app_service_1 = __webpack_require__(465);
+	var dist_1 = __webpack_require__(466);
 	var user_service_1 = __webpack_require__(462);
 	var LoginComponent = (function () {
-	    function LoginComponent(http, fb, router, userService, zone) {
+	    function LoginComponent(http, fb, router, userService) {
 	        this.http = http;
 	        this.fb = fb;
 	        this.router = router;
 	        this.userService = userService;
-	        this.zone = zone;
 	        this.infoMsg = new app_service_1.InfoMessage();
+	        this.formModel = { email: null, password: null };
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
 	        }
@@ -64522,10 +64699,17 @@
 	    };
 	    ;
 	    LoginComponent.prototype.login = function () {
-	        this.http.post('/login', this.formModel).subscribe(function (data) {
-	            localStorage.setItem('profile', JSON.stringify(data));
-	            console.log(data);
-	        });
+	        var _this = this;
+	        console.log(this.formModel);
+	        if (this.formModel && this.formModel.email && this.formModel.password) {
+	            this.http.post('/login', this.formModel).subscribe(function (data) {
+	                localStorage.setItem('profile', JSON.stringify(data));
+	                _this.isLoggedIn = true;
+	                _this.userService.confirmLogin(data);
+	                console.log(data);
+	                _this.router.navigate(['/']);
+	            });
+	        }
 	    };
 	    LoginComponent.prototype.sendInfoMsg = function (body, type, time) {
 	        var _this = this;
@@ -64566,10 +64750,11 @@
 	                        console.log(err);
 	                    else {
 	                        _this.user = data;
+	                        _this.isLoggedIn = true;
+	                        _this.userService.confirmLogin(data);
+	                        _this.router.navigate(['/']);
 	                    }
 	                });
-	                _this.zone.run(function () { return _this.router.navigate(['/']); });
-	                console.log(data);
 	            });
 	        });
 	    };
@@ -64608,7 +64793,7 @@
 	            templateUrl: 'app/login.component.html',
 	            providers: [dist_1.FacebookService]
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, dist_1.FacebookService, router_1.Router, user_service_1.UserService, core_1.NgZone])
+	        __metadata('design:paramtypes', [http_1.Http, dist_1.FacebookService, router_1.Router, user_service_1.UserService])
 	    ], LoginComponent);
 	    return LoginComponent;
 	}());
@@ -64616,7 +64801,7 @@
 
 
 /***/ },
-/* 464 */
+/* 465 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64692,18 +64877,18 @@
 
 
 /***/ },
-/* 465 */
+/* 466 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__export(__webpack_require__(466));
+	__export(__webpack_require__(467));
 
 
 /***/ },
-/* 466 */
+/* 467 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64832,7 +65017,7 @@
 
 
 /***/ },
-/* 467 */
+/* 468 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64862,7 +65047,7 @@
 
 
 /***/ },
-/* 468 */
+/* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64893,7 +65078,7 @@
 
 
 /***/ },
-/* 469 */
+/* 470 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64908,11 +65093,11 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(464);
-	var search_box_component_1 = __webpack_require__(472);
-	var org_details_component_1 = __webpack_require__(473);
-	var org_posts_component_1 = __webpack_require__(474);
+	var org_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(465);
+	var search_box_component_1 = __webpack_require__(473);
+	var org_details_component_1 = __webpack_require__(474);
+	var org_posts_component_1 = __webpack_require__(475);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, _elementRef) {
 	        this.http = http;
@@ -65048,7 +65233,7 @@
 
 
 /***/ },
-/* 470 */
+/* 471 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65063,7 +65248,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var search_service_1 = __webpack_require__(471);
+	var search_service_1 = __webpack_require__(472);
 	var OrgService = (function () {
 	    function OrgService(http, search) {
 	        this.http = http;
@@ -65075,6 +65260,9 @@
 	    OrgService.prototype.loadOrg = function (id) {
 	        return this.http.get("/org/" + id).map(function (res) { return res.json(); });
 	    };
+	    OrgService.prototype.editOrg = function (options) {
+	        return this.http.post("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	    };
 	    OrgService = __decorate([
 	        core_1.Injectable(), 
 	        __metadata('design:paramtypes', [http_1.Http, search_service_1.SearchService])
@@ -65085,7 +65273,7 @@
 
 
 /***/ },
-/* 471 */
+/* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65136,7 +65324,7 @@
 
 
 /***/ },
-/* 472 */
+/* 473 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65192,58 +65380,6 @@
 
 
 /***/ },
-/* 473 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(464);
-	var OrgDetailsComponent = (function () {
-	    function OrgDetailsComponent(http, orgService, helper, utilities) {
-	        this.http = http;
-	        this.orgService = orgService;
-	        this.helper = helper;
-	        this.utilities = utilities;
-	        this.update = new core_1.EventEmitter();
-	    }
-	    OrgDetailsComponent.prototype.ngOnInit = function () {
-	    };
-	    OrgDetailsComponent.prototype.sendMessage = function ($event) {
-	        this.update.emit({ body: "hello!", type: "info" });
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], OrgDetailsComponent.prototype, "org", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], OrgDetailsComponent.prototype, "update", void 0);
-	    OrgDetailsComponent = __decorate([
-	        core_1.Component({
-	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"item-details\">\n\t\t\t\t<img (click)=\"sendMessage($event)\" src=\"{{org.coverImage}}\" width=\"260\">\n\t\t\t</div>",
-	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
-	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
-	    ], OrgDetailsComponent);
-	    return OrgDetailsComponent;
-	}());
-	exports.OrgDetailsComponent = OrgDetailsComponent;
-
-
-/***/ },
 /* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -65259,8 +65395,67 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(464);
+	var org_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(465);
+	var OrgDetailsComponent = (function () {
+	    function OrgDetailsComponent(http, orgService, helper, utilities) {
+	        this.http = http;
+	        this.orgService = orgService;
+	        this.helper = helper;
+	        this.utilities = utilities;
+	        this.update = new core_1.EventEmitter();
+	        this.coverImageLinkBroken = false;
+	    }
+	    OrgDetailsComponent.prototype.ngOnInit = function () {
+	    };
+	    OrgDetailsComponent.prototype.sendMessage = function ($event) {
+	        this.update.emit({ body: "hello!", type: "info" });
+	    };
+	    OrgDetailsComponent.prototype.badLink = function ($event) {
+	        this.coverImageLinkBroken = true;
+	    };
+	    OrgDetailsComponent.prototype.goodLink = function () {
+	        this.coverImageLinkBroken = false;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgDetailsComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgDetailsComponent.prototype, "update", void 0);
+	    OrgDetailsComponent = __decorate([
+	        core_1.Component({
+	            selector: 'org-details',
+	            template: "\n\t\t\t<div class=\"item-details\">\n\t\t\t\t<img [hidden]=\"coverImageLinkBroken\" [src]=\"org.coverImage\" (error)=\"badLink($event)\" (success)=\"goodLink()\" width=\"260\">\n\t\t\t\t<div [hidden]=\"!coverImageLinkBroken\">Broken link :(</div>\n\t\t\t</div>",
+	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
+	    ], OrgDetailsComponent);
+	    return OrgDetailsComponent;
+	}());
+	exports.OrgDetailsComponent = OrgDetailsComponent;
+
+
+/***/ },
+/* 475 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
+	var org_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(465);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65294,7 +65489,7 @@
 
 
 /***/ },
-/* 475 */
+/* 476 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65309,15 +65504,16 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(464);
+	var org_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(465);
 	var SingleOrgComponent = (function () {
-	    function SingleOrgComponent(router, route, orgService, helper, utilities) {
+	    function SingleOrgComponent(router, route, orgService, helper, utilities, zone) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
+	        this.zone = zone;
 	        this.isLoaded = false;
 	    }
 	    SingleOrgComponent.prototype.ngOnInit = function () {
@@ -65327,30 +65523,19 @@
 	            _this.orgService.loadOrg(id).subscribe(function (data) {
 	                _this.org = data;
 	                _this.isLoaded = true;
-	                _this.uploadOptions = {
-	                    url: '/upload/cover-image/' + _this.org._id,
-	                    filterExtensions: true,
-	                    allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	                };
 	            }, function (error) { return console.log(error); });
 	        });
 	    };
 	    SingleOrgComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
 	    };
-	    SingleOrgComponent.prototype.handleUpload = function (data) {
-	        if (data && data.response) {
-	            data = JSON.parse(data.response);
-	            this.org = data;
-	        }
-	    };
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t\t<input type=\"file\" \n      \t\tngFileSelect\n\t\t      [options]=\"uploadOptions\"\n\t\t      (onUpload)=\"handleUpload($event)\">\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t\t<a href=\"/organization/manage/{{org._id}}\">Manage</a>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone])
 	    ], SingleOrgComponent);
 	    return SingleOrgComponent;
 	}());
@@ -65358,7 +65543,7 @@
 
 
 /***/ },
-/* 476 */
+/* 477 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65374,8 +65559,8 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(464);
-	var email_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(465);
+	var email_service_1 = __webpack_require__(478);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
 	        this.http = http;
@@ -65421,7 +65606,7 @@
 
 
 /***/ },
-/* 477 */
+/* 478 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -65434,7 +65619,7 @@
 
 
 /***/ },
-/* 478 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65448,7 +65633,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(479);
+	var click_outside_directive_1 = __webpack_require__(480);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -65466,7 +65651,7 @@
 
 
 /***/ },
-/* 479 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65544,6 +65729,362 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
+
+
+/***/ },
+/* 481 */,
+/* 482 */,
+/* 483 */,
+/* 484 */,
+/* 485 */,
+/* 486 */,
+/* 487 */,
+/* 488 */,
+/* 489 */,
+/* 490 */,
+/* 491 */,
+/* 492 */,
+/* 493 */,
+/* 494 */,
+/* 495 */,
+/* 496 */,
+/* 497 */,
+/* 498 */,
+/* 499 */,
+/* 500 */,
+/* 501 */,
+/* 502 */,
+/* 503 */,
+/* 504 */,
+/* 505 */,
+/* 506 */,
+/* 507 */,
+/* 508 */,
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */,
+/* 567 */,
+/* 568 */,
+/* 569 */,
+/* 570 */,
+/* 571 */,
+/* 572 */,
+/* 573 */,
+/* 574 */,
+/* 575 */,
+/* 576 */,
+/* 577 */,
+/* 578 */,
+/* 579 */,
+/* 580 */,
+/* 581 */,
+/* 582 */,
+/* 583 */,
+/* 584 */,
+/* 585 */,
+/* 586 */,
+/* 587 */,
+/* 588 */,
+/* 589 */,
+/* 590 */,
+/* 591 */,
+/* 592 */,
+/* 593 */,
+/* 594 */,
+/* 595 */,
+/* 596 */,
+/* 597 */,
+/* 598 */,
+/* 599 */,
+/* 600 */,
+/* 601 */,
+/* 602 */,
+/* 603 */,
+/* 604 */,
+/* 605 */,
+/* 606 */,
+/* 607 */,
+/* 608 */,
+/* 609 */,
+/* 610 */,
+/* 611 */,
+/* 612 */,
+/* 613 */,
+/* 614 */,
+/* 615 */,
+/* 616 */,
+/* 617 */,
+/* 618 */,
+/* 619 */,
+/* 620 */,
+/* 621 */,
+/* 622 */,
+/* 623 */,
+/* 624 */,
+/* 625 */,
+/* 626 */,
+/* 627 */,
+/* 628 */,
+/* 629 */,
+/* 630 */,
+/* 631 */,
+/* 632 */,
+/* 633 */,
+/* 634 */,
+/* 635 */,
+/* 636 */,
+/* 637 */,
+/* 638 */,
+/* 639 */,
+/* 640 */,
+/* 641 */,
+/* 642 */,
+/* 643 */,
+/* 644 */,
+/* 645 */,
+/* 646 */,
+/* 647 */,
+/* 648 */,
+/* 649 */,
+/* 650 */,
+/* 651 */,
+/* 652 */,
+/* 653 */,
+/* 654 */,
+/* 655 */,
+/* 656 */,
+/* 657 */,
+/* 658 */,
+/* 659 */,
+/* 660 */,
+/* 661 */,
+/* 662 */,
+/* 663 */,
+/* 664 */,
+/* 665 */,
+/* 666 */,
+/* 667 */,
+/* 668 */,
+/* 669 */,
+/* 670 */,
+/* 671 */,
+/* 672 */,
+/* 673 */,
+/* 674 */,
+/* 675 */,
+/* 676 */,
+/* 677 */,
+/* 678 */,
+/* 679 */,
+/* 680 */,
+/* 681 */,
+/* 682 */,
+/* 683 */,
+/* 684 */,
+/* 685 */,
+/* 686 */,
+/* 687 */,
+/* 688 */,
+/* 689 */,
+/* 690 */,
+/* 691 */,
+/* 692 */,
+/* 693 */,
+/* 694 */,
+/* 695 */,
+/* 696 */,
+/* 697 */,
+/* 698 */,
+/* 699 */,
+/* 700 */,
+/* 701 */,
+/* 702 */,
+/* 703 */,
+/* 704 */,
+/* 705 */,
+/* 706 */,
+/* 707 */,
+/* 708 */,
+/* 709 */,
+/* 710 */,
+/* 711 */,
+/* 712 */,
+/* 713 */,
+/* 714 */,
+/* 715 */,
+/* 716 */,
+/* 717 */,
+/* 718 */,
+/* 719 */,
+/* 720 */,
+/* 721 */,
+/* 722 */,
+/* 723 */,
+/* 724 */,
+/* 725 */,
+/* 726 */,
+/* 727 */,
+/* 728 */,
+/* 729 */,
+/* 730 */,
+/* 731 */,
+/* 732 */,
+/* 733 */,
+/* 734 */,
+/* 735 */,
+/* 736 */,
+/* 737 */,
+/* 738 */,
+/* 739 */,
+/* 740 */,
+/* 741 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var router_1 = __webpack_require__(336);
+	var org_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(465);
+	var ManageOrgPageComponent = (function () {
+	    function ManageOrgPageComponent(router, route, orgService, helper, utilities, zone) {
+	        this.router = router;
+	        this.route = route;
+	        this.orgService = orgService;
+	        this.helper = helper;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.isLoaded = false;
+	        this.stillWorking = false;
+	        this.loadingCoverImage = false;
+	        this.progress = 0;
+	    }
+	    ManageOrgPageComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        if (this.route.params) {
+	            this.sub = this.route.params.subscribe(function (params) {
+	                var id = params['id'];
+	                _this.orgService.loadOrg(id).subscribe(function (data) {
+	                    _this.org = data;
+	                    _this.isLoaded = true;
+	                    // for ng-upload
+	                    _this.uploadOptions = {
+	                        url: '/edit-org/upload/cover-image/' + _this.org._id,
+	                        filterExtensions: true,
+	                        calculateSpeed: true,
+	                        allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                    };
+	                }, function (error) { return console.log(error); });
+	            });
+	        }
+	    };
+	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
+	        this.sub.unsubscribe();
+	    };
+	    ManageOrgPageComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response) {
+	                _this.org = JSON.parse(data.response);
+	                _this.stillWorking = false;
+	                console.log(data.response);
+	            }
+	        });
+	    };
+	    ManageOrgPageComponent.prototype.editCoverImage = function (path) {
+	        var _this = this;
+	        this.loadingCoverImage = true;
+	        this.orgService.editOrg({
+	            id: this.org._id,
+	            key: "coverImage",
+	            value: path
+	        }).subscribe(function (org) {
+	            _this.org = org;
+	            _this.loadingCoverImage = false;
+	            console.log(org);
+	        });
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], ManageOrgPageComponent.prototype, "org", void 0);
+	    ManageOrgPageComponent = __decorate([
+	        core_1.Component({
+	            selector: 'manage-org-page',
+	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a href=\"/organization/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t<input type=\"file\" \n      \t\tngFileSelect\n\t\t      [options]=\"uploadOptions\"\n\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t    <span *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t    <span *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\n\t\t    <input [(ngModel)]=\"coverImageLink\"><button (click)=\"editCoverImage(coverImageLink)\"><i [hidden]=\"!loadingCoverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t</div>",
+	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone])
+	    ], ManageOrgPageComponent);
+	    return ManageOrgPageComponent;
+	}());
+	exports.ManageOrgPageComponent = ManageOrgPageComponent;
 
 
 /***/ }
