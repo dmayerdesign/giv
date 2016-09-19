@@ -15,7 +15,10 @@
 	        <li *ngIf="isLoggedIn" class="nav-item">
 	        		<a class="nav-link" (click)="logOut()"><i class="fa fa-lock"></i> Log out</a> 
 	        </li>
-	        <li *ngIf="isLoggedIn"><img width="40" src="{{user?.profile?.picture}}"></li>
+	        <li *ngIf="isLoggedIn" class="nav-item"><img width="40" src="{{user?.profile?.picture}}"></li>
+	        <li *ngIf="!isLoggedIn" class="nav-item">
+	        	<a class="nav-link" href="/login"><i class="fa fa-lock"></i>Log In</a>
+	        </li>
 	    </ul>
 	</nav>
 

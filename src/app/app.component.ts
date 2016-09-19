@@ -1,4 +1,4 @@
-import { Component, AfterContentInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Http } from '@angular/http';
 import { UserService } from './services/user.service';
@@ -8,7 +8,7 @@ import { UserService } from './services/user.service';
 	templateUrl: 'app/app.component.html'
 })
 
-export class AppComponent {
+export class AppComponent implements OnInit {
 	private isLoggedIn:boolean = false;
 	private user:any;
 
@@ -18,24 +18,29 @@ export class AppComponent {
 		router.events.subscribe(event => {
 			if (event instanceof NavigationEnd) {
 				console.log(event);
-				this.userService.getLoggedInUser((data) => {
-					this.user = data;
-					this.isLoggedIn = true;
+				this.userService.getLoggedInUser((err, data) => {
+					if (err) console.log(err);
+					else {
+						this.user = data;
+						this.isLoggedIn = true;
+					}
 				});
 			}
 		});
 	}
 
-	ngAfterContentInit() {
-		this.userService.getLoggedInUser((data) => {
-			this.user = data;
-			this.isLoggedIn = true;
+	ngOnInit() {
+		this.userService.getLoggedInUser((err, data) => {
+			if (err) console.log(err);
+			else {
+				this.user = data;
+				this.isLoggedIn = true;
+			}
 		});
 	}
 
 	logOut() {
 		localStorage.removeItem('profile');
 		this.isLoggedIn = false;
-		this.router.navigate(['/']);
 	}
 }

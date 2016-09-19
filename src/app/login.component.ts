@@ -80,8 +80,11 @@ export class LoginComponent implements OnInit {
       loginParams.token = {type: "facebook", accessToken: loginRes.authResponse.accessToken};
       this.http.post('/login', loginParams).subscribe(data => {
       	localStorage.setItem('profile', JSON.stringify(data));
-      	this.userService.getLoggedInUser((data) => {
-					this.user = data;
+      	this.userService.getLoggedInUser((err, data) => {
+					if (err) console.log(err);
+					else {
+						this.user = data;
+					}
 				});
       	this.zone.run(() => this.router.navigate(['/']));
       	console.log(data);

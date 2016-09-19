@@ -49915,16 +49915,16 @@
 	var forms_1 = __webpack_require__(419);
 	var ng2_uploader_1 = __webpack_require__(457);
 	var app_component_1 = __webpack_require__(461);
-	var login_component_1 = __webpack_require__(462);
-	var about_component_1 = __webpack_require__(466);
-	var library_component_1 = __webpack_require__(467);
+	var login_component_1 = __webpack_require__(463);
+	var about_component_1 = __webpack_require__(467);
+	var library_component_1 = __webpack_require__(468);
 	var browse_orgs_component_1 = __webpack_require__(469);
 	var org_details_component_1 = __webpack_require__(473);
 	var org_posts_component_1 = __webpack_require__(474);
 	var single_org_component_1 = __webpack_require__(475);
 	var search_box_component_1 = __webpack_require__(472);
 	var contact_component_1 = __webpack_require__(476);
-	var user_service_1 = __webpack_require__(468);
+	var user_service_1 = __webpack_require__(462);
 	var search_service_1 = __webpack_require__(471);
 	var ng2_click_outside_1 = __webpack_require__(478);
 	var core_2 = __webpack_require__(11);
@@ -64379,7 +64379,7 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var http_1 = __webpack_require__(397);
-	var user_service_1 = __webpack_require__(468);
+	var user_service_1 = __webpack_require__(462);
 	var AppComponent = (function () {
 	    function AppComponent(router, http, userService) {
 	        var _this = this;
@@ -64390,24 +64390,31 @@
 	        router.events.subscribe(function (event) {
 	            if (event instanceof router_1.NavigationEnd) {
 	                console.log(event);
-	                _this.userService.getLoggedInUser(function (data) {
-	                    _this.user = data;
-	                    _this.isLoggedIn = true;
+	                _this.userService.getLoggedInUser(function (err, data) {
+	                    if (err)
+	                        console.log(err);
+	                    else {
+	                        _this.user = data;
+	                        _this.isLoggedIn = true;
+	                    }
 	                });
 	            }
 	        });
 	    }
-	    AppComponent.prototype.ngAfterContentInit = function () {
+	    AppComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.userService.getLoggedInUser(function (data) {
-	            _this.user = data;
-	            _this.isLoggedIn = true;
+	        this.userService.getLoggedInUser(function (err, data) {
+	            if (err)
+	                console.log(err);
+	            else {
+	                _this.user = data;
+	                _this.isLoggedIn = true;
+	            }
 	        });
 	    };
 	    AppComponent.prototype.logOut = function () {
 	        localStorage.removeItem('profile');
 	        this.isLoggedIn = false;
-	        this.router.navigate(['/']);
 	    };
 	    AppComponent = __decorate([
 	        core_1.Component({
@@ -64437,10 +64444,61 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
+	var UserService = (function () {
+	    function UserService(http) {
+	        this.http = http;
+	    }
+	    UserService.prototype.getLoggedInUser = function (next) {
+	        if (localStorage['profile']
+	            && localStorage['profile'].length
+	            && JSON.parse(localStorage['profile'])
+	            && JSON.parse(localStorage['profile'])._body) {
+	            this.user = JSON.parse(JSON.parse(localStorage['profile'])._body);
+	        }
+	        else if (localStorage['profile']
+	            && localStorage['profile'].length) {
+	            this.user = JSON.parse(localStorage['profile']);
+	        }
+	        else
+	            return next("No user was logged in");
+	        this.http.get('/user/' + this.user._id).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data) {
+	                next(null, data);
+	            }
+	            else {
+	                next("The logged in user couldn't be found");
+	            }
+	        });
+	    };
+	    UserService = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [http_1.Http])
+	    ], UserService);
+	    return UserService;
+	}());
+	exports.UserService = UserService;
+
+
+/***/ },
+/* 463 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(463);
-	var dist_1 = __webpack_require__(464);
-	var user_service_1 = __webpack_require__(468);
+	var app_service_1 = __webpack_require__(464);
+	var dist_1 = __webpack_require__(465);
+	var user_service_1 = __webpack_require__(462);
 	var LoginComponent = (function () {
 	    function LoginComponent(http, fb, router, userService, zone) {
 	        this.http = http;
@@ -64503,8 +64561,12 @@
 	            loginParams.token = { type: "facebook", accessToken: loginRes.authResponse.accessToken };
 	            _this.http.post('/login', loginParams).subscribe(function (data) {
 	                localStorage.setItem('profile', JSON.stringify(data));
-	                _this.userService.getLoggedInUser(function (data) {
-	                    _this.user = data;
+	                _this.userService.getLoggedInUser(function (err, data) {
+	                    if (err)
+	                        console.log(err);
+	                    else {
+	                        _this.user = data;
+	                    }
 	                });
 	                _this.zone.run(function () { return _this.router.navigate(['/']); });
 	                console.log(data);
@@ -64554,7 +64616,7 @@
 
 
 /***/ },
-/* 463 */
+/* 464 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64630,18 +64692,18 @@
 
 
 /***/ },
-/* 464 */
+/* 465 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__export(__webpack_require__(465));
+	__export(__webpack_require__(466));
 
 
 /***/ },
-/* 465 */
+/* 466 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64770,7 +64832,7 @@
 
 
 /***/ },
-/* 466 */
+/* 467 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64800,7 +64862,7 @@
 
 
 /***/ },
-/* 467 */
+/* 468 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64831,51 +64893,6 @@
 
 
 /***/ },
-/* 468 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
-	var UserService = (function () {
-	    function UserService(http) {
-	        this.http = http;
-	    }
-	    UserService.prototype.getLoggedInUser = function (next) {
-	        if (localStorage['profile']
-	            && localStorage['profile'].length
-	            && JSON.parse(localStorage['profile'])
-	            && JSON.parse(localStorage['profile'])._body) {
-	            this.user = JSON.parse(JSON.parse(localStorage['profile'])._body);
-	            this.http.get('/user/' + this.user._id).map(function (res) { return res.json(); }).subscribe(function (data) {
-	                if (data) {
-	                    next(data);
-	                }
-	                else {
-	                    console.log("No data received");
-	                }
-	            });
-	        }
-	    };
-	    UserService = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [http_1.Http])
-	    ], UserService);
-	    return UserService;
-	}());
-	exports.UserService = UserService;
-
-
-/***/ },
 /* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -64892,7 +64909,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(463);
+	var app_service_1 = __webpack_require__(464);
 	var search_box_component_1 = __webpack_require__(472);
 	var org_details_component_1 = __webpack_require__(473);
 	var org_posts_component_1 = __webpack_require__(474);
@@ -65191,7 +65208,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(463);
+	var app_service_1 = __webpack_require__(464);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65243,7 +65260,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(463);
+	var app_service_1 = __webpack_require__(464);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65293,7 +65310,7 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(470);
-	var app_service_1 = __webpack_require__(463);
+	var app_service_1 = __webpack_require__(464);
 	var SingleOrgComponent = (function () {
 	    function SingleOrgComponent(router, route, orgService, helper, utilities) {
 	        this.router = router;
@@ -65357,7 +65374,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(463);
+	var app_service_1 = __webpack_require__(464);
 	var email_service_1 = __webpack_require__(477);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
