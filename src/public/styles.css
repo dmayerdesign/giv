@@ -52,8 +52,9 @@ a:hover .fa-heart {
 
 .flash-message {
 	display: block;
+	box-sizing: content-box;
 	width: 100%;
-	padding: 0;
+	padding: 7px 0 12px 0;
 	margin: 0;
 	height: 40px;
 	line-height: 40px;
