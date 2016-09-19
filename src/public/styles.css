@@ -48,6 +48,31 @@ a:hover .fa-heart {
 }
 
 
+/* Flash messages */
+
+.flash-message {
+	display: block;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	height: 40px;
+	line-height: 40px;
+	left: 0;
+	bottom: 0;
+	background: #99ccaa;
+	color: #fff;
+}
+
+.flash-message p {
+	display: inline-block;
+	width: 100%;
+	margin: 0;
+	vertical-align: middle;
+	line-height: 1;
+	text-align: center;
+}
+
+
 /* Grid */
 
 .grid-list {

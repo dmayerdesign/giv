@@ -49914,20 +49914,21 @@
 	var http_1 = __webpack_require__(397);
 	var forms_1 = __webpack_require__(419);
 	var ng2_uploader_1 = __webpack_require__(457);
-	var app_component_1 = __webpack_require__(461);
-	var login_component_1 = __webpack_require__(464);
-	var about_component_1 = __webpack_require__(468);
-	var library_component_1 = __webpack_require__(469);
-	var browse_orgs_component_1 = __webpack_require__(470);
-	var org_details_component_1 = __webpack_require__(474);
-	var org_posts_component_1 = __webpack_require__(475);
-	var single_org_component_1 = __webpack_require__(476);
-	var manage_org_page_component_1 = __webpack_require__(477);
-	var search_box_component_1 = __webpack_require__(473);
-	var contact_component_1 = __webpack_require__(478);
-	var user_service_1 = __webpack_require__(462);
-	var search_service_1 = __webpack_require__(472);
-	var ng2_click_outside_1 = __webpack_require__(480);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	var app_component_1 = __webpack_require__(467);
+	var login_component_1 = __webpack_require__(470);
+	var about_component_1 = __webpack_require__(474);
+	var library_component_1 = __webpack_require__(475);
+	var browse_orgs_component_1 = __webpack_require__(476);
+	var org_details_component_1 = __webpack_require__(480);
+	var org_posts_component_1 = __webpack_require__(481);
+	var single_org_component_1 = __webpack_require__(482);
+	var manage_org_page_component_1 = __webpack_require__(483);
+	var search_box_component_1 = __webpack_require__(479);
+	var contact_component_1 = __webpack_require__(484);
+	var user_service_1 = __webpack_require__(468);
+	var search_service_1 = __webpack_require__(478);
+	var ng2_click_outside_1 = __webpack_require__(486);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -49952,7 +49953,8 @@
 	                http_1.HttpModule,
 	                forms_1.FormsModule,
 	                forms_1.ReactiveFormsModule,
-	                ng2_click_outside_1.ClickOutsideModule
+	                ng2_click_outside_1.ClickOutsideModule,
+	                angular2_flash_messages_1.FlashMessagesModule
 	            ],
 	            declarations: [
 	                app_component_1.AppComponent,
@@ -64370,6 +64372,176 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(462));
+
+
+/***/ },
+/* 462 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var module_1 = __webpack_require__(463);
+	exports.FlashMessagesModule = module_1.FlashMessagesModule;
+	var flash_messages_service_1 = __webpack_require__(466);
+	exports.FlashMessagesService = flash_messages_service_1.FlashMessagesService;
+
+
+/***/ },
+/* 463 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var common_1 = __webpack_require__(203);
+	var flash_messages_component_1 = __webpack_require__(464);
+	var flash_messages_service_1 = __webpack_require__(466);
+	var FlashMessagesModule = (function () {
+	    function FlashMessagesModule() {
+	    }
+	    FlashMessagesModule = __decorate([
+	        core_1.NgModule({
+	            imports: [common_1.CommonModule],
+	            declarations: [flash_messages_component_1.FlashMessagesComponent],
+	            exports: [flash_messages_component_1.FlashMessagesComponent],
+	            providers: [flash_messages_service_1.FlashMessagesService]
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], FlashMessagesModule);
+	    return FlashMessagesModule;
+	}());
+	exports.FlashMessagesModule = FlashMessagesModule;
+
+
+/***/ },
+/* 464 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var flash_message_1 = __webpack_require__(465);
+	var flash_messages_service_1 = __webpack_require__(466);
+	var FlashMessagesComponent = (function () {
+	    function FlashMessagesComponent(_flashMessagesService) {
+	        this._flashMessagesService = _flashMessagesService;
+	        this._defaults = {
+	            text: 'default message',
+	            cssClass: ''
+	        };
+	        this.messages = [];
+	        this._grayOut = false;
+	        this._flashMessagesService.show = this.show.bind(this);
+	        this._flashMessagesService.grayOut = this.grayOut.bind(this);
+	    }
+	    FlashMessagesComponent.prototype.ngOnInit = function () {
+	        this._flashMessagesElement = document.getElementById('flashMessages');
+	    };
+	    FlashMessagesComponent.prototype.show = function (text, options) {
+	        var _this = this;
+	        if (options === void 0) { options = {}; }
+	        var defaults = {
+	            timeout: 2500,
+	            cssClass: ''
+	        };
+	        for (var attrname in options) {
+	            defaults[attrname] = options[attrname];
+	        }
+	        var message = new flash_message_1.FlashMessage(text, defaults.cssClass);
+	        this.messages.push(message);
+	        window.setTimeout(function () {
+	            _this._remove(message);
+	        }, defaults.timeout);
+	    };
+	    FlashMessagesComponent.prototype.grayOut = function (value) {
+	        if (value === void 0) { value = false; }
+	        this._grayOut = value;
+	    };
+	    FlashMessagesComponent.prototype._remove = function (message) {
+	        this.messages = this.messages.filter(function (msg) {
+	            return msg.text !== message.text;
+	        });
+	    };
+	    FlashMessagesComponent = __decorate([
+	        core_1.Component({
+	            selector: 'flash-messages',
+	            template: "\n      <div id=\"flashMessages\" class=\"flash-messages {{classes}}\">\n          <div id=\"grayOutDiv\" *ngIf='_grayOut && messages.length'></div>\n          <div class=\"alert flash-message {{message.cssClass}}\" *ngFor='let message of messages'>\n              <p>{{message.text}}</p>\n          </div> \n      </div>\n  "
+	        }), 
+	        __metadata('design:paramtypes', [flash_messages_service_1.FlashMessagesService])
+	    ], FlashMessagesComponent);
+	    return FlashMessagesComponent;
+	}());
+	exports.FlashMessagesComponent = FlashMessagesComponent;
+
+
+/***/ },
+/* 465 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var FlashMessage = (function () {
+	    function FlashMessage(text, cssClass) {
+	        this.text = 'default text';
+	        this.cssClass = '';
+	        this.text = text;
+	        this.cssClass = cssClass;
+	    }
+	    return FlashMessage;
+	}());
+	exports.FlashMessage = FlashMessage;
+
+
+/***/ },
+/* 466 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var FlashMessagesService = (function () {
+	    function FlashMessagesService() {
+	    }
+	    FlashMessagesService = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [])
+	    ], FlashMessagesService);
+	    return FlashMessagesService;
+	}());
+	exports.FlashMessagesService = FlashMessagesService;
+
+
+/***/ },
+/* 467 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
 	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
 	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -64381,7 +64553,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var user_service_1 = __webpack_require__(462);
+	var user_service_1 = __webpack_require__(468);
 	var AppComponent = (function () {
 	    function AppComponent(http, userService, zone) {
 	        var _this = this;
@@ -64425,7 +64597,7 @@
 
 
 /***/ },
-/* 462 */
+/* 468 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64440,7 +64612,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var subject_1 = __webpack_require__(463);
+	var subject_1 = __webpack_require__(469);
 	var UserService = (function () {
 	    function UserService(http) {
 	        this.http = http;
@@ -64492,7 +64664,7 @@
 
 
 /***/ },
-/* 463 */
+/* 469 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64657,7 +64829,7 @@
 
 
 /***/ },
-/* 464 */
+/* 470 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64673,9 +64845,9 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(465);
-	var dist_1 = __webpack_require__(466);
-	var user_service_1 = __webpack_require__(462);
+	var app_service_1 = __webpack_require__(471);
+	var dist_1 = __webpack_require__(472);
+	var user_service_1 = __webpack_require__(468);
 	var LoginComponent = (function () {
 	    function LoginComponent(http, fb, router, userService) {
 	        this.http = http;
@@ -64801,7 +64973,7 @@
 
 
 /***/ },
-/* 465 */
+/* 471 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64877,18 +65049,18 @@
 
 
 /***/ },
-/* 466 */
+/* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	__export(__webpack_require__(467));
+	__export(__webpack_require__(473));
 
 
 /***/ },
-/* 467 */
+/* 473 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65017,7 +65189,7 @@
 
 
 /***/ },
-/* 468 */
+/* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65047,7 +65219,7 @@
 
 
 /***/ },
-/* 469 */
+/* 475 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65078,7 +65250,7 @@
 
 
 /***/ },
-/* 470 */
+/* 476 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65093,11 +65265,11 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(471);
-	var app_service_1 = __webpack_require__(465);
-	var search_box_component_1 = __webpack_require__(473);
-	var org_details_component_1 = __webpack_require__(474);
-	var org_posts_component_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(471);
+	var search_box_component_1 = __webpack_require__(479);
+	var org_details_component_1 = __webpack_require__(480);
+	var org_posts_component_1 = __webpack_require__(481);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, _elementRef) {
 	        this.http = http;
@@ -65233,7 +65405,7 @@
 
 
 /***/ },
-/* 471 */
+/* 477 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65248,7 +65420,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var search_service_1 = __webpack_require__(472);
+	var search_service_1 = __webpack_require__(478);
 	var OrgService = (function () {
 	    function OrgService(http, search) {
 	        this.http = http;
@@ -65273,7 +65445,7 @@
 
 
 /***/ },
-/* 472 */
+/* 478 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65324,7 +65496,7 @@
 
 
 /***/ },
-/* 473 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65380,7 +65552,7 @@
 
 
 /***/ },
-/* 474 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65395,8 +65567,8 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(471);
-	var app_service_1 = __webpack_require__(465);
+	var org_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(471);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65441,7 +65613,7 @@
 
 
 /***/ },
-/* 475 */
+/* 481 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65456,8 +65628,8 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(471);
-	var app_service_1 = __webpack_require__(465);
+	var org_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(471);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65491,7 +65663,7 @@
 
 
 /***/ },
-/* 476 */
+/* 482 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65506,16 +65678,18 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(471);
-	var app_service_1 = __webpack_require__(465);
+	var org_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(471);
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
-	    function SingleOrgComponent(router, route, orgService, helper, utilities, zone) {
+	    function SingleOrgComponent(router, route, orgService, helper, utilities, zone, flash) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
 	        this.zone = zone;
+	        this.flash = flash;
 	        this.isLoaded = false;
 	    }
 	    SingleOrgComponent.prototype.ngOnInit = function () {
@@ -65527,6 +65701,7 @@
 	                _this.isLoaded = true;
 	            }, function (error) { return console.log(error); });
 	        });
+	        this.flash.show("Flash messages work!", { timeout: 2000 });
 	    };
 	    SingleOrgComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
@@ -65537,7 +65712,7 @@
 	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t\t<a href=\"/organization/manage/{{org._id}}\">Manage</a>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
 	    ], SingleOrgComponent);
 	    return SingleOrgComponent;
 	}());
@@ -65545,7 +65720,7 @@
 
 
 /***/ },
-/* 477 */
+/* 483 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65560,8 +65735,8 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(471);
-	var app_service_1 = __webpack_require__(465);
+	var org_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(471);
 	var ManageOrgPageComponent = (function () {
 	    function ManageOrgPageComponent(router, route, orgService, helper, utilities, zone) {
 	        this.router = router;
@@ -65641,7 +65816,7 @@
 
 
 /***/ },
-/* 478 */
+/* 484 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65657,8 +65832,8 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(465);
-	var email_service_1 = __webpack_require__(479);
+	var app_service_1 = __webpack_require__(471);
+	var email_service_1 = __webpack_require__(485);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
 	        this.http = http;
@@ -65704,7 +65879,7 @@
 
 
 /***/ },
-/* 479 */
+/* 485 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -65717,7 +65892,7 @@
 
 
 /***/ },
-/* 480 */
+/* 486 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65731,7 +65906,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(481);
+	var click_outside_directive_1 = __webpack_require__(487);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -65749,7 +65924,7 @@
 
 
 /***/ },
-/* 481 */
+/* 487 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

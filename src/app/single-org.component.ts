@@ -46,7 +46,7 @@ export class SingleOrgComponent implements OnInit {
 			);
 		});
 
-		this.flash.show("Hello!");
+		this.flash.show("Flash messages work!", { timeout: 2000 });
 	}
 
 	ngOnDestroy() {
