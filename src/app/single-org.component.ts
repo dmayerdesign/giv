@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
+import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
 	selector: 'single-org',
@@ -18,7 +19,6 @@ import { UIHelper, Utilities } from './services/app.service';
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
-// __TO_DO__: add an external link option
 
 export class SingleOrgComponent implements OnInit {
 	private org;
@@ -31,7 +31,8 @@ export class SingleOrgComponent implements OnInit {
 				private orgService: OrgService,
 				private helper: UIHelper,
 				private utilities: Utilities,
-				private zone: NgZone) { }
+				private zone: NgZone,
+				private flash: FlashMessagesService) { }
 
 	ngOnInit() {
 		this.sub = this.route.params.subscribe(params => {
@@ -44,6 +45,8 @@ export class SingleOrgComponent implements OnInit {
 				error => console.log(error)
 			);
 		});
+
+		this.flash.show("Hello!");
 	}
 
 	ngOnDestroy() {

@@ -369,12 +369,12 @@ mongoose.connection.on('connected', () => {
       res.sendFile(__dirname + '/public/index.html');
     });
 
-    User.find({}, function(err, users) {
-      console.log(users[0].password);
-      bcrypt.compare('test123', users[0].password, function(err, res) {
-        console.log(res);
-      });
-    });
+    // User.find({}, function(err, users) {
+    //   console.log(users[0].password);
+    //   bcrypt.compare('test123', users[0].password, function(err, res) {
+    //     console.log(res);
+    //   });
+    // });
      
     // var testdata = new User({
     //   name: "admin",

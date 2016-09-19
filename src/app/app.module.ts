@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader';
+import { FlashMessagesModule } from 'angular2-flash-messages';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login.component';
@@ -42,7 +43,8 @@ const routing = RouterModule.forRoot([
       HttpModule,
     	FormsModule,
     	ReactiveFormsModule,
-      ClickOutsideModule
+      ClickOutsideModule,
+      FlashMessagesModule
     ],
     declarations: [
       AppComponent,

@@ -49922,12 +49922,12 @@
 	var org_details_component_1 = __webpack_require__(474);
 	var org_posts_component_1 = __webpack_require__(475);
 	var single_org_component_1 = __webpack_require__(476);
-	var manage_org_page_component_1 = __webpack_require__(741);
+	var manage_org_page_component_1 = __webpack_require__(477);
 	var search_box_component_1 = __webpack_require__(473);
-	var contact_component_1 = __webpack_require__(477);
+	var contact_component_1 = __webpack_require__(478);
 	var user_service_1 = __webpack_require__(462);
 	var search_service_1 = __webpack_require__(472);
-	var ng2_click_outside_1 = __webpack_require__(479);
+	var ng2_click_outside_1 = __webpack_require__(480);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -65403,13 +65403,9 @@
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
-	        this.update = new core_1.EventEmitter();
 	        this.coverImageLinkBroken = false;
 	    }
 	    OrgDetailsComponent.prototype.ngOnInit = function () {
-	    };
-	    OrgDetailsComponent.prototype.sendMessage = function ($event) {
-	        this.update.emit({ body: "hello!", type: "info" });
 	    };
 	    OrgDetailsComponent.prototype.badLink = function ($event) {
 	        this.coverImageLinkBroken = true;
@@ -65417,18 +65413,24 @@
 	    OrgDetailsComponent.prototype.goodLink = function () {
 	        this.coverImageLinkBroken = false;
 	    };
+	    OrgDetailsComponent.prototype.hasCoverImage = function () {
+	        if (this.org.coverImage
+	            && this.org.coverImage.length) {
+	            return true;
+	        }
+	        else if (!this.org.coverImage
+	            || !this.org.coverImage.length) {
+	            return false;
+	        }
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgDetailsComponent.prototype, "org", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], OrgDetailsComponent.prototype, "update", void 0);
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"item-details\">\n\t\t\t\t<img [hidden]=\"coverImageLinkBroken\" [src]=\"org.coverImage\" (error)=\"badLink($event)\" (success)=\"goodLink()\" width=\"260\">\n\t\t\t\t<div [hidden]=\"!coverImageLinkBroken\">Broken link :(</div>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"item-details\">\n\t\t\t\t<img [hidden]=\"!hasCoverImage() || coverImageLinkBroken\" [src]=\"org.coverImage\" (error)=\"badLink($event)\" (success)=\"goodLink()\" width=\"260\">\n\t\t\t\t<div [hidden]=\"!hasCoverImage() || !coverImageLinkBroken\">Broken link :(</div>\n\t\t\t\t<div [hidden]=\"hasCoverImage()\">No image</div>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65557,455 +65559,6 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
-	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(465);
-	var email_service_1 = __webpack_require__(478);
-	var ContactComponent = (function () {
-	    function ContactComponent(http, router) {
-	        this.http = http;
-	        this.router = router;
-	        this.inputs = new email_service_1.EmailModel();
-	        this.infoMsg = new app_service_1.InfoMessage();
-	    }
-	    ContactComponent.prototype.submitForm = function () {
-	        var _this = this;
-	        this.inputs.subject = 'Contact Form | Fuse';
-	        this.inputs.redirectTo = '/';
-	        this.inputs.toName = 'Support';
-	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
-	        console.log(this.inputs);
-	        this.http.post('/contact-form', this.inputs)
-	            .map(function (res) { return res.json(); })
-	            .subscribe(function (data) {
-	            alert('no errors!');
-	            console.log(data);
-	            _this.router.navigate([data.redirectTo + JSON.stringify(data)]);
-	        }, function (err) {
-	            console.log(err);
-	            alert('not sent!');
-	        });
-	    };
-	    ContactComponent.prototype.sendInfoMsg = function (body, type, time) {
-	        var _this = this;
-	        if (time === void 0) { time = 3000; }
-	        this.infoMsg.body = body;
-	        this.infoMsg.type = type;
-	        window.setTimeout(function () { return _this.infoMsg.body = ""; }, time);
-	    };
-	    ContactComponent = __decorate([
-	        core_1.Component({
-	            selector: 'contact',
-	            templateUrl: 'app/contact.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router])
-	    ], ContactComponent);
-	    return ContactComponent;
-	}());
-	exports.ContactComponent = ContactComponent;
-
-
-/***/ },
-/* 478 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var EmailModel = (function () {
-	    function EmailModel() {
-	    }
-	    return EmailModel;
-	}());
-	exports.EmailModel = EmailModel;
-
-
-/***/ },
-/* 479 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(480);
-	exports.ClickOutsideDirective = click_outside_directive_1.default;
-	var ClickOutsideModule = (function () {
-	    function ClickOutsideModule() {
-	    }
-	    ClickOutsideModule = __decorate([
-	        core_1.NgModule({
-	            declarations: [click_outside_directive_1.default],
-	            exports: [click_outside_directive_1.default]
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], ClickOutsideModule);
-	    return ClickOutsideModule;
-	}());
-	exports.ClickOutsideModule = ClickOutsideModule;
-
-
-/***/ },
-/* 480 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var __param = (this && this.__param) || function (paramIndex, decorator) {
-	    return function (target, key) { decorator(target, key, paramIndex); }
-	};
-	var core_1 = __webpack_require__(11);
-	var platform_browser_1 = __webpack_require__(201);
-	var ClickOutsideDirective = (function () {
-	    function ClickOutsideDirective(_document, _el) {
-	        this._document = _document;
-	        this._el = _el;
-	        this.attachOutsideOnClick = false;
-	        this.clickOutside = new core_1.EventEmitter();
-	        this._initOnClickBody = this._initOnClickBody.bind(this);
-	        this._onClickBody = this._onClickBody.bind(this);
-	    }
-	    ClickOutsideDirective.prototype.ngOnInit = function () {
-	        this._init();
-	    };
-	    ClickOutsideDirective.prototype.ngOnDestroy = function () {
-	        if (this.attachOutsideOnClick) {
-	            this._el.nativeElement.removeEventListener('click', this._initOnClickBody);
-	        }
-	        this._document.body.removeEventListener('click', this._onClickBody);
-	    };
-	    ClickOutsideDirective.prototype.ngOnChanges = function (changes) {
-	        if (changes['attachOutsideOnClick'] &&
-	            changes['attachOutsideOnClick'].previousValue !== changes['attachOutsideOnClick'].currentValue) {
-	            this._init();
-	        }
-	    };
-	    ClickOutsideDirective.prototype._init = function () {
-	        if (this.attachOutsideOnClick) {
-	            this._el.nativeElement.addEventListener('click', this._initOnClickBody);
-	        }
-	        else {
-	            this._initOnClickBody();
-	        }
-	    };
-	    ClickOutsideDirective.prototype._initOnClickBody = function () {
-	        this._document.body.addEventListener('click', this._onClickBody);
-	    };
-	    ClickOutsideDirective.prototype._onClickBody = function (e) {
-	        if (!this._el.nativeElement.contains(e.target)) {
-	            this.clickOutside.emit(e);
-	            if (this.attachOutsideOnClick) {
-	                this._document.body.removeEventListener('click', this._onClickBody);
-	            }
-	        }
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Boolean)
-	    ], ClickOutsideDirective.prototype, "attachOutsideOnClick", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', core_1.EventEmitter)
-	    ], ClickOutsideDirective.prototype, "clickOutside", void 0);
-	    ClickOutsideDirective = __decorate([
-	        core_1.Directive({ selector: '[clickOutside]' }),
-	        __param(0, core_1.Inject(platform_browser_1.DOCUMENT)), 
-	        __metadata('design:paramtypes', [HTMLDocument, core_1.ElementRef])
-	    ], ClickOutsideDirective);
-	    return ClickOutsideDirective;
-	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ClickOutsideDirective;
-
-
-/***/ },
-/* 481 */,
-/* 482 */,
-/* 483 */,
-/* 484 */,
-/* 485 */,
-/* 486 */,
-/* 487 */,
-/* 488 */,
-/* 489 */,
-/* 490 */,
-/* 491 */,
-/* 492 */,
-/* 493 */,
-/* 494 */,
-/* 495 */,
-/* 496 */,
-/* 497 */,
-/* 498 */,
-/* 499 */,
-/* 500 */,
-/* 501 */,
-/* 502 */,
-/* 503 */,
-/* 504 */,
-/* 505 */,
-/* 506 */,
-/* 507 */,
-/* 508 */,
-/* 509 */,
-/* 510 */,
-/* 511 */,
-/* 512 */,
-/* 513 */,
-/* 514 */,
-/* 515 */,
-/* 516 */,
-/* 517 */,
-/* 518 */,
-/* 519 */,
-/* 520 */,
-/* 521 */,
-/* 522 */,
-/* 523 */,
-/* 524 */,
-/* 525 */,
-/* 526 */,
-/* 527 */,
-/* 528 */,
-/* 529 */,
-/* 530 */,
-/* 531 */,
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */,
-/* 544 */,
-/* 545 */,
-/* 546 */,
-/* 547 */,
-/* 548 */,
-/* 549 */,
-/* 550 */,
-/* 551 */,
-/* 552 */,
-/* 553 */,
-/* 554 */,
-/* 555 */,
-/* 556 */,
-/* 557 */,
-/* 558 */,
-/* 559 */,
-/* 560 */,
-/* 561 */,
-/* 562 */,
-/* 563 */,
-/* 564 */,
-/* 565 */,
-/* 566 */,
-/* 567 */,
-/* 568 */,
-/* 569 */,
-/* 570 */,
-/* 571 */,
-/* 572 */,
-/* 573 */,
-/* 574 */,
-/* 575 */,
-/* 576 */,
-/* 577 */,
-/* 578 */,
-/* 579 */,
-/* 580 */,
-/* 581 */,
-/* 582 */,
-/* 583 */,
-/* 584 */,
-/* 585 */,
-/* 586 */,
-/* 587 */,
-/* 588 */,
-/* 589 */,
-/* 590 */,
-/* 591 */,
-/* 592 */,
-/* 593 */,
-/* 594 */,
-/* 595 */,
-/* 596 */,
-/* 597 */,
-/* 598 */,
-/* 599 */,
-/* 600 */,
-/* 601 */,
-/* 602 */,
-/* 603 */,
-/* 604 */,
-/* 605 */,
-/* 606 */,
-/* 607 */,
-/* 608 */,
-/* 609 */,
-/* 610 */,
-/* 611 */,
-/* 612 */,
-/* 613 */,
-/* 614 */,
-/* 615 */,
-/* 616 */,
-/* 617 */,
-/* 618 */,
-/* 619 */,
-/* 620 */,
-/* 621 */,
-/* 622 */,
-/* 623 */,
-/* 624 */,
-/* 625 */,
-/* 626 */,
-/* 627 */,
-/* 628 */,
-/* 629 */,
-/* 630 */,
-/* 631 */,
-/* 632 */,
-/* 633 */,
-/* 634 */,
-/* 635 */,
-/* 636 */,
-/* 637 */,
-/* 638 */,
-/* 639 */,
-/* 640 */,
-/* 641 */,
-/* 642 */,
-/* 643 */,
-/* 644 */,
-/* 645 */,
-/* 646 */,
-/* 647 */,
-/* 648 */,
-/* 649 */,
-/* 650 */,
-/* 651 */,
-/* 652 */,
-/* 653 */,
-/* 654 */,
-/* 655 */,
-/* 656 */,
-/* 657 */,
-/* 658 */,
-/* 659 */,
-/* 660 */,
-/* 661 */,
-/* 662 */,
-/* 663 */,
-/* 664 */,
-/* 665 */,
-/* 666 */,
-/* 667 */,
-/* 668 */,
-/* 669 */,
-/* 670 */,
-/* 671 */,
-/* 672 */,
-/* 673 */,
-/* 674 */,
-/* 675 */,
-/* 676 */,
-/* 677 */,
-/* 678 */,
-/* 679 */,
-/* 680 */,
-/* 681 */,
-/* 682 */,
-/* 683 */,
-/* 684 */,
-/* 685 */,
-/* 686 */,
-/* 687 */,
-/* 688 */,
-/* 689 */,
-/* 690 */,
-/* 691 */,
-/* 692 */,
-/* 693 */,
-/* 694 */,
-/* 695 */,
-/* 696 */,
-/* 697 */,
-/* 698 */,
-/* 699 */,
-/* 700 */,
-/* 701 */,
-/* 702 */,
-/* 703 */,
-/* 704 */,
-/* 705 */,
-/* 706 */,
-/* 707 */,
-/* 708 */,
-/* 709 */,
-/* 710 */,
-/* 711 */,
-/* 712 */,
-/* 713 */,
-/* 714 */,
-/* 715 */,
-/* 716 */,
-/* 717 */,
-/* 718 */,
-/* 719 */,
-/* 720 */,
-/* 721 */,
-/* 722 */,
-/* 723 */,
-/* 724 */,
-/* 725 */,
-/* 726 */,
-/* 727 */,
-/* 728 */,
-/* 729 */,
-/* 730 */,
-/* 731 */,
-/* 732 */,
-/* 733 */,
-/* 734 */,
-/* 735 */,
-/* 736 */,
-/* 737 */,
-/* 738 */,
-/* 739 */,
-/* 740 */,
-/* 741 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(471);
 	var app_service_1 = __webpack_require__(465);
@@ -66085,6 +65638,195 @@
 	    return ManageOrgPageComponent;
 	}());
 	exports.ManageOrgPageComponent = ManageOrgPageComponent;
+
+
+/***/ },
+/* 478 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
+	var router_1 = __webpack_require__(336);
+	var app_service_1 = __webpack_require__(465);
+	var email_service_1 = __webpack_require__(479);
+	var ContactComponent = (function () {
+	    function ContactComponent(http, router) {
+	        this.http = http;
+	        this.router = router;
+	        this.inputs = new email_service_1.EmailModel();
+	        this.infoMsg = new app_service_1.InfoMessage();
+	    }
+	    ContactComponent.prototype.submitForm = function () {
+	        var _this = this;
+	        this.inputs.subject = 'Contact Form | Fuse';
+	        this.inputs.redirectTo = '/';
+	        this.inputs.toName = 'Support';
+	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
+	        console.log(this.inputs);
+	        this.http.post('/contact-form', this.inputs)
+	            .map(function (res) { return res.json(); })
+	            .subscribe(function (data) {
+	            alert('no errors!');
+	            console.log(data);
+	            _this.router.navigate([data.redirectTo + JSON.stringify(data)]);
+	        }, function (err) {
+	            console.log(err);
+	            alert('not sent!');
+	        });
+	    };
+	    ContactComponent.prototype.sendInfoMsg = function (body, type, time) {
+	        var _this = this;
+	        if (time === void 0) { time = 3000; }
+	        this.infoMsg.body = body;
+	        this.infoMsg.type = type;
+	        window.setTimeout(function () { return _this.infoMsg.body = ""; }, time);
+	    };
+	    ContactComponent = __decorate([
+	        core_1.Component({
+	            selector: 'contact',
+	            templateUrl: 'app/contact.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router])
+	    ], ContactComponent);
+	    return ContactComponent;
+	}());
+	exports.ContactComponent = ContactComponent;
+
+
+/***/ },
+/* 479 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var EmailModel = (function () {
+	    function EmailModel() {
+	    }
+	    return EmailModel;
+	}());
+	exports.EmailModel = EmailModel;
+
+
+/***/ },
+/* 480 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var click_outside_directive_1 = __webpack_require__(481);
+	exports.ClickOutsideDirective = click_outside_directive_1.default;
+	var ClickOutsideModule = (function () {
+	    function ClickOutsideModule() {
+	    }
+	    ClickOutsideModule = __decorate([
+	        core_1.NgModule({
+	            declarations: [click_outside_directive_1.default],
+	            exports: [click_outside_directive_1.default]
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ClickOutsideModule);
+	    return ClickOutsideModule;
+	}());
+	exports.ClickOutsideModule = ClickOutsideModule;
+
+
+/***/ },
+/* 481 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var __param = (this && this.__param) || function (paramIndex, decorator) {
+	    return function (target, key) { decorator(target, key, paramIndex); }
+	};
+	var core_1 = __webpack_require__(11);
+	var platform_browser_1 = __webpack_require__(201);
+	var ClickOutsideDirective = (function () {
+	    function ClickOutsideDirective(_document, _el) {
+	        this._document = _document;
+	        this._el = _el;
+	        this.attachOutsideOnClick = false;
+	        this.clickOutside = new core_1.EventEmitter();
+	        this._initOnClickBody = this._initOnClickBody.bind(this);
+	        this._onClickBody = this._onClickBody.bind(this);
+	    }
+	    ClickOutsideDirective.prototype.ngOnInit = function () {
+	        this._init();
+	    };
+	    ClickOutsideDirective.prototype.ngOnDestroy = function () {
+	        if (this.attachOutsideOnClick) {
+	            this._el.nativeElement.removeEventListener('click', this._initOnClickBody);
+	        }
+	        this._document.body.removeEventListener('click', this._onClickBody);
+	    };
+	    ClickOutsideDirective.prototype.ngOnChanges = function (changes) {
+	        if (changes['attachOutsideOnClick'] &&
+	            changes['attachOutsideOnClick'].previousValue !== changes['attachOutsideOnClick'].currentValue) {
+	            this._init();
+	        }
+	    };
+	    ClickOutsideDirective.prototype._init = function () {
+	        if (this.attachOutsideOnClick) {
+	            this._el.nativeElement.addEventListener('click', this._initOnClickBody);
+	        }
+	        else {
+	            this._initOnClickBody();
+	        }
+	    };
+	    ClickOutsideDirective.prototype._initOnClickBody = function () {
+	        this._document.body.addEventListener('click', this._onClickBody);
+	    };
+	    ClickOutsideDirective.prototype._onClickBody = function (e) {
+	        if (!this._el.nativeElement.contains(e.target)) {
+	            this.clickOutside.emit(e);
+	            if (this.attachOutsideOnClick) {
+	                this._document.body.removeEventListener('click', this._onClickBody);
+	            }
+	        }
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Boolean)
+	    ], ClickOutsideDirective.prototype, "attachOutsideOnClick", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', core_1.EventEmitter)
+	    ], ClickOutsideDirective.prototype, "clickOutside", void 0);
+	    ClickOutsideDirective = __decorate([
+	        core_1.Directive({ selector: '[clickOutside]' }),
+	        __param(0, core_1.Inject(platform_browser_1.DOCUMENT)), 
+	        __metadata('design:paramtypes', [HTMLDocument, core_1.ElementRef])
+	    ], ClickOutsideDirective);
+	    return ClickOutsideDirective;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ClickOutsideDirective;
 
 
 /***/ }
