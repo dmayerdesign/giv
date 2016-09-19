@@ -1,0 +1,55 @@
+<div class="col-md-8 col-md-offset-2" *ngIf="isLoading">
+	<h5>Loading...</h5>
+	<div class="text-xs-center">
+		<i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
+	</div>
+</div>
+
+<search-box
+	class="search-box-container col-md-8 col-md-offset-2 clearfix"
+	*ngIf="!isLoading"
+	(update)="searchOrgs($event)"
+	(focusChange)="toggleSearchBoxFocus($event)"
+	[ngClass]="{focused: searchBoxIsFocused}"
+	[collection]="'organizations'"></search-box>
+
+<div class="browse container-fluid" *ngIf="!isLoading">
+	<h5 class="col-md-12">Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span></h5>
+
+	<div class="nothing-to-show col-md-8 col-md-offset-2" *ngIf="orgs.length === 0">
+			No orgs to show. Try broadening your search.
+	</div>
+
+	<div class="items-list orgs-list col-md-12"
+			*ngIf="!isEditing">
+
+		<div class="single-item row"
+				#singleItem
+				*ngFor="let org of orgs"
+				(click)="viewOrg(org._id)"
+				(clickOutside)="deselectOrg($event, org._id)">
+			<h5>{{org.name}}</h5>
+			<p>{{org.stars}}</p>
+
+			<div class="org-expanded" *ngIf="viewingOrg && org._id === selectedOrg._id">
+				<org-details (update)="sendInfoMsg($event.body, $event.type)" [org]="selectedOrg"></org-details>
+				<a href="/organization/{{org._id}}">View Org</a>
+				<org-posts [org]="selectedOrg"></org-posts>
+			</div>
+		</div>
+		
+		<button class="row btn btn-default" (click)="showMore(10, orgs.length)">Show more</button>
+	</div>
+
+	<div *ngIf="loadingOrgs" class="loading-orgs text-xs-center">
+		<i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
+	</div>
+
+	<div [hidden]="!infoMsg.body" class="alert alert-{{infoMsg.type}} alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<strong>Message:</strong> {{infoMsg.body}}
+	</div>
+</div>
+

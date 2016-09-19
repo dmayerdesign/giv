@@ -1,0 +1,8 @@
+.loading-orgs {
+	position: absolute;
+	z-index: 999;
+	top: 60px;
+	left: 50%;
+	width: 60px;
+	margin-left: -30px;
+}

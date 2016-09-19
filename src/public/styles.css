@@ -1,0 +1,59 @@
+@import 'https://fonts.googleapis.com/css?family=Roboto:400,700|Muli:300,400';
+
+body {
+	font-family: 'Roboto', Helvetica, Arial, sans-serif;
+	margin-top: 15px;
+}
+
+h1, h2, h3, h4, h5, input, th {
+	font-family: 'Muli', Helvetica, Arial, sans-serif;
+}
+
+select {
+	margin-bottom: 0.6em;
+	min-width: 10rem;
+}
+
+a:hover .fa-heart {
+	color: #cc0000;
+}
+
+.alert {
+	z-index: 999;
+	position: fixed;
+	bottom: 15px;
+	left: 25%;
+	width: 50%;
+	opacity: 0.9;
+}
+
+
+/* Search */
+
+.search-box-container {
+	display: block;
+	perspective: 200px;
+}
+
+.search-box-container.focused .search-box {
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+	transform: translateZ(6px);
+}
+
+.search-box input {
+	padding: 0 0 0 0.4em;
+
+	font-size: 1.25rem;
+	font-weight: 300;
+}
+
+
+/* Grid */
+
+.grid-list {
+
+}
+
+.grid-list-item {
+	
+}
