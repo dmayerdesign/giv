@@ -66,7 +66,7 @@ const search = require('./services/search');
  */
 const User = require('./models/User');
 const Org = require('./models/Org');
-const Post = require('./models/Post')
+const Post = require('./models/Post');
 
 /**
  * API keys and Passport configuration.
@@ -281,7 +281,10 @@ mongoose.connection.on('connected', () => {
     app.get('/orgs/get', function(req, res) {
       var dbQuery = {};
       if (req.query.search) {
-          dbQuery = search(req.query.search, req.query.field);
+        dbQuery = search(req.query.search, req.query.field);
+      }
+      if (req.query.filterField) {
+        dbQuery[req.query.filterField] = req.query.filterValue;
       }
       Org.find(dbQuery, (err, docs) => {
         if(err) return console.error(err);
@@ -357,14 +360,18 @@ mongoose.connection.on('connected', () => {
       });
     });
 
-    // get posts by an org
+    // get posts by org and search
     app.get('/posts/get', function(req, res) {
       var dbQuery = {};
       if (req.query.search) {
         dbQuery = search(req.query.search, req.query.field);
       }
-      dbQuery.org = req.query.org;
-      if (dbQuery.org) {
+      if (req.query.filterField) {
+        dbQuery[req.query.filterField] = req.query.filterValue;
+      }
+      if (req.query.org) {
+        dbQuery.org = req.query.org;
+
         Post.find(dbQuery, (err, docs) => {
           if(err) return console.error(err);
           res.json(docs);
@@ -432,16 +439,22 @@ mongoose.connection.on('connected', () => {
       });
     });
 
-    app.post('/edit-org/coverImage/:orgId', function(req, res, next) {
-      Org.findOne({_id: req.params.orgId}, function(err, obj) {
+    app.post('/edit-org/coverImage/:orgId', function(req, res) {
+      console.log(req.body);
+      Org.findOneAndUpdate({_id: req.params.orgId}, {$set:{coverImage:req.body.value}}, {new: true}, function(err, org) {
         if(err) return console.error(err);
-        obj.coverImage = req.body.value;
-        obj.save(function(err, org) {
-          if(err) return console.error(err);
-          res.json(org);
-        }); 
+        console.log(org);
+        res.json(org);
       });
     });
+
+    //app.post('/generate-posts', function(req, res, next) {
+      // for (let i = 0; i < 10; i++) {
+      //   var lorem = i + "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
+      //   var post = new Post({content: lorem, org: "57d338246009ad5516447199"});
+      //   post.save();
+      // }
+   // });
 
 
     /**

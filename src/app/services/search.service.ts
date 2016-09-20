@@ -5,7 +5,7 @@ import { Http, URLSearchParams } from '@angular/http';
 export class SearchService {
   constructor (private http:Http) { }
 
-  loadSearchableData(uri:string, options) { //text?:string, limit?:number, offset?:number) {
+  loadSearchableData(uri:string, options) { //search?:string, field?:string, org?:string, limit?:number, offset?:number) {
     let params: URLSearchParams = new URLSearchParams();
 
     if (this.stringIsSet(options.search)) {
@@ -25,10 +25,10 @@ export class SearchService {
     }).map(res => res.json());
   }
 
-  stringIsSet(option) {
-    return typeof option === "string" && option.length;
+  stringIsSet(option):boolean {
+    return typeof option === "string" && option.length > 0;
   }
-  numberIsSet(option) {
+  numberIsSet(option):boolean {
     return typeof option === "number" && option > 0;
   }
 }

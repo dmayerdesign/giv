@@ -92,6 +92,7 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   editCoverImage(path:string):void {
+  	console.log(path);
   	this.loadingCoverImage = true;
   	this.orgService.editOrg({
   		id: this.org._id,

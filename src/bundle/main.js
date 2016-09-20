@@ -65497,7 +65497,7 @@
 	        }).map(function (res) { return res.json(); });
 	    };
 	    SearchService.prototype.stringIsSet = function (option) {
-	        return typeof option === "string" && option.length;
+	        return typeof option === "string" && option.length > 0;
 	    };
 	    SearchService.prototype.numberIsSet = function (option) {
 	        return typeof option === "number" && option > 0;
@@ -65873,6 +65873,7 @@
 	    };
 	    ManageOrgPageComponent.prototype.editCoverImage = function (path) {
 	        var _this = this;
+	        console.log(path);
 	        this.loadingCoverImage = true;
 	        this.orgService.editOrg({
 	            id: this.org._id,
