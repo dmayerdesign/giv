@@ -8,28 +8,27 @@ export class SearchService {
   loadSearchableData(uri:string, options) { //text?:string, limit?:number, offset?:number) {
     let params: URLSearchParams = new URLSearchParams();
 
-    if (typeof options.org === "string" && options.org.length) {
-      params.set("org", options.org);
-    }
-
-    if (typeof options.search === "string" && options.search.length) {
+    if (this.stringIsSet(options.search)) {
       params.set("search", options.search);
       localStorage.setItem("searching", "true");
     } else {
       localStorage.setItem("searching", "false");
     }
-    if (typeof options.field === "string" && options.field.length) {
-      params.set("field", options.field);
-    }
-    if (typeof options.limit === "number" && options.limit > 0) {
-      params.set("limit", typeof options.limit === "number" && options.limit.toString());
-    }
-    if (typeof options.offset === "number" && options.offset > 0) {
-      params.set("offset", (options.offset.toString()));
-    }
+
+    if (this.stringIsSet(options.org)) params.set("org", options.org);
+    if (this.stringIsSet(options.field)) params.set("field", options.field);
+    if (this.numberIsSet(options.limit)) params.set("limit", options.limit.toString());
+    if (this.numberIsSet(options.offset)) params.set("offset", options.offset.toString());
 
     return this.http.get(uri, {
       search: params,
     }).map(res => res.json());
+  }
+
+  stringIsSet(option) {
+    return typeof option === "string" && option.length;
+  }
+  numberIsSet(option) {
+    return typeof option === "number" && option > 0;
   }
 }

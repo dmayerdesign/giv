@@ -99,7 +99,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	searchOrgs(search:string) {
 		this.loadingOrgs = true;
-		this.orgService.loadOrgs({search:search, limit:10})
+		this.orgService.loadOrgs({search:search, field:"name", limit:10})
 			.subscribe(
 				results => {
 					this.orgs = results;

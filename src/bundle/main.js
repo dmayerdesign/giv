@@ -65341,7 +65341,7 @@
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
 	        this.loadingOrgs = true;
-	        this.orgService.loadOrgs({ search: search, limit: 10 })
+	        this.orgService.loadOrgs({ search: search, field: "name", limit: 10 })
 	            .subscribe(function (results) {
 	            _this.orgs = results;
 	            _this.loadingOrgs = false;
@@ -65477,28 +65477,30 @@
 	    }
 	    SearchService.prototype.loadSearchableData = function (uri, options) {
 	        var params = new http_1.URLSearchParams();
-	        if (typeof options.org === "string" && options.org.length) {
-	            params.set("org", options.org);
-	        }
-	        if (typeof options.search === "string" && options.search.length) {
+	        if (this.stringIsSet(options.search)) {
 	            params.set("search", options.search);
 	            localStorage.setItem("searching", "true");
 	        }
 	        else {
 	            localStorage.setItem("searching", "false");
 	        }
-	        if (typeof options.field === "string" && options.field.length) {
+	        if (this.stringIsSet(options.org))
+	            params.set("org", options.org);
+	        if (this.stringIsSet(options.field))
 	            params.set("field", options.field);
-	        }
-	        if (typeof options.limit === "number" && options.limit > 0) {
-	            params.set("limit", typeof options.limit === "number" && options.limit.toString());
-	        }
-	        if (typeof options.offset === "number" && options.offset > 0) {
-	            params.set("offset", (options.offset.toString()));
-	        }
+	        if (this.numberIsSet(options.limit))
+	            params.set("limit", options.limit.toString());
+	        if (this.numberIsSet(options.offset))
+	            params.set("offset", options.offset.toString());
 	        return this.http.get(uri, {
 	            search: params,
 	        }).map(function (res) { return res.json(); });
+	    };
+	    SearchService.prototype.stringIsSet = function (option) {
+	        return typeof option === "string" && option.length;
+	    };
+	    SearchService.prototype.numberIsSet = function (option) {
+	        return typeof option === "number" && option > 0;
 	    };
 	    SearchService = __decorate([
 	        core_1.Injectable(), 
@@ -65670,13 +65672,13 @@
 	            _this.isLoading = false;
 	            _this.posts = data;
 	            _this.takeCount(_this.posts);
+	            _this.route.queryParams.subscribe(function (params) {
+	                if (params['viewpost']) {
+	                    _this.selectPost(params['viewpost']);
+	                    _this.isPermalink = true;
+	                }
+	            });
 	        }, function (error) { return console.log(error); });
-	        this.route.queryParams.subscribe(function (params) {
-	            if (params['viewpost']) {
-	                _this.selectPost(params['viewpost']);
-	                _this.isPermalink = true;
-	            }
-	        });
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        this.viewingOne = true;

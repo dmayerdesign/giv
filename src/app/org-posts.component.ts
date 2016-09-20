@@ -71,17 +71,16 @@ export class OrgPostsComponent implements OnInit {
 				this.isLoading = false;
 				this.posts = data;
 				this.takeCount(this.posts);
+
+				this.route.queryParams.subscribe(params => {
+					if (params['viewpost']) {
+						this.selectPost(params['viewpost']);
+						this.isPermalink = true;
+					}
+				});
 			},
 			error => console.log(error)
 		);
-
-		this.route.queryParams.subscribe(params => {
-			if (params['viewpost']) {
-				this.selectPost(params['viewpost']);
-				this.isPermalink = true;
-			}
-		});
-
 	}
 
 	selectPost(id:any) {
