@@ -263,12 +263,12 @@ mongoose.connection.on('connected', () => {
     for (let i = 0; i < orgController.requests.length; i++) {
       let request = orgController.requests[i];
       if (request.middleware) {
-        if (request.middleware.length === 1) app[request.type](request.uri, request.middleware[0], request.process);
-        if (request.middleware.length === 2) app[request.type](request.uri, request.middleware[0], request.middleware[1], request.process);
-        if (request.middleware.length > 2) app[request.type](request.uri, request.middleware[0], request.middleware[1], request.middleware[2], request.process);
+        if (request.middleware.length === 1) app[request.method](request.uri, request.middleware[0], request.process);
+        if (request.middleware.length === 2) app[request.method](request.uri, request.middleware[0], request.middleware[1], request.process);
+        if (request.middleware.length > 2) app[request.method](request.uri, request.middleware[0], request.middleware[1], request.middleware[2], request.process);
       }
       else {
-        app[request.type](request.uri, request.process);
+        app[request.method](request.uri, request.process);
       }
     }
 
@@ -356,11 +356,29 @@ mongoose.connection.on('connected', () => {
     app.get('/user/:id', userController.getUser);
 
 
-
     // all other routes are handled by Angular
     app.get('/*', function(req, res) {
       res.sendFile(__dirname + '/public/index.html');
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    orgController.sample();
 
     // User.find({}, function(err, users) {
     //   console.log(users[0].password);
@@ -368,7 +386,12 @@ mongoose.connection.on('connected', () => {
     //     console.log(res);
     //   });
     // });
-     
+
+    User.find({}, function(err, users) {
+      users[0].orgs = ["57e1c6843f2c42147844771b", "57e1c74175032f160902f42f"];
+      users[0].save();
+    });
+
     // var testdata = new User({
     //   name: "admin",
     //   password: "test123"

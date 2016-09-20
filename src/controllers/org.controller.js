@@ -10,6 +10,8 @@ const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 
+const search = require('../services/search');
+
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
@@ -37,9 +39,27 @@ const upload = multer({
 
 const Org = require('../models/Org');
 
+exports.sample = function() {
+  let newOrg = new Org({"name": makeid(), "slug": makeid(), "email": makeid()});
+  newOrg.save(function(err, obj) {
+    if(err) return console.log(err);
+    console.log(obj);
+  });
+
+  function makeid()
+  {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
+
+      for( var i=0; i < 10; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+      return text;
+  }
+};
 
 exports.requests = [
-  { type: "get",
+  { method: "get",
     uri: "/orgs/get",
     process: function(req, res) {
       var dbQuery = {};
@@ -60,7 +80,7 @@ exports.requests = [
   },
 
   // count all
-  { type: "get",
+  { method: "get",
     uri: '/orgs/count',
     process: function(req, res) {
       Org.count(function(err, count) {
@@ -71,19 +91,20 @@ exports.requests = [
   },
 
   // create
-  { type: "post",
+  { method: "post",
     uri: '/org',
     process: function(req, res) {
       var obj = new Org(req.body);
       obj.save(function(err, obj) {
         if(err) return console.error(err);
+        console.log(obj);
         res.status(200).json(obj);
       });
     }
   },
 
   {
-    type: "get",
+    method: "get",
     uri: "/org/:id",
     process: function(req, res) {
       Org.findOne({_id: req.params.id}, function (err, obj) {
@@ -94,7 +115,7 @@ exports.requests = [
   },
 
   {
-    type: "put",
+    method: "put",
     uri: "/org/:id",
     process: function(req, res) {
       Org.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
@@ -105,7 +126,7 @@ exports.requests = [
   },
 
   {
-    type: "delete",
+    method: "delete",
     uri: "/org/:id",
     process: function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
@@ -116,7 +137,7 @@ exports.requests = [
   },
 
   {
-    type: "get",
+    method: "get",
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOne({slug: req.params.slug}, function (err, obj) {
@@ -127,7 +148,7 @@ exports.requests = [
   },
 
   {
-    type: "put",
+    method: "put",
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
@@ -138,7 +159,7 @@ exports.requests = [
   },
 
   {
-    type: "delete",
+    method: "delete",
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOneAndRemove({slug: req.params.slug}, function(err) {
@@ -150,7 +171,7 @@ exports.requests = [
 
   // file uploads with multer-s3
   {
-    type: "post",
+    method: "post",
     uri: "edit-org/upload/cover-image/:orgId",
     middleware: [upload.any],
     process: function(req, res, next) {
@@ -167,10 +188,14 @@ exports.requests = [
   }
 ];
 
+
+
+
 // edit org
 let editableInOrg = [
   "coverImage",
-  "donateLink"
+  "donateLink",
+  "slug"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.requests.push(editOrg(editableInOrg[i]));
@@ -178,15 +203,18 @@ for (let i = 0; i < editableInOrg.length; i++) {
 // helper function to edit org
 function editOrg(key) {
   return {
-    type: "put",
+    method: "put",
     uri: '/edit-org/'+key+'/:orgId',
     process: function(req, res) {
       let updateQuery = {$set:{}};
       updateQuery.$set[key] = req.body.value;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
-        if(err) return console.error(err);
+        if(err) {
+          res.json(err);
+          console.log(err);
+        }
         console.log(org);
-        res.json(org);
+        res.status(200).json(org);
       });
     }
   }

@@ -83,3 +83,13 @@ a:hover .fa-heart {
 .grid-list-item {
 	
 }
+
+
+/* Org Page */
+.single-org .item-details, .single-org .posts-by-org {
+	/*height: 800px;*/
+}
+
+.single-org #posts {
+	padding-top: 40px; /* For anchor links */
+}

@@ -65421,10 +65421,12 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var search_service_1 = __webpack_require__(478);
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var OrgService = (function () {
-	    function OrgService(http, search) {
+	    function OrgService(http, search, flash) {
 	        this.http = http;
 	        this.search = search;
+	        this.flash = flash;
 	    }
 	    OrgService.prototype.loadOrgs = function (options) {
 	        return this.search.loadSearchableData("/orgs/get", options);
@@ -65448,7 +65450,7 @@
 	    };
 	    OrgService = __decorate([
 	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [http_1.Http, search_service_1.SearchService])
+	        __metadata('design:paramtypes', [http_1.Http, search_service_1.SearchService, angular2_flash_messages_1.FlashMessagesService])
 	    ], OrgService);
 	    return OrgService;
 	}());
@@ -65660,7 +65662,6 @@
 	        this.posts = [];
 	        this.selectedPost = null;
 	        this.viewingOne = false;
-	        this.isPermalink = false;
 	        this.searchBoxIsFocused = false;
 	        this.isLoading = true;
 	        this.loadingPosts = false;
@@ -65675,7 +65676,8 @@
 	            _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
 	                    _this.selectPost(params['viewpost']);
-	                    _this.isPermalink = true;
+	                    //this.isPermalink = true;
+	                    window.location.href += "#posts";
 	                }
 	            });
 	        }, function (error) { return console.log(error); });
@@ -65734,7 +65736,7 @@
 	    OrgPostsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-posts',
-	            template: "\n\t\t\t<div class=\"posts-by-org\">\n\t\t\t\t<h4>What they're up to</h4>\n\t\t\t\t<search-box\n\t\t\t\t\tclass=\"search-box-container col-md-8 col-md-offset-2 clearfix\"\n\t\t\t\t\t*ngIf=\"!isBrowsing && !isLoading\"\n\t\t\t\t\t(update)=\"searchPosts($event)\"\n\t\t\t\t\t(focusChange)=\"toggleSearchBoxFocus($event)\"\n\t\t\t\t\t[ngClass]=\"{focused: searchBoxIsFocused}\"\n\t\t\t\t\t[collection]=\"'posts by' + org.name\"></search-box>\n\t\t\t\t\n\t\t\t\t<div *ngIf=\"!viewingOne && !isLoading\" class=\"posts\">\n\t\t\t\t\t<div #singlePost *ngFor=\"let post of posts\">\n\t\t\t\t\t\t<h5 *ngIf=\"isBrowsing\"><a href=\"/organization/i/{{org._id}}?viewpost={{post._id}}\">{{post.content}}</a></h5>\n\t\t\t\t\t\t<h5 *ngIf=\"!isBrowsing\" (click)=\"selectPost(post._id)\">{{post.content}}</h5>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"viewingOne && selectedPost\">\n\t\t\t\t\t<a *ngIf=\"isPermalink\" href=\"/organization/i/{{org._id}}\">Back to posts</a>\n\t\t\t\t\t<a *ngIf=\"!isPermalink\" (click)=\"deselectPost()\">Back to posts</a>\n\t\t\t\t\t<h5>{{selectedPost.content}}</h5>\n\t\t\t\t</div>\n\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"posts-by-org\" id=\"posts\">\n\t\t\t\t<h4>What they're up to</h4>\n\t\t\t\t<search-box\n\t\t\t\t\tclass=\"search-box-container col-md-8 col-md-offset-2 clearfix\"\n\t\t\t\t\t*ngIf=\"!isBrowsing && !isLoading\"\n\t\t\t\t\t(update)=\"searchPosts($event)\"\n\t\t\t\t\t(focusChange)=\"toggleSearchBoxFocus($event)\"\n\t\t\t\t\t[ngClass]=\"{focused: searchBoxIsFocused}\"\n\t\t\t\t\t[collection]=\"'posts by' + org.name\"></search-box>\n\t\t\t\t\n\t\t\t\t<div *ngIf=\"!viewingOne && !isLoading\" class=\"posts\">\n\t\t\t\t\t<div #singlePost *ngFor=\"let post of posts\">\n\t\t\t\t\t\t<h5 *ngIf=\"isBrowsing\"><a [routerLink]=\"['/organization/i', org._id]\" [queryParams]=\"{viewpost: post._id}\">{{post.content}}</a></h5>\n\t\t\t\t\t\t<h5 *ngIf=\"!isBrowsing\" (click)=\"selectPost(post._id)\">{{post.content}}</h5>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"viewingOne && selectedPost\">\n\t\t\t\t\t<a (click)=\"deselectPost()\" [routerLink]=\"['/organization/i', org._id]\">Back to posts</a>\n\t\t\t\t\t<h5>{{selectedPost.content}}</h5>\n\t\t\t\t</div>\n\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65761,13 +65763,15 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(477);
+	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(471);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
-	    function SingleOrgComponent(router, route, orgService, helper, utilities, zone, flash) {
+	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
+	        this.userService = userService;
 	        this.helper = helper;
 	        this.utilities = utilities;
 	        this.zone = zone;
@@ -65784,6 +65788,11 @@
 	                _this.isLoaded = true;
 	            }, function (error) { return console.log(error); });
 	        });
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	        });
 	        this.flash.show("Flash messages work!", { timeout: 2000 });
 	    };
 	    SingleOrgComponent.prototype.ngOnDestroy = function () {
@@ -65792,11 +65801,11 @@
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a href=\"/organization/manage/{{org._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.orgs.indexOf(org._id) > -1\" href=\"/organization/manage/{{org._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
 	    ], SingleOrgComponent);
 	    return SingleOrgComponent;
 	}());
@@ -65820,40 +65829,56 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(477);
+	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(471);
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, helper, utilities, zone) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
+	        this.userService = userService;
 	        this.helper = helper;
 	        this.utilities = utilities;
 	        this.zone = zone;
+	        this.flash = flash;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
-	        this.loadingCoverImage = false;
 	        this.progress = 0;
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        if (this.route.params) {
-	            this.sub = this.route.params.subscribe(function (params) {
-	                var id = params['id'];
-	                console.log(id);
-	                _this.orgService.loadOrg(id).subscribe(function (data) {
-	                    console.log(data);
-	                    _this.org = data;
-	                    _this.isLoaded = true;
-	                    // for ng-upload
-	                    _this.uploadOptions = {
-	                        url: '/edit-org/upload/cover-image/' + _this.org._id,
-	                        filterExtensions: true,
-	                        calculateSpeed: true,
-	                        allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	                    };
-	                }, function (error) { return console.log(error); });
-	            });
-	        }
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            if (_this.route.params) {
+	                _this.sub = _this.route.params.subscribe(function (params) {
+	                    var id = params['id'];
+	                    console.log(id);
+	                    if (user.orgs.indexOf(id) > -1) {
+	                        _this.orgService.loadOrg(id).subscribe(function (data) {
+	                            console.log(data);
+	                            _this.org = data;
+	                            _this.isLoaded = true;
+	                            // for ng-upload
+	                            _this.uploadOptions = {
+	                                url: '/edit-org/upload/cover-image/' + _this.org._id,
+	                                filterExtensions: true,
+	                                calculateSpeed: true,
+	                                allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                            };
+	                        }, function (error) { return console.log(error); });
+	                    }
+	                    else {
+	                        _this.flash.show("You don't have permission to manage this page", { timeout: 2000 });
+	                        _this.router.navigate(['/']);
+	                    }
+	                });
+	            }
+	            else {
+	                _this.router.navigate(['/']);
+	            }
+	        });
 	    };
 	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
@@ -65871,18 +65896,33 @@
 	            }
 	        });
 	    };
-	    ManageOrgPageComponent.prototype.editCoverImage = function (path) {
+	    ManageOrgPageComponent.prototype.editOrg = function (key, value) {
 	        var _this = this;
-	        console.log(path);
-	        this.loadingCoverImage = true;
+	        if (key === "slug") {
+	            var slugMatch = value.match(/[^a-zA-Z0-9\-]/);
+	            if (slugMatch) {
+	                return this.flash.show("Your slug can only have lowercase letters and hyphens");
+	            }
+	            else {
+	                value.toLowerCase();
+	            }
+	        }
+	        this['loading_' + key] = true;
 	        this.orgService.editOrg({
 	            id: this.org._id,
-	            key: "coverImage",
-	            value: path
-	        }).subscribe(function (org) {
-	            _this.org = org;
-	            _this.loadingCoverImage = false;
-	            console.log(org);
+	            key: key,
+	            value: value
+	        }).subscribe(function (res) {
+	            console.log(res);
+	            if (res.errmsg) {
+	                _this.flash.show("Save failed", { class: "error" });
+	                _this['loading_' + key] = false;
+	                return;
+	            }
+	            _this.org = res;
+	            _this['loading_' + key] = false;
+	            _this.flash.show("Saved");
+	            console.log(res);
 	        });
 	    };
 	    __decorate([
@@ -65892,10 +65932,10 @@
 	    ManageOrgPageComponent = __decorate([
 	        core_1.Component({
 	            selector: 'manage-org-page',
-	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t<input type=\"file\" \n      \t\tngFileSelect\n\t\t      [options]=\"uploadOptions\"\n\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t    <span *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t    <span *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\n\t\t    <input [(ngModel)]=\"coverImageLink\"><button (click)=\"editCoverImage(coverImageLink)\"><i [hidden]=\"!loadingCoverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t</div>",
-	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
+	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t<input type=\"file\" \n      \t\tngFileSelect\n\t\t      [options]=\"uploadOptions\"\n\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t    <span *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t    <span *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\n\t\t    <input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"{{org.coverImage || 'e.g. http://flickr.com/my-awesome-photo.jpg'}}\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    <input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"{{org.donateLink || 'e.g. http://myorg.com/donate'}}\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    <input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t</div>",
+	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());

@@ -16,9 +16,9 @@ const orgSchema = new mongoose.Schema({
 	gallery: [String]
 });
 
-orgSchema.pre('save', function(next) {
+// orgSchema.pre('save', function(next) {
 
-});
+// });
 
 const Org = mongoose.model('Org', orgSchema);
 

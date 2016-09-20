@@ -10,7 +10,7 @@ import 'rxjs/add/operator/map';
 @Component({
 	selector: 'org-posts',
 	template: `
-			<div class="posts-by-org">
+			<div class="posts-by-org" id="posts">
 				<h4>What they're up to</h4>
 				<search-box
 					class="search-box-container col-md-8 col-md-offset-2 clearfix"
@@ -22,14 +22,13 @@ import 'rxjs/add/operator/map';
 				
 				<div *ngIf="!viewingOne && !isLoading" class="posts">
 					<div #singlePost *ngFor="let post of posts">
-						<h5 *ngIf="isBrowsing"><a href="/organization/i/{{org._id}}?viewpost={{post._id}}">{{post.content}}</a></h5>
+						<h5 *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org._id]" [queryParams]="{viewpost: post._id}">{{post.content}}</a></h5>
 						<h5 *ngIf="!isBrowsing" (click)="selectPost(post._id)">{{post.content}}</h5>
 					</div>
 				</div>
 
 				<div *ngIf="viewingOne && selectedPost">
-					<a *ngIf="isPermalink" href="/organization/i/{{org._id}}">Back to posts</a>
-					<a *ngIf="!isPermalink" (click)="deselectPost()">Back to posts</a>
+					<a (click)="deselectPost()" [routerLink]="['/organization/i', org._id]">Back to posts</a>
 					<h5>{{selectedPost.content}}</h5>
 				</div>
 
@@ -46,7 +45,7 @@ export class OrgPostsComponent implements OnInit {
 	private postsShowing:number;
 	private selectedPost:any = null;
 	private viewingOne:boolean = false;
-	private isPermalink:boolean = false;
+	//private isPermalink:boolean = false;
 	public postId:Observable<string>;
 
 	private searchText:string;
@@ -75,7 +74,8 @@ export class OrgPostsComponent implements OnInit {
 				this.route.queryParams.subscribe(params => {
 					if (params['viewpost']) {
 						this.selectPost(params['viewpost']);
-						this.isPermalink = true;
+						//this.isPermalink = true;
+						window.location.href += "#posts";
 					}
 				});
 			},

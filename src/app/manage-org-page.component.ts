@@ -3,7 +3,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
+import { UserService } from './services/user.service';
 import { UIHelper, Utilities } from './services/app.service';
+import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
 	selector: 'manage-org-page',
@@ -21,9 +23,18 @@ import { UIHelper, Utilities } from './services/app.service';
 		    <span *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
 		    <span *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
 
-		    <input [(ngModel)]="coverImageLink"><button (click)="editCoverImage(coverImageLink)"><i [hidden]="!loadingCoverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    <input [(ngModel)]="coverImageLink"
+		    				name="coverImageLink"
+		    				placeholder="{{org.coverImage || 'e.g. http://flickr.com/my-awesome-photo.jpg'}}"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    <input [(ngModel)]="donateLink"
+		    				name="donateLink"
+		    				placeholder="{{org.donateLink || 'e.g. http://myorg.com/donate'}}"><button (click)="editOrg('donateLink', donateLink)"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    <input [(ngModel)]="slug"
+		    				ngControl="slug"
+		    				name="slug"
+		    				placeholder="{{org.slug || 'e.g. my-awesome-org'}}"><button (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
 			</div>`,
-	providers: [OrgService, UIHelper, Utilities]
+	providers: [OrgService, UserService, UIHelper, Utilities]
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
@@ -34,9 +45,15 @@ export class ManageOrgPageComponent implements OnInit {
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
-	private loadingCoverImage:boolean = false;
 	private progress:number = 0;
+
 	private coverImageLink:string;
+	private donateLink:string;
+	private slug:string;
+
+	private loading_coverImage:boolean;
+	private loading_donateLink:boolean;
+	private loading_slug:boolean;
 
 	uploadFile:any;
   uploadOptions:Object;
@@ -45,33 +62,48 @@ export class ManageOrgPageComponent implements OnInit {
 				private router: Router,
 				private route: ActivatedRoute,
 				private orgService: OrgService,
+				private userService: UserService,
 				private helper: UIHelper,
 				private utilities: Utilities,
-				private zone: NgZone) { }
+				private zone: NgZone,
+				private flash: FlashMessagesService) { }
 
 	ngOnInit() {
-		if (this.route.params) {
-			this.sub = this.route.params.subscribe(params => {
-				let id = params['id'];
-				console.log(id);
-				this.orgService.loadOrg(id).subscribe(
-					data => {
-						console.log(data);
-						this.org = data;
-						this.isLoaded = true;
+		this.userService.getLoggedInUser((err, user) => {
+			if (err) return console.error(err);
+			if (this.route.params) {
+				this.sub = this.route.params.subscribe(params => {
+					let id = params['id'];
+					console.log(id);
 
-						// for ng-upload
-						this.uploadOptions = {
-						  url: '/edit-org/upload/cover-image/' + this.org._id,
-						  filterExtensions: true,
-						  calculateSpeed: true,
-						  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-						};
-					},
-					error => console.log(error)
-				);
-			});
-		}
+					if (user.orgs.indexOf(id) > -1) {
+						this.orgService.loadOrg(id).subscribe(
+							data => {
+								console.log(data);
+								this.org = data;
+								this.isLoaded = true;
+
+								// for ng-upload
+								this.uploadOptions = {
+								  url: '/edit-org/upload/cover-image/' + this.org._id,
+								  filterExtensions: true,
+								  calculateSpeed: true,
+								  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+								};
+							},
+							error => console.log(error)
+						);
+					}
+					else {
+						this.flash.show("You don't have permission to manage this page", { timeout: 2000 });
+						this.router.navigate(['/']);
+					}
+				});
+			}
+			else {
+				this.router.navigate(['/']);
+			}
+		});
 	}
 
 	ngOnDestroy() {
@@ -91,17 +123,32 @@ export class ManageOrgPageComponent implements OnInit {
     });
   }
 
-  editCoverImage(path:string):void {
-  	console.log(path);
-  	this.loadingCoverImage = true;
+  editOrg(key:string, value:string):void {
+  	if (key === "slug") {
+  		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
+  		if (slugMatch) {
+  			return this.flash.show("Your slug can only have lowercase letters and hyphens");
+  		} else {
+  			value.toLowerCase();
+  		}
+  	}
+
+  	this['loading_' + key] = true;
   	this.orgService.editOrg({
   		id: this.org._id,
-  		key: "coverImage",
-  		value: path
-  	}).subscribe(org => {
-  		this.org = org;
-  		this.loadingCoverImage = false;
-  		console.log(org);
+  		key: key,
+  		value: value
+  	}).subscribe(res => {
+  		console.log(res);
+  		if (res.errmsg) {
+  			this.flash.show("Save failed", {class: "error"});
+  			this['loading_' + key] = false;
+  			return;
+  		}
+  		this.org = res;
+  		this['loading_' + key] = false;
+  		this.flash.show("Saved");
+  		console.log(res);
   	});
   }
 

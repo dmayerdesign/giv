@@ -3,6 +3,7 @@ import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
+import { UserService } from './services/user.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
@@ -13,7 +14,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 				<h4>{{org.name}}</h4>
 				<org-details [org]="org"></org-details>
 								
-				<a href="/organization/manage/{{org._id}}">Manage</a>
+				<a *ngIf="user && user.orgs.indexOf(org._id) > -1" href="/organization/manage/{{org._id}}">Manage</a>
 
 				<org-posts [org]="org"></org-posts>
 			</div>`,
@@ -25,6 +26,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 
 export class SingleOrgComponent implements OnInit {
 	private org;
+	private user;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 
@@ -32,6 +34,7 @@ export class SingleOrgComponent implements OnInit {
 				private router: Router,
 				private route: ActivatedRoute,
 				private orgService: OrgService,
+				private userService: UserService,
 				private helper: UIHelper,
 				private utilities: Utilities,
 				private zone: NgZone,
@@ -49,6 +52,11 @@ export class SingleOrgComponent implements OnInit {
 				},
 				error => console.log(error)
 			);
+		});
+
+		this.userService.getLoggedInUser((err, user) => {
+			if(err) return console.error(err);
+			this.user = user;
 		});
 
 		this.flash.show("Flash messages work!", { timeout: 2000 });
