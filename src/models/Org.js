@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const orgSchema = new mongoose.Schema({
-	name: String,
+	name: {type: String, index: true},
 	slug: {type: String, trim: true, unique: true},
-	description: String,
+	description: {type: String, index: true},
 	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,
 	website: String,

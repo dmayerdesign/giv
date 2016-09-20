@@ -82,6 +82,8 @@ const app = express();
  * Connect to MongoDB.
  */
 mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
+mongoose.connection.config.autoIndex = true; // set to false to boost performance in production
+
 // mongoose.connection.on('connected', () => {
 //   console.log('%s MongoDB connection established!', chalk.green('✓'));
 // });
