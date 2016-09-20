@@ -8,6 +8,10 @@ export class SearchService {
   loadSearchableData(uri:string, options) { //text?:string, limit?:number, offset?:number) {
     let params: URLSearchParams = new URLSearchParams();
 
+    if (typeof options.org === "string" && options.org.length) {
+      params.set("org", options.org);
+    }
+
     if (typeof options.search === "string" && options.search.length) {
       params.set("search", options.search);
       localStorage.setItem("searching", "true");
@@ -25,7 +29,7 @@ export class SearchService {
     }
 
     return this.http.get(uri, {
-      search: params
+      search: params,
     }).map(res => res.json());
   }
 }

@@ -31,7 +31,8 @@ const routing = RouterModule.forRoot([
   , { path: 'about', component: AboutComponent }
   , { path: 'library', component: LibraryComponent }
   , { path: 'contact', component: ContactComponent }
-  , { path: 'organization/:id', component: SingleOrgComponent }
+  , { path: 'organization/i/:id', component: SingleOrgComponent }
+  , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
   , { path: '', component: BrowseOrgsComponent }
 ]); // the order of this array matters

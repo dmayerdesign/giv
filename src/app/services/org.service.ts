@@ -19,8 +19,19 @@ export class OrgService {
 		return this.search.loadSearchableData("/orgs/get", options);
 	}
 
-	loadOrg(id) {
-		return this.http.get("/org/" + id).map(res => res.json());
+	loadPosts(options) {
+		return this.search.loadSearchableData("/posts/get", options);
+	}
+
+	loadOrg(options:any) {
+		if (options instanceof Object) {
+			if (options.slug) return this.http.get("/org/s/" + options.slug).map(res => res.json());
+			if (options.id) return this.http.get("/org/" + options.id).map(res => res.json());
+		}
+		else {
+			return this.http.get("/org/" + options).map(res => res.json());
+		}
+		
 	}
 
 	editOrg(options: EditOrgInterface) {

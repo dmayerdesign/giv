@@ -66,6 +66,7 @@ const search = require('./services/search');
  */
 const User = require('./models/User');
 const Org = require('./models/Org');
+const Post = require('./models/Post')
 
 /**
  * API keys and Passport configuration.
@@ -278,8 +279,9 @@ mongoose.connection.on('connected', () => {
 
     // find by search
     app.get('/orgs/get', function(req, res) {
+      var dbQuery = {};
       if (req.query.search) {
-          var dbQuery = search(req.query.search, req.query.field);
+          dbQuery = search(req.query.search, req.query.field);
       }
       Org.find(dbQuery, (err, docs) => {
         if(err) return console.error(err);
@@ -326,6 +328,92 @@ mongoose.connection.on('connected', () => {
     // delete by id
     app.delete('/org/:id', function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
+        if(err) return console.error(err);
+        res.sendStatus(200);
+      });
+    });
+
+    // find by slug
+    app.get('/org/s/:slug', function(req, res) {
+      Org.findOne({slug: req.params.slug}, function (err, obj) {
+        if(err) return console.error(err);
+        res.json(obj);
+      });
+    });
+
+    // update by slug
+    app.put('/org/s/:slug', function(req, res) {
+      Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
+        if(err) return console.error(err);
+        res.sendStatus(200);
+      });
+    });
+
+    // delete by slug
+    app.delete('/org/s/:slug', function(req, res) {
+      Org.findOneAndRemove({slug: req.params.slug}, function(err) {
+        if(err) return console.error(err);
+        res.sendStatus(200);
+      });
+    });
+
+    // get posts by an org
+    app.get('/posts/get', function(req, res) {
+      var dbQuery = {};
+      if (req.query.search) {
+        dbQuery = search(req.query.search, req.query.field);
+      }
+      dbQuery.org = req.query.org;
+      if (dbQuery.org) {
+        Post.find(dbQuery, (err, docs) => {
+          if(err) return console.error(err);
+          res.json(docs);
+        })
+        .sort("-dateCreated")
+        .skip(+req.query.offset)
+        .limit(+req.query.limit);
+      }
+      else {
+        console.log("Org needs to be specified to find posts");
+      }
+    });
+
+    // count all
+    app.get('/posts/count', function(req, res) {
+      Post.count(function(err, count) {
+        if(err) return console.error(err);
+        res.json(count);
+      });
+    });
+
+    // create
+    app.post('/post', function(req, res) {
+      var obj = new Post(req.body);
+      obj.save(function(err, obj) {
+        if(err) return console.error(err);
+        res.status(200).json(obj);
+      });
+    });
+
+    // find by id
+    app.get('/post/:id', function(req, res) {
+      Post.findOne({_id: req.params.id}, function (err, obj) {
+        if(err) return console.error(err);
+        res.json(obj);
+      });
+    });
+
+    // update by id
+    app.put('/post/:id', function(req, res) {
+      Post.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
+        if(err) return console.error(err);
+        res.sendStatus(200);
+      });
+    });
+
+    // delete by id
+    app.delete('/post/:id', function(req, res) {
+      Post.findOneAndRemove({_id: req.params.id}, function(err) {
         if(err) return console.error(err);
         res.sendStatus(200);
       });

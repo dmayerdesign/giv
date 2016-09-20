@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const orgSchema = new mongoose.Schema({
 	name: String,
-	slug: {type: String, unique: true},
+	slug: {type: String, trim: true, unique: true},
 	description: String,
 	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,
@@ -14,6 +14,10 @@ const orgSchema = new mongoose.Schema({
 	coverImage: String,
 	gravatar: String,
 	gallery: [String]
+});
+
+orgSchema.pre('save', function(next) {
+
 });
 
 const Org = mongoose.model('Org', orgSchema);

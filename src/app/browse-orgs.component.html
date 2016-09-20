@@ -33,8 +33,9 @@
 
 			<div class="org-expanded" *ngIf="viewingOrg && org._id === selectedOrg._id">
 				<org-details (update)="sendInfoMsg($event.body, $event.type)" [org]="selectedOrg"></org-details>
-				<a href="/organization/{{org._id}}">View Org</a>
-				<org-posts [org]="selectedOrg"></org-posts>
+				<a *ngIf="org.slug" href="/organization/{{org.slug}}">View Org Page</a>
+				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">View Org Page</a>
+				<org-posts [org]="selectedOrg" [isBrowsing]="true"></org-posts>
 			</div>
 		</div>
 		

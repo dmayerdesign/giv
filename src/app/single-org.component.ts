@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
@@ -12,10 +12,13 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 			<div class="single-org" *ngIf="isLoaded">
 				<h4>{{org.name}}</h4>
 				<org-details [org]="org"></org-details>
-				<org-posts [org]="org"></org-posts>
+								
 				<a href="/organization/manage/{{org._id}}">Manage</a>
+
+				<org-posts [org]="org"></org-posts>
 			</div>`,
-	providers: [OrgService, UIHelper, Utilities]
+	providers: [OrgService, UIHelper, Utilities],
+	directives: [ROUTER_DIRECTIVES]
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
@@ -37,7 +40,9 @@ export class SingleOrgComponent implements OnInit {
 	ngOnInit() {
 		this.sub = this.route.params.subscribe(params => {
 			let id = params['id'];
-			this.orgService.loadOrg(id).subscribe(
+			let slug = params['slug'];
+
+			this.orgService.loadOrg({id: id, slug: slug}).subscribe(
 				data => {
 					this.org = data;
 					this.isLoaded = true;

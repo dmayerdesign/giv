@@ -40,8 +40,7 @@ export class BrowseOrgsComponent implements OnInit {
 				private http: Http,
 				private orgService: OrgService,
 				private helper: UIHelper,
-				private utilities: Utilities,
-				private _elementRef: ElementRef) {
+				private utilities: Utilities) {
 	}
 
 	ngOnInit() {

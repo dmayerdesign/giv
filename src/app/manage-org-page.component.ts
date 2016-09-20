@@ -9,7 +9,8 @@ import { UIHelper, Utilities } from './services/app.service';
 	selector: 'manage-org-page',
 	template: `
 			<div class="manage-org-page" *ngIf="isLoaded">
-				<a href="/organization/{{org._id}}">Back to page</a>
+				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Back to page</a>
+				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Back to page</a>
 				<h4>Manage {{org.name}}</h4>
 				<img [src]="org.coverImage" width="200">
 				<input type="file" 
@@ -52,8 +53,10 @@ export class ManageOrgPageComponent implements OnInit {
 		if (this.route.params) {
 			this.sub = this.route.params.subscribe(params => {
 				let id = params['id'];
+				console.log(id);
 				this.orgService.loadOrg(id).subscribe(
 					data => {
+						console.log(data);
 						this.org = data;
 						this.isLoaded = true;
 
