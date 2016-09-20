@@ -65444,7 +65444,7 @@
 	        }
 	    };
 	    OrgService.prototype.editOrg = function (options) {
-	        return this.http.post("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	        return this.http.put("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
 	    };
 	    OrgService = __decorate([
 	        core_1.Injectable(), 

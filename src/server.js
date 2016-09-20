@@ -19,34 +19,10 @@ const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const bcrypt = require('bcrypt-nodejs');
 
-const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
 dotenv.load({ path: '.env' });
-
-/**
- * AWS S3 uploads
- */
-const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
-const initial_upload = multer({ dest: path.join(__dirname, 'uploads') });
-
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'fuse-uploads',
-    acl: 'public-read',
-    key: function (req, file, callback) {
-        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
-        console.log(file);
-        callback(null, req.newPath);
-    }
-  }),
-  limits: { fileSize: 5000000 }
-});
 
 /**
  * Controllers (route handlers).
@@ -65,8 +41,12 @@ const search = require('./services/search');
  * DANNY'S Models
  */
 const User = require('./models/User');
-const Org = require('./models/Org');
 const Post = require('./models/Post');
+
+/**
+* DANNY'S Controllers
+*/
+const orgController = require('./controllers/org.controller');
 
 /**
  * API keys and Passport configuration.
@@ -277,90 +257,20 @@ mongoose.connection.on('connected', () => {
 
     /**
     ** Orgs
+    **
+    ** Get the refactored orgs API from the orgController
     **/
-
-    // find by search
-    app.get('/orgs/get', function(req, res) {
-      var dbQuery = {};
-      if (req.query.search) {
-        dbQuery = search(req.query.search, req.query.field);
+    for (let i = 0; i < orgController.requests.length; i++) {
+      let request = orgController.requests[i];
+      if (request.middleware) {
+        if (request.middleware.length === 1) app[request.type](request.uri, request.middleware[0], request.process);
+        if (request.middleware.length === 2) app[request.type](request.uri, request.middleware[0], request.middleware[1], request.process);
+        if (request.middleware.length > 2) app[request.type](request.uri, request.middleware[0], request.middleware[1], request.middleware[2], request.process);
       }
-      if (req.query.filterField) {
-        dbQuery[req.query.filterField] = req.query.filterValue;
+      else {
+        app[request.type](request.uri, request.process);
       }
-      Org.find(dbQuery, (err, docs) => {
-        if(err) return console.error(err);
-        res.json(docs);
-      })
-      .sort("-stars")
-      .skip(+req.query.offset)
-      .limit(+req.query.limit);
-    });
-
-    // count all
-    app.get('/orgs/count', function(req, res) {
-      Org.count(function(err, count) {
-        if(err) return console.error(err);
-        res.json(count);
-      });
-    });
-
-    // create
-    app.post('/org', function(req, res) {
-      var obj = new Org(req.body);
-      obj.save(function(err, obj) {
-        if(err) return console.error(err);
-        res.status(200).json(obj);
-      });
-    });
-
-    // find by id
-    app.get('/org/:id', function(req, res) {
-      Org.findOne({_id: req.params.id}, function (err, obj) {
-        if(err) return console.error(err);
-        res.json(obj);
-      });
-    });
-
-    // update by id
-    app.put('/org/:id', function(req, res) {
-      Org.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
-      });
-    });
-
-    // delete by id
-    app.delete('/org/:id', function(req, res) {
-      Org.findOneAndRemove({_id: req.params.id}, function(err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
-      });
-    });
-
-    // find by slug
-    app.get('/org/s/:slug', function(req, res) {
-      Org.findOne({slug: req.params.slug}, function (err, obj) {
-        if(err) return console.error(err);
-        res.json(obj);
-      });
-    });
-
-    // update by slug
-    app.put('/org/s/:slug', function(req, res) {
-      Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
-      });
-    });
-
-    // delete by slug
-    app.delete('/org/s/:slug', function(req, res) {
-      Org.findOneAndRemove({slug: req.params.slug}, function(err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
-      });
-    });
+    }
 
     // get posts by org and search
     app.get('/posts/get', function(req, res) {
@@ -425,28 +335,6 @@ mongoose.connection.on('connected', () => {
       Post.findOneAndRemove({_id: req.params.id}, function(err) {
         if(err) return console.error(err);
         res.sendStatus(200);
-      });
-    });
-
-    // file uploads with multer-s3
-    app.post('edit-org/upload/cover-image/:orgId', upload.any(), function(req, res, next) {
-      Org.findOne({_id: req.params.orgId}, function(err, obj) {
-        if(err) return console.error(err);
-        obj.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
-        console.log(obj.coverImage);
-        obj.save(function(err, org) {
-          if(err) return console.error(err);
-          res.json(org);
-        }); 
-      });
-    });
-
-    app.post('/edit-org/coverImage/:orgId', function(req, res) {
-      console.log(req.body);
-      Org.findOneAndUpdate({_id: req.params.orgId}, {$set:{coverImage:req.body.value}}, {new: true}, function(err, org) {
-        if(err) return console.error(err);
-        console.log(org);
-        res.json(org);
       });
     });
 
