@@ -49940,7 +49940,8 @@
 	    { path: 'organization/i/:id', component: single_org_component_1.SingleOrgComponent },
 	    { path: 'organization/:slug', component: single_org_component_1.SingleOrgComponent },
 	    { path: 'organization/manage/:id', component: manage_org_page_component_1.ManageOrgPageComponent },
-	    { path: '', component: browse_orgs_component_1.BrowseOrgsComponent }
+	    { path: '', component: browse_orgs_component_1.BrowseOrgsComponent },
+	    { path: '*', component: browse_orgs_component_1.BrowseOrgsComponent }
 	]); // the order of this array matters
 	var AppModule = (function () {
 	    function AppModule() {
@@ -65266,17 +65267,21 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
+	var router_1 = __webpack_require__(336);
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var org_service_1 = __webpack_require__(477);
 	var app_service_1 = __webpack_require__(471);
 	var search_box_component_1 = __webpack_require__(479);
 	var org_details_component_1 = __webpack_require__(480);
 	var org_posts_component_1 = __webpack_require__(481);
 	var BrowseOrgsComponent = (function () {
-	    function BrowseOrgsComponent(http, orgService, helper, utilities) {
+	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash) {
 	        this.http = http;
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
+	        this.route = route;
+	        this.flash = flash;
 	        this.$orgs = [];
 	        this.selectedOrg = null;
 	        this.orgs = [];
@@ -65293,6 +65298,12 @@
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
 	        this.helper.setTitle("Browse organizations");
+	        // this.paramsSub = this.route.params.subscribe(params => {
+	        // 	let notfound = params['404'];
+	        // 	if (notfound == true) {
+	        // 		this.flash.show("The thing you were looking for doesn't exist. Sorry!");
+	        // 	}
+	        // });
 	        /** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
@@ -65306,6 +65317,9 @@
 	    BrowseOrgsComponent.prototype.ngDoCheck = function () {
 	        this.takeCount(this.$orgs);
 	    };
+	    // ngOnDestroy() {
+	    // 	this.paramsSub.unsubscribe();
+	    // }
 	    BrowseOrgsComponent.prototype.takeCount = function (children) {
 	        this.orgsShowing = this.helper.takeCount(children);
 	    };
@@ -65397,7 +65411,7 @@
 	            directives: [search_box_component_1.SearchBox, org_details_component_1.OrgDetailsComponent, org_posts_component_1.OrgPostsComponent],
 	            pipes: []
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, angular2_flash_messages_1.FlashMessagesService])
 	    ], BrowseOrgsComponent);
 	    return BrowseOrgsComponent;
 	}());
@@ -65736,7 +65750,7 @@
 	    OrgPostsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-posts',
-	            template: "\n\t\t\t<div class=\"posts-by-org\" id=\"posts\">\n\t\t\t\t<h4>What they're up to</h4>\n\t\t\t\t<search-box\n\t\t\t\t\tclass=\"search-box-container col-md-8 col-md-offset-2 clearfix\"\n\t\t\t\t\t*ngIf=\"!isBrowsing && !isLoading\"\n\t\t\t\t\t(update)=\"searchPosts($event)\"\n\t\t\t\t\t(focusChange)=\"toggleSearchBoxFocus($event)\"\n\t\t\t\t\t[ngClass]=\"{focused: searchBoxIsFocused}\"\n\t\t\t\t\t[collection]=\"'posts by' + org.name\"></search-box>\n\t\t\t\t\n\t\t\t\t<div *ngIf=\"!viewingOne && !isLoading\" class=\"posts\">\n\t\t\t\t\t<div #singlePost *ngFor=\"let post of posts\">\n\t\t\t\t\t\t<h5 *ngIf=\"isBrowsing\"><a [routerLink]=\"['/organization/i', org._id]\" [queryParams]=\"{viewpost: post._id}\">{{post.content}}</a></h5>\n\t\t\t\t\t\t<h5 *ngIf=\"!isBrowsing\" (click)=\"selectPost(post._id)\">{{post.content}}</h5>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"viewingOne && selectedPost\">\n\t\t\t\t\t<a (click)=\"deselectPost()\" [routerLink]=\"['/organization/i', org._id]\">Back to posts</a>\n\t\t\t\t\t<h5>{{selectedPost.content}}</h5>\n\t\t\t\t</div>\n\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"posts-by-org\" id=\"posts\">\n\t\t\t\t<h4>What they're up to</h4>\n\t\t\t\t<search-box\n\t\t\t\t\tclass=\"search-box-container col-md-8 col-md-offset-2 clearfix\"\n\t\t\t\t\t*ngIf=\"!isBrowsing && !isLoading\"\n\t\t\t\t\t(update)=\"searchPosts($event)\"\n\t\t\t\t\t(focusChange)=\"toggleSearchBoxFocus($event)\"\n\t\t\t\t\t[ngClass]=\"{focused: searchBoxIsFocused}\"\n\t\t\t\t\t[collection]=\"'posts by' + org.name\"></search-box>\n\t\t\t\t\n\t\t\t\t<div *ngIf=\"!viewingOne && !isLoading\" class=\"posts\">\n\t\t\t\t\t<div #singlePost *ngFor=\"let post of posts\">\n\t\t\t\t\t\t<h5 *ngIf=\"isBrowsing\"><a [routerLink]=\"['/organization/i', org?._id]\" [queryParams]=\"{viewpost: post._id}\">{{post.content}}</a></h5>\n\t\t\t\t\t\t<h5 *ngIf=\"!isBrowsing\" (click)=\"selectPost(post._id)\">{{post.content}}</h5>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"viewingOne && selectedPost\">\n\t\t\t\t\t<a (click)=\"deselectPost()\" [routerLink]=\"['/organization/i', org?._id]\">Back to posts</a>\n\t\t\t\t\t<h5>{{selectedPost.content}}</h5>\n\t\t\t\t</div>\n\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65784,17 +65798,23 @@
 	            var id = params['id'];
 	            var slug = params['slug'];
 	            _this.orgService.loadOrg({ id: id, slug: slug }).subscribe(function (data) {
+	                if (!data || !data._id) {
+	                    _this.flash.show("This page doesn't exist");
+	                    return _this.router.navigate([''], { queryParams: { "404": true } });
+	                }
 	                _this.org = data;
 	                _this.isLoaded = true;
-	            }, function (error) { return console.log(error); });
+	            }, function (error) {
+	                console.error(error);
+	                _this.flash.show("This page doesn't exist");
+	                return _this.router.navigate([''], { queryParams: { "404": true } });
+	            });
 	        });
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
-	            console.log(_this.user.orgs);
 	        });
-	        this.flash.show("Flash messages work!", { timeout: 2000 });
 	    };
 	    SingleOrgComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
@@ -65802,7 +65822,7 @@
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.orgs.indexOf(org._id) > -1\" href=\"/organization/manage/{{org._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
@@ -65855,29 +65875,34 @@
 	            if (_this.route.params) {
 	                _this.sub = _this.route.params.subscribe(function (params) {
 	                    var id = params['id'];
-	                    console.log(id);
-	                    if (user.orgs.indexOf(id) > -1) {
-	                        _this.orgService.loadOrg(id).subscribe(function (data) {
-	                            console.log(data);
-	                            _this.org = data;
-	                            _this.isLoaded = true;
-	                            // for ng-upload
-	                            _this.uploadOptions = {
-	                                url: '/edit-org/upload/cover-image/' + _this.org._id,
-	                                filterExtensions: true,
-	                                calculateSpeed: true,
-	                                allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	                            };
-	                        }, function (error) { return console.log(error); });
+	                    if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+	                        _this.flash.show("This page doesn't exist");
+	                        return _this.router.navigate([''], { queryParams: { "404": true } });
 	                    }
-	                    else {
-	                        _this.flash.show("You don't have permission to manage this page", { timeout: 2000 });
-	                        _this.router.navigate(['/']);
-	                    }
+	                    _this.orgService.loadOrg(id).subscribe(function (data) {
+	                        if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
+	                            _this.flash.show("Either the page doesn't exist or you don't have permission to manage it");
+	                            return _this.router.navigate([''], { queryParams: { "404": true } });
+	                        }
+	                        _this.org = data;
+	                        _this.isLoaded = true;
+	                        // for ng-upload
+	                        _this.uploadOptions = {
+	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
+	                            filterExtensions: true,
+	                            calculateSpeed: true,
+	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                        };
+	                    }, function (err) {
+	                        _this.router.navigate([''], { queryParams: { "404": true } });
+	                        console.log("Error: ");
+	                        console.log(err);
+	                        return console.error(err);
+	                    });
 	                });
 	            }
 	            else {
-	                _this.router.navigate(['/']);
+	                _this.router.navigate(['../']);
 	            }
 	        });
 	    };

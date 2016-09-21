@@ -74,34 +74,41 @@ export class ManageOrgPageComponent implements OnInit {
 			if (this.route.params) {
 				this.sub = this.route.params.subscribe(params => {
 					let id = params['id'];
-					console.log(id);
-
-					if (user.orgs.indexOf(id) > -1) {
-						this.orgService.loadOrg(id).subscribe(
-							data => {
-								console.log(data);
-								this.org = data;
-								this.isLoaded = true;
-
-								// for ng-upload
-								this.uploadOptions = {
-								  url: '/edit-org/upload/cover-image/' + this.org._id,
-								  filterExtensions: true,
-								  calculateSpeed: true,
-								  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-								};
-							},
-							error => console.log(error)
-						);
+					if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+						this.flash.show("This page doesn't exist");
+						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
-					else {
-						this.flash.show("You don't have permission to manage this page", { timeout: 2000 });
-						this.router.navigate(['/']);
-					}
+
+					this.orgService.loadOrg(id).subscribe(
+						data => {
+							if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
+								this.flash.show("Either the page doesn't exist or you don't have permission to manage it");
+								return this.router.navigate([''], { queryParams: {"404": true}});
+							}
+							this.org = data;
+							this.isLoaded = true;
+
+							
+							// for ng-upload
+							this.uploadOptions = {
+							  url: '/edit-org/upload/cover-image/' + this.org._id,
+							  filterExtensions: true,
+							  calculateSpeed: true,
+							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+							};
+						},
+						err => {
+							this.router.navigate([''], { queryParams: {"404": true}});
+							console.log("Error: ");
+							console.log(err);
+							return console.error(err);
+						}
+					);
+					
 				});
 			}
 			else {
-				this.router.navigate(['/']);
+				this.router.navigate(['../']);
 			}
 		});
 	}

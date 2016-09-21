@@ -47,15 +47,14 @@ exports.sample = function(next) {
     next(err, obj);
   });
 
-  function makeid()
-  {
-      var text = "";
-      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ     abcdefghijklmnopqrstuvwxyz-";
 
-      for( var i=0; i < 10; i++ )
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
+    for( var i=0; i < 20; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-      return text;
+    return text;
   }
 };
 

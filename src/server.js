@@ -376,21 +376,24 @@ mongoose.connection.on('connected', () => {
 
 
 
-
-    // (function() {
-    //   let i = 0;
-    //   while (i < 50) {
-    //     orgController.sample(function(err, obj) {
-    //       User.find({}, function(err, users) {
-    //         users.forEach(function(user) {
-    //           user.orgs.push(obj._id);
-    //           user.save();
-    //         });
-    //       });
-    //     });
-    //     i++;
-    //   }
-    // }());
+    //generateOrgs();
+    function generateOrgs() {
+      let i = 0;
+      while (i < 50) {
+        orgController.sample(function(err, obj) {
+          User.find({}, function(err, users) { // Give all users globalPermission
+            users.forEach(function(user) {
+              if (i = 0) {
+                user.permissions = [];
+              }
+              user.permissions.push(obj.globalPermission);
+              user.save();
+            });
+          });
+        });
+        i++;
+      }
+    }
 
     // User.find({}, function(err, users) {
     //   console.log(users[0].password);

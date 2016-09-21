@@ -14,7 +14,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 				<h4>{{org.name}}</h4>
 				<org-details [org]="org"></org-details>
 								
-				<a *ngIf="user && user.orgs.indexOf(org._id) > -1" href="/organization/manage/{{org._id}}">Manage</a>
+				<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
 
 				<org-posts [org]="org"></org-posts>
 			</div>`,
@@ -47,20 +47,25 @@ export class SingleOrgComponent implements OnInit {
 
 			this.orgService.loadOrg({id: id, slug: slug}).subscribe(
 				data => {
+					if (!data || !data._id) {
+						this.flash.show("This page doesn't exist");
+						return this.router.navigate([''], { queryParams: {"404": true}});
+					}
 					this.org = data;
 					this.isLoaded = true;
 				},
-				error => console.log(error)
+				error => {
+					console.error(error);
+					this.flash.show("This page doesn't exist");
+					return this.router.navigate([''], { queryParams: {"404": true}});
+				}
 			);
 		});
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
 			this.user = user;
-			console.log(this.user.orgs);
 		});
-
-		this.flash.show("Flash messages work!", { timeout: 2000 });
 	}
 
 	ngOnDestroy() {

@@ -22,13 +22,13 @@ import 'rxjs/add/operator/map';
 				
 				<div *ngIf="!viewingOne && !isLoading" class="posts">
 					<div #singlePost *ngFor="let post of posts">
-						<h5 *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org._id]" [queryParams]="{viewpost: post._id}">{{post.content}}</a></h5>
+						<h5 *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org?._id]" [queryParams]="{viewpost: post._id}">{{post.content}}</a></h5>
 						<h5 *ngIf="!isBrowsing" (click)="selectPost(post._id)">{{post.content}}</h5>
 					</div>
 				</div>
 
 				<div *ngIf="viewingOne && selectedPost">
-					<a (click)="deselectPost()" [routerLink]="['/organization/i', org._id]">Back to posts</a>
+					<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
 					<h5>{{selectedPost.content}}</h5>
 				</div>
 

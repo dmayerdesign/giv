@@ -35,6 +35,7 @@ const routing = RouterModule.forRoot([
   , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
   , { path: '', component: BrowseOrgsComponent }
+  , { path: '*', component: BrowseOrgsComponent }
 ]); // the order of this array matters
 
 @NgModule({

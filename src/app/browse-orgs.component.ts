@@ -1,7 +1,11 @@
-import { Component, OnInit, ViewChildren, ViewChild, Input, Output, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChildren, ViewChild, Input, Output, ElementRef, HostListener } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { Subscription } from 'rxjs/Subscription';
+import { FlashMessagesService } from 'angular2-flash-messages';
+
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities, InfoMessage } from './services/app.service';
 import { SearchBox } from './search-box.component';
@@ -32,6 +36,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	private isLoading = true;
 	private loadingOrgs = false;
+	private paramsSub:Subscription;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
 	private infoMsg = new InfoMessage();
@@ -40,11 +45,20 @@ export class BrowseOrgsComponent implements OnInit {
 				private http: Http,
 				private orgService: OrgService,
 				private helper: UIHelper,
-				private utilities: Utilities) {
+				private utilities: Utilities,
+				private route:ActivatedRoute,
+				private flash:FlashMessagesService) {
 	}
 
 	ngOnInit() {
 		this.helper.setTitle("Browse organizations");
+
+		// this.paramsSub = this.route.params.subscribe(params => {
+		// 	let notfound = params['404'];
+		// 	if (notfound == true) {
+		// 		this.flash.show("The thing you were looking for doesn't exist. Sorry!");
+		// 	}
+		// });
 
 		/** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 		!this.utilities.existsLocally('OrgsSorting')
@@ -64,6 +78,10 @@ export class BrowseOrgsComponent implements OnInit {
 	ngDoCheck() {
 		this.takeCount(this.$orgs);
 	}
+
+	// ngOnDestroy() {
+	// 	this.paramsSub.unsubscribe();
+	// }
 
 	takeCount(children:any) {
 		this.orgsShowing = this.helper.takeCount(children);
