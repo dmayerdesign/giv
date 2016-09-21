@@ -382,7 +382,7 @@ exports.postForgot = (req, res, next) => {
  */
 
 exports.login = (req, res, next) => {
-  if (req.body.token && req.body.token.accessToken) { // If this is a Facebook login
+  if (req.body.token && req.body.token.accessToken && req.body.token.accessToken.type === "facebook") { // If this is a Facebook login
     User.findOne({ facebook: req.body.id }, (err, existingUser) => {
       if (err) return console.log(err);
       if (existingUser) {

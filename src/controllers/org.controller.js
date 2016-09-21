@@ -165,6 +165,7 @@ for (let i = 0; i < editableInOrg.length; i++) {
 function editOrg(key) {
   return {
     method: "put",
+    middleware: "passport",
     uri: '/edit-org/'+key+'/:orgId',
     process: function(req, res) {
       let updateQuery = {$set:{}};

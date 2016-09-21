@@ -64848,12 +64848,13 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var app_service_1 = __webpack_require__(471);
-	var dist_1 = __webpack_require__(472);
+	//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 	var user_service_1 = __webpack_require__(468);
 	var LoginComponent = (function () {
-	    function LoginComponent(http, fb, router, userService) {
+	    function LoginComponent(http, 
+	        //private fb:FacebookService,
+	        router, userService) {
 	        this.http = http;
-	        this.fb = fb;
 	        this.router = router;
 	        this.userService = userService;
 	        this.infoMsg = new app_service_1.InfoMessage();
@@ -64861,21 +64862,26 @@
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
 	        }
-	        this.fb.init({
-	            appId: '146608639126993',
-	            cookie: false,
-	            xfbml: true,
-	            version: 'v2.5' // use graph api version 2.5
-	        });
+	        // this.fb.init({
+	        //     appId      : '146608639126993',
+	        //     cookie     : false,
+	        //     xfbml      : true,  // parse social plugins on this page
+	        //     version    : 'v2.5' // use graph api version 2.5
+	        //   });
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
-	        this.checkLoginStatus();
+	        //this.checkLoginStatus();
 	    };
 	    ;
-	    LoginComponent.prototype.login = function () {
+	    LoginComponent.prototype.login = function (facebook) {
 	        var _this = this;
 	        console.log(this.formModel);
-	        if (this.formModel && this.formModel.email && this.formModel.password) {
+	        if (facebook) {
+	            this.http.get('/auth/facebook').map(function (res) { return res.json(); }).subscribe(function (data) {
+	                console.log(data);
+	            }, function (err) { return console.log(err); });
+	        }
+	        else if (this.formModel && this.formModel.email && this.formModel.password) {
 	            this.http.post('/login', this.formModel).subscribe(function (data) {
 	                localStorage.setItem('profile', JSON.stringify(data));
 	                _this.isLoggedIn = true;
@@ -64895,56 +64901,50 @@
 	    /**
 	    * Facebook SDK implementation
 	    */
-	    LoginComponent.prototype.checkLoginStatus = function () {
-	        this.fb.getLoginStatus().then(function (response) {
-	            if (response.status === 'connected') {
-	                console.log("Logged in with Facebook!");
-	            }
-	            else if (response.status === 'not_authorized') {
-	                console.log('Please log ' +
-	                    'into this app.');
-	            }
-	            else {
-	                console.log('Please log ' +
-	                    'into Facebook.');
-	            }
-	        });
-	    };
-	    LoginComponent.prototype.getFacebookUser = function (loginRes) {
-	        var _this = this;
-	        console.log('Welcome!  Fetching your information.... ');
-	        this.fb.api('/me', 0 /* get */, { fields: 'id,email,first_name,last_name' }).then(function (res) {
-	            console.log(res);
-	            var loginParams = res;
-	            loginParams.token = { type: "facebook", accessToken: loginRes.authResponse.accessToken };
-	            _this.http.post('/login', loginParams).subscribe(function (data) {
-	                localStorage.setItem('profile', JSON.stringify(data));
-	                _this.userService.getLoggedInUser(function (err, data) {
-	                    if (err)
-	                        console.log(err);
-	                    else {
-	                        _this.user = data;
-	                        _this.isLoggedIn = true;
-	                        _this.userService.confirmLogin(data);
-	                        _this.router.navigate(['/']);
-	                    }
-	                });
-	            });
-	        });
-	    };
-	    LoginComponent.prototype.loginWithFacebook = function () {
-	        var _this = this;
-	        this.fb.login().then(function (res) {
-	            console.log(res);
-	            _this.getFacebookUser(res);
-	        });
-	    };
-	    LoginComponent.prototype.logoutOfFacebook = function () {
-	        var _this = this;
-	        this.fb.logout().then(function (res) {
-	            _this.checkLoginStatus();
-	        });
-	    };
+	    // checkLoginStatus() {
+	    //   this.fb.getLoginStatus().then(response => {
+	    //     if (response.status === 'connected') {
+	    //      console.log("Logged in with Facebook!");
+	    //    } else if (response.status === 'not_authorized') {
+	    //      console.log('Please log ' +
+	    //        'into this app.');
+	    //    } else {
+	    //      console.log('Please log ' +
+	    //        'into Facebook.');
+	    //    }
+	    //   });
+	    // }
+	    // getFacebookUser(loginRes:any) {
+	    //   console.log('Welcome!  Fetching your information.... ');
+	    //   this.fb.api('/me', FacebookApiMethod.get, {fields: 'id,email,first_name,last_name'}).then(res => {
+	    //     console.log(res);
+	    //     let loginParams = res;
+	    //     loginParams.token = {type: "facebook", accessToken: loginRes.authResponse.accessToken};
+	    //     this.http.post('/login', loginParams).subscribe(data => {
+	    //     	localStorage.setItem('profile', JSON.stringify(data));
+	    //     	this.userService.getLoggedInUser((err, data) => {
+	    // 			if (err) console.log(err);
+	    // 			else {
+	    // 				this.user = data;
+	    //           this.isLoggedIn = true;
+	    //           this.userService.confirmLogin(data);
+	    //           this.router.navigate(['/']);
+	    // 			}
+	    // 		});
+	    //     });
+	    //   });
+	    // }
+	    // loginWithFacebook() {
+	    //    this.fb.login().then((res:FacebookLoginResponse) => {
+	    //    	console.log(res);
+	    //    	this.getFacebookUser(res);
+	    //    });
+	    //  }
+	    //  logoutOfFacebook() {
+	    //  	this.fb.logout().then(res => {
+	    //    	this.checkLoginStatus()
+	    //    });
+	    //  }
 	    LoginComponent.prototype.statusChangeCallback = function (response) {
 	        console.log('statusChangeCallback');
 	        console.log(response);
@@ -64964,10 +64964,9 @@
 	    LoginComponent = __decorate([
 	        core_1.Component({
 	            selector: 'login',
-	            templateUrl: 'app/login.component.html',
-	            providers: [dist_1.FacebookService]
+	            templateUrl: 'app/login.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, dist_1.FacebookService, router_1.Router, user_service_1.UserService])
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService])
 	    ], LoginComponent);
 	    return LoginComponent;
 	}());
@@ -65051,146 +65050,8 @@
 
 
 /***/ },
-/* 472 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	__export(__webpack_require__(473));
-
-
-/***/ },
-/* 473 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var core_1 = __webpack_require__(11);
-	// TODO create an interface (type) for the response instead of any
-	var FacebookService = (function () {
-	    function FacebookService() {
-	    }
-	    /**
-	     * This method is used to initialize and setup the SDK.
-	     * @param params
-	     */
-	    FacebookService.prototype.init = function (params) {
-	        FB.init(params);
-	    };
-	    /**
-	     * This method lets you make calls to the Graph API
-	     * @param path This is the Graph API endpoint path that you want to call.
-	     * @param method This is the HTTP method that you want to use for the API request.
-	     * @param params This is an object consisting of any parameters that you want to pass into your Graph API call.
-	     * @returns {Promise<any>}
-	     */
-	    FacebookService.prototype.api = function (path, method, params) {
-	        if (method === void 0) { method = 'get'; }
-	        if (params === void 0) { params = {}; }
-	        return new Promise(function (resolve, reject) {
-	            FB.api(path, method, params, function (response) {
-	                if (!response) {
-	                    reject();
-	                }
-	                else if (response.error) {
-	                    reject(response.error);
-	                }
-	                else {
-	                    resolve(response);
-	                }
-	            });
-	        });
-	    };
-	    /**
-	     * This method is used to trigger different forms of Facebook created UI dialogs.
-	     * These dialogs include:
-	     * - Share dialog
-	     * - Login dialog
-	     * - Add page tab dialog
-	     * - Requests dialog
-	     * - Send dialog
-	     * - Payments dialog
-	     * - Go Live dialog
-	     * @param params A collection of parameters that control which dialog is loaded, and relevant settings.
-	     * @returns {Promise<any>}
-	     */
-	    FacebookService.prototype.ui = function (params) {
-	        return new Promise(function (resolve, reject) {
-	            FB.ui(params, function (response) {
-	                if (!response)
-	                    reject();
-	                else if (response.error)
-	                    reject(response.error);
-	                else
-	                    resolve(response);
-	            });
-	        });
-	    };
-	    /**
-	     * This method allows you to determine if a user is logged in to Facebook and has authenticated your app.
-	     * @returns {Promise<FacebookLoginStatus>}
-	     */
-	    FacebookService.prototype.getLoginStatus = function () {
-	        return new Promise(function (resolve, reject) {
-	            FB.getLoginStatus(function (response) {
-	                if (!response)
-	                    reject();
-	                else
-	                    resolve(response);
-	            });
-	        });
-	    };
-	    /**
-	     * Login the user
-	     * @param options
-	     * @returns {Promise<FacebookLoginResponse>}
-	     */
-	    FacebookService.prototype.login = function (options) {
-	        return new Promise(function (resolve, reject) {
-	            FB.login(function (response) {
-	                if (response.authResponse) {
-	                    resolve(response);
-	                }
-	                else {
-	                    reject();
-	                }
-	            }, options);
-	        });
-	    };
-	    /**
-	     * Logout the user
-	     * @returns {Promise<any>}
-	     */
-	    FacebookService.prototype.logout = function () {
-	        return new Promise(function (resolve) {
-	            FB.logout(function (response) {
-	                resolve(response);
-	            });
-	        });
-	    };
-	    /**
-	     * This synchronous function returns back the current authResponse.
-	     * @returns {Promise<FacebookAuthResponse>}
-	     */
-	    FacebookService.prototype.getAuthResponse = function () {
-	        return FB.getAuthResponse();
-	    };
-	    FacebookService = __decorate([
-	        core_1.Injectable()
-	    ], FacebookService);
-	    return FacebookService;
-	}());
-	exports.FacebookService = FacebookService;
-
-
-/***/ },
+/* 472 */,
+/* 473 */,
 /* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
