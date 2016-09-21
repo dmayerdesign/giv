@@ -57,6 +57,7 @@ export class SingleOrgComponent implements OnInit {
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
 			this.user = user;
+			console.log(this.user.orgs);
 		});
 
 		this.flash.show("Flash messages work!", { timeout: 2000 });

@@ -377,8 +377,20 @@ mongoose.connection.on('connected', () => {
 
 
 
-
-    orgController.sample();
+    // (function() {
+    //   let i = 0;
+    //   while (i < 50) {
+    //     orgController.sample(function(err, obj) {
+    //       User.find({}, function(err, users) {
+    //         users.forEach(function(user) {
+    //           user.orgs.push(obj._id);
+    //           user.save();
+    //         });
+    //       });
+    //     });
+    //     i++;
+    //   }
+    // }());
 
     // User.find({}, function(err, users) {
     //   console.log(users[0].password);
@@ -386,11 +398,6 @@ mongoose.connection.on('connected', () => {
     //     console.log(res);
     //   });
     // });
-
-    User.find({}, function(err, users) {
-      users[0].orgs = ["57e1c6843f2c42147844771b", "57e1c74175032f160902f42f"];
-      users[0].save();
-    });
 
     // var testdata = new User({
     //   name: "admin",

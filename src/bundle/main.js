@@ -65792,6 +65792,7 @@
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
+	            console.log(_this.user.orgs);
 	        });
 	        this.flash.show("Flash messages work!", { timeout: 2000 });
 	    };

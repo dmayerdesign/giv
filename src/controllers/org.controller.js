@@ -39,11 +39,12 @@ const upload = multer({
 
 const Org = require('../models/Org');
 
-exports.sample = function() {
+exports.sample = function(next) {
   let newOrg = new Org({"name": makeid(), "slug": makeid(), "email": makeid()});
   newOrg.save(function(err, obj) {
     if(err) return console.log(err);
     console.log(obj);
+    next(err, obj);
   });
 
   function makeid()
