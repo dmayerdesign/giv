@@ -56,6 +56,10 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 		    				name="name"
 		    				placeholder="Change the name of the page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
 				</div>
+				<div class="edit-field-container">
+		    	<button *ngIf="!org.featured" (click)="editOrg('featured', true)">Set featured org</button>
+		    	<button *ngIf="org.featured" (click)="editOrg('featured', false)">Unset featured org</button>
+				</div>
 			</div>`,
 	providers: [OrgService, UserService, UIHelper, Utilities]
 })

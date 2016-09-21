@@ -14,25 +14,6 @@ dotenv.load({ path: '.env' });
 
 const Org = require('../models/Org');
 
-exports.sample = function(next) {
-  let newOrg = new Org({"name": makeid(), "slug": makeid(), "email": makeid()});
-  newOrg.save(function(err, obj) {
-    if(err) return console.log(err);
-    console.log(obj);
-    next(err, obj);
-  });
-
-  function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ     abcdefghijklmnopqrstuvwxyz-";
-
-    for( var i=0; i < 20; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-  }
-};
-
 exports.requests = [
   { method: "get",
     uri: "/orgs/get",
@@ -44,6 +25,7 @@ exports.requests = [
       if (req.query.filterField) {
         dbQuery[req.query.filterField] = req.query.filterValue;
       }
+      dbQuery.verified = true;
       Org.find(dbQuery, (err, docs) => {
         if(err) return console.error(err);
         res.json(docs);
@@ -82,7 +64,7 @@ exports.requests = [
     method: "get",
     uri: "/org/:id",
     process: function(req, res) {
-      Org.findOne({_id: req.params.id}, function (err, obj) {
+      Org.findOne({_id: req.params.id, verified: true}, function (err, obj) {
         if(err) return console.error(err);
         res.json(obj);
       });
@@ -115,7 +97,7 @@ exports.requests = [
     method: "get",
     uri: "/org/s/:slug",
     process: function(req, res) {
-      Org.findOne({slug: req.params.slug}, function (err, obj) {
+      Org.findOne({slug: req.params.slug, verified: true}, function (err, obj) {
         if(err) return console.error(err);
         res.json(obj);
       });
@@ -167,15 +149,14 @@ exports.requests = [
   }
 ];
 
-
-
-
 // edit org
 let editableInOrg = [
   "coverImage",
   "donateLink",
   "slug",
-  "name"
+  "name",
+  "verified",
+  "featured"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.requests.push(editOrg(editableInOrg[i]));
@@ -199,3 +180,28 @@ function editOrg(key) {
     }
   }
 }
+
+exports.sample = function(next) {
+  let newOrg = new Org({
+    "name": makeid(),
+    "slug": makeid(),
+    "email": makeid(),
+    "verified": true,
+    "stars": Math.ceil(Math.random()*300)
+  });
+  newOrg.save(function(err, obj) {
+    if(err) return console.log(err);
+    console.log(obj);
+    next(err, obj);
+  });
+
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ     abcdefghijklmnopqrstuvwxyz-";
+
+    for( var i=0; i < 20; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
+};

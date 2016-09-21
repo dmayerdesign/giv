@@ -24,18 +24,22 @@ import { OrgPostsComponent } from './org-posts.component';
 export class BrowseOrgsComponent implements OnInit {
 	@ViewChildren('singleItem') $orgs = [];
 	@Output() selectedOrg:any = null;
+	@Output() selectedFeaturedOrg:any = null;
 
 	private orgs = [];
-	private orgsLoaded:number = 10;
+	private featuredOrgs = [];
+	private orgsLoaded:number = 20;
 	private orgsShowing:number;
 	private orgsSorting = {order: "-name"};
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
 	private viewingOrg:boolean = false;
+	private viewingFeaturedOrg:boolean = false;
 	//private selectedOrg:any = null;
 
 	private isLoading = true;
-	private loadingOrgs = false;
+	private isLoadingFeatured = true;
+	private loadingOrgSearch = false;
 	private paramsSub:Subscription;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
@@ -65,11 +69,19 @@ export class BrowseOrgsComponent implements OnInit {
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 			: this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
 
-		this.orgService.loadOrgs({limit:10}).subscribe(
+		this.orgService.loadOrgs({limit:20}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
 				this.takeCount(this.orgs);
+			},
+			error => console.log(error)
+		);
+
+		this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
+			data => {
+				this.isLoadingFeatured = false;
+				this.featuredOrgs = data;
 			},
 			error => console.log(error)
 		);
@@ -116,12 +128,12 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		this.loadingOrgs = true;
-		this.orgService.loadOrgs({search:search, field:"name", limit:10})
+		this.loadingOrgSearch = true;
+		this.orgService.loadOrgs({search:search, field:"name", limit:20})
 			.subscribe(
 				results => {
 					this.orgs = results;
-					this.loadingOrgs = false;
+					this.loadingOrgSearch = false;
 					this.searchText = search;
 				},
 				error => console.error(error)
@@ -159,11 +171,27 @@ export class BrowseOrgsComponent implements OnInit {
 		this.viewingOrg = true;
 	}
 
+	viewFeaturedOrg(id:string):void {
+		let findOrg = function(org) {
+			return org._id === id;
+		}
+		this.selectedFeaturedOrg = this.orgs.find(findOrg);
+		this.viewingFeaturedOrg = true;
+	}
+
 	deselectOrg(e:Event, id:string):void {
 		console.log(e);
 		if (this.viewingOrg && this.selectedOrg._id === id) {
 			this.selectedOrg = null;
 			this.viewingOrg = false;
+		}
+	}
+
+	deselectFeaturedOrg(e:Event, id:string):void {
+		console.log(e);
+		if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
+			this.selectedFeaturedOrg = null;
+			this.viewingFeaturedOrg = false;
 		}
 	}
 

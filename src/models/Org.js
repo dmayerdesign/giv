@@ -11,6 +11,7 @@ const orgSchema = new mongoose.Schema({
 	facebook: String,
 	stars: Number,
 	verified: Boolean,
+	featured: Boolean,
 
 	globalPermission: String, // for manager permission
 	managers: [String],

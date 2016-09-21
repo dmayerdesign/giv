@@ -65284,14 +65284,18 @@
 	        this.flash = flash;
 	        this.$orgs = [];
 	        this.selectedOrg = null;
+	        this.selectedFeaturedOrg = null;
 	        this.orgs = [];
-	        this.orgsLoaded = 10;
+	        this.featuredOrgs = [];
+	        this.orgsLoaded = 20;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
+	        this.viewingFeaturedOrg = false;
 	        //private selectedOrg:any = null;
 	        this.isLoading = true;
-	        this.loadingOrgs = false;
+	        this.isLoadingFeatured = true;
+	        this.loadingOrgSearch = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	        this.infoMsg = new app_service_1.InfoMessage();
 	    }
@@ -65308,10 +65312,14 @@
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 	            : this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
-	        this.orgService.loadOrgs({ limit: 10 }).subscribe(function (data) {
+	        this.orgService.loadOrgs({ limit: 20 }).subscribe(function (data) {
 	            _this.isLoading = false;
 	            _this.orgs = data;
 	            _this.takeCount(_this.orgs);
+	        }, function (error) { return console.log(error); });
+	        this.orgService.loadOrgs({ limit: 6, filterField: "featured", filterValue: "true" }).subscribe(function (data) {
+	            _this.isLoadingFeatured = false;
+	            _this.featuredOrgs = data;
 	        }, function (error) { return console.log(error); });
 	    };
 	    BrowseOrgsComponent.prototype.ngDoCheck = function () {
@@ -65354,11 +65362,11 @@
 	    };
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
-	        this.loadingOrgs = true;
-	        this.orgService.loadOrgs({ search: search, field: "name", limit: 10 })
+	        this.loadingOrgSearch = true;
+	        this.orgService.loadOrgs({ search: search, field: "name", limit: 20 })
 	            .subscribe(function (results) {
 	            _this.orgs = results;
-	            _this.loadingOrgs = false;
+	            _this.loadingOrgSearch = false;
 	            _this.searchText = search;
 	        }, function (error) { return console.error(error); });
 	    };
@@ -65387,11 +65395,25 @@
 	        this.selectedOrg = this.orgs.find(findOrg);
 	        this.viewingOrg = true;
 	    };
+	    BrowseOrgsComponent.prototype.viewFeaturedOrg = function (id) {
+	        var findOrg = function (org) {
+	            return org._id === id;
+	        };
+	        this.selectedFeaturedOrg = this.orgs.find(findOrg);
+	        this.viewingFeaturedOrg = true;
+	    };
 	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
 	        console.log(e);
 	        if (this.viewingOrg && this.selectedOrg._id === id) {
 	            this.selectedOrg = null;
 	            this.viewingOrg = false;
+	        }
+	    };
+	    BrowseOrgsComponent.prototype.deselectFeaturedOrg = function (e, id) {
+	        console.log(e);
+	        if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
+	            this.selectedFeaturedOrg = null;
+	            this.viewingFeaturedOrg = false;
 	        }
 	    };
 	    __decorate([
@@ -65402,6 +65424,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], BrowseOrgsComponent.prototype, "selectedOrg", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], BrowseOrgsComponent.prototype, "selectedFeaturedOrg", void 0);
 	    BrowseOrgsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'orgs-list',
@@ -65493,6 +65519,8 @@
 	    }
 	    SearchService.prototype.loadSearchableData = function (uri, options) {
 	        var params = new http_1.URLSearchParams();
+	        if (this.stringIsSet(options.org))
+	            params.set("org", options.org);
 	        if (this.stringIsSet(options.search)) {
 	            params.set("search", options.search);
 	            localStorage.setItem("searching", "true");
@@ -65500,10 +65528,12 @@
 	        else {
 	            localStorage.setItem("searching", "false");
 	        }
-	        if (this.stringIsSet(options.org))
-	            params.set("org", options.org);
 	        if (this.stringIsSet(options.field))
 	            params.set("field", options.field);
+	        if (this.stringIsSet(options.filterField))
+	            params.set("filterField", options.filterField);
+	        if (this.stringIsSet(options.filterValue))
+	            params.set("filterValue", options.filterValue);
 	        if (this.numberIsSet(options.limit))
 	            params.set("limit", options.limit.toString());
 	        if (this.numberIsSet(options.offset))
@@ -65970,7 +66000,7 @@
 	    ManageOrgPageComponent = __decorate([
 	        core_1.Component({
 	            selector: 'manage-org-page',
-	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t\t\t\t<input type=\"file\"\n\t\t\t\t\t\tclass=\"form-control\"\n\t      \t\tngFileSelect\n\t\t\t      [options]=\"uploadOptions\"\n\t\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\t\t\t    <span class=\"editing-tip\">If you want to upload a file larger than 3 MB, go <a href=\"http://compressjpeg.com\">here for JPEGs</a> and <a href=\"http://tinypng.com\">here for PNGs.</a></span>\n\t\t\t  \t<span class=\"editing-tip\">If your file is publicly accessible on the Internet, simply paste the link below.</span>\n\t\t\t  </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the cover image\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the main Donate link\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\t(keyup)=\"checkForUniqueSlug($event)\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button [disabled]=\"!slugIsValid\" (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"name\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tngControl=\"name\"\n\t\t    \t\t\t\tname=\"name\"\n\t\t    \t\t\t\tplaceholder=\"Change the name of the page\"><button (click)=\"editOrg('name', name)\"><i [hidden]=\"!loading_name\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t\t</div>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t\t\t\t<input type=\"file\"\n\t\t\t\t\t\tclass=\"form-control\"\n\t      \t\tngFileSelect\n\t\t\t      [options]=\"uploadOptions\"\n\t\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\t\t\t    <span class=\"editing-tip\">If you want to upload a file larger than 3 MB, go <a href=\"http://compressjpeg.com\">here for JPEGs</a> and <a href=\"http://tinypng.com\">here for PNGs.</a></span>\n\t\t\t  \t<span class=\"editing-tip\">If your file is publicly accessible on the Internet, simply paste the link below.</span>\n\t\t\t  </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the cover image\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the main Donate link\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\t(keyup)=\"checkForUniqueSlug($event)\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button [disabled]=\"!slugIsValid\" (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"name\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tngControl=\"name\"\n\t\t    \t\t\t\tname=\"name\"\n\t\t    \t\t\t\tplaceholder=\"Change the name of the page\"><button (click)=\"editOrg('name', name)\"><i [hidden]=\"!loading_name\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t    \t<button *ngIf=\"!org.featured\" (click)=\"editOrg('featured', true)\">Set featured org</button>\n\t\t    \t<button *ngIf=\"org.featured\" (click)=\"editOrg('featured', false)\">Unset featured org</button>\n\t\t\t\t</div>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
