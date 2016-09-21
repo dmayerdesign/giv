@@ -29,20 +29,19 @@ exports.postLogin = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
     return res.redirect('/login');
   }
 
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
     if (!user) {
-      req.flash('errors', info);
       return res.redirect('/login');
     }
     req.logIn(user, (err) => {
       if (err) { return next(err); }
-      req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      console.log(user);
+      res.json(user);
+      //res.redirect(req.session.returnTo || '/');
     });
   })(req, res, next);
 };
@@ -382,7 +381,7 @@ exports.postForgot = (req, res, next) => {
  */
 
 exports.login = (req, res, next) => {
-  if (req.body.token && req.body.token.accessToken) { // If this is a Facebook login
+  if (req.body.token && req.body.token.accessToken && req.body.token.accessToken.type === "facebook") { // If this is a Facebook login
     User.findOne({ facebook: req.body.id }, (err, existingUser) => {
       if (err) return console.log(err);
       if (existingUser) {

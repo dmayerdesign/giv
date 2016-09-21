@@ -157,9 +157,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
  * Primary app routes.
  */
 app.get('/', homeController.index);
-// app.get('/login', userController.getLogin);
-// app.post('/login', userController.postLogin);
-app.post('/login', userController.login);
+app.post('/login', userController.postLogin);
+//app.post('/login', userController.login);
 app.get('/logout', userController.logout);
 app.get('/forgot', userController.getForgot);
 app.post('/forgot', userController.postForgot);
@@ -285,7 +284,8 @@ mongoose.connection.on('connected', () => {
     for (let i = 0; i < orgController.requests.length; i++) {
       let request = orgController.requests[i];
       if (request.middleware) {
-        if (request.middleware === "upload") app[request.method](request.uri, upload.any(), request.process);
+        if (request.middleware === "upload") app[request.method](request.uri, passportConfig.isAuthenticated, upload.any(), request.process);
+        if (request.middleware === "passport") app[request.method](request.uri, passportConfig.isAuthenticated, request.process);
       }
       else {
         app[request.method](request.uri, request.process);
@@ -423,8 +423,9 @@ mongoose.connection.on('connected', () => {
     // });
 
     // var testdata = new User({
-    //   name: "admin",
-    //   password: "test123"
+    //   name: "Danny",
+    //   email: "d.a.mayer92@gmail.com",
+    //   password: "sohcahtoa"
     // });
     // testdata.save(function(err, data){
     //     if(err) console.log(err);

@@ -166,6 +166,7 @@ function editOrg(key) {
   return {
     method: "put",
     uri: '/edit-org/'+key+'/:orgId',
+    middleware: "passport",
     process: function(req, res) {
       let updateQuery = {$set:{}};
       updateQuery.$set[key] = req.body.value;
