@@ -93,3 +93,11 @@ a:hover .fa-heart {
 .single-org #posts {
 	padding-top: 40px; /* For anchor links */
 }
+
+
+/* Editing */
+.edit-field-container {
+	padding: 2em;
+	border: 2px solid #f5f5f5;
+	border-radius: 4px;
+}

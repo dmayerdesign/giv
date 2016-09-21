@@ -65849,12 +65849,13 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
+	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(477);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(471);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -65863,9 +65864,11 @@
 	        this.utilities = utilities;
 	        this.zone = zone;
 	        this.flash = flash;
+	        this.http = http;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        this.slugIsValid = true;
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -65915,11 +65918,20 @@
 	            console.log(data);
 	            _this.progress = data.progress.percent;
 	            _this.stillWorking = true;
-	            if (data.response) {
+	            if (data.response && data.status !== 404) {
 	                _this.org = JSON.parse(data.response);
 	                _this.stillWorking = false;
 	                console.log(data.response);
 	            }
+	        });
+	    };
+	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
+	        var _this = this;
+	        this.http.get("/org/s/" + this.slug).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data)
+	                _this.slugIsValid = false;
+	            else
+	                _this.slugIsValid = true;
 	        });
 	    };
 	    ManageOrgPageComponent.prototype.editOrg = function (key, value) {
@@ -65958,10 +65970,10 @@
 	    ManageOrgPageComponent = __decorate([
 	        core_1.Component({
 	            selector: 'manage-org-page',
-	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t<input type=\"file\" \n      \t\tngFileSelect\n\t\t      [options]=\"uploadOptions\"\n\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t    <span *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t    <span *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\n\t\t    <input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"{{org.coverImage || 'e.g. http://flickr.com/my-awesome-photo.jpg'}}\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    <input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"{{org.donateLink || 'e.g. http://myorg.com/donate'}}\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    <input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t\t\t\t<input type=\"file\"\n\t\t\t\t\t\tclass=\"form-control\"\n\t      \t\tngFileSelect\n\t\t\t      [options]=\"uploadOptions\"\n\t\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\t\t\t    <span class=\"editing-tip\">If you want to upload a file larger than 3 MB, go <a href=\"http://compressjpeg.com\">here for JPEGs</a> and <a href=\"http://tinypng.com\">here for PNGs.</a></span>\n\t\t\t  \t<span class=\"editing-tip\">If your file is publicly accessible on the Internet, simply paste the link below.</span>\n\t\t\t  </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the cover image\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the main Donate link\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\t(keyup)=\"checkForUniqueSlug($event)\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button [disabled]=\"!slugIsValid\" (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"name\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tngControl=\"name\"\n\t\t    \t\t\t\tname=\"name\"\n\t\t    \t\t\t\tplaceholder=\"Change the name of the page\"><button (click)=\"editOrg('name', name)\"><i [hidden]=\"!loading_name\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t\t</div>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());

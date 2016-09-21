@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, NgZone, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
@@ -15,24 +16,46 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Back to page</a>
 				<h4>Manage {{org.name}}</h4>
 				<img [src]="org.coverImage" width="200">
-				<input type="file" 
-      		ngFileSelect
-		      [options]="uploadOptions"
-		      (onUpload)="handleUpload($event)">
+				
+				<div class="edit-field-container">
+					<input type="file"
+						class="form-control"
+	      		ngFileSelect
+			      [options]="uploadOptions"
+			      (onUpload)="handleUpload($event)">
 
-		    <span *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
-		    <span *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
-
-		    <input [(ngModel)]="coverImageLink"
-		    				name="coverImageLink"
-		    				placeholder="{{org.coverImage || 'e.g. http://flickr.com/my-awesome-photo.jpg'}}"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-		    <input [(ngModel)]="donateLink"
-		    				name="donateLink"
-		    				placeholder="{{org.donateLink || 'e.g. http://myorg.com/donate'}}"><button (click)="editOrg('donateLink', donateLink)"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-		    <input [(ngModel)]="slug"
+			    <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
+			    <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
+			    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
+			  	<span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
+			  </div>
+		    <div class="edit-field-container">
+		    	<input [(ngModel)]="coverImageLink"
+		    				class="form-control"
+	      				name="coverImageLink"
+		    				placeholder="Change the cover image"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    </div>
+		    <div class="edit-field-container">
+		    	<input [(ngModel)]="donateLink"
+		    				class="form-control"
+	      				name="donateLink"
+		    				placeholder="Change the main Donate link"><button (click)="editOrg('donateLink', donateLink)"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    </div>
+		    <div class="edit-field-container">
+		    	<input [(ngModel)]="slug"
+		    				class="form-control"
+	      				(keyup)="checkForUniqueSlug($event)"
 		    				ngControl="slug"
 		    				name="slug"
-		    				placeholder="{{org.slug || 'e.g. my-awesome-org'}}"><button (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    				placeholder="{{org.slug || 'e.g. my-awesome-org'}}"><button [disabled]="!slugIsValid" (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+		    </div>
+		    <div class="edit-field-container">
+		    	<input [(ngModel)]="name"
+		    				class="form-control"
+	      				ngControl="name"
+		    				name="name"
+		    				placeholder="Change the name of the page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+				</div>
 			</div>`,
 	providers: [OrgService, UserService, UIHelper, Utilities]
 })
@@ -50,10 +73,12 @@ export class ManageOrgPageComponent implements OnInit {
 	private coverImageLink:string;
 	private donateLink:string;
 	private slug:string;
+	private name:string;
 
 	private loading_coverImage:boolean;
 	private loading_donateLink:boolean;
 	private loading_slug:boolean;
+	private slugIsValid:boolean = true;
 
 	uploadFile:any;
   uploadOptions:Object;
@@ -66,7 +91,8 @@ export class ManageOrgPageComponent implements OnInit {
 				private helper: UIHelper,
 				private utilities: Utilities,
 				private zone: NgZone,
-				private flash: FlashMessagesService) { }
+				private flash: FlashMessagesService,
+				private http: Http) { }
 
 	ngOnInit() {
 		this.userService.getLoggedInUser((err, user) => {
@@ -122,13 +148,21 @@ export class ManageOrgPageComponent implements OnInit {
   		console.log(data);
   		this.progress = data.progress.percent;
   		this.stillWorking = true;
-	    if (data.response) {
+
+	    if (data.response && data.status !== 404) {
 	    	this.org = JSON.parse(data.response);
 	    	this.stillWorking = false;
 	    	console.log(data.response);
 	    }
     });
   }
+
+  checkForUniqueSlug($event) {
+  	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
+  		if (data) this.slugIsValid = false;
+  		else this.slugIsValid = true;
+  	});
+  } 
 
   editOrg(key:string, value:string):void {
   	if (key === "slug") {

@@ -5,37 +5,12 @@ const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
 const mongoose = require('mongoose');
-
-const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-
 const search = require('../services/search');
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
 dotenv.load({ path: '.env' });
-
-/**
- * AWS S3 uploads
- */
-const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
-const initial_upload = multer({ dest: path.join(__dirname, 'uploads') });
-
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'fuse-uploads',
-    acl: 'public-read',
-    key: function (req, file, callback) {
-        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
-        console.log(file);
-        callback(null, req.newPath);
-    }
-  }),
-  limits: { fileSize: 5000000 }
-});
 
 const Org = require('../models/Org');
 
@@ -172,17 +147,21 @@ exports.requests = [
   // file uploads with multer-s3
   {
     method: "post",
-    uri: "edit-org/upload/cover-image/:orgId",
-    middleware: [upload.any],
+    uri: "/edit-org/upload/cover-image/:orgId",
+    middleware: "upload",
     process: function(req, res, next) {
-      Org.findOne({_id: req.params.orgId}, function(err, obj) {
-        if(err) return console.error(err);
-        obj.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
-        console.log(obj.coverImage);
-        obj.save(function(err, org) {
-          if(err) return console.error(err);
-          res.json(org);
-        }); 
+      let updateQuery = {$set:{}};
+      // updateQuery.$set.coverImage = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
+      updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
+      Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
+        if(err) {
+          console.error(err);
+          res.send(400).json(err);
+        }
+        else {
+          console.log(obj.coverImage);
+          res.json(obj);
+        } 
       });
     }
   }
@@ -195,7 +174,8 @@ exports.requests = [
 let editableInOrg = [
   "coverImage",
   "donateLink",
-  "slug"
+  "slug",
+  "name"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.requests.push(editOrg(editableInOrg[i]));

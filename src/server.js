@@ -18,11 +18,33 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const bcrypt = require('bcrypt-nodejs');
-
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
 dotenv.load({ path: '.env' });
+
+/**
+ * AWS S3 uploads
+ */
+const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
+const initial_upload = multer({ dest: path.join(__dirname, 'uploads') });
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'fuse-uploads',
+    acl: 'public-read',
+    key: function (req, file, callback) {
+      req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
+      console.log("Uploading "); console.log(file);
+      callback(null, req.newPath);
+    }
+  }),
+  limits: { fileSize: 3000000 }
+});
 
 /**
  * Controllers (route handlers).
@@ -263,9 +285,7 @@ mongoose.connection.on('connected', () => {
     for (let i = 0; i < orgController.requests.length; i++) {
       let request = orgController.requests[i];
       if (request.middleware) {
-        if (request.middleware.length === 1) app[request.method](request.uri, request.middleware[0], request.process);
-        if (request.middleware.length === 2) app[request.method](request.uri, request.middleware[0], request.middleware[1], request.process);
-        if (request.middleware.length > 2) app[request.method](request.uri, request.middleware[0], request.middleware[1], request.middleware[2], request.process);
+        if (request.middleware === "upload") app[request.method](request.uri, upload.any(), request.process);
       }
       else {
         app[request.method](request.uri, request.process);
