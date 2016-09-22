@@ -8,3 +8,4 @@ Point system levels you up, each level you get a prize: we donate $$ in your nam
 
 Let organizations list what kind of giving they accept and instructions for how to give
 Let users list what they have to give
+Send an email to users who have favorited an org when that org posts something

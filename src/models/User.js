@@ -7,12 +7,12 @@ const userSchema = new mongoose.Schema({
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  facebook: String,
+  tokens: Array,
 
   permissions: [String],
   uniqueClicks: [String],
-
-  facebook: String,
-  tokens: Array,
+  favorites: [String],
 
   profile: {
     name: String,

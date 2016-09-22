@@ -56,19 +56,6 @@ exports.logout = (req, res) => {
 };
 
 /**
- * GET /signup
- * Signup page.
- */
-exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  res.render('account/signup', {
-    title: 'Create Account'
-  });
-};
-
-/**
  * POST /signup
  * Create a new local account.
  */
@@ -373,69 +360,6 @@ exports.postForgot = (req, res, next) => {
   });
 };
 
-
-
-
-/**
- * Danny's login
- */
-
-exports.login = (req, res, next) => {
-  if (req.body.token && req.body.token.accessToken && req.body.token.accessToken.type === "facebook") { // If this is a Facebook login
-    User.findOne({ facebook: req.body.id }, (err, existingUser) => {
-      if (err) return console.log(err);
-      if (existingUser) {
-        res.json(existingUser);
-        return;
-      }
-      User.findOne({ email: req.body.email }, (err, existingEmailUser) => {
-        if (err) return console.log(err);
-        if (existingEmailUser) {
-          res.send("An account with this email already exists.");
-        } else {
-          const user = new User();
-          user.email = req.body.email;
-          user.facebook = req.body.id;
-          user.tokens.push(req.body.token);
-          user.profile.name = req.body.first_name + ' ' + req.body.last_name;
-          user.profile.picture = `https://graph.facebook.com/${req.body.id}/picture?type=large`;
-          user.save((err) => {
-            if (err) return console.log(err);
-            res.json(user);
-          });
-        }
-      });
-    });
-  }
-  else {
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('password', 'Password cannot be blank').notEmpty();
-    req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-    const errors = req.validationErrors();
-
-    if (errors) {
-      res.json(errors);
-    }
-
-    User.findOne({ email: req.body.email }, (err, user) => {
-      if (err) return console.log(err);
-      if (user) {
-        user.comparePassword(req.body.password, (err, isMatch) => {
-          if (err) return console.log(err);
-          if (isMatch) {
-            res.json(user);
-          }
-          else {
-            res.send("Incorrect password");
-          }
-        });
-      }
-    });
-  }
-
-};
-
 exports.getUser = (req, res) => {
   User.findOne({ _id: req.params.id }, (err, user) => {
     if (err) return console.log(err);
@@ -444,3 +368,65 @@ exports.getUser = (req, res) => {
     }
   });
 };
+
+
+
+/**
+ * Danny's login
+ */
+
+// exports.login = (req, res, next) => {
+//   if (req.body.token && req.body.token.accessToken && req.body.token.accessToken.type === "facebook") { // If this is a Facebook login
+//     User.findOne({ facebook: req.body.id }, (err, existingUser) => {
+//       if (err) return console.log(err);
+//       if (existingUser) {
+//         res.json(existingUser);
+//         return;
+//       }
+//       User.findOne({ email: req.body.email }, (err, existingEmailUser) => {
+//         if (err) return console.log(err);
+//         if (existingEmailUser) {
+//           res.send("An account with this email already exists.");
+//         } else {
+//           const user = new User();
+//           user.email = req.body.email;
+//           user.facebook = req.body.id;
+//           user.tokens.push(req.body.token);
+//           user.profile.name = req.body.first_name + ' ' + req.body.last_name;
+//           user.profile.picture = `https://graph.facebook.com/${req.body.id}/picture?type=large`;
+//           user.save((err) => {
+//             if (err) return console.log(err);
+//             res.json(user);
+//           });
+//         }
+//       });
+//     });
+//   }
+//   else {
+//     req.assert('email', 'Email is not valid').isEmail();
+//     req.assert('password', 'Password cannot be blank').notEmpty();
+//     req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+//     const errors = req.validationErrors();
+
+//     if (errors) {
+//       res.json(errors);
+//     }
+
+//     User.findOne({ email: req.body.email }, (err, user) => {
+//       if (err) return console.log(err);
+//       if (user) {
+//         user.comparePassword(req.body.password, (err, isMatch) => {
+//           if (err) return console.log(err);
+//           if (isMatch) {
+//             res.json(user);
+//           }
+//           else {
+//             res.send("Incorrect password");
+//           }
+//         });
+//       }
+//     });
+//   }
+
+// };

@@ -15,6 +15,7 @@ const orgSchema = new mongoose.Schema({
 
 	globalPermission: String, // for manager permission
 	managers: [String],
+	favoritedBy: [String],
 	
 	coverImage: String,
 	gravatar: String,

@@ -6,9 +6,9 @@ import { InfoMessage } from './services/app.service';
 import { UserService } from './services/user.service';
 
 @Component({
-	selector: 'login',
-	templateUrl: 'app/login.component.html'
-	//providers: [FacebookService]
+	selector: 'login'
+, templateUrl: 'app/login.component.html'
+//, providers: [FacebookService]
 })
 
 export class LoginComponent implements OnInit {
