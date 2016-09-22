@@ -49917,18 +49917,18 @@
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var app_component_1 = __webpack_require__(467);
 	var login_component_1 = __webpack_require__(470);
-	var about_component_1 = __webpack_require__(474);
-	var library_component_1 = __webpack_require__(475);
-	var browse_orgs_component_1 = __webpack_require__(476);
-	var org_details_component_1 = __webpack_require__(480);
-	var org_posts_component_1 = __webpack_require__(481);
-	var single_org_component_1 = __webpack_require__(482);
-	var manage_org_page_component_1 = __webpack_require__(483);
-	var search_box_component_1 = __webpack_require__(479);
-	var contact_component_1 = __webpack_require__(484);
+	var about_component_1 = __webpack_require__(472);
+	var library_component_1 = __webpack_require__(473);
+	var browse_orgs_component_1 = __webpack_require__(474);
+	var org_details_component_1 = __webpack_require__(478);
+	var org_posts_component_1 = __webpack_require__(479);
+	var single_org_component_1 = __webpack_require__(480);
+	var manage_org_page_component_1 = __webpack_require__(481);
+	var search_box_component_1 = __webpack_require__(477);
+	var contact_component_1 = __webpack_require__(482);
 	var user_service_1 = __webpack_require__(468);
-	var search_service_1 = __webpack_require__(478);
-	var ng2_click_outside_1 = __webpack_require__(486);
+	var search_service_1 = __webpack_require__(476);
+	var ng2_click_outside_1 = __webpack_require__(484);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -64982,9 +64982,7 @@
 
 
 /***/ },
-/* 472 */,
-/* 473 */,
-/* 474 */
+/* 472 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65014,7 +65012,7 @@
 
 
 /***/ },
-/* 475 */
+/* 473 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65045,7 +65043,7 @@
 
 
 /***/ },
-/* 476 */
+/* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65062,11 +65060,11 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var angular2_flash_messages_1 = __webpack_require__(461);
-	var org_service_1 = __webpack_require__(477);
+	var org_service_1 = __webpack_require__(475);
 	var app_service_1 = __webpack_require__(471);
-	var search_box_component_1 = __webpack_require__(479);
-	var org_details_component_1 = __webpack_require__(480);
-	var org_posts_component_1 = __webpack_require__(481);
+	var search_box_component_1 = __webpack_require__(477);
+	var org_details_component_1 = __webpack_require__(478);
+	var org_posts_component_1 = __webpack_require__(479);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash) {
 	        this.http = http;
@@ -65238,7 +65236,7 @@
 
 
 /***/ },
-/* 477 */
+/* 475 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65253,7 +65251,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var search_service_1 = __webpack_require__(478);
+	var search_service_1 = __webpack_require__(476);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var OrgService = (function () {
 	    function OrgService(http, search, flash) {
@@ -65291,7 +65289,7 @@
 
 
 /***/ },
-/* 478 */
+/* 476 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65351,7 +65349,7 @@
 
 
 /***/ },
-/* 479 */
+/* 477 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65407,7 +65405,7 @@
 
 
 /***/ },
-/* 480 */
+/* 478 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65422,7 +65420,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(477);
+	var org_service_1 = __webpack_require__(475);
 	var app_service_1 = __webpack_require__(471);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
@@ -65468,7 +65466,7 @@
 
 
 /***/ },
-/* 481 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65484,7 +65482,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(477);
+	var org_service_1 = __webpack_require__(475);
 	var app_service_1 = __webpack_require__(471);
 	__webpack_require__(339);
 	var OrgPostsComponent = (function () {
@@ -65584,7 +65582,7 @@
 
 
 /***/ },
-/* 482 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65599,7 +65597,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(477);
+	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(471);
 	var angular2_flash_messages_1 = __webpack_require__(461);
@@ -65657,7 +65655,7 @@
 
 
 /***/ },
-/* 483 */
+/* 481 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65673,7 +65671,7 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(477);
+	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(471);
 	var angular2_flash_messages_1 = __webpack_require__(461);
@@ -65804,7 +65802,7 @@
 
 
 /***/ },
-/* 484 */
+/* 482 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65821,7 +65819,7 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var app_service_1 = __webpack_require__(471);
-	var email_service_1 = __webpack_require__(485);
+	var email_service_1 = __webpack_require__(483);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
 	        this.http = http;
@@ -65867,7 +65865,7 @@
 
 
 /***/ },
-/* 485 */
+/* 483 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -65880,7 +65878,7 @@
 
 
 /***/ },
-/* 486 */
+/* 484 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65894,7 +65892,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(487);
+	var click_outside_directive_1 = __webpack_require__(485);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -65912,7 +65910,7 @@
 
 
 /***/ },
-/* 487 */
+/* 485 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

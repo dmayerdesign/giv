@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const chalk = require('chalk');
 const errorHandler = require('errorhandler');
-//const lusca = require('lusca');
 const dotenv = require('dotenv');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('express-flash');
@@ -18,6 +17,7 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const bcrypt = require('bcrypt-nodejs');
+
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
@@ -45,6 +45,11 @@ const upload = multer({
   }),
   limits: { fileSize: 3000000 }
 });
+
+/**
+* Security middleware
+**/
+const helmet = require('helmet');
 
 /**
  * Controllers (route handlers).
@@ -100,6 +105,7 @@ mongoose.connection.config.autoIndex = true; // set to false to boost performanc
 app.set('port', process.env.PORT || 3000);
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'pug');
+app.use(helmet());
 app.use(compression());
 app.use(sass({
   src: path.join(__dirname, 'public'),
@@ -121,15 +127,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-// app.use((req, res, next) => {
-//   if (req.path === '/api/upload') {
-//     next();
-//   } else {
-//     lusca.csrf()(req, res, next);
-//   }
-// });
-//app.use(lusca.xframe('SAMEORIGIN'));
-//app.use(lusca.xssProtection(true));
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
