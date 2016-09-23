@@ -2,15 +2,10 @@
  * Module dependencies.
  */
 const express = require('express');
-const dotenv = require('dotenv');
 const path = require('path');
 const mongoose = require('mongoose');
 const search = require('../services/search');
 
-/**
- * Load environment variables from .env file, where API keys and passwords are configured.
- */
-dotenv.load({ path: '.env' });
 
 const Org = require('../models/Org');
 
