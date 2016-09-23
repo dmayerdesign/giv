@@ -3,7 +3,7 @@ import { Http, URLSearchParams } from '@angular/http';
 import { SearchService } from './search.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
-interface EditOrgInterface {
+interface EditInterface {
 		id?: string;
     key?: string;
    	value?: string;
@@ -33,11 +33,14 @@ export class OrgService {
 		else {
 			return this.http.get("/org/" + options).map(res => res.json());
 		}
-		
 	}
 
-	editOrg(options: EditOrgInterface) {
+	editOrg(options: EditInterface) {
 		return this.http.put("/edit-org/" + options.key + "/" + options.id, {value: options.value}).map(res => res.json());
+	}
+
+	editPost(options: EditInterface) {
+		return this.http.put("/edit-post/" + options.key + "/" + options.id, {value: options.value}).map(res => res.json());
 	}
 
 }

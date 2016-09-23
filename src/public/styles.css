@@ -18,15 +18,6 @@ a:hover .fa-heart {
 	color: #cc0000;
 }
 
-.alert {
-	z-index: 999;
-	position: fixed;
-	bottom: 15px;
-	left: 25%;
-	width: 50%;
-	opacity: 0.9;
-}
-
 
 /* Search */
 
@@ -52,6 +43,8 @@ a:hover .fa-heart {
 
 .flash-message {
 	display: block;
+	position: fixed;
+	z-index: 1000;
 	box-sizing: content-box;
 	width: 100%;
 	padding: 7px 0 12px 0;
@@ -62,6 +55,10 @@ a:hover .fa-heart {
 	bottom: 0;
 	background: #99ccaa;
 	color: #fff;
+}
+
+.error {
+	background: #cc9a99;
 }
 
 .flash-message p {

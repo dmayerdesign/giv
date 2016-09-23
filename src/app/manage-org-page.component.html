@@ -1,0 +1,50 @@
+<div class="manage-org-page" *ngIf="isLoaded">
+	<a *ngIf="org.slug" href="/organization/{{org.slug}}">Back to page</a>
+	<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Back to page</a>
+	<h4>Manage {{org.name}}</h4>
+	<img [src]="org.coverImage" width="200">
+	
+	<div class="edit-field-container">
+		<input type="file"
+			class="form-control"
+  		ngFileSelect
+      [options]="uploadOptions"
+      (onUpload)="handleUpload($event)">
+
+    <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
+    <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
+    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
+  	<span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
+  </div>
+  <div class="edit-field-container">
+  	<input [(ngModel)]="coverImageLink"
+  				class="form-control"
+  				name="coverImageLink"
+  				placeholder="Change the cover image"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="edit-field-container">
+  	<input [(ngModel)]="donateLink"
+  				class="form-control"
+  				name="donateLink"
+  				placeholder="Change the main Donate link (currently {{org.donateLink}})"><button (click)="editOrg('donateLink', donateLink)"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="edit-field-container">
+  	<input [(ngModel)]="slug"
+  				class="form-control"
+  				(keyup)="checkForUniqueSlug($event)"
+  				ngControl="slug"
+  				name="slug"
+  				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="edit-field-container">
+  	<input [(ngModel)]="name"
+  				class="form-control"
+  				ngControl="name"
+  				name="name"
+  				placeholder="Change the name of your page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+	</div>
+	<div class="edit-field-container">
+  	<button *ngIf="!org.featured" (click)="editOrg('featured', true)">Set featured org</button>
+  	<button *ngIf="org.featured" (click)="editOrg('featured', false)">Unset featured org</button>
+	</div>
+</div>

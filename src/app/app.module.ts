@@ -8,6 +8,7 @@ import { FlashMessagesModule } from 'angular2-flash-messages';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login.component';
+import { SignupComponent } from './signup.component';
 import { AboutComponent } from './about.component';
 import { LibraryComponent } from './library.component';
 import { BrowseOrgsComponent } from './browse-orgs.component';
@@ -28,6 +29,7 @@ enableProdMode();
 const routing = RouterModule.forRoot([
     { path: 'browse', component: BrowseOrgsComponent }
   , { path: 'login', component: LoginComponent }
+  , { path: 'signup', component: SignupComponent }
   , { path: 'about', component: AboutComponent }
   , { path: 'library', component: LibraryComponent }
   , { path: 'contact', component: ContactComponent }
@@ -40,32 +42,33 @@ const routing = RouterModule.forRoot([
 
 @NgModule({
     imports: [
-      BrowserModule,
-    	routing,
-      HttpModule,
-    	FormsModule,
-    	ReactiveFormsModule,
-      ClickOutsideModule,
-      FlashMessagesModule
+        BrowserModule
+      ,	routing
+      , HttpModule
+      ,	FormsModule
+      ,	ReactiveFormsModule
+      , ClickOutsideModule
+      , FlashMessagesModule
     ],
     declarations: [
-      AppComponent,
-      LoginComponent,
-      BrowseOrgsComponent,
-      OrgDetailsComponent,
-      OrgPostsComponent,
-      SingleOrgComponent,
-      ManageOrgPageComponent,
-    	AboutComponent,
-      LibraryComponent,
-      ContactComponent,
-      UPLOAD_DIRECTIVES
+        AppComponent
+      , LoginComponent
+      , SignupComponent
+      , BrowseOrgsComponent
+      , OrgDetailsComponent
+      , OrgPostsComponent
+      , SingleOrgComponent
+      , ManageOrgPageComponent
+    	, AboutComponent
+      , LibraryComponent
+      , ContactComponent
+      , UPLOAD_DIRECTIVES
     ],
     providers: [
-      Title,
-      UserService,
-      SearchBox,
-      SearchService
+      Title
+      , UserService
+      , SearchBox
+      , SearchService
     ],
     bootstrap: [AppComponent]
 })

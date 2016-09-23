@@ -49917,6 +49917,7 @@
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var app_component_1 = __webpack_require__(467);
 	var login_component_1 = __webpack_require__(470);
+	var signup_component_1 = __webpack_require__(746);
 	var about_component_1 = __webpack_require__(472);
 	var library_component_1 = __webpack_require__(473);
 	var browse_orgs_component_1 = __webpack_require__(474);
@@ -49934,6 +49935,7 @@
 	var routing = router_1.RouterModule.forRoot([
 	    { path: 'browse', component: browse_orgs_component_1.BrowseOrgsComponent },
 	    { path: 'login', component: login_component_1.LoginComponent },
+	    { path: 'signup', component: signup_component_1.SignupComponent },
 	    { path: 'about', component: about_component_1.AboutComponent },
 	    { path: 'library', component: library_component_1.LibraryComponent },
 	    { path: 'contact', component: contact_component_1.ContactComponent },
@@ -49961,6 +49963,7 @@
 	            declarations: [
 	                app_component_1.AppComponent,
 	                login_component_1.LoginComponent,
+	                signup_component_1.SignupComponent,
 	                browse_orgs_component_1.BrowseOrgsComponent,
 	                org_details_component_1.OrgDetailsComponent,
 	                org_posts_component_1.OrgPostsComponent,
@@ -64847,17 +64850,16 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(471);
-	//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var user_service_1 = __webpack_require__(468);
+	//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 	var LoginComponent = (function () {
-	    function LoginComponent(http, 
-	        //private fb:FacebookService,
-	        router, userService) {
+	    function LoginComponent(//private fb:FacebookService,
+	        http, router, userService, flash) {
 	        this.http = http;
 	        this.router = router;
 	        this.userService = userService;
-	        this.infoMsg = new app_service_1.InfoMessage();
+	        this.flash = flash;
 	        this.formModel = { email: null, password: null };
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
@@ -64872,11 +64874,13 @@
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
 	    };
-	    ;
 	    LoginComponent.prototype.login = function () {
 	        var _this = this;
-	        console.log(this.formModel);
-	        if (this.formModel && this.formModel.email && this.formModel.password) {
+	        for (var field in this.formModel) {
+	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
+	                return this.flash.show("Oops! You need to enter your " + field);
+	        }
+	        if (this.formModel.email && this.formModel.password) {
 	            this.http.post('/login', this.formModel).subscribe(function (data) {
 	                localStorage.setItem('profile', JSON.stringify(data));
 	                _this.isLoggedIn = true;
@@ -64885,20 +64889,16 @@
 	                _this.router.navigate(['/']);
 	            });
 	        }
-	    };
-	    LoginComponent.prototype.sendInfoMsg = function (body, type, time) {
-	        var _this = this;
-	        if (time === void 0) { time = 3000; }
-	        this.infoMsg.body = body;
-	        this.infoMsg.type = type;
-	        window.setTimeout(function () { return _this.infoMsg.body = ""; }, time);
+	        else {
+	            console.error("The form model was undefined.");
+	        }
 	    };
 	    LoginComponent = __decorate([
 	        core_1.Component({
 	            selector: 'login',
 	            templateUrl: 'app/login.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService])
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
 	    ], LoginComponent);
 	    return LoginComponent;
 	}());
@@ -65278,6 +65278,9 @@
 	    };
 	    OrgService.prototype.editOrg = function (options) {
 	        return this.http.put("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	    };
+	    OrgService.prototype.editPost = function (options) {
+	        return this.http.put("/edit-post/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
 	    };
 	    OrgService = __decorate([
 	        core_1.Injectable(), 
@@ -65700,12 +65703,12 @@
 	                _this.sub = _this.route.params.subscribe(function (params) {
 	                    var id = params['id'];
 	                    if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-	                        _this.flash.show("This page doesn't exist");
+	                        _this.flash.show("This page doesn't exist", { cssClass: "error" });
 	                        return _this.router.navigate([''], { queryParams: { "404": true } });
 	                    }
 	                    _this.orgService.loadOrg(id).subscribe(function (data) {
 	                        if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-	                            _this.flash.show("Either the page doesn't exist or you don't have permission to manage it");
+	                            _this.flash.show("Either the page doesn't exist or you don't have permission to manage it", { cssClass: "error" });
 	                            return _this.router.navigate([''], { queryParams: { "404": true } });
 	                        }
 	                        _this.org = data;
@@ -65760,7 +65763,7 @@
 	        if (key === "slug") {
 	            var slugMatch = value.match(/[^a-zA-Z0-9\-]/);
 	            if (slugMatch) {
-	                return this.flash.show("Your slug can only have lowercase letters and hyphens");
+	                return this.flash.show("Your slug can only have lowercase letters, numbers, and hyphens", { cssClass: "error" });
 	            }
 	            else {
 	                value.toLowerCase();
@@ -65774,7 +65777,7 @@
 	        }).subscribe(function (res) {
 	            console.log(res);
 	            if (res.errmsg) {
-	                _this.flash.show("Save failed", { class: "error" });
+	                _this.flash.show("Save failed", { cssClass: "error" });
 	                _this['loading_' + key] = false;
 	                return;
 	            }
@@ -65791,7 +65794,7 @@
 	    ManageOrgPageComponent = __decorate([
 	        core_1.Component({
 	            selector: 'manage-org-page',
-	            template: "\n\t\t\t<div class=\"manage-org-page\" *ngIf=\"isLoaded\">\n\t\t\t\t<a *ngIf=\"org.slug\" href=\"/organization/{{org.slug}}\">Back to page</a>\n\t\t\t\t<a *ngIf=\"!org.slug\" href=\"/organization/i/{{org._id}}\">Back to page</a>\n\t\t\t\t<h4>Manage {{org.name}}</h4>\n\t\t\t\t<img [src]=\"org.coverImage\" width=\"200\">\n\t\t\t\t\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t\t\t\t<input type=\"file\"\n\t\t\t\t\t\tclass=\"form-control\"\n\t      \t\tngFileSelect\n\t\t\t      [options]=\"uploadOptions\"\n\t\t\t      (onUpload)=\"handleUpload($event)\">\n\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && stillWorking\"><i class=\"fa fa-circle-o-notch fa-spin\"></i></span>\n\t\t\t    <span class=\"upload-status\" *ngIf=\"progress && !stillWorking\"><i class=\"fa fa-check\"></i></span>\n\t\t\t    <span class=\"editing-tip\">If you want to upload a file larger than 3 MB, go <a href=\"http://compressjpeg.com\">here for JPEGs</a> and <a href=\"http://tinypng.com\">here for PNGs.</a></span>\n\t\t\t  \t<span class=\"editing-tip\">If your file is publicly accessible on the Internet, simply paste the link below.</span>\n\t\t\t  </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"coverImageLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"coverImageLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the cover image\"><button (click)=\"editOrg('coverImage', coverImageLink)\"><i [hidden]=\"!loading_coverImage\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"donateLink\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tname=\"donateLink\"\n\t\t    \t\t\t\tplaceholder=\"Change the main Donate link\"><button (click)=\"editOrg('donateLink', donateLink)\"><i [hidden]=\"!loading_donateLink\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"slug\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\t(keyup)=\"checkForUniqueSlug($event)\"\n\t\t    \t\t\t\tngControl=\"slug\"\n\t\t    \t\t\t\tname=\"slug\"\n\t\t    \t\t\t\tplaceholder=\"{{org.slug || 'e.g. my-awesome-org'}}\"><button [disabled]=\"!slugIsValid\" (click)=\"editOrg('slug', slug)\"><i [hidden]=\"!loading_slug\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t    </div>\n\t\t    <div class=\"edit-field-container\">\n\t\t    \t<input [(ngModel)]=\"name\"\n\t\t    \t\t\t\tclass=\"form-control\"\n\t      \t\t\t\tngControl=\"name\"\n\t\t    \t\t\t\tname=\"name\"\n\t\t    \t\t\t\tplaceholder=\"Change the name of the page\"><button (click)=\"editOrg('name', name)\"><i [hidden]=\"!loading_name\" class=\"fa fa-circle-o-notch fa-spin\"></i>Apply</button>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"edit-field-container\">\n\t\t    \t<button *ngIf=\"!org.featured\" (click)=\"editOrg('featured', true)\">Set featured org</button>\n\t\t    \t<button *ngIf=\"org.featured\" (click)=\"editOrg('featured', false)\">Unset featured org</button>\n\t\t\t\t</div>\n\t\t\t</div>",
+	            templateUrl: 'app/manage-org-page.component.html',
 	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
@@ -65988,6 +65991,333 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
+
+
+/***/ },
+/* 486 */,
+/* 487 */,
+/* 488 */,
+/* 489 */,
+/* 490 */,
+/* 491 */,
+/* 492 */,
+/* 493 */,
+/* 494 */,
+/* 495 */,
+/* 496 */,
+/* 497 */,
+/* 498 */,
+/* 499 */,
+/* 500 */,
+/* 501 */,
+/* 502 */,
+/* 503 */,
+/* 504 */,
+/* 505 */,
+/* 506 */,
+/* 507 */,
+/* 508 */,
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */,
+/* 567 */,
+/* 568 */,
+/* 569 */,
+/* 570 */,
+/* 571 */,
+/* 572 */,
+/* 573 */,
+/* 574 */,
+/* 575 */,
+/* 576 */,
+/* 577 */,
+/* 578 */,
+/* 579 */,
+/* 580 */,
+/* 581 */,
+/* 582 */,
+/* 583 */,
+/* 584 */,
+/* 585 */,
+/* 586 */,
+/* 587 */,
+/* 588 */,
+/* 589 */,
+/* 590 */,
+/* 591 */,
+/* 592 */,
+/* 593 */,
+/* 594 */,
+/* 595 */,
+/* 596 */,
+/* 597 */,
+/* 598 */,
+/* 599 */,
+/* 600 */,
+/* 601 */,
+/* 602 */,
+/* 603 */,
+/* 604 */,
+/* 605 */,
+/* 606 */,
+/* 607 */,
+/* 608 */,
+/* 609 */,
+/* 610 */,
+/* 611 */,
+/* 612 */,
+/* 613 */,
+/* 614 */,
+/* 615 */,
+/* 616 */,
+/* 617 */,
+/* 618 */,
+/* 619 */,
+/* 620 */,
+/* 621 */,
+/* 622 */,
+/* 623 */,
+/* 624 */,
+/* 625 */,
+/* 626 */,
+/* 627 */,
+/* 628 */,
+/* 629 */,
+/* 630 */,
+/* 631 */,
+/* 632 */,
+/* 633 */,
+/* 634 */,
+/* 635 */,
+/* 636 */,
+/* 637 */,
+/* 638 */,
+/* 639 */,
+/* 640 */,
+/* 641 */,
+/* 642 */,
+/* 643 */,
+/* 644 */,
+/* 645 */,
+/* 646 */,
+/* 647 */,
+/* 648 */,
+/* 649 */,
+/* 650 */,
+/* 651 */,
+/* 652 */,
+/* 653 */,
+/* 654 */,
+/* 655 */,
+/* 656 */,
+/* 657 */,
+/* 658 */,
+/* 659 */,
+/* 660 */,
+/* 661 */,
+/* 662 */,
+/* 663 */,
+/* 664 */,
+/* 665 */,
+/* 666 */,
+/* 667 */,
+/* 668 */,
+/* 669 */,
+/* 670 */,
+/* 671 */,
+/* 672 */,
+/* 673 */,
+/* 674 */,
+/* 675 */,
+/* 676 */,
+/* 677 */,
+/* 678 */,
+/* 679 */,
+/* 680 */,
+/* 681 */,
+/* 682 */,
+/* 683 */,
+/* 684 */,
+/* 685 */,
+/* 686 */,
+/* 687 */,
+/* 688 */,
+/* 689 */,
+/* 690 */,
+/* 691 */,
+/* 692 */,
+/* 693 */,
+/* 694 */,
+/* 695 */,
+/* 696 */,
+/* 697 */,
+/* 698 */,
+/* 699 */,
+/* 700 */,
+/* 701 */,
+/* 702 */,
+/* 703 */,
+/* 704 */,
+/* 705 */,
+/* 706 */,
+/* 707 */,
+/* 708 */,
+/* 709 */,
+/* 710 */,
+/* 711 */,
+/* 712 */,
+/* 713 */,
+/* 714 */,
+/* 715 */,
+/* 716 */,
+/* 717 */,
+/* 718 */,
+/* 719 */,
+/* 720 */,
+/* 721 */,
+/* 722 */,
+/* 723 */,
+/* 724 */,
+/* 725 */,
+/* 726 */,
+/* 727 */,
+/* 728 */,
+/* 729 */,
+/* 730 */,
+/* 731 */,
+/* 732 */,
+/* 733 */,
+/* 734 */,
+/* 735 */,
+/* 736 */,
+/* 737 */,
+/* 738 */,
+/* 739 */,
+/* 740 */,
+/* 741 */,
+/* 742 */,
+/* 743 */,
+/* 744 */,
+/* 745 */,
+/* 746 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
+	var router_1 = __webpack_require__(336);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	var user_service_1 = __webpack_require__(468);
+	var SignupComponent = (function () {
+	    function SignupComponent(http, router, userService, flash) {
+	        this.http = http;
+	        this.router = router;
+	        this.userService = userService;
+	        this.flash = flash;
+	        if (localStorage['profile']) {
+	            this.router.navigate(['/']);
+	            this.flash.show("You're already logged in!");
+	        }
+	    }
+	    SignupComponent.prototype.ngOnInit = function () {
+	        this.formModel = { email: null, password: null, confirmPassword: null };
+	    };
+	    SignupComponent.prototype.signup = function () {
+	        var _this = this;
+	        for (var field in this.formModel) {
+	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
+	                return this.flash.show("Oops! You need to fill out your " + field, { cssClass: "error" });
+	        }
+	        if (this.formModel.email && this.formModel.password && this.formModel.confirmPassword) {
+	            if (this.formModel.password !== this.formModel.confirmPassword)
+	                return this.flash.show("Oops! Your passwords didn't match", { cssClass: "error" });
+	            this.http.post('/signup', this.formModel).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                localStorage.setItem('profile', JSON.stringify(data));
+	                _this.isLoggedIn = true;
+	                _this.userService.confirmLogin(data);
+	                console.log(data);
+	                _this.router.navigate(['/']);
+	            });
+	        }
+	        else {
+	            console.error("The form model was undefined.");
+	            this.flash.show("Something went wrong", { cssClass: "error" });
+	        }
+	    };
+	    SignupComponent = __decorate([
+	        core_1.Component({
+	            selector: 'login',
+	            templateUrl: 'app/signup.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
+	    ], SignupComponent);
+	    return SignupComponent;
+	}());
+	exports.SignupComponent = SignupComponent;
 
 
 /***/ }

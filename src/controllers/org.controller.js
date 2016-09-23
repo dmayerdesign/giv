@@ -14,7 +14,7 @@ dotenv.load({ path: '.env' });
 
 const Org = require('../models/Org');
 
-exports.requests = [
+exports.routes = [
   { method: "get",
     uri: "/orgs/get",
     process: function(req, res) {
@@ -50,6 +50,7 @@ exports.requests = [
   // create
   { method: "post",
     uri: '/org',
+    middleware: "passport",
     process: function(req, res) {
       var obj = new Org(req.body);
       obj.save(function(err, obj) {
@@ -74,6 +75,7 @@ exports.requests = [
   {
     method: "put",
     uri: "/org/:id",
+    middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
         if(err) return console.error(err);
@@ -85,6 +87,7 @@ exports.requests = [
   {
     method: "delete",
     uri: "/org/:id",
+    middleware: "passport",
     process: function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
         if(err) return console.error(err);
@@ -107,6 +110,7 @@ exports.requests = [
   {
     method: "put",
     uri: "/org/s/:slug",
+    middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
         if(err) return console.error(err);
@@ -149,7 +153,9 @@ exports.requests = [
   }
 ];
 
-// edit org
+/*
+** Edit Organization (refactored code)
+*/
 let editableInOrg = [
   "coverImage",
   "donateLink",
@@ -159,7 +165,7 @@ let editableInOrg = [
   "featured"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
-  exports.requests.push(editOrg(editableInOrg[i]));
+  exports.routes.push(editOrg(editableInOrg[i]));
 }
 // helper function to edit org
 function editOrg(key) {

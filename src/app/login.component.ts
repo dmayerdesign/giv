@@ -1,9 +1,9 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { InfoMessage } from './services/app.service';
-//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
+import { FlashMessagesService } from 'angular2-flash-messages';
 import { UserService } from './services/user.service';
+//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 
 @Component({
 	selector: 'login'
@@ -12,15 +12,15 @@ import { UserService } from './services/user.service';
 })
 
 export class LoginComponent implements OnInit {
-	private infoMsg = new InfoMessage();
 	private formModel = {email: null, password: null};
 	private user:any;
   private isLoggedIn:boolean;
 
-	constructor(private http:Http,
-							//private fb:FacebookService,
+	constructor(//private fb:FacebookService,
+							private http:Http,
 							private router:Router,
-							private userService:UserService) {
+							private userService:UserService,
+							private flash:FlashMessagesService) {
 
 		if (localStorage['profile']) {
 			this.router.navigate(['/']);
@@ -36,12 +36,13 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
 	  //this.checkLoginStatus();
-  };
-
+  }
 
   login() {
-    console.log(this.formModel);
-    if (this.formModel && this.formModel.email && this.formModel.password) {
+    for (let field in this.formModel) {
+    	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.flash.show("Oops! You need to enter your " + field);
+    }
+    if (this.formModel.email && this.formModel.password) {
     	this.http.post('/login', this.formModel).subscribe(data => {
     		localStorage.setItem('profile', JSON.stringify(data));
         this.isLoggedIn = true;
@@ -49,15 +50,10 @@ export class LoginComponent implements OnInit {
       	console.log(data);
         this.router.navigate(['/']);
       });
+    } else {
+    	console.error("The form model was undefined.");
     }
   }
-
-
-  sendInfoMsg(body, type, time = 3000) {
-		this.infoMsg.body = body;
-		this.infoMsg.type = type;
-		window.setTimeout(() => this.infoMsg.body = "", time);
-	}
 
 /**
 * Facebook SDK implementation

@@ -57,17 +57,18 @@ const helmet = require('helmet');
 const userController = require('./controllers/user.controller');
 const contactController = require('./controllers/contact.controller');
 const orgController = require('./controllers/org.controller');
+const postController = require('./controllers/post.controller');
 
 /**
   * DANNY'S Services
   */
 const search = require('./services/search');
+const appService = require('./services/app.service');
 
 /**
  * DANNY'S Models
  */
 const User = require('./models/User');
-const Post = require('./models/Post');
 
 
 /**
@@ -177,96 +178,13 @@ mongoose.connection.on('connected', () => {
 
   /**
   ** Orgs
-  **
-  ** Get the refactored orgs API from the orgController
   **/
-  for (let i = 0; i < orgController.requests.length; i++) {
-    let request = orgController.requests[i];
-    if (request.middleware) {
-      if (request.middleware === "upload") app[request.method](request.uri, passportConfig.isAuthenticated, upload.any(), request.process);
-      if (request.middleware === "passport") app[request.method](request.uri, passportConfig.isAuthenticated, request.process);
-    }
-    else {
-      app[request.method](request.uri, request.process);
-    }
-  }
+  appService.applyRoutes(app, orgController.routes);
 
-  // get posts by org and search
-  app.get('/posts/get', function(req, res) {
-    var dbQuery = {};
-    if (req.query.search) {
-      dbQuery = search(req.query.search, req.query.field);
-    }
-    if (req.query.filterField) {
-      dbQuery[req.query.filterField] = req.query.filterValue;
-    }
-    if (req.query.org) {
-      dbQuery.org = req.query.org;
-
-      Post.find(dbQuery, (err, docs) => {
-        if(err) return console.error(err);
-        res.json(docs);
-      })
-      .sort("-dateCreated")
-      .skip(+req.query.offset)
-      .limit(+req.query.limit);
-    }
-    else {
-      console.log("Org needs to be specified to find posts");
-    }
-  });
-
-  // count all
-  app.get('/posts/count', function(req, res) {
-    Post.count(function(err, count) {
-      if(err) return console.error(err);
-      res.json(count);
-    });
-  });
-
-  // create
-  app.post('/post', function(req, res) {
-    var obj = new Post(req.body);
-    obj.save(function(err, obj) {
-      if(err) return console.error(err);
-      res.status(200).json(obj);
-    });
-  });
-
-  // find by id
-  app.get('/post/:id', function(req, res) {
-    Post.findOne({_id: req.params.id}, function (err, obj) {
-      if(err) return console.error(err);
-      res.json(obj);
-    });
-  });
-
-  // update by id
-  app.put('/post/:id', function(req, res) {
-    Post.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
-      if(err) return console.error(err);
-      res.sendStatus(200);
-    });
-  });
-
-  // delete by id
-  app.delete('/post/:id', function(req, res) {
-    Post.findOneAndRemove({_id: req.params.id}, function(err) {
-      if(err) return console.error(err);
-      res.sendStatus(200);
-    });
-  });
-
-  
-  var generateSomePosts = false;
-  if (generateSomePosts) {
-    for (let i = 0; i < 10; i++) {
-      var lorem = i + "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
-      var post = new Post({content: lorem, org: "57d3229c5e14ef284d0915ea"});
-      post.save();
-    }
-  }
-
+  /**
+  ** Posts
+  **/
+  appService.applyRoutes(app, postController.routes);
 
   /**
   ** Users
@@ -314,12 +232,22 @@ mongoose.connection.on('connected', () => {
     }
   }
 
-  // User.find({}, function(err, users) {
-  //   console.log(users[0].password);
-  //   bcrypt.compare('test123', users[0].password, function(err, res) {
-  //     console.log(res);
-  //   });
-  // });
+  var generateSomePosts = false;
+  if (generateSomePosts) {
+    for (let i = 0; i < 10; i++) {
+
+      var lorem = i + "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?";
+      var post = new Post({content: lorem, org: "57d3229c5e14ef284d0915ea"});
+      post.save();
+    }
+  }
+
+  User.find({}, function(err, users) {
+    console.log(users[0].password);
+    bcrypt.compare('sohcahtoa', users[0].password, function(err, res) {
+      console.log(res);
+    });
+  });
 
   // var testdata = new User({
   //   name: "Danny",

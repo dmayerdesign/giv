@@ -1,3 +1,9 @@
+	// authorId: {type: String},
+	// title: {type: String, index: true},
+	// content: {type: String, index: true},
+	// org: {type: String, index: true},
+	// dateCreated: {type: Date, default: Date.now()}
+
 import { Component, OnInit, OnDestroy, NgZone, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
@@ -9,30 +15,27 @@ import { UIHelper, Utilities } from './services/app.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
-	selector: 'manage-org-page',
-	templateUrl: 'app/manage-org-page.component.html',
+	selector: 'create-post',
+	template: `<h3>Create post</h3>`,
 	providers: [OrgService, UserService, UIHelper, Utilities]
 })
 
-// Tell users to go to compressjpeg.com if their images exceed 2 MB
-// __TO_DO__: add an external link option
-
-export class ManageOrgPageComponent implements OnInit {
-	@Input() org; // Declared as an Input in case you're including it inside another template like <manage-org-page [org]="org"></...>
+export class CreatePostComponent implements OnInit {
+	@Input() org;
+	@Input() user;
 	private sub:Subscription;
-	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 
-	private coverImageLink:string;
-	private donateLink:string;
-	private slug:string;
-	private name:string;
+	private post:{
+		authorId: string,
+		title: string,
+		content: string,
+		org: string,
+		images: [string]
+	};
 
-	private loading_coverImage:boolean;
-	private loading_donateLink:boolean;
-	private loading_slug:boolean;
-	private slugIsValid:boolean = true;
+	private loadingImage:boolean;
 
 	uploadFile:any;
   uploadOptions:Object;
@@ -59,23 +62,23 @@ export class ManageOrgPageComponent implements OnInit {
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
 
+					if (!this.org || !this.org._id || user.permissions.indexOf(this.org.globalPermission) === -1) {
+						this.flash.show("Either the page doesn't exist or you don't have permission to manage it", {cssClass: "error"});
+						return this.router.navigate([''], { queryParams: {"404": true}});
+					}
+
+					
+					// for ng-upload
+					// this.uploadOptions = {
+					//   url: '/edit-post/upload/image/' + this.post._id,
+					//   filterExtensions: true,
+					//   calculateSpeed: true,
+					//   allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+					// };
+
 					this.orgService.loadOrg(id).subscribe(
 						data => {
-							if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-								this.flash.show("Either the page doesn't exist or you don't have permission to manage it", {cssClass: "error"});
-								return this.router.navigate([''], { queryParams: {"404": true}});
-							}
-							this.org = data;
-							this.isLoaded = true;
-
 							
-							// for ng-upload
-							this.uploadOptions = {
-							  url: '/edit-org/upload/cover-image/' + this.org._id,
-							  filterExtensions: true,
-							  calculateSpeed: true,
-							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-							};
 						},
 						err => {
 							this.router.navigate([''], { queryParams: {"404": true}});
@@ -97,26 +100,19 @@ export class ManageOrgPageComponent implements OnInit {
 		this.sub.unsubscribe();
 	}
 
-  handleUpload(data:any):void {
-  	this.zone.run(() => {
-  		console.log(data);
-  		this.progress = data.progress.percent;
-  		this.stillWorking = true;
+  // handleUpload(data:any):void {
+  // 	this.zone.run(() => {
+  // 		console.log(data);
+  // 		this.progress = data.progress.percent;
+  // 		this.stillWorking = true;
 
-	    if (data.response && data.status !== 404) {
-	    	this.org = JSON.parse(data.response);
-	    	this.stillWorking = false;
-	    	console.log(data.response);
-	    }
-    });
-  }
-
-  checkForUniqueSlug($event) {
-  	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
-  		if (data) this.slugIsValid = false;
-  		else this.slugIsValid = true;
-  	});
-  } 
+	 //    if (data.response && data.status !== 404) {
+	 //    	this.org = JSON.parse(data.response);
+	 //    	this.stillWorking = false;
+	 //    	console.log(data.response);
+	 //    }
+  //   });
+  // }
 
   editOrg(key:string, value:string):void {
   	if (key === "slug") {
