@@ -8,7 +8,8 @@
   "scripts": {
     "postinstall": "typings install",
     "prestart": "webpack",
-    "start": "concurrently \"webpack --watch --colors\" \"nodemon src/server.js\"",
+    "start-dev": "concurrently \"webpack --watch --colors\" \"nodemon src/server.js\"",
+    "start": "node src/server.js",
     "typings": "typings",
     "test": "mocha --reporter spec --timeout 5000"
   },
