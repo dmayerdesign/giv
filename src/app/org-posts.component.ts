@@ -13,7 +13,7 @@ import 'rxjs/add/operator/map';
 	providers: [OrgService, UIHelper, Utilities]
 })
 
-export class OrgPostsComponent implements OnInit {
+export class OrgPostsComponent {
 	@Input() org;
 	@Input() user;
 	@Input() isBrowsing:boolean;

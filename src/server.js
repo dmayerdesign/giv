@@ -1,3 +1,4 @@
+const env = 'p';
 /**
  * Module dependencies.
  */
@@ -21,7 +22,7 @@ const bcrypt = require('bcrypt-nodejs');
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.load({ path: '.env' });
+if (env === 'd') dotenv.load({ path: '.env' });
 
 /**
  * AWS S3 uploads
@@ -38,10 +39,10 @@ const upload = multer({
     bucket: 'fuse-uploads',
     acl: 'public-read',
     key: function (req, file, callback) {
-      if (req.params.orgId)
-        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
       if (req.params.bucket)
         req.newPath = "post-uploads/" + req.params.bucket + "/" + Date.now().toString() + ".jpg";
+      else if (req.params.orgId)
+        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
       console.log("Uploading "); console.log(file);
       callback(null, req.newPath);
     }
@@ -87,7 +88,8 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
+// mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
+mongoose.connect(process.env.MONGOLAB_URI);
 mongoose.connection.config.autoIndex = true; // set to false to boost performance in production
 
 /**
