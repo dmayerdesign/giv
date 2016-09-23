@@ -7,7 +7,6 @@
   },
   "scripts": {
     "postinstall": "typings install",
-    "prestart": "webpack",
     "start-dev": "concurrently \"webpack --watch --colors\" \"nodemon src/server.js\"",
     "start": "node src/server.js",
     "typings": "typings",
