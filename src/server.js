@@ -1,4 +1,4 @@
-const env = 'p';
+const env = process.env.ENV;
 /**
  * Module dependencies.
  */
@@ -22,7 +22,7 @@ const bcrypt = require('bcrypt-nodejs');
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-if (env === 'd') dotenv.load({ path: '.env' });
+if (env !== "PRODUCTION") dotenv.load({ path: '.env' });
 
 /**
  * AWS S3 uploads
@@ -31,24 +31,6 @@ const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
-const initial_upload = multer({ dest: path.join(__dirname, 'uploads') });
-
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: 'fuse-uploads',
-    acl: 'public-read',
-    key: function (req, file, callback) {
-      if (req.params.bucket)
-        req.newPath = "post-uploads/" + req.params.bucket + "/" + Date.now().toString() + ".jpg";
-      else if (req.params.orgId)
-        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
-      console.log("Uploading "); console.log(file);
-      callback(null, req.newPath);
-    }
-  }),
-  limits: { fileSize: 3000000 }
-});
 
 /**
 * Security middleware

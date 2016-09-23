@@ -104,7 +104,7 @@ exports.routes = [
   {
     method: "post",
     uri: "/post/upload/featuredImage/:bucket",
-    middleware: "upload",
+    middleware: "attach",
     process: function(req, res, next) {
       console.log(req.newPath);
       res.send("https://d1poe49zt5yre3.cloudfront.net/" + req.newPath);
