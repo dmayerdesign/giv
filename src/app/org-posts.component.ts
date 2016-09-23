@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, ViewChildren } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Input, Output, ViewChildren } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrgService } from './services/org.service';
@@ -43,7 +43,7 @@ export class OrgPostsComponent implements OnInit {
 				private helper: UIHelper,
 				private utilities: Utilities) { }
 
-	ngOnInit() {
+	ngAfterViewInit() {
 		console.log(this.org);
 		this.loadPosts();
 	}
@@ -93,7 +93,7 @@ export class OrgPostsComponent implements OnInit {
 
 	searchPosts(search:string) {
 		this.loadingPosts = true;
-		this.orgService.loadPosts({org: this.org._id, search:search, field:"content", limit:10})
+		this.orgService.loadPosts({filterField: "org", filterValue: this.org._id, search:search, field:"content", limit:10})
 			.subscribe(
 				results => {
 					this.posts = results;

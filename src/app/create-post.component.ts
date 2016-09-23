@@ -14,6 +14,17 @@ interface post {
 	org: string,
 	featuredImage: string,
 	imageBucket: string
+}
+
+function Post():void {
+	this.authorId = null;
+	this.title = null;
+	this.content = null;
+	this.org = null;
+	this.featuredImage = null;
+	this.imageBucket = Date.now().toString();
+
+	return this;
 };
 
 @Component({
@@ -29,7 +40,7 @@ export class CreatePostComponent implements OnInit {
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 	private savingPost:boolean = false;
-	private post:post;
+	private post = new Post();
 	private loadingImage:boolean;
 
 	private uploadFile:any;
@@ -99,6 +110,7 @@ export class CreatePostComponent implements OnInit {
   		this.org = res;
   		this.update.emit(this.org);
   		this.savingPost = false;
+  		this.post = new Post();
   		this.flash.show("Saved");
   		console.log(res);
   	});

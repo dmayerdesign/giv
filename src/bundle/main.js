@@ -49925,12 +49925,12 @@
 	var org_posts_component_1 = __webpack_require__(480);
 	var single_org_component_1 = __webpack_require__(481);
 	var manage_org_page_component_1 = __webpack_require__(482);
-	var create_post_component_1 = __webpack_require__(747);
+	var create_post_component_1 = __webpack_require__(483);
 	var search_box_component_1 = __webpack_require__(478);
-	var contact_component_1 = __webpack_require__(483);
+	var contact_component_1 = __webpack_require__(484);
 	var user_service_1 = __webpack_require__(468);
 	var search_service_1 = __webpack_require__(476);
-	var ng2_click_outside_1 = __webpack_require__(485);
+	var ng2_click_outside_1 = __webpack_require__(486);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -65357,6 +65357,9 @@
 	            params.set("limit", options.limit.toString());
 	        if (this.numberIsSet(options.offset))
 	            params.set("offset", options.offset.toString());
+	        if (this.stringIsSet(options.sort))
+	            params.set("sort", options.sort);
+	        console.log(params);
 	        return this.http.get(uri, {
 	            search: params,
 	        }).map(function (res) { return res.json(); });
@@ -65606,7 +65609,7 @@
 	        this.loadingPosts = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	    }
-	    OrgPostsComponent.prototype.ngOnInit = function () {
+	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
 	        console.log(this.org);
 	        this.loadPosts();
 	    };
@@ -65647,7 +65650,7 @@
 	    OrgPostsComponent.prototype.searchPosts = function (search) {
 	        var _this = this;
 	        this.loadingPosts = true;
-	        this.orgService.loadPosts({ org: this.org._id, search: search, field: "content", limit: 10 })
+	        this.orgService.loadPosts({ filterField: "org", filterValue: this.org._id, search: search, field: "content", limit: 10 })
 	            .subscribe(function (results) {
 	            _this.posts = results;
 	            _this.loadingPosts = false;
@@ -65936,10 +65939,140 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
+	var router_1 = __webpack_require__(336);
+	var http_1 = __webpack_require__(397);
+	var org_service_1 = __webpack_require__(475);
+	var user_service_1 = __webpack_require__(468);
+	var app_service_1 = __webpack_require__(477);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	function Post() {
+	    this.authorId = null;
+	    this.title = null;
+	    this.content = null;
+	    this.org = null;
+	    this.featuredImage = null;
+	    this.imageBucket = Date.now().toString();
+	    return this;
+	}
+	;
+	var CreatePostComponent = (function () {
+	    function CreatePostComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
+	        this.router = router;
+	        this.route = route;
+	        this.orgService = orgService;
+	        this.userService = userService;
+	        this.helper = helper;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.flash = flash;
+	        this.http = http;
+	        this.update = new core_1.EventEmitter();
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        this.savingPost = false;
+	        this.post = new Post();
+	    }
+	    CreatePostComponent.prototype.ngOnInit = function () {
+	        this.post = {
+	            authorId: null,
+	            title: null,
+	            content: null,
+	            org: null,
+	            featuredImage: null,
+	            imageBucket: Date.now().toString()
+	        };
+	        // for ng-upload
+	        this.uploadOptions = {
+	            url: '/post/upload/featuredImage/' + this.post.imageBucket,
+	            filterExtensions: true,
+	            calculateSpeed: true,
+	            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	        };
+	    };
+	    CreatePostComponent.prototype.ngAfterViewChecked = function () {
+	        if (this.org && this.user && !this.post.org) {
+	            this.post.authorId = this.user._id;
+	            this.post.org = this.org._id;
+	            console.log(this.post);
+	        }
+	    };
+	    CreatePostComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response && data.status !== 404) {
+	                if (data.response.indexOf("errmsg") > -1)
+	                    return console.error(data.response);
+	                _this.post.featuredImage = data.response;
+	                _this.stillWorking = false;
+	                console.log(_this.post);
+	            }
+	        });
+	    };
+	    CreatePostComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        this.savingPost = true;
+	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log("New post: ", res);
+	            if (res.errmsg) {
+	                _this.flash.show("Save failed", { cssClass: "error" });
+	                _this.savingPost = false;
+	                return;
+	            }
+	            _this.org = res;
+	            _this.update.emit(_this.org);
+	            _this.savingPost = false;
+	            _this.post = new Post();
+	            _this.flash.show("Saved");
+	            console.log(res);
+	        });
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "update", void 0);
+	    CreatePostComponent = __decorate([
+	        core_1.Component({
+	            selector: 'create-post',
+	            templateUrl: 'app/create-post.component.html',
+	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
+	    ], CreatePostComponent);
+	    return CreatePostComponent;
+	}());
+	exports.CreatePostComponent = CreatePostComponent;
+
+
+/***/ },
+/* 484 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var app_service_1 = __webpack_require__(477);
-	var email_service_1 = __webpack_require__(484);
+	var email_service_1 = __webpack_require__(485);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
 	        this.http = http;
@@ -65985,7 +66118,7 @@
 
 
 /***/ },
-/* 484 */
+/* 485 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -65998,7 +66131,7 @@
 
 
 /***/ },
-/* 485 */
+/* 486 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -66012,7 +66145,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(486);
+	var click_outside_directive_1 = __webpack_require__(487);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -66030,7 +66163,7 @@
 
 
 /***/ },
-/* 486 */
+/* 487 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -66108,385 +66241,6 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
-
-
-/***/ },
-/* 487 */,
-/* 488 */,
-/* 489 */,
-/* 490 */,
-/* 491 */,
-/* 492 */,
-/* 493 */,
-/* 494 */,
-/* 495 */,
-/* 496 */,
-/* 497 */,
-/* 498 */,
-/* 499 */,
-/* 500 */,
-/* 501 */,
-/* 502 */,
-/* 503 */,
-/* 504 */,
-/* 505 */,
-/* 506 */,
-/* 507 */,
-/* 508 */,
-/* 509 */,
-/* 510 */,
-/* 511 */,
-/* 512 */,
-/* 513 */,
-/* 514 */,
-/* 515 */,
-/* 516 */,
-/* 517 */,
-/* 518 */,
-/* 519 */,
-/* 520 */,
-/* 521 */,
-/* 522 */,
-/* 523 */,
-/* 524 */,
-/* 525 */,
-/* 526 */,
-/* 527 */,
-/* 528 */,
-/* 529 */,
-/* 530 */,
-/* 531 */,
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */,
-/* 544 */,
-/* 545 */,
-/* 546 */,
-/* 547 */,
-/* 548 */,
-/* 549 */,
-/* 550 */,
-/* 551 */,
-/* 552 */,
-/* 553 */,
-/* 554 */,
-/* 555 */,
-/* 556 */,
-/* 557 */,
-/* 558 */,
-/* 559 */,
-/* 560 */,
-/* 561 */,
-/* 562 */,
-/* 563 */,
-/* 564 */,
-/* 565 */,
-/* 566 */,
-/* 567 */,
-/* 568 */,
-/* 569 */,
-/* 570 */,
-/* 571 */,
-/* 572 */,
-/* 573 */,
-/* 574 */,
-/* 575 */,
-/* 576 */,
-/* 577 */,
-/* 578 */,
-/* 579 */,
-/* 580 */,
-/* 581 */,
-/* 582 */,
-/* 583 */,
-/* 584 */,
-/* 585 */,
-/* 586 */,
-/* 587 */,
-/* 588 */,
-/* 589 */,
-/* 590 */,
-/* 591 */,
-/* 592 */,
-/* 593 */,
-/* 594 */,
-/* 595 */,
-/* 596 */,
-/* 597 */,
-/* 598 */,
-/* 599 */,
-/* 600 */,
-/* 601 */,
-/* 602 */,
-/* 603 */,
-/* 604 */,
-/* 605 */,
-/* 606 */,
-/* 607 */,
-/* 608 */,
-/* 609 */,
-/* 610 */,
-/* 611 */,
-/* 612 */,
-/* 613 */,
-/* 614 */,
-/* 615 */,
-/* 616 */,
-/* 617 */,
-/* 618 */,
-/* 619 */,
-/* 620 */,
-/* 621 */,
-/* 622 */,
-/* 623 */,
-/* 624 */,
-/* 625 */,
-/* 626 */,
-/* 627 */,
-/* 628 */,
-/* 629 */,
-/* 630 */,
-/* 631 */,
-/* 632 */,
-/* 633 */,
-/* 634 */,
-/* 635 */,
-/* 636 */,
-/* 637 */,
-/* 638 */,
-/* 639 */,
-/* 640 */,
-/* 641 */,
-/* 642 */,
-/* 643 */,
-/* 644 */,
-/* 645 */,
-/* 646 */,
-/* 647 */,
-/* 648 */,
-/* 649 */,
-/* 650 */,
-/* 651 */,
-/* 652 */,
-/* 653 */,
-/* 654 */,
-/* 655 */,
-/* 656 */,
-/* 657 */,
-/* 658 */,
-/* 659 */,
-/* 660 */,
-/* 661 */,
-/* 662 */,
-/* 663 */,
-/* 664 */,
-/* 665 */,
-/* 666 */,
-/* 667 */,
-/* 668 */,
-/* 669 */,
-/* 670 */,
-/* 671 */,
-/* 672 */,
-/* 673 */,
-/* 674 */,
-/* 675 */,
-/* 676 */,
-/* 677 */,
-/* 678 */,
-/* 679 */,
-/* 680 */,
-/* 681 */,
-/* 682 */,
-/* 683 */,
-/* 684 */,
-/* 685 */,
-/* 686 */,
-/* 687 */,
-/* 688 */,
-/* 689 */,
-/* 690 */,
-/* 691 */,
-/* 692 */,
-/* 693 */,
-/* 694 */,
-/* 695 */,
-/* 696 */,
-/* 697 */,
-/* 698 */,
-/* 699 */,
-/* 700 */,
-/* 701 */,
-/* 702 */,
-/* 703 */,
-/* 704 */,
-/* 705 */,
-/* 706 */,
-/* 707 */,
-/* 708 */,
-/* 709 */,
-/* 710 */,
-/* 711 */,
-/* 712 */,
-/* 713 */,
-/* 714 */,
-/* 715 */,
-/* 716 */,
-/* 717 */,
-/* 718 */,
-/* 719 */,
-/* 720 */,
-/* 721 */,
-/* 722 */,
-/* 723 */,
-/* 724 */,
-/* 725 */,
-/* 726 */,
-/* 727 */,
-/* 728 */,
-/* 729 */,
-/* 730 */,
-/* 731 */,
-/* 732 */,
-/* 733 */,
-/* 734 */,
-/* 735 */,
-/* 736 */,
-/* 737 */,
-/* 738 */,
-/* 739 */,
-/* 740 */,
-/* 741 */,
-/* 742 */,
-/* 743 */,
-/* 744 */,
-/* 745 */,
-/* 746 */,
-/* 747 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var router_1 = __webpack_require__(336);
-	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(475);
-	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(477);
-	var angular2_flash_messages_1 = __webpack_require__(461);
-	;
-	var CreatePostComponent = (function () {
-	    function CreatePostComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
-	        this.router = router;
-	        this.route = route;
-	        this.orgService = orgService;
-	        this.userService = userService;
-	        this.helper = helper;
-	        this.utilities = utilities;
-	        this.zone = zone;
-	        this.flash = flash;
-	        this.http = http;
-	        this.update = new core_1.EventEmitter();
-	        this.stillWorking = false;
-	        this.progress = 0;
-	        this.savingPost = false;
-	    }
-	    CreatePostComponent.prototype.ngOnInit = function () {
-	        this.post = {
-	            authorId: null,
-	            title: null,
-	            content: null,
-	            org: null,
-	            featuredImage: null,
-	            imageBucket: Date.now().toString()
-	        };
-	        // for ng-upload
-	        this.uploadOptions = {
-	            url: '/post/upload/featuredImage/' + this.post.imageBucket,
-	            filterExtensions: true,
-	            calculateSpeed: true,
-	            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	        };
-	    };
-	    CreatePostComponent.prototype.ngAfterViewChecked = function () {
-	        if (this.org && this.user && !this.post.org) {
-	            this.post.authorId = this.user._id;
-	            this.post.org = this.org._id;
-	            console.log(this.post);
-	        }
-	    };
-	    CreatePostComponent.prototype.handleUpload = function (data) {
-	        var _this = this;
-	        this.zone.run(function () {
-	            console.log(data);
-	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
-	            if (data.response && data.status !== 404) {
-	                if (data.response.indexOf("errmsg") > -1)
-	                    return console.error(data.response);
-	                _this.post.featuredImage = data.response;
-	                _this.stillWorking = false;
-	                console.log(_this.post);
-	            }
-	        });
-	    };
-	    CreatePostComponent.prototype.createPost = function (newPost) {
-	        var _this = this;
-	        this.savingPost = true;
-	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            console.log("New post: ", res);
-	            if (res.errmsg) {
-	                _this.flash.show("Save failed", { cssClass: "error" });
-	                _this.savingPost = false;
-	                return;
-	            }
-	            _this.org = res;
-	            _this.update.emit(_this.org);
-	            _this.savingPost = false;
-	            _this.flash.show("Saved");
-	            console.log(res);
-	        });
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "org", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "user", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "update", void 0);
-	    CreatePostComponent = __decorate([
-	        core_1.Component({
-	            selector: 'create-post',
-	            templateUrl: 'app/create-post.component.html',
-	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
-	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
-	    ], CreatePostComponent);
-	    return CreatePostComponent;
-	}());
-	exports.CreatePostComponent = CreatePostComponent;
 
 
 /***/ }

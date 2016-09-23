@@ -5,7 +5,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
 const mongoose = require('mongoose');
-const search = require('../services/search');
+const search = require('../services/search'); // helper function for creating a database query
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -31,7 +31,7 @@ exports.routes = [
         if(err) return console.error(err);
         res.json(docs);
       })
-      .sort("-likes")
+      .sort(req.query.sort || "-dateCreated")
       .skip(+req.query.offset)
       .limit(+req.query.limit);
     }
