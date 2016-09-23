@@ -16,6 +16,7 @@ import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
+import { CreatePostComponent } from './create-post.component';
 import { SearchBox } from './search-box.component';
 import { ContactComponent } from './contact.component';
 
@@ -63,6 +64,7 @@ const routing = RouterModule.forRoot([
       , LibraryComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES
+      , CreatePostComponent
     ],
     providers: [
       Title

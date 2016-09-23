@@ -8,8 +8,6 @@ export class SearchService {
   loadSearchableData(uri:string, options) { //search?:string, field?:string, org?:string, limit?:number, offset?:number) {
     let params: URLSearchParams = new URLSearchParams();
 
-    if (this.stringIsSet(options.org)) params.set("org", options.org);
-
     if (this.stringIsSet(options.search)) {
       params.set("search", options.search);
       localStorage.setItem("searching", "true");

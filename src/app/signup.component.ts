@@ -35,10 +35,16 @@ export class SignupComponent implements OnInit {
     }
     if (this.formModel.email && this.formModel.password && this.formModel.confirmPassword) {
     	if (this.formModel.password !== this.formModel.confirmPassword) return this.flash.show("Oops! Your passwords didn't match", {cssClass: "error"});
-    	this.http.post('/signup', this.formModel).map(res => res.json()).subscribe(data => {
+    	
+      this.http.post('/signup', this.formModel).map(res => res.json()).subscribe(data => {
+        if (data.errmsg) {
+          this.flash.show("There's already an account with this email in our system.");
+          return this.router.navigate(["/login"]);
+        }
     		localStorage.setItem('profile', JSON.stringify(data));
         this.isLoggedIn = true;
         this.userService.confirmLogin(data);
+        this.flash.show("Welcome!");
       	console.log(data);
         this.router.navigate(['/']);
       });

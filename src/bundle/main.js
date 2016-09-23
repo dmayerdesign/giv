@@ -49917,19 +49917,20 @@
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var app_component_1 = __webpack_require__(467);
 	var login_component_1 = __webpack_require__(470);
-	var signup_component_1 = __webpack_require__(746);
+	var signup_component_1 = __webpack_require__(471);
 	var about_component_1 = __webpack_require__(472);
 	var library_component_1 = __webpack_require__(473);
 	var browse_orgs_component_1 = __webpack_require__(474);
-	var org_details_component_1 = __webpack_require__(478);
-	var org_posts_component_1 = __webpack_require__(479);
-	var single_org_component_1 = __webpack_require__(480);
-	var manage_org_page_component_1 = __webpack_require__(481);
-	var search_box_component_1 = __webpack_require__(477);
-	var contact_component_1 = __webpack_require__(482);
+	var org_details_component_1 = __webpack_require__(479);
+	var org_posts_component_1 = __webpack_require__(480);
+	var single_org_component_1 = __webpack_require__(481);
+	var manage_org_page_component_1 = __webpack_require__(482);
+	var create_post_component_1 = __webpack_require__(747);
+	var search_box_component_1 = __webpack_require__(478);
+	var contact_component_1 = __webpack_require__(483);
 	var user_service_1 = __webpack_require__(468);
 	var search_service_1 = __webpack_require__(476);
-	var ng2_click_outside_1 = __webpack_require__(484);
+	var ng2_click_outside_1 = __webpack_require__(485);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -49972,7 +49973,8 @@
 	                about_component_1.AboutComponent,
 	                library_component_1.LibraryComponent,
 	                contact_component_1.ContactComponent,
-	                ng2_uploader_1.UPLOAD_DIRECTIVES
+	                ng2_uploader_1.UPLOAD_DIRECTIVES,
+	                create_post_component_1.CreatePostComponent
 	            ],
 	            providers: [
 	                platform_browser_1.Title,
@@ -64558,17 +64560,22 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
+	var router_1 = __webpack_require__(336);
 	var user_service_1 = __webpack_require__(468);
+	var angular2_flash_messages_1 = __webpack_require__(461);
 	var AppComponent = (function () {
-	    function AppComponent(http, userService, zone) {
+	    function AppComponent(http, userService, flash, zone, router, route) {
 	        var _this = this;
 	        this.http = http;
 	        this.userService = userService;
+	        this.flash = flash;
 	        this.zone = zone;
+	        this.router = router;
+	        this.route = route;
 	        this.isLoggedIn = false;
 	        // Updates the component upon redirect from login
 	        userService.loginConfirmed$.subscribe(function (user) {
-	            console.log("Login confirmed parent subscription");
+	            console.log("Login confirmed in app component");
 	            console.log(user);
 	            _this.user = user;
 	            _this.isLoggedIn = true;
@@ -64585,16 +64592,24 @@
 	            }
 	        });
 	    };
+	    AppComponent.prototype.ngDoCheck = function () {
+	        this.location = encodeURI(window.location.href);
+	    };
+	    AppComponent.prototype.logIn = function () {
+	        this.router.navigate(['/login'], { queryParams: { redirect: this.location } });
+	    };
 	    AppComponent.prototype.logOut = function () {
 	        localStorage.removeItem('profile');
 	        this.isLoggedIn = false;
+	        this.flash.show("Bye!");
+	        this.router.navigate(['/']);
 	    };
 	    AppComponent = __decorate([
 	        core_1.Component({
 	            selector: 'app',
 	            templateUrl: 'app/app.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, user_service_1.UserService, core_1.NgZone])
+	        __metadata('design:paramtypes', [http_1.Http, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService, core_1.NgZone, router_1.Router, router_1.ActivatedRoute])
 	    ], AppComponent);
 	    return AppComponent;
 	}());
@@ -64855,9 +64870,10 @@
 	//import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 	var LoginComponent = (function () {
 	    function LoginComponent(//private fb:FacebookService,
-	        http, router, userService, flash) {
+	        http, router, route, userService, flash) {
 	        this.http = http;
 	        this.router = router;
+	        this.route = route;
 	        this.userService = userService;
 	        this.flash = flash;
 	        this.formModel = { email: null, password: null };
@@ -64873,6 +64889,13 @@
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
+	        this.getQueryParams(function (data) { return console.log(data); });
+	    };
+	    LoginComponent.prototype.ngOnDestroy = function () {
+	        this.querySub.unsubscribe();
+	    };
+	    LoginComponent.prototype.getQueryParams = function (next) {
+	        this.querySub = this.route.queryParams.subscribe(function (data) { return next(data); });
 	    };
 	    LoginComponent.prototype.login = function () {
 	        var _this = this;
@@ -64886,7 +64909,15 @@
 	                _this.isLoggedIn = true;
 	                _this.userService.confirmLogin(data);
 	                console.log(data);
-	                _this.router.navigate(['/']);
+	                _this.getQueryParams(function (params) {
+	                    if (params['redirect']) {
+	                        console.log(decodeURI(params['redirect']));
+	                        window.location.href = decodeURI(params['redirect']);
+	                    }
+	                    else {
+	                        _this.router.navigate(['/']);
+	                    }
+	                });
 	            });
 	        }
 	        else {
@@ -64898,7 +64929,7 @@
 	            selector: 'login',
 	            templateUrl: 'app/login.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
 	    ], LoginComponent);
 	    return LoginComponent;
 	}());
@@ -64920,65 +64951,61 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var platform_browser_1 = __webpack_require__(201);
-	var UIHelper = (function () {
-	    function UIHelper(title) {
-	        this.title = title;
+	var http_1 = __webpack_require__(397);
+	var router_1 = __webpack_require__(336);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	var user_service_1 = __webpack_require__(468);
+	var SignupComponent = (function () {
+	    function SignupComponent(http, router, userService, flash) {
+	        this.http = http;
+	        this.router = router;
+	        this.userService = userService;
+	        this.flash = flash;
+	        if (localStorage['profile']) {
+	            this.router.navigate(['/']);
+	            this.flash.show("You're already logged in!");
+	        }
 	    }
-	    UIHelper.prototype.setTitle = function (newTitle) {
-	        this.title.setTitle(newTitle);
+	    SignupComponent.prototype.ngOnInit = function () {
+	        this.formModel = { email: null, password: null, confirmPassword: null };
 	    };
-	    UIHelper.prototype.takeCount = function (children) {
-	        var counter = function () {
-	            if (children && children.length) {
-	                return children.length;
-	            }
-	            else {
-	                window.clearInterval(counterFunc);
-	                return 0;
-	            }
-	        };
-	        var counterFunc = window.setInterval(counter, 100);
-	        return counter();
-	    };
-	    UIHelper = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [platform_browser_1.Title])
-	    ], UIHelper);
-	    return UIHelper;
-	}());
-	exports.UIHelper = UIHelper;
-	var Utilities = (function () {
-	    function Utilities() {
-	    }
-	    Utilities.prototype.existsLocally = function (localItem) {
-	        if (typeof localStorage[localItem] === "undefined" || !localStorage[localItem] || !localStorage[localItem].length) {
-	            return false;
+	    SignupComponent.prototype.signup = function () {
+	        var _this = this;
+	        for (var field in this.formModel) {
+	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
+	                return this.flash.show("Oops! You need to fill out your " + field, { cssClass: "error" });
+	        }
+	        if (this.formModel.email && this.formModel.password && this.formModel.confirmPassword) {
+	            if (this.formModel.password !== this.formModel.confirmPassword)
+	                return this.flash.show("Oops! Your passwords didn't match", { cssClass: "error" });
+	            this.http.post('/signup', this.formModel).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                if (data.errmsg) {
+	                    _this.flash.show("There's already an account with this email in our system.");
+	                    return _this.router.navigate(["/login"]);
+	                }
+	                localStorage.setItem('profile', JSON.stringify(data));
+	                _this.isLoggedIn = true;
+	                _this.userService.confirmLogin(data);
+	                _this.flash.show("Welcome!");
+	                console.log(data);
+	                _this.router.navigate(['/']);
+	            });
 	        }
 	        else {
-	            return true;
+	            console.error("The form model was undefined.");
+	            this.flash.show("Something went wrong", { cssClass: "error" });
 	        }
 	    };
-	    Utilities.prototype.contains = function (a, b) {
-	        if (a.indexOf(b) > -1)
-	            return true;
-	        else
-	            return false;
-	    };
-	    Utilities = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [])
-	    ], Utilities);
-	    return Utilities;
+	    SignupComponent = __decorate([
+	        core_1.Component({
+	            selector: 'login',
+	            templateUrl: 'app/signup.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
+	    ], SignupComponent);
+	    return SignupComponent;
 	}());
-	exports.Utilities = Utilities;
-	var InfoMessage = (function () {
-	    function InfoMessage() {
-	        this.type = 'info';
-	    }
-	    return InfoMessage;
-	}());
-	exports.InfoMessage = InfoMessage;
+	exports.SignupComponent = SignupComponent;
 
 
 /***/ },
@@ -65061,10 +65088,10 @@
 	var router_1 = __webpack_require__(336);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(471);
-	var search_box_component_1 = __webpack_require__(477);
-	var org_details_component_1 = __webpack_require__(478);
-	var org_posts_component_1 = __webpack_require__(479);
+	var app_service_1 = __webpack_require__(477);
+	var search_box_component_1 = __webpack_require__(478);
+	var org_details_component_1 = __webpack_require__(479);
+	var org_posts_component_1 = __webpack_require__(480);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash) {
 	        this.http = http;
@@ -65313,8 +65340,6 @@
 	    }
 	    SearchService.prototype.loadSearchableData = function (uri, options) {
 	        var params = new http_1.URLSearchParams();
-	        if (this.stringIsSet(options.org))
-	            params.set("org", options.org);
 	        if (this.stringIsSet(options.search)) {
 	            params.set("search", options.search);
 	            localStorage.setItem("searching", "true");
@@ -65353,6 +65378,82 @@
 
 /***/ },
 /* 477 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var platform_browser_1 = __webpack_require__(201);
+	var UIHelper = (function () {
+	    function UIHelper(title) {
+	        this.title = title;
+	    }
+	    UIHelper.prototype.setTitle = function (newTitle) {
+	        this.title.setTitle(newTitle);
+	    };
+	    UIHelper.prototype.takeCount = function (children) {
+	        var counter = function () {
+	            if (children && children.length) {
+	                return children.length;
+	            }
+	            else {
+	                window.clearInterval(counterFunc);
+	                return 0;
+	            }
+	        };
+	        var counterFunc = window.setInterval(counter, 100);
+	        return counter();
+	    };
+	    UIHelper = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [platform_browser_1.Title])
+	    ], UIHelper);
+	    return UIHelper;
+	}());
+	exports.UIHelper = UIHelper;
+	var Utilities = (function () {
+	    function Utilities() {
+	    }
+	    Utilities.prototype.existsLocally = function (localItem) {
+	        if (typeof localStorage[localItem] === "undefined" || !localStorage[localItem] || !localStorage[localItem].length) {
+	            return false;
+	        }
+	        else {
+	            return true;
+	        }
+	    };
+	    Utilities.prototype.contains = function (a, b) {
+	        if (a.indexOf(b) > -1)
+	            return true;
+	        else
+	            return false;
+	    };
+	    Utilities = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [])
+	    ], Utilities);
+	    return Utilities;
+	}());
+	exports.Utilities = Utilities;
+	var InfoMessage = (function () {
+	    function InfoMessage() {
+	        this.type = 'info';
+	    }
+	    return InfoMessage;
+	}());
+	exports.InfoMessage = InfoMessage;
+
+
+/***/ },
+/* 478 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65408,7 +65509,7 @@
 
 
 /***/ },
-/* 478 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65424,7 +65525,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(477);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65469,7 +65570,7 @@
 
 
 /***/ },
-/* 479 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65486,7 +65587,7 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(477);
 	__webpack_require__(339);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(router, route, http, orgService, helper, utilities) {
@@ -65506,12 +65607,21 @@
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	    }
 	    OrgPostsComponent.prototype.ngOnInit = function () {
+	        console.log(this.org);
+	        this.loadPosts();
+	    };
+	    OrgPostsComponent.prototype.ngOnDestroy = function () {
+	        this.querySub.unsubscribe();
+	    };
+	    OrgPostsComponent.prototype.loadPosts = function () {
 	        var _this = this;
-	        this.orgService.loadPosts({ org: this.org._id, limit: 10 }).subscribe(function (data) {
+	        this.orgService.loadPosts({ filterField: "org", filterValue: this.org._id, limit: 10 }).subscribe(function (data) {
+	            console.log("data");
+	            console.log(data);
 	            _this.isLoading = false;
 	            _this.posts = data;
 	            _this.takeCount(_this.posts);
-	            _this.route.queryParams.subscribe(function (params) {
+	            _this.querySub = _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
 	                    _this.selectPost(params['viewpost']);
 	                    //this.isPermalink = true;
@@ -65519,6 +65629,9 @@
 	                }
 	            });
 	        }, function (error) { return console.log(error); });
+	    };
+	    OrgPostsComponent.prototype.updatePosts = function (org) {
+	        this.loadPosts();
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        this.viewingOne = true;
@@ -65565,6 +65678,10 @@
 	    ], OrgPostsComponent.prototype, "org", void 0);
 	    __decorate([
 	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgPostsComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Input(), 
 	        __metadata('design:type', Boolean)
 	    ], OrgPostsComponent.prototype, "isBrowsing", void 0);
 	    __decorate([
@@ -65574,7 +65691,7 @@
 	    OrgPostsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-posts',
-	            template: "\n\t\t\t<div class=\"posts-by-org\" id=\"posts\">\n\t\t\t\t<h4>What they're up to</h4>\n\t\t\t\t<search-box\n\t\t\t\t\tclass=\"search-box-container col-md-8 col-md-offset-2 clearfix\"\n\t\t\t\t\t*ngIf=\"!isBrowsing && !isLoading\"\n\t\t\t\t\t(update)=\"searchPosts($event)\"\n\t\t\t\t\t(focusChange)=\"toggleSearchBoxFocus($event)\"\n\t\t\t\t\t[ngClass]=\"{focused: searchBoxIsFocused}\"\n\t\t\t\t\t[collection]=\"'posts by' + org.name\"></search-box>\n\t\t\t\t\n\t\t\t\t<div *ngIf=\"!viewingOne && !isLoading\" class=\"posts\">\n\t\t\t\t\t<div #singlePost *ngFor=\"let post of posts\">\n\t\t\t\t\t\t<h5 *ngIf=\"isBrowsing\"><a [routerLink]=\"['/organization/i', org?._id]\" [queryParams]=\"{viewpost: post._id}\">{{post.content}}</a></h5>\n\t\t\t\t\t\t<h5 *ngIf=\"!isBrowsing\" (click)=\"selectPost(post._id)\">{{post.content}}</h5>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div *ngIf=\"viewingOne && selectedPost\">\n\t\t\t\t\t<a (click)=\"deselectPost()\" [routerLink]=\"['/organization/i', org?._id]\">Back to posts</a>\n\t\t\t\t\t<h5>{{selectedPost.content}}</h5>\n\t\t\t\t</div>\n\n\t\t\t</div>",
+	            templateUrl: 'app/org-posts.component.html',
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65585,7 +65702,7 @@
 
 
 /***/ },
-/* 480 */
+/* 481 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65602,7 +65719,7 @@
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
 	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
@@ -65646,7 +65763,7 @@
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\"></org-posts>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\" [user]=\"user\"></org-posts>\n\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
@@ -65658,7 +65775,7 @@
 
 
 /***/ },
-/* 481 */
+/* 482 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65676,7 +65793,7 @@
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(471);
+	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var ManageOrgPageComponent = (function () {
 	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
@@ -65805,7 +65922,7 @@
 
 
 /***/ },
-/* 482 */
+/* 483 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65821,8 +65938,8 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(471);
-	var email_service_1 = __webpack_require__(483);
+	var app_service_1 = __webpack_require__(477);
+	var email_service_1 = __webpack_require__(484);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {
 	        this.http = http;
@@ -65868,7 +65985,7 @@
 
 
 /***/ },
-/* 483 */
+/* 484 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -65881,7 +65998,7 @@
 
 
 /***/ },
-/* 484 */
+/* 485 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65895,7 +66012,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var click_outside_directive_1 = __webpack_require__(485);
+	var click_outside_directive_1 = __webpack_require__(486);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -65913,7 +66030,7 @@
 
 
 /***/ },
-/* 485 */
+/* 486 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65994,7 +66111,6 @@
 
 
 /***/ },
-/* 486 */,
 /* 487 */,
 /* 488 */,
 /* 489 */,
@@ -66254,7 +66370,8 @@
 /* 743 */,
 /* 744 */,
 /* 745 */,
-/* 746 */
+/* 746 */,
+/* 747 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -66268,56 +66385,108 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var angular2_flash_messages_1 = __webpack_require__(461);
+	var http_1 = __webpack_require__(397);
+	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var SignupComponent = (function () {
-	    function SignupComponent(http, router, userService, flash) {
-	        this.http = http;
+	var app_service_1 = __webpack_require__(477);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	;
+	var CreatePostComponent = (function () {
+	    function CreatePostComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
 	        this.router = router;
+	        this.route = route;
+	        this.orgService = orgService;
 	        this.userService = userService;
+	        this.helper = helper;
+	        this.utilities = utilities;
+	        this.zone = zone;
 	        this.flash = flash;
-	        if (localStorage['profile']) {
-	            this.router.navigate(['/']);
-	            this.flash.show("You're already logged in!");
-	        }
+	        this.http = http;
+	        this.update = new core_1.EventEmitter();
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        this.savingPost = false;
 	    }
-	    SignupComponent.prototype.ngOnInit = function () {
-	        this.formModel = { email: null, password: null, confirmPassword: null };
+	    CreatePostComponent.prototype.ngOnInit = function () {
+	        this.post = {
+	            authorId: null,
+	            title: null,
+	            content: null,
+	            org: null,
+	            featuredImage: null,
+	            imageBucket: Date.now().toString()
+	        };
+	        // for ng-upload
+	        this.uploadOptions = {
+	            url: '/post/upload/featuredImage/' + this.post.imageBucket,
+	            filterExtensions: true,
+	            calculateSpeed: true,
+	            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	        };
 	    };
-	    SignupComponent.prototype.signup = function () {
+	    CreatePostComponent.prototype.ngAfterViewChecked = function () {
+	        if (this.org && this.user && !this.post.org) {
+	            this.post.authorId = this.user._id;
+	            this.post.org = this.org._id;
+	            console.log(this.post);
+	        }
+	    };
+	    CreatePostComponent.prototype.handleUpload = function (data) {
 	        var _this = this;
-	        for (var field in this.formModel) {
-	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
-	                return this.flash.show("Oops! You need to fill out your " + field, { cssClass: "error" });
-	        }
-	        if (this.formModel.email && this.formModel.password && this.formModel.confirmPassword) {
-	            if (this.formModel.password !== this.formModel.confirmPassword)
-	                return this.flash.show("Oops! Your passwords didn't match", { cssClass: "error" });
-	            this.http.post('/signup', this.formModel).map(function (res) { return res.json(); }).subscribe(function (data) {
-	                localStorage.setItem('profile', JSON.stringify(data));
-	                _this.isLoggedIn = true;
-	                _this.userService.confirmLogin(data);
-	                console.log(data);
-	                _this.router.navigate(['/']);
-	            });
-	        }
-	        else {
-	            console.error("The form model was undefined.");
-	            this.flash.show("Something went wrong", { cssClass: "error" });
-	        }
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response && data.status !== 404) {
+	                if (data.response.indexOf("errmsg") > -1)
+	                    return console.error(data.response);
+	                _this.post.featuredImage = data.response;
+	                _this.stillWorking = false;
+	                console.log(_this.post);
+	            }
+	        });
 	    };
-	    SignupComponent = __decorate([
+	    CreatePostComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        this.savingPost = true;
+	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log("New post: ", res);
+	            if (res.errmsg) {
+	                _this.flash.show("Save failed", { cssClass: "error" });
+	                _this.savingPost = false;
+	                return;
+	            }
+	            _this.org = res;
+	            _this.update.emit(_this.org);
+	            _this.savingPost = false;
+	            _this.flash.show("Saved");
+	            console.log(res);
+	        });
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "update", void 0);
+	    CreatePostComponent = __decorate([
 	        core_1.Component({
-	            selector: 'login',
-	            templateUrl: 'app/signup.component.html'
+	            selector: 'create-post',
+	            templateUrl: 'app/create-post.component.html',
+	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService])
-	    ], SignupComponent);
-	    return SignupComponent;
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
+	    ], CreatePostComponent);
+	    return CreatePostComponent;
 	}());
-	exports.SignupComponent = SignupComponent;
+	exports.CreatePostComponent = CreatePostComponent;
 
 
 /***/ }

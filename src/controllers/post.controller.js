@@ -13,19 +13,20 @@ const search = require('../services/search');
 dotenv.load({ path: '.env' });
 
 const Post = require('../models/Post');
+const Org = require('../models/Org');
 
 exports.routes = [
   { method: "get",
     uri: "/posts/get",
     process: function(req, res) {
       var dbQuery = {};
+      console.log(req.query);
       if (req.query.search) {
         dbQuery = search(req.query.search, req.query.field);
       }
       if (req.query.filterField) {
         dbQuery[req.query.filterField] = req.query.filterValue;
       }
-      dbQuery.verified = true;
       Post.find(dbQuery, (err, docs) => {
         if(err) return console.error(err);
         res.json(docs);
@@ -49,14 +50,23 @@ exports.routes = [
 
   // create
   { method: "post",
-    uri: '/post',
     middleware: "passport",
+    uri: '/post',
+    //middleware: "passport",
     process: function(req, res) {
+      console.log(req.body);
       var obj = new Post(req.body);
       obj.save(function(err, obj) {
         if(err) return console.error(err);
         console.log(obj);
-        res.status(200).json(obj);
+        Org.findById(obj.org, function(err, org) {
+          if(err) return console.error(err);
+          org.posts.push(obj._id);
+          org.save((err, org) => {
+            if(err) return res.status(500).json(err);
+            res.status(200).json(org);
+          })
+        })
       });
     }
   },
@@ -99,22 +109,12 @@ exports.routes = [
   // file uploads with multer-s3
   {
     method: "post",
-    uri: "/edit-post/upload/image/:id",
+    uri: "/post/upload/featuredImage/:bucket",
     middleware: "upload",
     process: function(req, res, next) {
-      let updateQuery = {$push:{}};
-      updateQuery.$push.images = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
-      //updateQuery.$push.images = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
-      Post.findOneAndUpdate({_id: req.params.postId}, updateQuery, {new: true}, function(err, obj) {
-        if(err) {
-          console.error(err);
-          res.send(400).json(err);
-        }
-        else {
-          console.log(obj.images);
-          res.json(obj);
-        } 
-      });
+      console.log(req.newPath);
+      res.send("https://d1poe49zt5yre3.cloudfront.net/" + req.newPath);
+      if (next) next();
     }
   }
 ];

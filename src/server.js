@@ -38,7 +38,10 @@ const upload = multer({
     bucket: 'fuse-uploads',
     acl: 'public-read',
     key: function (req, file, callback) {
-      req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
+      if (req.params.orgId)
+        req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + ".jpg";
+      if (req.params.bucket)
+        req.newPath = "post-uploads/" + req.params.bucket + "/" + Date.now().toString() + ".jpg";
       console.log("Uploading "); console.log(file);
       callback(null, req.newPath);
     }
@@ -213,8 +216,8 @@ mongoose.connection.on('connected', () => {
 
 
 
-  //generateOrgs();
-  function generateOrgs() {
+  var generateOrgs = false;
+  if (generateOrgs) {
     let i = 0;
     while (i < 50) {
       orgController.sample(function(err, obj) {
@@ -242,12 +245,12 @@ mongoose.connection.on('connected', () => {
     }
   }
 
-  User.find({}, function(err, users) {
-    console.log(users[0].password);
-    bcrypt.compare('sohcahtoa', users[0].password, function(err, res) {
-      console.log(res);
-    });
-  });
+  // User.find({}, function(err, users) {
+  //   console.log(users[0].password);
+  //   bcrypt.compare('sohcahtoa', users[0].password, function(err, res) {
+  //     console.log(res);
+  //   });
+  // });
 
   // var testdata = new User({
   //   name: "Danny",

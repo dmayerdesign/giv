@@ -19,7 +19,8 @@ const orgSchema = new mongoose.Schema({
 	
 	coverImage: String,
 	gravatar: String,
-	gallery: [String]
+	gallery: [String],
+	posts: [String]
 });
 
 orgSchema.pre('save', function (next) {

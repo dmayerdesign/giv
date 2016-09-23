@@ -516,7 +516,8 @@ exports.isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect('/login');
+  res.status(401).json({errmsg: "User authentication error"});
+  return console.error("User authentication error");;
 };
 
 /**

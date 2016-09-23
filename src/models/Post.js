@@ -4,10 +4,11 @@ const postSchema = new mongoose.Schema({
 	authorId: {type: String},
 	title: {type: String, index: true},
 	content: {type: String, index: true},
-	images: [String],
+	featuredImage: String,
 	likes: Number,
 	org: {type: String, index: true},
-	dateCreated: {type: Date, default: Date.now()}
+	dateCreated: {type: Date, default: Date.now()},
+	imageBucket: String
 });
 
 const Post = mongoose.model('Post', postSchema);

@@ -16,7 +16,8 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 								
 				<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
 
-				<org-posts [org]="org"></org-posts>
+				<org-posts [org]="org" [user]="user"></org-posts>
+
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities],
 	directives: [ROUTER_DIRECTIVES]

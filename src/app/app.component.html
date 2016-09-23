@@ -17,7 +17,7 @@
 	        </li>
 	        <li *ngIf="isLoggedIn" class="nav-item"><img width="40" src="{{user?.profile?.picture || 'app/images/default-avatar.gif'}}"></li>
 	        <li *ngIf="!isLoggedIn" class="nav-item">
-	        	<a class="nav-link" href="/login"><i class="fa fa-lock"></i>Log In</a>
+	        	<a class="nav-link" (click)="logIn()"><i class="fa fa-lock"></i>Log In</a>
 	        </li>
 	    </ul>
 	</nav>

@@ -1,0 +1,29 @@
+<div class="posts-by-org" id="posts">
+	<h4>What they're up to</h4>
+	<search-box
+		class="search-box-container col-md-8 col-md-offset-2 clearfix"
+		*ngIf="!isBrowsing && !isLoading"
+		(update)="searchPosts($event)"
+		(focusChange)="toggleSearchBoxFocus($event)"
+		[ngClass]="{focused: searchBoxIsFocused}"
+		[collection]="'posts by ' + org.name"></search-box>
+
+	<create-post *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1 && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
+	
+	<!-- Posts -->
+	<div *ngIf="!viewingOne && !isLoading" class="posts">
+		<div #singlePost *ngFor="let post of posts" (click)="selectPost(post._id)">
+			<img *ngIf="post?.featuredImage?.length" [src]="post.featuredImage" width="100">
+			<h5 class="post-title" *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org?._id]" [queryParams]="{viewpost: post._id}">{{post.title}}</a></h5>
+			<h5 class="post-title" *ngIf="!isBrowsing">{{post.title}}</h5>
+		</div>
+	</div>
+
+	<!-- View Post -->
+	<div *ngIf="viewingOne && selectedPost">
+		<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
+		<img *ngIf="selectedPost?.featuredImage?.length" [src]="selectedPost.featuredImage" width="100">
+		<h5>{{selectedPost.title}}</h5>
+	</div>
+
+</div>

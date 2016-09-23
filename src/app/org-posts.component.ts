@@ -9,35 +9,13 @@ import 'rxjs/add/operator/map';
 
 @Component({
 	selector: 'org-posts',
-	template: `
-			<div class="posts-by-org" id="posts">
-				<h4>What they're up to</h4>
-				<search-box
-					class="search-box-container col-md-8 col-md-offset-2 clearfix"
-					*ngIf="!isBrowsing && !isLoading"
-					(update)="searchPosts($event)"
-					(focusChange)="toggleSearchBoxFocus($event)"
-					[ngClass]="{focused: searchBoxIsFocused}"
-					[collection]="'posts by' + org.name"></search-box>
-				
-				<div *ngIf="!viewingOne && !isLoading" class="posts">
-					<div #singlePost *ngFor="let post of posts">
-						<h5 *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org?._id]" [queryParams]="{viewpost: post._id}">{{post.content}}</a></h5>
-						<h5 *ngIf="!isBrowsing" (click)="selectPost(post._id)">{{post.content}}</h5>
-					</div>
-				</div>
-
-				<div *ngIf="viewingOne && selectedPost">
-					<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
-					<h5>{{selectedPost.content}}</h5>
-				</div>
-
-			</div>`,
+	templateUrl: 'app/org-posts.component.html',
 	providers: [OrgService, UIHelper, Utilities]
 })
 
 export class OrgPostsComponent implements OnInit {
 	@Input() org;
+	@Input() user;
 	@Input() isBrowsing:boolean;
 	@ViewChildren('singlePost') $posts = [];
 
@@ -47,6 +25,7 @@ export class OrgPostsComponent implements OnInit {
 	private viewingOne:boolean = false;
 	//private isPermalink:boolean = false;
 	public postId:Observable<string>;
+	private querySub:Subscription;
 
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -65,13 +44,24 @@ export class OrgPostsComponent implements OnInit {
 				private utilities: Utilities) { }
 
 	ngOnInit() {
-		this.orgService.loadPosts({org: this.org._id, limit:10}).subscribe(
+		console.log(this.org);
+		this.loadPosts();
+	}
+
+	ngOnDestroy() {
+		this.querySub.unsubscribe();
+	}
+
+	loadPosts() {
+		this.orgService.loadPosts({filterField: "org", filterValue: this.org._id, limit:10}).subscribe(
 			data => {
+				console.log("data");
+				console.log(data);
 				this.isLoading = false;
 				this.posts = data;
 				this.takeCount(this.posts);
 
-				this.route.queryParams.subscribe(params => {
+				this.querySub = this.route.queryParams.subscribe(params => {
 					if (params['viewpost']) {
 						this.selectPost(params['viewpost']);
 						//this.isPermalink = true;
@@ -81,6 +71,10 @@ export class OrgPostsComponent implements OnInit {
 			},
 			error => console.log(error)
 		);
+	}
+
+	updatePosts(org) {
+		this.loadPosts();
 	}
 
 	selectPost(id:any) {

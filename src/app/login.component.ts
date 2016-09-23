@@ -1,8 +1,9 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FlashMessagesService } from 'angular2-flash-messages';
 import { UserService } from './services/user.service';
+import { Subscription } from 'rxjs/Subscription';
 //import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 
 @Component({
@@ -15,10 +16,12 @@ export class LoginComponent implements OnInit {
 	private formModel = {email: null, password: null};
 	private user:any;
   private isLoggedIn:boolean;
+  private querySub:Subscription;
 
 	constructor(//private fb:FacebookService,
 							private http:Http,
 							private router:Router,
+              private route:ActivatedRoute,
 							private userService:UserService,
 							private flash:FlashMessagesService) {
 
@@ -36,6 +39,15 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
 	  //this.checkLoginStatus();
+    this.getQueryParams((data) => console.log(data));
+  }
+
+  ngOnDestroy() {
+    this.querySub.unsubscribe();
+  }
+
+  getQueryParams(next) {
+    this.querySub = this.route.queryParams.subscribe(data => next(data));
   }
 
   login() {
@@ -48,7 +60,15 @@ export class LoginComponent implements OnInit {
         this.isLoggedIn = true;
         this.userService.confirmLogin(data);
       	console.log(data);
-        this.router.navigate(['/']);
+        this.getQueryParams(params => {
+          if (params['redirect']) {
+            console.log(decodeURI(params['redirect']));
+            window.location.href = decodeURI(params['redirect']);
+          } else {
+            this.router.navigate(['/']);
+          }
+        });
+        
       });
     } else {
     	console.error("The form model was undefined.");
