@@ -1,4 +1,3 @@
-const env = process.env.ENV;
 /**
  * Module dependencies.
  */
@@ -20,8 +19,9 @@ const sass = require('node-sass-middleware');
 const bcrypt = require('bcrypt-nodejs');
 
 /**
- * Load environment variables from .env file, where API keys and passwords are configured.
+ * Load environment variables either from .env file or Heroku config vars
  */
+const env = process.env.ENV;
 if (env !== "PRODUCTION") dotenv.load({ path: '.env' });
 
 /**
