@@ -1,16 +1,17 @@
 {
-  "name": "hackathon-starter",
+  "name": "giv",
   "version": "4.2.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": "https://github.com/dmayerdesign/hackathon-fuse.git"
   },
   "scripts": {
     "postinstall": "typings install",
-    "start": "concurrently \"webpack --watch --colors\" \"nodemon src/server.js\"",
+    "test": "concurrently \"webpack --watch --colors\" \"nodemon src/server.js\"",
+    "start": "node src/server",
     "prestart": "webpack",
     "typings": "typings",
-    "test": "mocha --reporter spec --timeout 5000"
+    "test-d": "mocha --reporter spec --timeout 5000"
   },
   "dependencies": {
     "@angular/common": "2.0.0-rc.5",
