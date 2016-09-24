@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
 			}
 		});
 
-		localStorage.setItem("construction", "sohcahtoa");
+		//localStorage.setItem("construction", "sohcahtoa");
 	}
 
 	ngDoCheck() {

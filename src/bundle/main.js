@@ -64591,7 +64591,7 @@
 	                _this.isLoggedIn = true;
 	            }
 	        });
-	        localStorage.setItem("construction", "sohcahtoa");
+	        //localStorage.setItem("construction", "sohcahtoa");
 	    };
 	    AppComponent.prototype.ngDoCheck = function () {
 	        this.location = encodeURI(window.location.href);
