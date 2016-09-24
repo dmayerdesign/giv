@@ -10,8 +10,10 @@ const orgSchema = new mongoose.Schema({
 	website: String,
 	facebook: String,
 	stars: Number,
-	verified: Boolean,
 	featured: Boolean,
+
+	verified: Boolean,
+	official: Boolean,
 
 	globalPermission: String, // for manager permission
 	managers: [String],

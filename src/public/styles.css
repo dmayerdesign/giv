@@ -19,7 +19,7 @@ a:hover .fa-heart {
 }
 
 
-/* Search */
+/* Search Box */
 
 .search-box-container {
 	display: block;
@@ -82,6 +82,19 @@ a:hover .fa-heart {
 }
 
 
+/* Browse */
+
+.loading-org-search {
+	position: fixed;
+	width: 100px;
+	text-align: center;
+	left: 50%;
+	bottom: 100px;
+	z-index: 999;
+	margin-left: -50px;
+}
+
+
 /* Org Page */
 .single-org .item-details, .single-org .posts-by-org {
 	/*height: 800px;*/
@@ -90,6 +103,7 @@ a:hover .fa-heart {
 .single-org #posts {
 	padding-top: 40px; /* For anchor links */
 }
+
 
 
 /* Editing */

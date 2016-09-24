@@ -1,0 +1,8 @@
+<h3>Claim {{org}}</h3>
+<p>Let us know you're a representative for this organization so we can let you manage its Giv page</p>
+<form (submit)="submitForm()" #contactForm="ngForm">
+	<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">
+	<input [(ngModel)]="inputs.fromAddr" type="email" name="email" placeholder="your email address">
+	<textarea [(ngModel)]="inputs.message" name="message" placeholder="your message"></textarea>
+	<button>Submit</button>
+</form>

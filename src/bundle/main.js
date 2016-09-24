@@ -65120,12 +65120,6 @@
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
 	        this.helper.setTitle("Browse organizations");
-	        // this.paramsSub = this.route.params.subscribe(params => {
-	        // 	let notfound = params['404'];
-	        // 	if (notfound == true) {
-	        // 		this.flash.show("The thing you were looking for doesn't exist. Sorry!");
-	        // 	}
-	        // });
 	        /** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
@@ -65134,6 +65128,21 @@
 	            _this.isLoading = false;
 	            _this.orgs = data;
 	            _this.takeCount(_this.orgs);
+	            /** Infinite scrolling! **/
+	            var orgs = _this.orgs;
+	            var showMore = _this.showMore;
+	            document.onscroll = function () {
+	                var body = document.body;
+	                var html = document.documentElement;
+	                var height = Math.max(body.scrollHeight, body.offsetHeight, html.scrollHeight, html.offsetHeight, html.clientHeight);
+	                var winHeight = window.innerHeight;
+	                console.log(height);
+	                console.log(document.body.scrollTop);
+	                if (document.body.scrollTop === (height - winHeight)) {
+	                    console.log(orgs);
+	                    document.getElementById("show-more").click();
+	                }
+	            };
 	        }, function (error) { return console.log(error); });
 	        this.orgService.loadOrgs({ limit: 6, filterField: "featured", filterValue: "true" }).subscribe(function (data) {
 	            _this.isLoadingFeatured = false;
@@ -65143,9 +65152,6 @@
 	    BrowseOrgsComponent.prototype.ngDoCheck = function () {
 	        this.takeCount(this.$orgs);
 	    };
-	    // ngOnDestroy() {
-	    // 	this.paramsSub.unsubscribe();
-	    // }
 	    BrowseOrgsComponent.prototype.takeCount = function (children) {
 	        this.orgsShowing = this.helper.takeCount(children);
 	    };
@@ -65191,8 +65197,10 @@
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
+	        this.loadingOrgSearch = true;
 	        this.orgService.loadOrgs({ search: this.searchText, limit: increase, offset: offset }).subscribe(function (res) {
 	            _this.isLoading = false;
+	            _this.loadingOrgSearch = false;
 	            console.log(res);
 	            _this.orgs = _this.orgs.concat(res);
 	            _this.takeCount(_this.$orgs);
@@ -65637,8 +65645,13 @@
 	        this.loadPosts();
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
-	        this.viewingOne = true;
-	        this.selectedPost = this.posts.find(function (post) { return post._id === id; });
+	        if (!this.isBrowsing) {
+	            this.viewingOne = true;
+	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
+	        }
+	        else {
+	            this.router.navigate(['/organization/i', this.org._id], { queryParams: { viewpost: id } });
+	        }
 	    };
 	    OrgPostsComponent.prototype.deselectPost = function () {
 	        this.viewingOne = false;

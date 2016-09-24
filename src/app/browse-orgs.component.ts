@@ -57,13 +57,6 @@ export class BrowseOrgsComponent implements OnInit {
 	ngOnInit() {
 		this.helper.setTitle("Browse organizations");
 
-		// this.paramsSub = this.route.params.subscribe(params => {
-		// 	let notfound = params['404'];
-		// 	if (notfound == true) {
-		// 		this.flash.show("The thing you were looking for doesn't exist. Sorry!");
-		// 	}
-		// });
-
 		/** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 		!this.utilities.existsLocally('OrgsSorting')
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
@@ -74,6 +67,23 @@ export class BrowseOrgsComponent implements OnInit {
 				this.isLoading = false;
 				this.orgs = data;
 				this.takeCount(this.orgs);
+
+				/** Infinite scrolling! **/
+				let orgs = this.orgs;
+				let showMore = this.showMore;
+				document.onscroll = function() {
+					let body = document.body;
+		    	let html = document.documentElement;
+					let height = Math.max( body.scrollHeight, body.offsetHeight, 
+		                       		 	 html.scrollHeight, html.offsetHeight, html.clientHeight );
+					let winHeight = window.innerHeight;
+					console.log(height);
+					console.log(document.body.scrollTop);
+					if (document.body.scrollTop === (height - winHeight)) {
+						console.log(orgs);
+						document.getElementById("show-more").click();
+					}
+				};
 			},
 			error => console.log(error)
 		);
@@ -90,10 +100,6 @@ export class BrowseOrgsComponent implements OnInit {
 	ngDoCheck() {
 		this.takeCount(this.$orgs);
 	}
-
-	// ngOnDestroy() {
-	// 	this.paramsSub.unsubscribe();
-	// }
 
 	takeCount(children:any) {
 		this.orgsShowing = this.helper.takeCount(children);
@@ -140,12 +146,14 @@ export class BrowseOrgsComponent implements OnInit {
 		);
 	}
 
-	showMore(increase:number, offset:number) {
+	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
+		this.loadingOrgSearch = true;
 
 		this.orgService.loadOrgs({search: this.searchText, limit: increase, offset: offset}).subscribe(
 			res => {
 				this.isLoading = false;
+				this.loadingOrgSearch = false;
 				console.log(res);
 				this.orgs = this.orgs.concat(res);
 				this.takeCount(this.$orgs);

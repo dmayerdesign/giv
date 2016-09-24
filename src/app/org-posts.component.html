@@ -14,8 +14,7 @@
 	<div *ngIf="!viewingOne && !isLoading" class="posts">
 		<div #singlePost *ngFor="let post of posts" (click)="selectPost(post._id)">
 			<img *ngIf="post?.featuredImage?.length" [src]="post.featuredImage" width="100">
-			<h5 class="post-title" *ngIf="isBrowsing"><a [routerLink]="['/organization/i', org?._id]" [queryParams]="{viewpost: post._id}">{{post.title}}</a></h5>
-			<h5 class="post-title" *ngIf="!isBrowsing">{{post.title}}</h5>
+			<h5 class="post-title">{{post.title}}</h5>
 		</div>
 	</div>
 

@@ -59,10 +59,10 @@
 			</div>
 		</div>
 		
-		<button class="row btn btn-default" (click)="showMore(10, orgs.length)">Show more</button>
+		<button id="show-more" class="row btn btn-default" (click)="showMore(10, orgs.length)">Show more</button>
 	</div>
 
-	<div *ngIf="loadingOrgSearch" class="loading-orgs text-xs-center">
+	<div *ngIf="loadingOrgSearch" class="loading-org-search text-xs-center">
 		<i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
 	</div>
 

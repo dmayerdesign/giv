@@ -78,8 +78,13 @@ export class OrgPostsComponent {
 	}
 
 	selectPost(id:any) {
-		this.viewingOne = true;
-		this.selectedPost = this.posts.find(post => post._id === id);
+		if (!this.isBrowsing) {
+			this.viewingOne = true;
+			this.selectedPost = this.posts.find(post => post._id === id);
+		}
+		else {
+			this.router.navigate(['/organization/i', this.org._id], {queryParams: { viewpost: id } });
+		}
 	}
 
 	deselectPost() {
