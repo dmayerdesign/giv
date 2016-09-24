@@ -38,6 +38,11 @@
     <!-- Webpack bundles -->
     <script src="bundle/vendor.js"></script>
     <script src="bundle/main.js"></script>
+    <script>
+      if (localStorage['construction'] !== 'sohcahtoa') {
+        window.location.href = '/construction.html';
+      }
+    </script>
 
   </head>
 

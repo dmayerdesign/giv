@@ -39,6 +39,8 @@ export class AppComponent implements OnInit {
 				this.isLoggedIn = true;
 			}
 		});
+
+		localStorage.setItem("construction", "sohcahtoa");
 	}
 
 	ngDoCheck() {
