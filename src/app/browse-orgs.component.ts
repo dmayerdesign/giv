@@ -150,7 +150,7 @@ export class BrowseOrgsComponent implements OnInit {
 	searchOrgs(search:string) {
 		let query = {search: search, field: "name", limit: 20};
 		if (this.categoryFilter) {
-			query['filterField'] = "category";
+			query['filterField'] = "categories";
 			query['filterValue'] = this.categoryFilter;
 		}
 		this.loadingOrgSearch = true;

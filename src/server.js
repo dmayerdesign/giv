@@ -70,8 +70,8 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-// mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
-mongoose.connect(process.env.MONGOLAB_URI);
+mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
+//mongoose.connect(process.env.MONGOLAB_URI);
 mongoose.connection.config.autoIndex = true; // set to false to boost performance in production
 
 /**

@@ -49921,17 +49921,17 @@
 	var about_component_1 = __webpack_require__(472);
 	var library_component_1 = __webpack_require__(473);
 	var browse_orgs_component_1 = __webpack_require__(474);
-	var org_details_component_1 = __webpack_require__(480);
-	var org_posts_component_1 = __webpack_require__(481);
+	var org_details_component_1 = __webpack_require__(479);
+	var org_posts_component_1 = __webpack_require__(480);
 	var single_org_component_1 = __webpack_require__(482);
 	var manage_org_page_component_1 = __webpack_require__(483);
 	var create_post_component_1 = __webpack_require__(484);
-	var search_box_component_1 = __webpack_require__(479);
+	var search_box_component_1 = __webpack_require__(478);
 	var contact_component_1 = __webpack_require__(485);
 	var user_service_1 = __webpack_require__(468);
 	var search_service_1 = __webpack_require__(476);
 	var ng2_click_outside_1 = __webpack_require__(487);
-	var categories_service_1 = __webpack_require__(477);
+	var categories_service_1 = __webpack_require__(481);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -65098,11 +65098,11 @@
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var user_service_1 = __webpack_require__(468);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(478);
-	var search_box_component_1 = __webpack_require__(479);
-	var org_details_component_1 = __webpack_require__(480);
-	var org_posts_component_1 = __webpack_require__(481);
-	var categories_service_1 = __webpack_require__(477);
+	var app_service_1 = __webpack_require__(477);
+	var search_box_component_1 = __webpack_require__(478);
+	var org_details_component_1 = __webpack_require__(479);
+	var org_posts_component_1 = __webpack_require__(480);
+	var categories_service_1 = __webpack_require__(481);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash, userService, categories) {
 	        this.http = http;
@@ -65208,7 +65208,7 @@
 	        var _this = this;
 	        var query = { search: search, field: "name", limit: 20 };
 	        if (this.categoryFilter) {
-	            query['filterField'] = "category";
+	            query['filterField'] = "categories";
 	            query['filterValue'] = this.categoryFilter;
 	        }
 	        this.loadingOrgSearch = true;
@@ -65432,42 +65432,6 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
-	var Categories = (function () {
-	    function Categories() {
-	    }
-	    Categories.prototype.list = function () {
-	        return [
-	            "Racial justice",
-	            "Environmental justice",
-	            "Reproductive rights",
-	            "Economic justice",
-	            "Other"
-	        ];
-	    };
-	    Categories = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [])
-	    ], Categories);
-	    return Categories;
-	}());
-	exports.Categories = Categories;
-
-
-/***/ },
-/* 478 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
 	var platform_browser_1 = __webpack_require__(201);
 	var UIHelper = (function () {
 	    function UIHelper(title) {
@@ -65530,7 +65494,7 @@
 
 
 /***/ },
-/* 479 */
+/* 478 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65586,7 +65550,7 @@
 
 
 /***/ },
-/* 480 */
+/* 479 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65602,7 +65566,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
 	        this.http = http;
@@ -65647,7 +65611,7 @@
 
 
 /***/ },
-/* 481 */
+/* 480 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65664,7 +65628,7 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(475);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	__webpack_require__(339);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(router, route, http, orgService, helper, utilities) {
@@ -65791,6 +65755,42 @@
 
 
 /***/ },
+/* 481 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var Categories = (function () {
+	    function Categories() {
+	    }
+	    Categories.prototype.list = function () {
+	        return [
+	            "Racial justice",
+	            "Environmental justice",
+	            "Reproductive rights",
+	            "Economic justice",
+	            "Other"
+	        ];
+	    };
+	    Categories = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [])
+	    ], Categories);
+	    return Categories;
+	}());
+	exports.Categories = Categories;
+
+
+/***/ },
 /* 482 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -65808,7 +65808,7 @@
 	var router_1 = __webpack_require__(336);
 	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
 	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
@@ -65882,7 +65882,7 @@
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var ManageOrgPageComponent = (function () {
 	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
@@ -66029,7 +66029,7 @@
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(475);
 	var user_service_1 = __webpack_require__(468);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	function Post() {
 	    this.authorId = null;
@@ -66157,7 +66157,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var app_service_1 = __webpack_require__(478);
+	var app_service_1 = __webpack_require__(477);
 	var email_service_1 = __webpack_require__(486);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router) {

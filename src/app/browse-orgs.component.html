@@ -32,6 +32,7 @@
 
 	<h3>Browse Organizations</h3>
 	<h5 class="col-md-12">Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span></h5>
+	<p *ngIf="categoryFilter">Category: {{categoryFilter}}</p>
 
 	<div class="nothing-to-show col-md-8 col-md-offset-2" *ngIf="orgs.length === 0">
 			No orgs to show. Try broadening your search.
