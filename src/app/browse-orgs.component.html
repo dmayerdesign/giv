@@ -6,6 +6,12 @@
 	[ngClass]="{focused: searchBoxIsFocused}"
 	[collection]="'organizations'"></search-box>
 
+<select *ngIf="!isLoading"
+		(change)="filterByCategory($event.target.value); searchOrgs(searchText)">
+	<option value="">All categories</option>
+	<option *ngFor="let category of categoriesList" value="{{category}}">{{category}}</option>
+</select>
+
 
 <div class="col-md-7 browse-orgs" *ngIf="!isLoading">
 <!-- 	<h2>Featured Organizations</h2>

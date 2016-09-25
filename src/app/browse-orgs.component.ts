@@ -12,6 +12,7 @@ import { UIHelper, Utilities, InfoMessage } from './services/app.service';
 import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
+import { Categories } from './services/categories.service';
 
 @Component({
 	selector: 'orgs-list',
@@ -37,6 +38,8 @@ export class BrowseOrgsComponent implements OnInit {
 	private searchBoxIsFocused:boolean = false;
 	private viewingOrg:boolean = false;
 	private viewingFeaturedOrg:boolean = false;
+	private categoriesList:any;
+	private categoryFilter:string;
 	//private selectedOrg:any = null;
 
 	private isLoading = true;
@@ -54,11 +57,13 @@ export class BrowseOrgsComponent implements OnInit {
 				private utilities:Utilities,
 				private route:ActivatedRoute,
 				private flash:FlashMessagesService,
-				private userService:UserService) {
+				private userService:UserService,
+				private categories:Categories) {
 	}
 
 	ngOnInit() {
 		this.helper.setTitle("Browse organizations");
+		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
@@ -143,9 +148,13 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		console.log(search);
+		let query = {search: search, field: "name", limit: 20};
+		if (this.categoryFilter) {
+			query['filterField'] = "category";
+			query['filterValue'] = this.categoryFilter;
+		}
 		this.loadingOrgSearch = true;
-		this.orgService.loadOrgs({search:search, field:"name", limit:20})
+		this.orgService.loadOrgs(query)
 			.subscribe(
 				results => {
 					this.orgs = results;
@@ -154,6 +163,10 @@ export class BrowseOrgsComponent implements OnInit {
 				},
 				error => console.error(error)
 		);
+	}
+
+	filterByCategory(category:string) {
+		this.categoryFilter = category;
 	}
 
 	showMore(increase:number, offset:number):void {

@@ -1,16 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Http, URLSearchParams } from '@angular/http';
-import { Categories } from './categories.service';
 
 @Injectable()
 export class SearchService {
 
-  constructor (private http:Http, private categories:Categories) { }
+  constructor (private http:Http) { }
 
   loadSearchableData(uri:string, options) { //search?:string, field?:string, org?:string, limit?:number, offset?:number) {
     let params: URLSearchParams = new URLSearchParams();
-    let categories = this.categories.list();
-    console.log(categories);
 
     if (this.stringIsSet(options.search)) {
       params.set("search", options.search);
@@ -18,10 +15,7 @@ export class SearchService {
     } else {
       localStorage.setItem("searching", "false");
     }
-    if (this.stringIsSet(options.field)) {
-      if (categories.indexOf(options.search) > -1) params.set("field", "categories");
-      else params.set("field", options.field);
-    }
+    if (this.stringIsSet(options.field)) params.set("field", options.field);
 
     if (this.stringIsSet(options.filterField)) params.set("filterField", options.filterField);
     if (this.stringIsSet(options.filterValue)) params.set("filterValue", options.filterValue);

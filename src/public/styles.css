@@ -139,9 +139,14 @@ main {
 
 }
 
-section, search-box {
+section, .search-box {
 	background: #F4F9F8;
 	border: 2px solid #F1F6F5;
+}
+
+search-box {
+	padding-right: 0 !important;
+	padding-left: 0 !important;
 }
 
 .navbar {
@@ -178,12 +183,12 @@ a:hover .fa-heart {
 
 .search-box-container {
 	display: block;
-	perspective: 200px;
+	/*perspective: 200px;*/
 }
 
 .search-box-container.focused .search-box {
 	box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-	transform: translateZ(6px);
+	/*transform: translateZ(6px);*/
 }
 
 .search-box input {
