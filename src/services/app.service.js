@@ -6,7 +6,7 @@ const passportConfig = require('../config/passport');
 const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
+const s3 = new AWS.S3({params: {Bucket: 'giv-uploads', Key: 'default'}});
 const appendFileExt = function(file) {
   if (file && file.mimetype) {
     if (file.mimetype.indexOf("jpeg") > -1) return ".jpg";
@@ -17,7 +17,7 @@ const appendFileExt = function(file) {
 const uploadCoverImage = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'fuse-uploads',
+    bucket: 'giv-uploads',
     acl: 'public-read',
     key: function (req, file, callback) {
       req.newPath = "cover-images/" + req.params.orgId + "_" + Date.now().toString() + appendFileExt(file);
@@ -31,7 +31,7 @@ const uploadCoverImage = multer({
 const attach = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'fuse-uploads',
+    bucket: 'giv-uploads',
     acl: 'public-read',
     key: function (req, file, callback) {
       req.newPath = "post-uploads/" + req.params.bucket + "/" + Date.now().toString() + appendFileExt(file);
@@ -45,7 +45,7 @@ const attach = multer({
 const uploadProfilePic = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'fuse-uploads',
+    bucket: 'giv-uploads',
     acl: 'public-read',
     key: function (req, file, callback) {
       req.newPath = "avatars/users/" + req.params.userId + "_" + Date.now().toString() + appendFileExt(file);

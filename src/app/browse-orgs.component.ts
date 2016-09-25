@@ -6,6 +6,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Subscription } from 'rxjs/Subscription';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
+import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities, InfoMessage } from './services/app.service';
 import { SearchBox } from './search-box.component';
@@ -25,6 +26,7 @@ export class BrowseOrgsComponent implements OnInit {
 	@ViewChildren('singleItem') $orgs = [];
 	@Output() selectedOrg:any = null;
 	@Output() selectedFeaturedOrg:any = null;
+	@Output() user;
 
 	private orgs = [];
 	private featuredOrgs = [];
@@ -46,16 +48,23 @@ export class BrowseOrgsComponent implements OnInit {
 	private infoMsg = new InfoMessage();
 
 	constructor(
-				private http: Http,
-				private orgService: OrgService,
-				private helper: UIHelper,
-				private utilities: Utilities,
+				private http:Http,
+				private orgService:OrgService,
+				private helper:UIHelper,
+				private utilities:Utilities,
 				private route:ActivatedRoute,
-				private flash:FlashMessagesService) {
+				private flash:FlashMessagesService,
+				private userService:UserService) {
 	}
 
 	ngOnInit() {
 		this.helper.setTitle("Browse organizations");
+
+		this.userService.getLoggedInUser((err, user) => {
+			if(err) return console.error(err);
+			this.user = user;
+			console.log("User: ", user);
+		});
 
 		/** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 		!this.utilities.existsLocally('OrgsSorting')
@@ -134,6 +143,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
+		console.log(search);
 		this.loadingOrgSearch = true;
 		this.orgService.loadOrgs({search:search, field:"name", limit:20})
 			.subscribe(
@@ -188,7 +198,6 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	deselectOrg(e:Event, id:string):void {
-		console.log(e);
 		if (this.viewingOrg && this.selectedOrg._id === id) {
 			this.selectedOrg = null;
 			this.viewingOrg = false;
@@ -196,7 +205,6 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	deselectFeaturedOrg(e:Event, id:string):void {
-		console.log(e);
 		if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
 			this.selectedFeaturedOrg = null;
 			this.viewingFeaturedOrg = false;

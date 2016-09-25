@@ -24,7 +24,7 @@
   height: 0;
   width: 0;
   box-sizing: border-box;
-  border: 2px solid #4ee9d1;
+  border: 1px solid #4ee9d1;
   border-radius: 50%;
   -webkit-animation: loader-figure 2s infinite ease-out;
   -moz-animation: loader-figure 2s infinite ease-out;
@@ -130,6 +130,24 @@
 }
 
 
+/* Layout */
+main {
+	padding-top: 80px;
+}
+
+@media only screen and (min-width: 1200px) {
+
+}
+
+section, search-box {
+	background: #F4F9F8;
+	border: 2px solid #F1F6F5;
+}
+
+.navbar {
+	padding: 1em 0;
+}
+
 /* Typography */
 
 body {
@@ -151,6 +169,10 @@ a:hover .fa-heart {
 	color: #cc0000;
 }
 
+/* Masthead */
+.navbar {
+	background: linear-gradient(20deg, #4AEFB3, #53E4ED);
+}
 
 /* Search Box */
 
@@ -170,7 +192,6 @@ a:hover .fa-heart {
 	font-size: 1.25rem;
 	font-weight: 300;
 }
-
 
 /* Flash messages */
 
@@ -203,28 +224,10 @@ a:hover .fa-heart {
 	text-align: center;
 }
 
-
-/* Grid */
-
-.grid-list {
-
-}
-
-.grid-list-item {
-	
-}
-
-
 /* Browse */
 
 .loading-org-search {
-	position: fixed;
-	width: 100px;
-	text-align: center;
-	left: 50%;
-	bottom: 100px;
-	z-index: 999;
-	margin-left: -50px;
+	bottom: 10%;
 }
 
 

@@ -6,9 +6,9 @@
 		(update)="searchPosts($event)"
 		(focusChange)="toggleSearchBoxFocus($event)"
 		[ngClass]="{focused: searchBoxIsFocused}"
-		[collection]="'posts by ' + org.name"></search-box>
+		[collection]="'posts by ' + org?.name"></search-box>
 
-	<create-post *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1 && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
+	<create-post *ngIf="user && user?.permissions?.indexOf(org?.globalPermission) > -1 && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 	
 	<!-- Posts -->
 	<div *ngIf="!viewingOne && !isLoading" class="posts">

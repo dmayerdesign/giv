@@ -53,7 +53,12 @@ export class OrgPostsComponent {
 	}
 
 	loadPosts() {
-		this.orgService.loadPosts({filterField: "org", filterValue: this.org._id, limit:10}).subscribe(
+		let query:any = function():any {
+			if (this.org) return {filterField: "org", filterValue: this.org._id, limit: 10};
+			else return {limit: 10, sort: "-likes"};
+		};
+
+		this.orgService.loadPosts(query).subscribe(
 			data => {
 				console.log("data");
 				console.log(data);
@@ -64,7 +69,6 @@ export class OrgPostsComponent {
 				this.querySub = this.route.queryParams.subscribe(params => {
 					if (params['viewpost']) {
 						this.selectPost(params['viewpost']);
-						//this.isPermalink = true;
 						window.location.href += "#posts";
 					}
 				});
@@ -78,12 +82,14 @@ export class OrgPostsComponent {
 	}
 
 	selectPost(id:any) {
+		console.log(id);
+		console.log(this.isBrowsing);
 		if (!this.isBrowsing) {
 			this.viewingOne = true;
 			this.selectedPost = this.posts.find(post => post._id === id);
 		}
 		else {
-			this.router.navigate(['/organization/i', this.org._id], {queryParams: { viewpost: id } });
+			this.router.navigate(['/organization/i', this.posts.find(post => post._id === id).org], {queryParams: { viewpost: id } });
 		}
 	}
 

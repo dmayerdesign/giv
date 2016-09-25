@@ -49931,6 +49931,7 @@
 	var user_service_1 = __webpack_require__(468);
 	var search_service_1 = __webpack_require__(476);
 	var ng2_click_outside_1 = __webpack_require__(486);
+	var categories_service_1 = __webpack_require__(748);
 	var core_2 = __webpack_require__(11);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -49980,7 +49981,8 @@
 	                platform_browser_1.Title,
 	                user_service_1.UserService,
 	                search_box_component_1.SearchBox,
-	                search_service_1.SearchService
+	                search_service_1.SearchService,
+	                categories_service_1.Categories
 	            ],
 	            bootstrap: [app_component_1.AppComponent]
 	        }), 
@@ -65094,19 +65096,21 @@
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
 	var angular2_flash_messages_1 = __webpack_require__(461);
+	var user_service_1 = __webpack_require__(468);
 	var org_service_1 = __webpack_require__(475);
 	var app_service_1 = __webpack_require__(477);
 	var search_box_component_1 = __webpack_require__(478);
 	var org_details_component_1 = __webpack_require__(479);
 	var org_posts_component_1 = __webpack_require__(480);
 	var BrowseOrgsComponent = (function () {
-	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash) {
+	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash, userService) {
 	        this.http = http;
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
 	        this.route = route;
 	        this.flash = flash;
+	        this.userService = userService;
 	        this.$orgs = [];
 	        this.selectedOrg = null;
 	        this.selectedFeaturedOrg = null;
@@ -65127,6 +65131,12 @@
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
 	        this.helper.setTitle("Browse organizations");
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	            console.log("User: ", user);
+	        });
 	        /** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
@@ -65193,6 +65203,7 @@
 	    };
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
+	        console.log(search);
 	        this.loadingOrgSearch = true;
 	        this.orgService.loadOrgs({ search: search, field: "name", limit: 20 })
 	            .subscribe(function (results) {
@@ -65236,14 +65247,12 @@
 	        this.viewingFeaturedOrg = true;
 	    };
 	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e);
 	        if (this.viewingOrg && this.selectedOrg._id === id) {
 	            this.selectedOrg = null;
 	            this.viewingOrg = false;
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.deselectFeaturedOrg = function (e, id) {
-	        console.log(e);
 	        if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
 	            this.selectedFeaturedOrg = null;
 	            this.viewingFeaturedOrg = false;
@@ -65261,6 +65270,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], BrowseOrgsComponent.prototype, "selectedFeaturedOrg", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], BrowseOrgsComponent.prototype, "user", void 0);
 	    BrowseOrgsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'orgs-list',
@@ -65270,7 +65283,7 @@
 	            directives: [search_box_component_1.SearchBox, org_details_component_1.OrgDetailsComponent, org_posts_component_1.OrgPostsComponent],
 	            pipes: []
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, angular2_flash_messages_1.FlashMessagesService])
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, angular2_flash_messages_1.FlashMessagesService, user_service_1.UserService])
 	    ], BrowseOrgsComponent);
 	    return BrowseOrgsComponent;
 	}());
@@ -65349,12 +65362,16 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
+	var categories_service_1 = __webpack_require__(748);
 	var SearchService = (function () {
-	    function SearchService(http) {
+	    function SearchService(http, categories) {
 	        this.http = http;
+	        this.categories = categories;
 	    }
 	    SearchService.prototype.loadSearchableData = function (uri, options) {
 	        var params = new http_1.URLSearchParams();
+	        var categories = this.categories.list();
+	        console.log(categories);
 	        if (this.stringIsSet(options.search)) {
 	            params.set("search", options.search);
 	            localStorage.setItem("searching", "true");
@@ -65362,8 +65379,12 @@
 	        else {
 	            localStorage.setItem("searching", "false");
 	        }
-	        if (this.stringIsSet(options.field))
-	            params.set("field", options.field);
+	        if (this.stringIsSet(options.field)) {
+	            if (categories.indexOf(options.search) > -1)
+	                params.set("field", "categories");
+	            else
+	                params.set("field", options.field);
+	        }
 	        if (this.stringIsSet(options.filterField))
 	            params.set("filterField", options.filterField);
 	        if (this.stringIsSet(options.filterValue))
@@ -65387,7 +65408,7 @@
 	    };
 	    SearchService = __decorate([
 	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [http_1.Http])
+	        __metadata('design:paramtypes', [http_1.Http, categories_service_1.Categories])
 	    ], SearchService);
 	    return SearchService;
 	}());
@@ -65485,15 +65506,22 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(11);
+	var categories_service_1 = __webpack_require__(748);
 	var SearchBox = (function () {
-	    function SearchBox(el) {
+	    function SearchBox(el, categories) {
 	        this.el = el;
+	        this.categories = categories;
 	        this.update = new core_1.EventEmitter();
 	        this.focusChange = new core_1.EventEmitter();
+	        this.catList = this.categories.list();
+	        console.log("List: ", this.categories);
 	    }
-	    SearchBox.prototype.submitSearch = function ($event) {
+	    SearchBox.prototype.submitSearch = function ($event, categorySearch) {
 	        var search = $event.target.value;
 	        var keyCode = $event.keyCode;
+	        if (categorySearch) {
+	            return this.update.emit(search);
+	        }
 	        if (search.length <= 1 && keyCode === 8)
 	            this.update.emit("");
 	        if (keyCode === 13) {
@@ -65517,9 +65545,9 @@
 	        core_1.Component({
 	            selector: 'search-box',
 	            styleUrls: ['app/search-box.component.css'],
-	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\" (keydown)=\"submitSearch($event)\"\n\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>"
+	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\" (keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\n\t\t\t<select *ngIf=\"this.collection === 'organizations'\"\n\t\t\t\t\t(change)=\"submitSearch($event, true)\">\n\t\t\t\t<option value=\"\">All categories</option>\n\t\t\t\t<option *ngFor=\"let category of catList\" value=\"{{category}}\">{{category}}</option>\n\t\t\t</select>\n\t\t</div>"
 	        }), 
-	        __metadata('design:paramtypes', [core_1.ElementRef])
+	        __metadata('design:paramtypes', [core_1.ElementRef, categories_service_1.Categories])
 	    ], SearchBox);
 	    return SearchBox;
 	}());
@@ -65633,7 +65661,13 @@
 	    };
 	    OrgPostsComponent.prototype.loadPosts = function () {
 	        var _this = this;
-	        this.orgService.loadPosts({ filterField: "org", filterValue: this.org._id, limit: 10 }).subscribe(function (data) {
+	        var query = function () {
+	            if (this.org)
+	                return { filterField: "org", filterValue: this.org._id, limit: 10 };
+	            else
+	                return { limit: 10, sort: "-likes" };
+	        };
+	        this.orgService.loadPosts(query).subscribe(function (data) {
 	            console.log("data");
 	            console.log(data);
 	            _this.isLoading = false;
@@ -65642,7 +65676,6 @@
 	            _this.querySub = _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
 	                    _this.selectPost(params['viewpost']);
-	                    //this.isPermalink = true;
 	                    window.location.href += "#posts";
 	                }
 	            });
@@ -65652,12 +65685,14 @@
 	        this.loadPosts();
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
+	        console.log(id);
+	        console.log(this.isBrowsing);
 	        if (!this.isBrowsing) {
 	            this.viewingOne = true;
 	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
 	        }
 	        else {
-	            this.router.navigate(['/organization/i', this.org._id], { queryParams: { viewpost: id } });
+	            this.router.navigate(['/organization/i', this.posts.find(function (post) { return post._id === id; }).org], { queryParams: { viewpost: id } });
 	        }
 	    };
 	    OrgPostsComponent.prototype.deselectPost = function () {
@@ -66261,6 +66296,302 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
+
+
+/***/ },
+/* 488 */,
+/* 489 */,
+/* 490 */,
+/* 491 */,
+/* 492 */,
+/* 493 */,
+/* 494 */,
+/* 495 */,
+/* 496 */,
+/* 497 */,
+/* 498 */,
+/* 499 */,
+/* 500 */,
+/* 501 */,
+/* 502 */,
+/* 503 */,
+/* 504 */,
+/* 505 */,
+/* 506 */,
+/* 507 */,
+/* 508 */,
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */,
+/* 567 */,
+/* 568 */,
+/* 569 */,
+/* 570 */,
+/* 571 */,
+/* 572 */,
+/* 573 */,
+/* 574 */,
+/* 575 */,
+/* 576 */,
+/* 577 */,
+/* 578 */,
+/* 579 */,
+/* 580 */,
+/* 581 */,
+/* 582 */,
+/* 583 */,
+/* 584 */,
+/* 585 */,
+/* 586 */,
+/* 587 */,
+/* 588 */,
+/* 589 */,
+/* 590 */,
+/* 591 */,
+/* 592 */,
+/* 593 */,
+/* 594 */,
+/* 595 */,
+/* 596 */,
+/* 597 */,
+/* 598 */,
+/* 599 */,
+/* 600 */,
+/* 601 */,
+/* 602 */,
+/* 603 */,
+/* 604 */,
+/* 605 */,
+/* 606 */,
+/* 607 */,
+/* 608 */,
+/* 609 */,
+/* 610 */,
+/* 611 */,
+/* 612 */,
+/* 613 */,
+/* 614 */,
+/* 615 */,
+/* 616 */,
+/* 617 */,
+/* 618 */,
+/* 619 */,
+/* 620 */,
+/* 621 */,
+/* 622 */,
+/* 623 */,
+/* 624 */,
+/* 625 */,
+/* 626 */,
+/* 627 */,
+/* 628 */,
+/* 629 */,
+/* 630 */,
+/* 631 */,
+/* 632 */,
+/* 633 */,
+/* 634 */,
+/* 635 */,
+/* 636 */,
+/* 637 */,
+/* 638 */,
+/* 639 */,
+/* 640 */,
+/* 641 */,
+/* 642 */,
+/* 643 */,
+/* 644 */,
+/* 645 */,
+/* 646 */,
+/* 647 */,
+/* 648 */,
+/* 649 */,
+/* 650 */,
+/* 651 */,
+/* 652 */,
+/* 653 */,
+/* 654 */,
+/* 655 */,
+/* 656 */,
+/* 657 */,
+/* 658 */,
+/* 659 */,
+/* 660 */,
+/* 661 */,
+/* 662 */,
+/* 663 */,
+/* 664 */,
+/* 665 */,
+/* 666 */,
+/* 667 */,
+/* 668 */,
+/* 669 */,
+/* 670 */,
+/* 671 */,
+/* 672 */,
+/* 673 */,
+/* 674 */,
+/* 675 */,
+/* 676 */,
+/* 677 */,
+/* 678 */,
+/* 679 */,
+/* 680 */,
+/* 681 */,
+/* 682 */,
+/* 683 */,
+/* 684 */,
+/* 685 */,
+/* 686 */,
+/* 687 */,
+/* 688 */,
+/* 689 */,
+/* 690 */,
+/* 691 */,
+/* 692 */,
+/* 693 */,
+/* 694 */,
+/* 695 */,
+/* 696 */,
+/* 697 */,
+/* 698 */,
+/* 699 */,
+/* 700 */,
+/* 701 */,
+/* 702 */,
+/* 703 */,
+/* 704 */,
+/* 705 */,
+/* 706 */,
+/* 707 */,
+/* 708 */,
+/* 709 */,
+/* 710 */,
+/* 711 */,
+/* 712 */,
+/* 713 */,
+/* 714 */,
+/* 715 */,
+/* 716 */,
+/* 717 */,
+/* 718 */,
+/* 719 */,
+/* 720 */,
+/* 721 */,
+/* 722 */,
+/* 723 */,
+/* 724 */,
+/* 725 */,
+/* 726 */,
+/* 727 */,
+/* 728 */,
+/* 729 */,
+/* 730 */,
+/* 731 */,
+/* 732 */,
+/* 733 */,
+/* 734 */,
+/* 735 */,
+/* 736 */,
+/* 737 */,
+/* 738 */,
+/* 739 */,
+/* 740 */,
+/* 741 */,
+/* 742 */,
+/* 743 */,
+/* 744 */,
+/* 745 */,
+/* 746 */,
+/* 747 */,
+/* 748 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var Categories = (function () {
+	    function Categories() {
+	    }
+	    Categories.prototype.list = function () {
+	        return [
+	            "Racial justice",
+	            "Environmental justice",
+	            "Reproductive rights",
+	            "Economic justice",
+	            "Other"
+	        ];
+	    };
+	    Categories = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [])
+	    ], Categories);
+	    return Categories;
+	}());
+	exports.Categories = Categories;
 
 
 /***/ }

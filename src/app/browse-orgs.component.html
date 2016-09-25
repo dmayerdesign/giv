@@ -1,12 +1,14 @@
-<div class="col-md-8 col-md-offset-2" *ngIf="isLoading">
-	<h5>Loading...</h5>
-	<div class="text-xs-center">
-		<i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
-	</div>
-</div>
+<search-box
+	class="search-box-container col-md-12 clearfix"
+	*ngIf="!isLoading"
+	(update)="searchOrgs($event)"
+	(focusChange)="toggleSearchBoxFocus($event)"
+	[ngClass]="{focused: searchBoxIsFocused}"
+	[collection]="'organizations'"></search-box>
 
-<div class="container-fluid" *ngIf="!isLoading">
-	<h3>Featured</h3>
+
+<div class="col-md-7 browse-orgs" *ngIf="!isLoading">
+<!-- 	<h2>Featured Organizations</h2>
 	<div class="single-item row"
 			*ngFor="let org of featuredOrgs"
 			(click)="viewFeaturedOrg(org._id)"
@@ -20,27 +22,16 @@
 			<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">View Org Page</a>
 			<org-posts [org]="selectedFeaturedOrg" [isBrowsing]="true"></org-posts>
 		</div>
-	</div>
+	</div> -->
 
-</div>
-
-<search-box
-	class="search-box-container col-md-8 col-md-offset-2 clearfix"
-	*ngIf="!isLoading"
-	(update)="searchOrgs($event)"
-	(focusChange)="toggleSearchBoxFocus($event)"
-	[ngClass]="{focused: searchBoxIsFocused}"
-	[collection]="'organizations'"></search-box>
-
-<div class="browse container-fluid" *ngIf="!isLoading">
 	<h3>Browse Organizations</h3>
 	<h5 class="col-md-12">Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span></h5>
 
 	<div class="nothing-to-show col-md-8 col-md-offset-2" *ngIf="orgs.length === 0">
 			No orgs to show. Try broadening your search.
 	</div>
-
-	<div class="items-list orgs-list col-md-12"
+	
+	<section class="row items-list orgs-list col-md-12"
 			*ngIf="!isEditing">
 
 		<div class="single-item row"
@@ -60,17 +51,21 @@
 		</div>
 		
 		<button id="show-more" class="row btn btn-default" (click)="showMore(10, orgs.length)">Show more</button>
-	</div>
+	</section>
 
-	<div *ngIf="loadingOrgSearch" class="loading-org-search text-xs-center">
-		<i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
+	<div class="loader loading-org-search" *ngIf="isLoading">
+	  <div class="loader__figure"></div>
+	  <p class="loader__label">Loading organizations</p>
 	</div>
+</div>
 
-	<div [hidden]="!infoMsg.body" class="alert alert-{{infoMsg.type}} alert-dismissible" role="alert">
-		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
-		</button>
-		<strong>Message:</strong> {{infoMsg.body}}
-	</div>
+<div class="col-md-5 browse-posts" *ngIf="!isLoading">
+	<h3>What they're up to</h3>
+	<org-posts [user]="user" [isBrowsing]="true"></org-posts>
+</div>
+
+<div class="loader" *ngIf="isLoading">
+  <div class="loader__figure"></div>
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="30"></p>
 </div>
 

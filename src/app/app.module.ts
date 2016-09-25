@@ -23,6 +23,7 @@ import { ContactComponent } from './contact.component';
 import { UserService } from './services/user.service';
 import { SearchService } from './services/search.service';
 import { ClickOutsideModule } from 'ng2-click-outside';
+import { Categories } from './services/categories.service';
 
 import { enableProdMode } from '@angular/core';
 enableProdMode();
@@ -71,6 +72,7 @@ const routing = RouterModule.forRoot([
       , UserService
       , SearchBox
       , SearchService
+      , Categories
     ],
     bootstrap: [AppComponent]
 })

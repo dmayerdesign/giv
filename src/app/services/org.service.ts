@@ -15,7 +15,7 @@ export class OrgService {
 	constructor(
 		private http:Http,
 		private search:SearchService,
-		private flash:FlashMessagesService) {	}
+		private flash:FlashMessagesService) { }
 
 	loadOrgs(options) {
 		return this.search.loadSearchableData("/orgs/get", options);
@@ -42,5 +42,4 @@ export class OrgService {
 	editPost(options: EditInterface) {
 		return this.http.put("/edit-post/" + options.key + "/" + options.id, {value: options.value}).map(res => res.json());
 	}
-
 }
