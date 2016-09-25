@@ -55,7 +55,9 @@ export class LoginComponent implements OnInit {
     	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.flash.show("Oops! You need to enter your " + field);
     }
     if (this.formModel.email && this.formModel.password) {
-    	this.http.post('/login', this.formModel).subscribe(data => {
+    	this.http.post('/login', this.formModel).map(res => res.json()).subscribe(data => {
+        console.log(data);
+        if (!data["_id"]) return this.flash.show("Login failed", { cssClass: "error" });
     		localStorage.setItem('profile', JSON.stringify(data));
         this.isLoggedIn = true;
         this.userService.confirmLogin(data);
@@ -67,8 +69,10 @@ export class LoginComponent implements OnInit {
           } else {
             this.router.navigate(['/']);
           }
-        });
-        
+        }); 
+      }, error => {
+        console.log(error);
+        this.flash.show("That account doesn't exist", { cssClass: "error" });
       });
     } else {
     	console.error("The form model was undefined.");

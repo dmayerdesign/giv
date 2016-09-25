@@ -64905,7 +64905,10 @@
 	                return this.flash.show("Oops! You need to enter your " + field);
 	        }
 	        if (this.formModel.email && this.formModel.password) {
-	            this.http.post('/login', this.formModel).subscribe(function (data) {
+	            this.http.post('/login', this.formModel).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                console.log(data);
+	                if (!data["_id"])
+	                    return _this.flash.show("Login failed", { cssClass: "error" });
 	                localStorage.setItem('profile', JSON.stringify(data));
 	                _this.isLoggedIn = true;
 	                _this.userService.confirmLogin(data);
@@ -64919,6 +64922,9 @@
 	                        _this.router.navigate(['/']);
 	                    }
 	                });
+	            }, function (error) {
+	                console.log(error);
+	                _this.flash.show("That account doesn't exist", { cssClass: "error" });
 	            });
 	        }
 	        else {
