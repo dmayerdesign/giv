@@ -29,13 +29,13 @@ exports.postLogin = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.redirect('/login');
+    return res.status(401).json({"errmsg": "Login was not valid"});
   }
 
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
     if (!user) {
-      return res.redirect('/login');
+      res.status(401).json({"errmsg": "Login was not valid"});
     }
     req.logIn(user, (err) => {
       if (err) { return next(err); }
