@@ -1,15 +1,24 @@
 <nav class="navbar navbar-fixed-top">
   <div class="container">
-    <ul class="nav navbar-nav">
+    <h1 class="masthead-logo"><img src="images/logo-2x.png" width="56" alt="Giv"></h1>
+    <ul class="nav nav-left pull-left">
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <a class="nav-link" [routerLink]="['/']" routerLinkActive="nav-link-active"><i class="fa fa-home"></i> Browse</a>
+        <a class="nav-link" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
       </li>
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <a class="nav-link" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
+      </li>
+    </ul>
+    <ul class="nav nav-right pull-right">
       <li *ngIf="isLoggedIn" class="nav-item">
-    		<a class="nav-link" (click)="logOut()"><i class="fa fa-lock"></i> Log out</a> 
+    		<a class="nav-link"><img src="app/images/profile-icon.svg" height="18"><span>Your account</span></a>
+        <ul class="subnav">
+          <li class="subnav-item" (click)="logOut()"><i class="fa fa-lock"></i><span>Log out</span></li>
+        </ul>
       </li>
       <li *ngIf="isLoggedIn" class="nav-item"><img width="40" src="{{user?.profile?.picture || 'app/images/default-avatar.gif'}}"></li>
       <li *ngIf="!isLoggedIn" class="nav-item">
-      	<a class="nav-link" (click)="logIn()"><i class="fa fa-lock"></i> Log in</a>
+      	<a class="nav-link" (click)="logIn()"><img src="app/images/profile-icon.svg" height="18"><span>Log in</span></a>
       </li>
     </ul>
   </div>

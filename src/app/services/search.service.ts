@@ -3,7 +3,6 @@ import { Http, URLSearchParams } from '@angular/http';
 
 @Injectable()
 export class SearchService {
-
   constructor (private http:Http) { }
 
   loadSearchableData(uri:string, options) { //search?:string, field?:string, org?:string, limit?:number, offset?:number) {
@@ -16,6 +15,7 @@ export class SearchService {
       localStorage.setItem("searching", "false");
     }
     if (this.stringIsSet(options.field)) params.set("field", options.field);
+    if (this.stringIsSet(options.bodyField)) params.set("bodyField", options.bodyField);
 
     if (this.stringIsSet(options.filterField)) params.set("filterField", options.filterField);
     if (this.stringIsSet(options.filterValue)) params.set("filterValue", options.filterValue);

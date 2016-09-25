@@ -29,6 +29,7 @@ export class OrgPostsComponent {
 
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
+	private searchPlaceholder:string;
 
 	private isLoading = true;
 	private loadingPosts:boolean = false;
@@ -41,10 +42,11 @@ export class OrgPostsComponent {
 				private http: Http,
 				private orgService: OrgService,
 				private helper: UIHelper,
-				private utilities: Utilities) { }
+				private utilities: Utilities) {
+	}
 
 	ngAfterViewInit() {
-		console.log(this.org);
+		this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
 		this.loadPosts();
 	}
 
@@ -53,9 +55,10 @@ export class OrgPostsComponent {
 	}
 
 	loadPosts() {
+		let orgIds:any = null;
 		let query:any = function():any {
-			if (this.org) return {filterField: "org", filterValue: this.org._id, limit: 10};
-			else return {limit: 10, sort: "-likes"};
+			if (this.org) return {filterField: "org", filterValue: this.org._id, limit: 20};
+			else return {limit: 20, sort: "-likes"};
 		};
 
 		this.orgService.loadPosts(query).subscribe(
@@ -103,8 +106,14 @@ export class OrgPostsComponent {
 	}
 
 	searchPosts(search:string) {
+		let query = {search: search, field: "title", bodyField: "content", limit: 20};
+		
+		if (this.org && this.org._id) {
+			query['filterField'] = "org";
+			query['filterValue'] = this.org._id;
+		}
 		this.loadingPosts = true;
-		this.orgService.loadPosts({filterField: "org", filterValue: this.org._id, search:search, field:"content", limit:10})
+		this.orgService.loadPosts(query)
 			.subscribe(
 				results => {
 					this.posts = results;

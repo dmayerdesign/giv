@@ -17,6 +17,20 @@
   	<span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
   </div>
   <div class="form-block">
+    <input [(ngModel)]="name"
+          class="form-control"
+          ngControl="name"
+          name="name"
+          placeholder="Change the name of your page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="form-block">
+    <input [(ngModel)]="description"
+          class="form-control"
+          ngControl="description"
+          name="description"
+          placeholder="Change the description of your page"><button (click)="editOrg('description', description)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="form-block">
   	<input [(ngModel)]="coverImageLink"
   				class="form-control"
   				name="coverImageLink"
@@ -36,13 +50,6 @@
   				name="slug"
   				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
-  <div class="form-block">
-  	<input [(ngModel)]="name"
-  				class="form-control"
-  				ngControl="name"
-  				name="name"
-  				placeholder="Change the name of your page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-	</div>
 	<div class="form-block">
   	<button *ngIf="!org.featured" (click)="editOrg('featured', true)">Set featured org</button>
   	<button *ngIf="org.featured" (click)="editOrg('featured', false)">Unset featured org</button>

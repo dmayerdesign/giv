@@ -28,6 +28,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private donateLink:string;
 	private slug:string;
 	private name:string;
+	private description:string;
 
 	private loading_coverImage:boolean;
 	private loading_donateLink:boolean;

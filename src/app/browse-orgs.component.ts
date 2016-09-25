@@ -40,7 +40,6 @@ export class BrowseOrgsComponent implements OnInit {
 	private viewingFeaturedOrg:boolean = false;
 	private categoriesList:any;
 	private categoryFilter:string;
-	//private selectedOrg:any = null;
 
 	private isLoading = true;
 	private isLoadingFeatured = true;
@@ -148,12 +147,14 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		let query = {search: search, field: "name", limit: 20};
+		let query = {search: search, field: "name", bodyField: "description", limit: 20};
+
 		if (this.categoryFilter) {
 			query['filterField'] = "categories";
 			query['filterValue'] = this.categoryFilter;
 		}
 		this.loadingOrgSearch = true;
+		console.log(query);
 		this.orgService.loadOrgs(query)
 			.subscribe(
 				results => {
@@ -171,9 +172,15 @@ export class BrowseOrgsComponent implements OnInit {
 
 	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
+		let query = {search: this.searchText, limit: increase, offset: offset};
 		this.loadingOrgSearch = true;
 
-		this.orgService.loadOrgs({search: this.searchText, limit: increase, offset: offset}).subscribe(
+		if (this.categoryFilter) {
+			query['filterField'] = "categories";
+			query['filterValue'] = this.categoryFilter;
+		}
+
+		this.orgService.loadOrgs(query).subscribe(
 			res => {
 				this.isLoading = false;
 				this.loadingOrgSearch = false;

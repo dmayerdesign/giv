@@ -14,20 +14,37 @@ exports.routes = [
     uri: "/posts/get",
     process: function(req, res) {
       var dbQuery = {};
+      var dbQuery2 = null;
       console.log(req.query);
       if (req.query.search) {
         dbQuery = search(req.query.search, req.query.field);
       }
+      if (req.query.bodyField) {
+        dbQuery2 = search(req.query.search, req.query.bodyField);
+      }
       if (req.query.filterField) {
         dbQuery[req.query.filterField] = req.query.filterValue;
       }
-      Post.find(dbQuery, (err, docs) => {
-        if(err) return console.error(err);
-        res.json(docs);
-      })
-      .sort(req.query.sort || "-dateCreated")
-      .skip(+req.query.offset)
-      .limit(+req.query.limit);
+
+      if (dbQuery2) {
+        Post.find().or([dbQuery, dbQuery2])
+        .sort(req.query.sort || "-dateCreated")
+        .skip(+req.query.offset)
+        .limit(+req.query.limit)
+        .exec((err, docs) => {
+          if(err) return console.error(err);
+          res.json(docs);
+        })
+      }
+      else {
+        Post.find(dbQuery, (err, docs) => {
+          if(err) return console.error(err);
+          res.json(docs);
+        })
+        .sort(req.query.sort || "-dateCreated")
+        .skip(+req.query.offset)
+        .limit(+req.query.limit);
+      }
     }
   },
 

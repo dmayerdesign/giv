@@ -1,14 +1,16 @@
 <div class="posts-by-org" id="posts">
-	<h4>What they're up to</h4>
-	<search-box
-		class="search-box-container col-md-8 col-md-offset-2 clearfix"
-		*ngIf="!isBrowsing && !isLoading"
-		(update)="searchPosts($event)"
-		(focusChange)="toggleSearchBoxFocus($event)"
-		[ngClass]="{focused: searchBoxIsFocused}"
-		[collection]="'posts by ' + org?.name"></search-box>
+	<header class="row col-md-12">
+		<h3>What they're up to</h3>
+		<search-box
+			class="search-box-container col-md-8 col-md-offset-2 clearfix"
+			*ngIf="(!org?._id || !isBrowsing) && !isLoading"
+			(update)="searchPosts($event)"
+			(focusChange)="toggleSearchBoxFocus($event)"
+			[ngClass]="{focused: searchBoxIsFocused}"
+			[collection]="searchPlaceholder"></search-box>
+	</header>
 
-	<create-post *ngIf="user && user?.permissions?.indexOf(org?.globalPermission) > -1 && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
+	<create-post *ngIf="user && (user?.permissions?.indexOf(org?.globalPermission) > -1) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 	
 	<!-- Posts -->
 	<div *ngIf="!viewingOne && !isLoading" class="posts">

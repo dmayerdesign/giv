@@ -65123,7 +65123,6 @@
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
 	        this.viewingFeaturedOrg = false;
-	        //private selectedOrg:any = null;
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
 	        this.loadingOrgSearch = false;
@@ -65206,12 +65205,13 @@
 	    };
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
-	        var query = { search: search, field: "name", limit: 20 };
+	        var query = { search: search, field: "name", bodyField: "description", limit: 20 };
 	        if (this.categoryFilter) {
 	            query['filterField'] = "categories";
 	            query['filterValue'] = this.categoryFilter;
 	        }
 	        this.loadingOrgSearch = true;
+	        console.log(query);
 	        this.orgService.loadOrgs(query)
 	            .subscribe(function (results) {
 	            _this.orgs = results;
@@ -65225,8 +65225,13 @@
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
+	        var query = { search: this.searchText, limit: increase, offset: offset };
 	        this.loadingOrgSearch = true;
-	        this.orgService.loadOrgs({ search: this.searchText, limit: increase, offset: offset }).subscribe(function (res) {
+	        if (this.categoryFilter) {
+	            query['filterField'] = "categories";
+	            query['filterValue'] = this.categoryFilter;
+	        }
+	        this.orgService.loadOrgs(query).subscribe(function (res) {
 	            _this.isLoading = false;
 	            _this.loadingOrgSearch = false;
 	            console.log(res);
@@ -65387,6 +65392,8 @@
 	        }
 	        if (this.stringIsSet(options.field))
 	            params.set("field", options.field);
+	        if (this.stringIsSet(options.bodyField))
+	            params.set("bodyField", options.bodyField);
 	        if (this.stringIsSet(options.filterField))
 	            params.set("filterField", options.filterField);
 	        if (this.stringIsSet(options.filterValue))
@@ -65648,7 +65655,7 @@
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	    }
 	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
-	        console.log(this.org);
+	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
 	        this.loadPosts();
 	    };
 	    OrgPostsComponent.prototype.ngOnDestroy = function () {
@@ -65656,11 +65663,12 @@
 	    };
 	    OrgPostsComponent.prototype.loadPosts = function () {
 	        var _this = this;
+	        var orgIds = null;
 	        var query = function () {
 	            if (this.org)
-	                return { filterField: "org", filterValue: this.org._id, limit: 10 };
+	                return { filterField: "org", filterValue: this.org._id, limit: 20 };
 	            else
-	                return { limit: 10, sort: "-likes" };
+	                return { limit: 20, sort: "-likes" };
 	        };
 	        this.orgService.loadPosts(query).subscribe(function (data) {
 	            console.log("data");
@@ -65699,8 +65707,13 @@
 	    };
 	    OrgPostsComponent.prototype.searchPosts = function (search) {
 	        var _this = this;
+	        var query = { search: search, field: "title", bodyField: "content", limit: 20 };
+	        if (this.org && this.org._id) {
+	            query['filterField'] = "org";
+	            query['filterValue'] = this.org._id;
+	        }
 	        this.loadingPosts = true;
-	        this.orgService.loadPosts({ filterField: "org", filterValue: this.org._id, search: search, field: "content", limit: 10 })
+	        this.orgService.loadPosts(query)
 	            .subscribe(function (results) {
 	            _this.posts = results;
 	            _this.loadingPosts = false;

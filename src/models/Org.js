@@ -22,7 +22,8 @@ const orgSchema = new mongoose.Schema({
 	coverImage: String,
 	gravatar: String,
 	gallery: [String],
-	posts: [String]
+	posts: [String],
+	categories: [String]
 });
 
 orgSchema.pre('save', function (next) {
