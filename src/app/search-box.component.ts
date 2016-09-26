@@ -5,7 +5,9 @@ import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core'
 	styleUrls: ['app/search-box.component.css'],
 	template: `
 		<div class="search-box">
-			<input type="text" (keydown)="submitSearch($event)"
+			<input type="text"
+					(keydown)="submitSearch($event)"
+					(keyup)="checkEmpty($event)"
 					(focus)="focusChange.emit('focus')"
 					(blur)="focusChange.emit('blur')"
 					placeholder='Search {{collection}}'>
@@ -29,6 +31,13 @@ export class SearchBox {
 		if (keyCode === 13) {
 			this.update.emit(search);
 			this.el.nativeElement.querySelectorAll(".search-box-container input")[0].blur();
+		}
+	}
+
+	checkEmpty($event) {
+		let search:string = $event.target.value;
+		if (!search || search === "") {
+			this.update.emit("");
 		}
 	}
 }

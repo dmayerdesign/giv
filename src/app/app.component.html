@@ -3,15 +3,15 @@
     <h1 class="masthead-logo"><img src="images/logo-2x.png" width="56" alt="Giv"></h1>
     <ul class="nav nav-left pull-left">
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <a class="nav-link" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
+        <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
       </li>
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <a class="nav-link" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
+        <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
       </li>
     </ul>
     <ul class="nav nav-right pull-right">
       <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
-    		<a class="nav-link" (click)="toggleAccountMenu()">
+    		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
           <img *ngIf="!user?.profile?.picture" height="18" src="app/images/profile-icon.svg">
           <img *ngIf="user?.profile?.picture" height="18" [src]="user?.profile?.picture">
           <span>Your account</span>
@@ -21,7 +21,7 @@
         </ul>
       </li>
       <li *ngIf="!isLoggedIn" class="nav-item">
-      	<a class="nav-link" (click)="logIn()"><img src="app/images/profile-icon.svg" height="18"><span>Log in</span></a>
+      	<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()"><img src="app/images/profile-icon.svg" height="18"><span>Log in</span></a>
       </li>
     </ul>
   </div>
@@ -34,7 +34,7 @@
 <footer class="bg-faded">
   <ul class="nav navbar-nav">
     <li class="nav-item">
-      <small><a class="nav-link" target="_blank" href="https://github.com/dmayerdesign">Made with <i class="fa fa-heart"></i> by Danny Mayer</a></small>
+      <small><a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" target="_blank" href="https://github.com/dmayerdesign">Made with <i class="fa fa-heart"></i> by Danny Mayer</a></small>
     </li>
   </ul>
 </footer>

@@ -49919,8 +49919,8 @@
 	var login_component_1 = __webpack_require__(470);
 	var signup_component_1 = __webpack_require__(471);
 	var about_component_1 = __webpack_require__(472);
-	var starred_orgs_component_1 = __webpack_require__(749);
-	var browse_orgs_component_1 = __webpack_require__(474);
+	var starred_orgs_component_1 = __webpack_require__(473);
+	var browse_orgs_component_1 = __webpack_require__(476);
 	var org_details_component_1 = __webpack_require__(479);
 	var org_posts_component_1 = __webpack_require__(480);
 	var single_org_component_1 = __webpack_require__(482);
@@ -49929,7 +49929,7 @@
 	var search_box_component_1 = __webpack_require__(478);
 	var contact_component_1 = __webpack_require__(485);
 	var user_service_1 = __webpack_require__(468);
-	var search_service_1 = __webpack_require__(476);
+	var search_service_1 = __webpack_require__(475);
 	var ng2_click_outside_1 = __webpack_require__(487);
 	var categories_service_1 = __webpack_require__(481);
 	var core_2 = __webpack_require__(11);
@@ -64616,6 +64616,12 @@
 	    AppComponent.prototype.exitAccountMenu = function () {
 	        this.showAccountMenu = false;
 	    };
+	    AppComponent.prototype.navOver = function (e) {
+	        e.target.parentNode.parentNode.className += " hovered";
+	    };
+	    AppComponent.prototype.navOut = function (e) {
+	        e.target.parentNode.parentNode.className = e.target.parentNode.parentNode.className.replace(" hovered", "");
+	    };
 	    AppComponent = __decorate([
 	        core_1.Component({
 	            selector: 'app',
@@ -65057,8 +65063,185 @@
 
 
 /***/ },
-/* 473 */,
+/* 473 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var user_service_1 = __webpack_require__(468);
+	var org_service_1 = __webpack_require__(474);
+	var StarredOrgsComponent = (function () {
+	    function StarredOrgsComponent(userService, orgService) {
+	        this.userService = userService;
+	        this.orgService = orgService;
+	        this.orgs = [];
+	    }
+	    StarredOrgsComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	            console.log(_this.user.starred);
+	            _this.loadStarredOrgs(_this.user.starred);
+	        });
+	    };
+	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred) {
+	        var _this = this;
+	        this.orgService.loadStarredOrgs(starred)
+	            .subscribe(function (results) {
+	            _this.orgs = results;
+	            console.log("Starred orgs: ", _this.orgs);
+	        }, function (error) { return console.error(error); });
+	    };
+	    StarredOrgsComponent = __decorate([
+	        core_1.Component({
+	            selector: 'starred-orgs',
+	            templateUrl: 'app/starred-orgs.component.html',
+	            providers: [org_service_1.OrgService, user_service_1.UserService]
+	        }), 
+	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService])
+	    ], StarredOrgsComponent);
+	    return StarredOrgsComponent;
+	}());
+	exports.StarredOrgsComponent = StarredOrgsComponent;
+
+
+/***/ },
 /* 474 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
+	var search_service_1 = __webpack_require__(475);
+	var angular2_flash_messages_1 = __webpack_require__(461);
+	var OrgService = (function () {
+	    function OrgService(http, search, flash) {
+	        this.http = http;
+	        this.search = search;
+	        this.flash = flash;
+	    }
+	    OrgService.prototype.loadOrgs = function (options) {
+	        return this.search.loadSearchableData("/orgs/get", options);
+	    };
+	    OrgService.prototype.loadStarredOrgs = function (starred) {
+	        var params = new http_1.URLSearchParams();
+	        params.set("starred", starred.join(","));
+	        return this.http.get("/orgs/get/starred", { search: params }).map(function (res) { return res.json(); });
+	    };
+	    OrgService.prototype.loadPosts = function (options) {
+	        return this.search.loadSearchableData("/posts/get", options);
+	    };
+	    OrgService.prototype.loadOrg = function (options) {
+	        if (options instanceof Object) {
+	            if (options.slug)
+	                return this.http.get("/org/s/" + options.slug).map(function (res) { return res.json(); });
+	            if (options.id)
+	                return this.http.get("/org/" + options.id).map(function (res) { return res.json(); });
+	        }
+	        else {
+	            return this.http.get("/org/" + options).map(function (res) { return res.json(); });
+	        }
+	    };
+	    OrgService.prototype.editOrg = function (options) {
+	        return this.http.put("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	    };
+	    OrgService.prototype.editPost = function (options) {
+	        return this.http.put("/edit-post/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	    };
+	    OrgService = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [http_1.Http, search_service_1.SearchService, angular2_flash_messages_1.FlashMessagesService])
+	    ], OrgService);
+	    return OrgService;
+	}());
+	exports.OrgService = OrgService;
+
+
+/***/ },
+/* 475 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var http_1 = __webpack_require__(397);
+	var SearchService = (function () {
+	    function SearchService(http) {
+	        this.http = http;
+	    }
+	    SearchService.prototype.loadSearchableData = function (uri, options) {
+	        var params = new http_1.URLSearchParams();
+	        if (this.stringIsSet(options.search)) {
+	            params.set("search", options.search);
+	            localStorage.setItem("searching", "true");
+	        }
+	        else {
+	            localStorage.setItem("searching", "false");
+	        }
+	        if (this.stringIsSet(options.field))
+	            params.set("field", options.field);
+	        if (this.stringIsSet(options.bodyField))
+	            params.set("bodyField", options.bodyField);
+	        if (this.stringIsSet(options.filterField))
+	            params.set("filterField", options.filterField);
+	        if (this.stringIsSet(options.filterValue))
+	            params.set("filterValue", options.filterValue);
+	        if (this.numberIsSet(options.limit))
+	            params.set("limit", options.limit.toString());
+	        if (this.numberIsSet(options.offset))
+	            params.set("offset", options.offset.toString());
+	        if (this.stringIsSet(options.sort))
+	            params.set("sort", options.sort);
+	        console.log(params);
+	        return this.http.get(uri, {
+	            search: params,
+	        }).map(function (res) { return res.json(); });
+	    };
+	    SearchService.prototype.stringIsSet = function (option) {
+	        return typeof option === "string" && option.length > 0;
+	    };
+	    SearchService.prototype.numberIsSet = function (option) {
+	        return typeof option === "number" && option > 0;
+	    };
+	    SearchService = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [http_1.Http])
+	    ], SearchService);
+	    return SearchService;
+	}());
+	exports.SearchService = SearchService;
+
+
+/***/ },
+/* 476 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65076,7 +65259,7 @@
 	var router_1 = __webpack_require__(336);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var user_service_1 = __webpack_require__(468);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var app_service_1 = __webpack_require__(477);
 	var search_box_component_1 = __webpack_require__(478);
 	var org_details_component_1 = __webpack_require__(479);
@@ -65313,130 +65496,6 @@
 
 
 /***/ },
-/* 475 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
-	var search_service_1 = __webpack_require__(476);
-	var angular2_flash_messages_1 = __webpack_require__(461);
-	var OrgService = (function () {
-	    function OrgService(http, search, flash) {
-	        this.http = http;
-	        this.search = search;
-	        this.flash = flash;
-	    }
-	    OrgService.prototype.loadOrgs = function (options) {
-	        return this.search.loadSearchableData("/orgs/get", options);
-	    };
-	    OrgService.prototype.loadStarredOrgs = function (starred) {
-	        var params = new http_1.URLSearchParams();
-	        params.set("starred", starred.join(","));
-	        return this.http.get("/orgs/get/starred", { search: params }).map(function (res) { return res.json(); });
-	    };
-	    OrgService.prototype.loadPosts = function (options) {
-	        return this.search.loadSearchableData("/posts/get", options);
-	    };
-	    OrgService.prototype.loadOrg = function (options) {
-	        if (options instanceof Object) {
-	            if (options.slug)
-	                return this.http.get("/org/s/" + options.slug).map(function (res) { return res.json(); });
-	            if (options.id)
-	                return this.http.get("/org/" + options.id).map(function (res) { return res.json(); });
-	        }
-	        else {
-	            return this.http.get("/org/" + options).map(function (res) { return res.json(); });
-	        }
-	    };
-	    OrgService.prototype.editOrg = function (options) {
-	        return this.http.put("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
-	    };
-	    OrgService.prototype.editPost = function (options) {
-	        return this.http.put("/edit-post/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
-	    };
-	    OrgService = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [http_1.Http, search_service_1.SearchService, angular2_flash_messages_1.FlashMessagesService])
-	    ], OrgService);
-	    return OrgService;
-	}());
-	exports.OrgService = OrgService;
-
-
-/***/ },
-/* 476 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var http_1 = __webpack_require__(397);
-	var SearchService = (function () {
-	    function SearchService(http) {
-	        this.http = http;
-	    }
-	    SearchService.prototype.loadSearchableData = function (uri, options) {
-	        var params = new http_1.URLSearchParams();
-	        if (this.stringIsSet(options.search)) {
-	            params.set("search", options.search);
-	            localStorage.setItem("searching", "true");
-	        }
-	        else {
-	            localStorage.setItem("searching", "false");
-	        }
-	        if (this.stringIsSet(options.field))
-	            params.set("field", options.field);
-	        if (this.stringIsSet(options.bodyField))
-	            params.set("bodyField", options.bodyField);
-	        if (this.stringIsSet(options.filterField))
-	            params.set("filterField", options.filterField);
-	        if (this.stringIsSet(options.filterValue))
-	            params.set("filterValue", options.filterValue);
-	        if (this.numberIsSet(options.limit))
-	            params.set("limit", options.limit.toString());
-	        if (this.numberIsSet(options.offset))
-	            params.set("offset", options.offset.toString());
-	        if (this.stringIsSet(options.sort))
-	            params.set("sort", options.sort);
-	        console.log(params);
-	        return this.http.get(uri, {
-	            search: params,
-	        }).map(function (res) { return res.json(); });
-	    };
-	    SearchService.prototype.stringIsSet = function (option) {
-	        return typeof option === "string" && option.length > 0;
-	    };
-	    SearchService.prototype.numberIsSet = function (option) {
-	        return typeof option === "number" && option > 0;
-	    };
-	    SearchService = __decorate([
-	        core_1.Injectable(), 
-	        __metadata('design:paramtypes', [http_1.Http])
-	    ], SearchService);
-	    return SearchService;
-	}());
-	exports.SearchService = SearchService;
-
-
-/***/ },
 /* 477 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -65543,6 +65602,12 @@
 	            this.el.nativeElement.querySelectorAll(".search-box-container input")[0].blur();
 	        }
 	    };
+	    SearchBox.prototype.checkEmpty = function ($event) {
+	        var search = $event.target.value;
+	        if (!search || search === "") {
+	            this.update.emit("");
+	        }
+	    };
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -65559,7 +65624,7 @@
 	        core_1.Component({
 	            selector: 'search-box',
 	            styleUrls: ['app/search-box.component.css'],
-	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\" (keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>"
+	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>"
 	        }), 
 	        __metadata('design:paramtypes', [core_1.ElementRef])
 	    ], SearchBox);
@@ -65584,7 +65649,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var app_service_1 = __webpack_require__(477);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
@@ -65646,7 +65711,7 @@
 	var core_1 = __webpack_require__(11);
 	var http_1 = __webpack_require__(397);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var app_service_1 = __webpack_require__(477);
 	__webpack_require__(339);
 	var OrgPostsComponent = (function () {
@@ -65831,7 +65896,7 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
@@ -65905,7 +65970,7 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
@@ -66052,7 +66117,7 @@
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
 	var http_1 = __webpack_require__(397);
-	var org_service_1 = __webpack_require__(475);
+	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
@@ -66352,320 +66417,6 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
-
-
-/***/ },
-/* 489 */,
-/* 490 */,
-/* 491 */,
-/* 492 */,
-/* 493 */,
-/* 494 */,
-/* 495 */,
-/* 496 */,
-/* 497 */,
-/* 498 */,
-/* 499 */,
-/* 500 */,
-/* 501 */,
-/* 502 */,
-/* 503 */,
-/* 504 */,
-/* 505 */,
-/* 506 */,
-/* 507 */,
-/* 508 */,
-/* 509 */,
-/* 510 */,
-/* 511 */,
-/* 512 */,
-/* 513 */,
-/* 514 */,
-/* 515 */,
-/* 516 */,
-/* 517 */,
-/* 518 */,
-/* 519 */,
-/* 520 */,
-/* 521 */,
-/* 522 */,
-/* 523 */,
-/* 524 */,
-/* 525 */,
-/* 526 */,
-/* 527 */,
-/* 528 */,
-/* 529 */,
-/* 530 */,
-/* 531 */,
-/* 532 */,
-/* 533 */,
-/* 534 */,
-/* 535 */,
-/* 536 */,
-/* 537 */,
-/* 538 */,
-/* 539 */,
-/* 540 */,
-/* 541 */,
-/* 542 */,
-/* 543 */,
-/* 544 */,
-/* 545 */,
-/* 546 */,
-/* 547 */,
-/* 548 */,
-/* 549 */,
-/* 550 */,
-/* 551 */,
-/* 552 */,
-/* 553 */,
-/* 554 */,
-/* 555 */,
-/* 556 */,
-/* 557 */,
-/* 558 */,
-/* 559 */,
-/* 560 */,
-/* 561 */,
-/* 562 */,
-/* 563 */,
-/* 564 */,
-/* 565 */,
-/* 566 */,
-/* 567 */,
-/* 568 */,
-/* 569 */,
-/* 570 */,
-/* 571 */,
-/* 572 */,
-/* 573 */,
-/* 574 */,
-/* 575 */,
-/* 576 */,
-/* 577 */,
-/* 578 */,
-/* 579 */,
-/* 580 */,
-/* 581 */,
-/* 582 */,
-/* 583 */,
-/* 584 */,
-/* 585 */,
-/* 586 */,
-/* 587 */,
-/* 588 */,
-/* 589 */,
-/* 590 */,
-/* 591 */,
-/* 592 */,
-/* 593 */,
-/* 594 */,
-/* 595 */,
-/* 596 */,
-/* 597 */,
-/* 598 */,
-/* 599 */,
-/* 600 */,
-/* 601 */,
-/* 602 */,
-/* 603 */,
-/* 604 */,
-/* 605 */,
-/* 606 */,
-/* 607 */,
-/* 608 */,
-/* 609 */,
-/* 610 */,
-/* 611 */,
-/* 612 */,
-/* 613 */,
-/* 614 */,
-/* 615 */,
-/* 616 */,
-/* 617 */,
-/* 618 */,
-/* 619 */,
-/* 620 */,
-/* 621 */,
-/* 622 */,
-/* 623 */,
-/* 624 */,
-/* 625 */,
-/* 626 */,
-/* 627 */,
-/* 628 */,
-/* 629 */,
-/* 630 */,
-/* 631 */,
-/* 632 */,
-/* 633 */,
-/* 634 */,
-/* 635 */,
-/* 636 */,
-/* 637 */,
-/* 638 */,
-/* 639 */,
-/* 640 */,
-/* 641 */,
-/* 642 */,
-/* 643 */,
-/* 644 */,
-/* 645 */,
-/* 646 */,
-/* 647 */,
-/* 648 */,
-/* 649 */,
-/* 650 */,
-/* 651 */,
-/* 652 */,
-/* 653 */,
-/* 654 */,
-/* 655 */,
-/* 656 */,
-/* 657 */,
-/* 658 */,
-/* 659 */,
-/* 660 */,
-/* 661 */,
-/* 662 */,
-/* 663 */,
-/* 664 */,
-/* 665 */,
-/* 666 */,
-/* 667 */,
-/* 668 */,
-/* 669 */,
-/* 670 */,
-/* 671 */,
-/* 672 */,
-/* 673 */,
-/* 674 */,
-/* 675 */,
-/* 676 */,
-/* 677 */,
-/* 678 */,
-/* 679 */,
-/* 680 */,
-/* 681 */,
-/* 682 */,
-/* 683 */,
-/* 684 */,
-/* 685 */,
-/* 686 */,
-/* 687 */,
-/* 688 */,
-/* 689 */,
-/* 690 */,
-/* 691 */,
-/* 692 */,
-/* 693 */,
-/* 694 */,
-/* 695 */,
-/* 696 */,
-/* 697 */,
-/* 698 */,
-/* 699 */,
-/* 700 */,
-/* 701 */,
-/* 702 */,
-/* 703 */,
-/* 704 */,
-/* 705 */,
-/* 706 */,
-/* 707 */,
-/* 708 */,
-/* 709 */,
-/* 710 */,
-/* 711 */,
-/* 712 */,
-/* 713 */,
-/* 714 */,
-/* 715 */,
-/* 716 */,
-/* 717 */,
-/* 718 */,
-/* 719 */,
-/* 720 */,
-/* 721 */,
-/* 722 */,
-/* 723 */,
-/* 724 */,
-/* 725 */,
-/* 726 */,
-/* 727 */,
-/* 728 */,
-/* 729 */,
-/* 730 */,
-/* 731 */,
-/* 732 */,
-/* 733 */,
-/* 734 */,
-/* 735 */,
-/* 736 */,
-/* 737 */,
-/* 738 */,
-/* 739 */,
-/* 740 */,
-/* 741 */,
-/* 742 */,
-/* 743 */,
-/* 744 */,
-/* 745 */,
-/* 746 */,
-/* 747 */,
-/* 748 */,
-/* 749 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var user_service_1 = __webpack_require__(468);
-	var org_service_1 = __webpack_require__(475);
-	var StarredOrgsComponent = (function () {
-	    function StarredOrgsComponent(userService, orgService) {
-	        this.userService = userService;
-	        this.orgService = orgService;
-	        this.orgs = [];
-	    }
-	    StarredOrgsComponent.prototype.ngOnInit = function () {
-	        var _this = this;
-	        this.userService.getLoggedInUser(function (err, user) {
-	            if (err)
-	                return console.error(err);
-	            _this.user = user;
-	            console.log(_this.user.starred);
-	            _this.loadStarredOrgs(_this.user.starred);
-	        });
-	    };
-	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred) {
-	        var _this = this;
-	        this.orgService.loadStarredOrgs(starred)
-	            .subscribe(function (results) {
-	            _this.orgs = results;
-	            console.log("Starred orgs: ", _this.orgs);
-	        }, function (error) { return console.error(error); });
-	    };
-	    StarredOrgsComponent = __decorate([
-	        core_1.Component({
-	            selector: 'starred-orgs',
-	            templateUrl: 'app/starred-orgs.component.html',
-	            providers: [org_service_1.OrgService, user_service_1.UserService]
-	        }), 
-	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService])
-	    ], StarredOrgsComponent);
-	    return StarredOrgsComponent;
-	}());
-	exports.StarredOrgsComponent = StarredOrgsComponent;
 
 
 /***/ }

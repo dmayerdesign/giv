@@ -65,4 +65,12 @@ export class AppComponent implements OnInit {
 	exitAccountMenu() {
 		this.showAccountMenu = false;
 	}
+
+	navOver(e) {
+		e.target.parentNode.parentNode.className += " hovered";
+	}
+
+	navOut(e) {
+		e.target.parentNode.parentNode.className = e.target.parentNode.parentNode.className.replace(" hovered", "");
+	}
 }

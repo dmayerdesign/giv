@@ -68,7 +68,7 @@ const routing = RouterModule.forRoot([
       , CreatePostComponent
     ],
     providers: [
-      Title
+        Title
       , UserService
       , SearchBox
       , SearchService

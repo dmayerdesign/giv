@@ -25,18 +25,21 @@ h2 {
 select {
   margin-bottom: 0.6em;
   min-width: 10rem;
+  font-size: 0.8em;
+  height: 2.3em;
+  opacity: 0.4;
 }
 
 a:hover .fa-heart {
   color: #cc0000;
 }
 
-a:hover, a:focus, a:active {
+/*a:hover, a:focus, a:active {
   opacity: 0.9;
-}
+}*/
 
 p {
-  font-size: 0.84em;
+  font-size: 0.8em;
 }
 
 .subtitle {
@@ -56,6 +59,7 @@ main {
 section, .search-box {
 	background: #F4F9F8;
 	border: 2px solid #F1F6F5;
+  border-radius: 2px;
 }
 
 search-box {
@@ -63,10 +67,21 @@ search-box {
 	padding-left: 0 !important;
 }
 
+search-box + select {
+  float: right;
+  margin-top: -3.33em;
+  margin-bottom: 3.33em;
+  margin-right: 1em;
+}
+
+.browse-posts {
+  padding-right: 0;
+}
+
 /* Masthead */
 
 .navbar {
-	background: linear-gradient(20deg, #4AEFB3, #53E4ED);
+	background: linear-gradient(20deg, #53E4ED, #4AEFB3);
 	padding: 0;
 }
 
@@ -89,15 +104,19 @@ ul.nav {
 	box-sizing: content-box;
 	display: inline-block;
 	line-height: 1em;
-	padding: 1.75em 0 1.85em;
+	padding: 1.75em 0.6em 1.85em;
 }
 
-.nav-left .nav-item {
+/*.nav-left .nav-item {
 	margin-right: 1.2em;
 }
 
 .nav-right .nav-item {
 	margin-left: 1.2em;
+}*/
+
+.nav-item.hovered {
+  background: rgba(100,100,100,0.1);
 }
 
 .nav-item.active::after {
@@ -108,6 +127,7 @@ ul.nav {
 	background: url("app/images/triangle.svg") 50% bottom no-repeat;
 	background-size: 18px 5px;
 	position: absolute;
+    left: 0;
 		bottom: 0;
 }
 
@@ -143,7 +163,7 @@ a.nav-link:not([href]):not([tabindex]) {
 }
 
 .nav-link > img {
-	margin-right: 0.8em;
+	padding-right: 0.8em;
 }
 
 .nav-link > span {
@@ -166,13 +186,13 @@ a.nav-link:not([href]):not([tabindex]) {
 .search-box input {
 	display: block;
 	width: 100%;
-	padding: 0.35em 0 0.3em 2em;
-	font-size: 1.6rem;
+	padding: 0.4em 0 0.28em 2.15em;
+	font-size: 1.5rem;
 	font-weight: 300;
   color: #999194;
 
-  background: url('app/images/search-icon-2x.png') no-repeat 0.6em 50%;
-  background-size: 0.9em 0.9em;
+  background: url('app/images/search-icon-2x.png') no-repeat 0.8em 50%;
+  background-size: 0.8em 0.8em;
 }
 
 search-box input,
