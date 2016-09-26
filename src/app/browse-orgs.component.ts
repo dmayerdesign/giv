@@ -84,7 +84,6 @@ export class BrowseOrgsComponent implements OnInit {
 
 				/** Infinite scrolling! **/
 				let orgs = this.orgs;
-				let showMore = this.showMore;
 				document.onscroll = function() {
 					let body = document.body;
 		    	let html = document.documentElement;
@@ -179,7 +178,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
-		let query = {search: this.searchText, limit: increase, offset: offset};
+		let query = {search: this.searchText, field: "name", bodyField: "description", limit: increase, offset: offset};
 		this.loadingOrgSearch = true;
 
 		if (this.categoryFilter) {

@@ -16,11 +16,14 @@
 	<create-post *ngIf="user && (user?.permissions?.indexOf(org?.globalPermission) > -1) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 	
 	<!-- Posts -->
-	<section *ngIf="!viewingOne && !isLoading" class="posts col-md-12">
+	<section *ngIf="!viewingOne && !loadingPosts" class="posts col-md-12">
 		<div #singlePost *ngFor="let post of posts" (click)="selectPost(post._id)">
 			<img *ngIf="post?.featuredImage?.length" [src]="post.featuredImage" width="100">
 			<h5 class="post-title">{{post.title}}</h5>
+			<p class="post-content">{{post.content}}</p>
 		</div>
+
+		<button id="show-more" class="row btn btn-default" (click)="showMore(10, posts.length)">Show more</button>
 	</section>
 
 	<!-- View Post -->

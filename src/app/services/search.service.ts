@@ -28,7 +28,7 @@ export class SearchService {
 
     return this.http.get(uri, {
       search: params,
-    }).map(res => res.json());
+    }).map(res => res['json']());
   }
 
   stringIsSet(option):boolean {

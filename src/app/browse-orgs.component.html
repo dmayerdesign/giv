@@ -20,7 +20,7 @@
 			<h2>Organizations</h2>
 			<p class="subtitle">People doing important work right now</p>
 			<search-box
-			class="search-box-container col-md-12 clearfix"
+			class="search-box-container clearfix"
 			*ngIf="!isLoading"
 			(update)="searchOrgs($event)"
 			(focusChange)="toggleSearchBoxFocus($event)"
@@ -33,14 +33,11 @@
 				<option *ngFor="let category of categoriesList" value="{{category}}">{{category}}</option>
 			</select>
 
-			<!-- <ng-select [allowClear]="true"
-              [items]="categoriesList"
-              (data)="filterByCategory($event.target.value)"
-              placeholder="All categories">
-  		</ng-select> -->
-
-			<p class="col-md-12">Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span></p>
-			<p *ngIf="categoryFilter">Category: {{categoryFilter}} <button (click)="filterByCategory(''); searchOrgs(searchText)">Show all categories</button></p>
+			<p class="info" *ngIf="orgsShowing">Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span></p>
+			<p class="info" *ngIf="categoryFilter">
+				Category: {{categoryFilter}}&nbsp;&nbsp;
+				<button class="mini" (click)="filterByCategory(''); searchOrgs(searchText)"><i class="fa fa-undo"></i>Clear filter</button>
+			</p>
 		</div>
 	</header>
 

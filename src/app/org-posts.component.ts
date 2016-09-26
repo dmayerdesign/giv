@@ -19,7 +19,7 @@ export class OrgPostsComponent {
 	@Input() isBrowsing:boolean;
 	@ViewChildren('singlePost') $posts = [];
 
-	private posts = [];
+	private posts:Array<any> = [];
 	private postsShowing:number;
 	private selectedPost:any = null;
 	private viewingOne:boolean = false;
@@ -54,21 +54,28 @@ export class OrgPostsComponent {
 		this.querySub.unsubscribe();
 	}
 
-	loadPosts() {
-		let orgIds:any = null;
-		let query:any = function():any {
-			if (this.org) return {filterField: "org", filterValue: this.org._id, limit: 20};
-			else return {limit: 20, sort: "-likes"};
-		};
+	loadPosts(increase?:number, offset?:number, search?:string) {
+		this.loadingPosts = true;
+		let query:any;
+
+		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated"};
+		else query = {limit: 20, sort: "-likes"};
+
+		if (search) {
+			query.search = search;
+			query.field = "title";
+			query.bodyField = "content";
+		}
+
+		console.log("query: ", query);
 
 		this.orgService.loadPosts(query).subscribe(
 			data => {
-				console.log("data");
-				console.log(data);
-				this.isLoading = false;
+				this.loadingPosts = false;
 				this.posts = data;
 				this.takeCount(this.posts);
 
+				console.log("posts: ", this.posts);
 				this.querySub = this.route.queryParams.subscribe(params => {
 					if (params['viewpost']) {
 						this.selectPost(params['viewpost']);
@@ -80,8 +87,8 @@ export class OrgPostsComponent {
 		);
 	}
 
-	updatePosts(org) {
-		this.loadPosts();
+	updatePosts(org?:any) {
+		this.loadPosts(org);
 	}
 
 	selectPost(id:any) {
@@ -127,7 +134,7 @@ export class OrgPostsComponent {
 	showMore(increase:number, offset:number) {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
 
-		this.orgService.loadOrgs({search: this.searchText, limit: increase, offset: offset}).subscribe(
+		this.orgService.loadPosts({search: this.searchText, field: "title", bodyField: "content", limit: increase, offset: offset}).subscribe(
 			res => {
 				this.isLoading = false;
 				console.log(res);

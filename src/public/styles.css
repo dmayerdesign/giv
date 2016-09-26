@@ -42,6 +42,11 @@ p {
   font-size: 0.8em;
 }
 
+p.info {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+
 .subtitle {
   margin-top: -0.5em;
 }
@@ -59,6 +64,10 @@ button, button:active, button:hover {
   padding: 0.6em 1em;
 }
 
+button.mini, button.mini:active, button.mini:hover {
+  font-size: 0.8em;
+}
+
 button:hover {
   box-shadow: 0px 1px 3px rgba(50,50,50,0.1);
   background: #6fd4ba;
@@ -68,6 +77,10 @@ button:active {
   box-shadow: 0px 0px 1px rgba(20,20,20,0.1);
   background: #f0f5f4;
   border-color: #dee0df;
+}
+
+button i {
+  padding-right: 0.6em;
 }
 
 /* Layout */
@@ -99,6 +112,21 @@ search-box + select {
 
 .browse-posts {
   padding-right: 0;
+}
+
+footer {
+  background: #ffffff;
+  font-size: 0.8em;
+  text-align: center;
+  padding: 1.2em;
+}
+
+footer, footer a {
+  color: #d8d3d5;
+}
+
+footer a:hover {
+  color: #b8b3b5;
 }
 
 /* Masthead */

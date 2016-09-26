@@ -65223,7 +65223,7 @@
 	        console.log(params);
 	        return this.http.get(uri, {
 	            search: params,
-	        }).map(function (res) { return res.json(); });
+	        }).map(function (res) { return res['json'](); });
 	    };
 	    SearchService.prototype.stringIsSet = function (option) {
 	        return typeof option === "string" && option.length > 0;
@@ -65313,7 +65313,6 @@
 	            _this.takeCount(_this.orgs);
 	            /** Infinite scrolling! **/
 	            var orgs = _this.orgs;
-	            var showMore = _this.showMore;
 	            document.onscroll = function () {
 	                var body = document.body;
 	                var html = document.documentElement;
@@ -65393,7 +65392,7 @@
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        var query = { search: this.searchText, limit: increase, offset: offset };
+	        var query = { search: this.searchText, field: "name", bodyField: "description", limit: increase, offset: offset };
 	        this.loadingOrgSearch = true;
 	        if (this.categoryFilter) {
 	            query['filterField'] = "categories";
@@ -65738,21 +65737,25 @@
 	    OrgPostsComponent.prototype.ngOnDestroy = function () {
 	        this.querySub.unsubscribe();
 	    };
-	    OrgPostsComponent.prototype.loadPosts = function () {
+	    OrgPostsComponent.prototype.loadPosts = function (increase, offset, search) {
 	        var _this = this;
-	        var orgIds = null;
-	        var query = function () {
-	            if (this.org)
-	                return { filterField: "org", filterValue: this.org._id, limit: 20 };
-	            else
-	                return { limit: 20, sort: "-likes" };
-	        };
+	        this.loadingPosts = true;
+	        var query;
+	        if (this.org)
+	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
+	        else
+	            query = { limit: 20, sort: "-likes" };
+	        if (search) {
+	            query.search = search;
+	            query.field = "title";
+	            query.bodyField = "content";
+	        }
+	        console.log("query: ", query);
 	        this.orgService.loadPosts(query).subscribe(function (data) {
-	            console.log("data");
-	            console.log(data);
-	            _this.isLoading = false;
+	            _this.loadingPosts = false;
 	            _this.posts = data;
 	            _this.takeCount(_this.posts);
+	            console.log("posts: ", _this.posts);
 	            _this.querySub = _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
 	                    _this.selectPost(params['viewpost']);
@@ -65762,7 +65765,7 @@
 	        }, function (error) { return console.log(error); });
 	    };
 	    OrgPostsComponent.prototype.updatePosts = function (org) {
-	        this.loadPosts();
+	        this.loadPosts(org);
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        console.log(id);
@@ -65800,7 +65803,7 @@
 	    OrgPostsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        this.orgService.loadOrgs({ search: this.searchText, limit: increase, offset: offset }).subscribe(function (res) {
+	        this.orgService.loadPosts({ search: this.searchText, field: "title", bodyField: "content", limit: increase, offset: offset }).subscribe(function (res) {
 	            _this.isLoading = false;
 	            console.log(res);
 	            _this.posts = _this.posts.concat(res);
