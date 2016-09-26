@@ -65414,12 +65414,13 @@
 	            this.searchBoxIsFocused = false;
 	        }
 	    };
-	    BrowseOrgsComponent.prototype.viewOrg = function (id) {
+	    BrowseOrgsComponent.prototype.viewOrg = function (e, id) {
 	        var findOrg = function (org) {
 	            return org._id === id;
 	        };
 	        this.selectedOrg = this.orgs.find(findOrg);
 	        this.viewingOrg = true;
+	        console.log(this.selectedOrg);
 	    };
 	    BrowseOrgsComponent.prototype.viewFeaturedOrg = function (id) {
 	        var findOrg = function (org) {
@@ -65429,7 +65430,11 @@
 	        this.viewingFeaturedOrg = true;
 	    };
 	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
+	        console.log(e.target.className);
+	        if (e.target.className.indexOf("inside-org") > -1)
+	            return;
 	        if (this.viewingOrg && this.selectedOrg._id === id) {
+	            console.log(this.selectedOrg);
 	            this.selectedOrg = null;
 	            this.viewingOrg = false;
 	        }
@@ -65746,7 +65751,7 @@
 	        if (this.org)
 	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
 	        else
-	            query = { limit: 20, sort: "-likes" };
+	            query = { limit: 20, sort: "-dateCreated" };
 	        if (search) {
 	            query.search = search;
 	            query.field = "title";
@@ -65755,6 +65760,7 @@
 	        console.log("query: ", query);
 	        this.orgService.loadPosts(query).subscribe(function (data) {
 	            _this.loadingPosts = false;
+	            _this.isLoading = false;
 	            _this.posts = data;
 	            _this.takeCount(_this.posts);
 	            console.log("posts: ", _this.posts);
@@ -65799,6 +65805,7 @@
 	            .subscribe(function (results) {
 	            _this.posts = results;
 	            _this.loadingPosts = false;
+	            _this.isLoading = false;
 	            _this.searchText = search;
 	        }, function (error) { return console.error(error); });
 	    };

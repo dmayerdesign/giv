@@ -51,25 +51,29 @@
 		<div class="org single-item row"
 				#singleItem
 				*ngFor="let org of orgs"
-				(click)="viewOrg(org._id)"
-				(clickOutside)="deselectOrg($event, org._id)">
+				(clickOutside)="deselectOrg($event, org._id)"
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id}">
 
-			<header [ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}">
-				<img class="org-avatar" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
-				<h5>{{org.name}}</h5>
-				<p *ngIf="!selectedOrg || org._id !== selectedOrg._id">Hello lorem ipsum dolor sit amet {{org.description}}</p>
+			<header [ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}" (click)="viewOrg($event, org._id)">
+				<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
+
+				<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+				<p class="info inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">Hello lorem ipsum dolor sit amet {{org.description}}</p>
+
+				<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
+					<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+					<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+				</h4>
 				<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
 					<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
 					<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
 					{{org.stars}} people starred this
 				</p>
-				<span (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">X</span>
 			</header>
+			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">X</span>
 
-			<div class="org-expanded" *ngIf="viewingOrg && org._id === selectedOrg._id">
+			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id">
 				<org-details (update)="sendInfoMsg($event.body, $event.type)" [org]="selectedOrg"></org-details>
-				<a *ngIf="org.slug" href="/organization/{{org.slug}}">View Org Page</a>
-				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">View Org Page</a>
 				<org-posts [org]="selectedOrg" [isBrowsing]="true"></org-posts>
 			</div>
 		</div>

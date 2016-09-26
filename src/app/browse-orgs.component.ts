@@ -207,12 +207,13 @@ export class BrowseOrgsComponent implements OnInit {
 		}
 	}
 
-	viewOrg(id:string):void {
+	viewOrg(e:any, id:string):void {
 		let findOrg = function(org) {
 			return org._id === id;
 		}
 		this.selectedOrg = this.orgs.find(findOrg);
 		this.viewingOrg = true;
+		console.log(this.selectedOrg);
 	}
 
 	viewFeaturedOrg(id:string):void {
@@ -223,8 +224,12 @@ export class BrowseOrgsComponent implements OnInit {
 		this.viewingFeaturedOrg = true;
 	}
 
-	deselectOrg(e:Event, id:string):void {
+	deselectOrg(e:any, id:string):void {
+		console.log(e.target.className);
+		if (e.target.className.indexOf("inside-org") > -1) return;
+
 		if (this.viewingOrg && this.selectedOrg._id === id) {
+			console.log(this.selectedOrg);
 			this.selectedOrg = null;
 			this.viewingOrg = false;
 		}

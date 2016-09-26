@@ -110,6 +110,33 @@ search-box + select {
   margin-right: 1em;
 }
 
+/* Layout - org in browse */
+.org header {
+  padding: 1.5em 2em;
+  -webkit-transition: padding 0.5s ease-in-out;
+  transition: padding 0.5s ease-in-out;
+  background-size: cover;
+  background-position: 50%;
+  color: #fff;
+}
+
+.org .exit {
+  cursor: pointer;
+  position: absolute;
+  display: block;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  color: #fff;
+  padding: 0.7em;
+}
+
+.org.selected header {
+  padding: 8em 2em 2em;
+}
+
+
+
 .browse-posts {
   padding-right: 0;
 }
@@ -237,7 +264,7 @@ a.nav-link:not([href]):not([tabindex]) {
 .search-box input {
 	display: block;
 	width: 100%;
-	padding: 0.4em 0 0.28em 2.15em;
+	padding: 0.4em 7.1em 0.28em 2.15em;
 	font-size: 1.5rem;
 	font-weight: 300;
   color: #999194;

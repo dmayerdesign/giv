@@ -61,7 +61,7 @@ export class OrgPostsComponent {
 		let query:any;
 
 		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated"};
-		else query = {limit: 20, sort: "-likes"};
+		else query = {limit: 20, sort: "-dateCreated"};
 
 		if (search) {
 			query.search = search;
@@ -74,6 +74,7 @@ export class OrgPostsComponent {
 		this.orgService.loadPosts(query).subscribe(
 			data => {
 				this.loadingPosts = false;
+				this.isLoading = false;
 				this.posts = data;
 				this.takeCount(this.posts);
 
@@ -127,6 +128,7 @@ export class OrgPostsComponent {
 				results => {
 					this.posts = results;
 					this.loadingPosts = false;
+					this.isLoading = false;
 					this.searchText = search;
 				},
 				error => console.error(error)
