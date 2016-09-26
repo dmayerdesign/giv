@@ -5,12 +5,14 @@ import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import { TruncatePipe } from './pipes/truncate.pipe';
 import 'rxjs/add/operator/map';
 
 @Component({
 	selector: 'org-posts',
 	templateUrl: 'app/org-posts.component.html',
-	providers: [OrgService, UIHelper, Utilities]
+	providers: [OrgService, UIHelper, Utilities],
+	pipes: [ TruncatePipe ]
 })
 
 export class OrgPostsComponent {
