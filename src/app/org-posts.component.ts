@@ -53,7 +53,7 @@ export class OrgPostsComponent {
 	}
 
 	ngOnDestroy() {
-		this.querySub.unsubscribe();
+		if (this.querySub) this.querySub.unsubscribe();
 	}
 
 	loadPosts(increase?:number, offset?:number, search?:string) {

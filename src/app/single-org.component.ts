@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -26,7 +26,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 
 export class SingleOrgComponent implements OnInit {
-	private org;
+	@Input() org;
 	private user;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
@@ -42,26 +42,31 @@ export class SingleOrgComponent implements OnInit {
 				private flash: FlashMessagesService) { }
 
 	ngOnInit() {
-		this.sub = this.route.params.subscribe(params => {
-			let id = params['id'];
-			let slug = params['slug'];
+		if (this.org) {
+			this.isLoaded = true;
+		}
+		else {
+			this.sub = this.route.params.subscribe(params => {
+				let id = params['id'];
+				let slug = params['slug'];
 
-			this.orgService.loadOrg({id: id, slug: slug}).subscribe(
-				data => {
-					if (!data || !data._id) {
+				this.orgService.loadOrg({id: id, slug: slug}).subscribe(
+					data => {
+						if (!data || !data._id) {
+							this.flash.show("This page doesn't exist");
+							return this.router.navigate([''], { queryParams: {"404": true}});
+						}
+						this.org = data;
+						this.isLoaded = true;
+					},
+					error => {
+						console.error(error);
 						this.flash.show("This page doesn't exist");
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
-					this.org = data;
-					this.isLoaded = true;
-				},
-				error => {
-					console.error(error);
-					this.flash.show("This page doesn't exist");
-					return this.router.navigate([''], { queryParams: {"404": true}});
-				}
-			);
-		});
+				);
+			});
+		}
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);

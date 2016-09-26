@@ -10,6 +10,7 @@ const orgSchema = new mongoose.Schema({
 	website: String,
 	facebook: String,
 	stars: Number,
+	starredBy: [String],
 	featured: Boolean,
 
 	verified: Boolean,
@@ -17,7 +18,6 @@ const orgSchema = new mongoose.Schema({
 
 	globalPermission: String, // for manager permission
 	managers: [String],
-	favoritedBy: [String],
 	
 	coverImage: String,
 	gravatar: String,

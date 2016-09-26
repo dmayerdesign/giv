@@ -374,6 +374,9 @@ exports.star = (req, res) => {
     else return 0;
   }(req.params.action);
   let updateQuery = {$inc:{"stars": operator}};
+  if (req.params.action === "add") updateQuery.$push = {"starredBy": req.body.userId};
+  if (req.params.action === "subtract") updateQuery.$pull = {"starredBy": req.body.userId};
+  
   Org.findOneAndUpdate({_id: orgId}, updateQuery, {new: true}, function(err, org) {
     if(err) {
       res.json(err);
