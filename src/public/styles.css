@@ -46,6 +46,29 @@ p {
   margin-top: -0.5em;
 }
 
+/* Buttons and forms */
+button, button:active, button:hover {
+  background: #F4F9F8;
+  /*background: linear-gradient(20deg, #53E4ED, #4fead1);*/
+  background: #7fe4ca;
+  border: 0 none;
+  border-radius: 2px;
+  color: inherit;
+  color: #fff;
+  outline: none !important;
+  padding: 0.6em 1em;
+}
+
+button:hover {
+  box-shadow: 0px 1px 3px rgba(50,50,50,0.1);
+  background: #6fd4ba;
+}
+
+button:active {
+  box-shadow: 0px 0px 1px rgba(20,20,20,0.1);
+  background: #f0f5f4;
+  border-color: #dee0df;
+}
 
 /* Layout */
 main {

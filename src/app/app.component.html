@@ -12,8 +12,7 @@
     <ul class="nav nav-right pull-right">
       <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
     		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
-          <img *ngIf="!user?.profile?.picture" height="18" src="app/images/profile-icon.svg">
-          <img *ngIf="user?.profile?.picture" height="18" [src]="user?.profile?.picture">
+          <img *ngIf="!user?.profile?.picture" height="18" [src]="user?.profile?.picture || 'app/images/profile-icon.svg'" style="position:relative; left:4px;">
           <span>Your account</span>
         </a>
         <ul *ngIf="showAccountMenu" class="subnav">
