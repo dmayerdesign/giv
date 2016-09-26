@@ -54,6 +54,23 @@ exports.routes = [
     }
   },
 
+  { method: "get",
+    uri: "/orgs/get/starred",
+    process: function(req, res) {
+      var dbQuery = {};
+      dbQuery._id = {
+        $in: req.query.starred.split(",")
+      }
+      dbQuery.verified = true;
+
+      console.log("Query starred: ", dbQuery);
+      Org.find(dbQuery, (err, docs) => {
+        if(err) return console.error(err);
+        res.json(docs);
+      });
+    }
+  },
+
   // count all
   { method: "get",
     uri: '/orgs/count',
@@ -169,6 +186,7 @@ exports.routes = [
       });
     }
   }
+
 ];
 
 /*

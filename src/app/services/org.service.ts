@@ -21,6 +21,12 @@ export class OrgService {
 		return this.search.loadSearchableData("/orgs/get", options);
 	}
 
+	loadStarredOrgs(starred) {
+		let params: URLSearchParams = new URLSearchParams();
+		params.set("starred", starred.join(","));
+		return this.http.get("/orgs/get/starred", { search: params }).map(res => res.json());
+	}
+
 	loadPosts(options) {
 		return this.search.loadSearchableData("/posts/get", options);
 	}

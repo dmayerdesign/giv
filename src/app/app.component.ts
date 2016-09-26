@@ -14,6 +14,7 @@ export class AppComponent implements OnInit {
 	private isLoggedIn:boolean = false;
 	private user:any;
 	private location:string;
+	private showAccountMenu:boolean = false;
 
 	constructor(private http:Http,
 							private userService:UserService,
@@ -39,8 +40,6 @@ export class AppComponent implements OnInit {
 				this.isLoggedIn = true;
 			}
 		});
-
-		//localStorage.setItem("construction", "sohcahtoa");
 	}
 
 	ngDoCheck() {
@@ -56,5 +55,14 @@ export class AppComponent implements OnInit {
 		this.isLoggedIn = false;
 		this.flash.show("Bye!");
 		this.router.navigate(['/']);
+	}
+
+	toggleAccountMenu() {
+		if (this.showAccountMenu) this.showAccountMenu = false;
+		else this.showAccountMenu = true;
+	}
+
+	exitAccountMenu() {
+		this.showAccountMenu = false;
 	}
 }

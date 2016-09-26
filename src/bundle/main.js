@@ -49919,7 +49919,7 @@
 	var login_component_1 = __webpack_require__(470);
 	var signup_component_1 = __webpack_require__(471);
 	var about_component_1 = __webpack_require__(472);
-	var library_component_1 = __webpack_require__(473);
+	var starred_orgs_component_1 = __webpack_require__(749);
 	var browse_orgs_component_1 = __webpack_require__(474);
 	var org_details_component_1 = __webpack_require__(479);
 	var org_posts_component_1 = __webpack_require__(480);
@@ -49939,7 +49939,7 @@
 	    { path: 'login', component: login_component_1.LoginComponent },
 	    { path: 'signup', component: signup_component_1.SignupComponent },
 	    { path: 'about', component: about_component_1.AboutComponent },
-	    { path: 'library', component: library_component_1.LibraryComponent },
+	    { path: 'starred', component: starred_orgs_component_1.StarredOrgsComponent },
 	    { path: 'contact', component: contact_component_1.ContactComponent },
 	    { path: 'organization/i/:id', component: single_org_component_1.SingleOrgComponent },
 	    { path: 'organization/:slug', component: single_org_component_1.SingleOrgComponent },
@@ -49972,7 +49972,7 @@
 	                single_org_component_1.SingleOrgComponent,
 	                manage_org_page_component_1.ManageOrgPageComponent,
 	                about_component_1.AboutComponent,
-	                library_component_1.LibraryComponent,
+	                starred_orgs_component_1.StarredOrgsComponent,
 	                contact_component_1.ContactComponent,
 	                ng2_uploader_1.UPLOAD_DIRECTIVES,
 	                create_post_component_1.CreatePostComponent
@@ -64575,6 +64575,7 @@
 	        this.router = router;
 	        this.route = route;
 	        this.isLoggedIn = false;
+	        this.showAccountMenu = false;
 	        // Updates the component upon redirect from login
 	        userService.loginConfirmed$.subscribe(function (user) {
 	            console.log("Login confirmed in app component");
@@ -64593,7 +64594,6 @@
 	                _this.isLoggedIn = true;
 	            }
 	        });
-	        //localStorage.setItem("construction", "sohcahtoa");
 	    };
 	    AppComponent.prototype.ngDoCheck = function () {
 	        this.location = encodeURI(window.location.href);
@@ -64606,6 +64606,15 @@
 	        this.isLoggedIn = false;
 	        this.flash.show("Bye!");
 	        this.router.navigate(['/']);
+	    };
+	    AppComponent.prototype.toggleAccountMenu = function () {
+	        if (this.showAccountMenu)
+	            this.showAccountMenu = false;
+	        else
+	            this.showAccountMenu = true;
+	    };
+	    AppComponent.prototype.exitAccountMenu = function () {
+	        this.showAccountMenu = false;
 	    };
 	    AppComponent = __decorate([
 	        core_1.Component({
@@ -65048,37 +65057,7 @@
 
 
 /***/ },
-/* 473 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(11);
-	var LibraryComponent = (function () {
-	    function LibraryComponent() {
-	        this.user = '';
-	    }
-	    LibraryComponent = __decorate([
-	        core_1.Component({
-	            selector: 'library',
-	            templateUrl: 'app/library.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], LibraryComponent);
-	    return LibraryComponent;
-	}());
-	exports.LibraryComponent = LibraryComponent;
-
-
-/***/ },
+/* 473 */,
 /* 474 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -65118,11 +65097,13 @@
 	        this.selectedFeaturedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
+	        this.starredOrgs = [];
 	        this.orgsLoaded = 20;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
 	        this.viewingFeaturedOrg = false;
+	        this.categoryFilter = "";
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
 	        this.loadingOrgSearch = false;
@@ -65206,6 +65187,7 @@
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
 	        var query = { search: search, field: "name", bodyField: "description", limit: 20 };
+	        console.log(this.categoryFilter);
 	        if (this.categoryFilter) {
 	            query['filterField'] = "categories";
 	            query['filterValue'] = this.categoryFilter;
@@ -65221,6 +65203,9 @@
 	    };
 	    BrowseOrgsComponent.prototype.filterByCategory = function (category) {
 	        this.categoryFilter = category;
+	    };
+	    BrowseOrgsComponent.prototype.clearCategoryFilter = function () {
+	        this.categoryFilter = null;
 	    };
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
@@ -65272,6 +65257,28 @@
 	            this.selectedFeaturedOrg = null;
 	            this.viewingFeaturedOrg = false;
 	        }
+	    };
+	    BrowseOrgsComponent.prototype.orgIsStarred = function (org) {
+	        if (this.user.starred.indexOf(org._id) === -1)
+	            return false;
+	        else
+	            return true;
+	    };
+	    BrowseOrgsComponent.prototype.starOrg = function (orgId) {
+	        var _this = this;
+	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
+	    };
+	    BrowseOrgsComponent.prototype.unstarOrg = function (orgId) {
+	        var _this = this;
+	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
 	    };
 	    __decorate([
 	        core_1.ViewChildren('singleItem'), 
@@ -65331,6 +65338,11 @@
 	    }
 	    OrgService.prototype.loadOrgs = function (options) {
 	        return this.search.loadSearchableData("/orgs/get", options);
+	    };
+	    OrgService.prototype.loadStarredOrgs = function (starred) {
+	        var params = new http_1.URLSearchParams();
+	        params.set("starred", starred.join(","));
+	        return this.http.get("/orgs/get/starred", { search: params }).map(function (res) { return res.json(); });
 	    };
 	    OrgService.prototype.loadPosts = function (options) {
 	        return this.search.loadSearchableData("/posts/get", options);
@@ -66340,6 +66352,320 @@
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ClickOutsideDirective;
+
+
+/***/ },
+/* 489 */,
+/* 490 */,
+/* 491 */,
+/* 492 */,
+/* 493 */,
+/* 494 */,
+/* 495 */,
+/* 496 */,
+/* 497 */,
+/* 498 */,
+/* 499 */,
+/* 500 */,
+/* 501 */,
+/* 502 */,
+/* 503 */,
+/* 504 */,
+/* 505 */,
+/* 506 */,
+/* 507 */,
+/* 508 */,
+/* 509 */,
+/* 510 */,
+/* 511 */,
+/* 512 */,
+/* 513 */,
+/* 514 */,
+/* 515 */,
+/* 516 */,
+/* 517 */,
+/* 518 */,
+/* 519 */,
+/* 520 */,
+/* 521 */,
+/* 522 */,
+/* 523 */,
+/* 524 */,
+/* 525 */,
+/* 526 */,
+/* 527 */,
+/* 528 */,
+/* 529 */,
+/* 530 */,
+/* 531 */,
+/* 532 */,
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */,
+/* 541 */,
+/* 542 */,
+/* 543 */,
+/* 544 */,
+/* 545 */,
+/* 546 */,
+/* 547 */,
+/* 548 */,
+/* 549 */,
+/* 550 */,
+/* 551 */,
+/* 552 */,
+/* 553 */,
+/* 554 */,
+/* 555 */,
+/* 556 */,
+/* 557 */,
+/* 558 */,
+/* 559 */,
+/* 560 */,
+/* 561 */,
+/* 562 */,
+/* 563 */,
+/* 564 */,
+/* 565 */,
+/* 566 */,
+/* 567 */,
+/* 568 */,
+/* 569 */,
+/* 570 */,
+/* 571 */,
+/* 572 */,
+/* 573 */,
+/* 574 */,
+/* 575 */,
+/* 576 */,
+/* 577 */,
+/* 578 */,
+/* 579 */,
+/* 580 */,
+/* 581 */,
+/* 582 */,
+/* 583 */,
+/* 584 */,
+/* 585 */,
+/* 586 */,
+/* 587 */,
+/* 588 */,
+/* 589 */,
+/* 590 */,
+/* 591 */,
+/* 592 */,
+/* 593 */,
+/* 594 */,
+/* 595 */,
+/* 596 */,
+/* 597 */,
+/* 598 */,
+/* 599 */,
+/* 600 */,
+/* 601 */,
+/* 602 */,
+/* 603 */,
+/* 604 */,
+/* 605 */,
+/* 606 */,
+/* 607 */,
+/* 608 */,
+/* 609 */,
+/* 610 */,
+/* 611 */,
+/* 612 */,
+/* 613 */,
+/* 614 */,
+/* 615 */,
+/* 616 */,
+/* 617 */,
+/* 618 */,
+/* 619 */,
+/* 620 */,
+/* 621 */,
+/* 622 */,
+/* 623 */,
+/* 624 */,
+/* 625 */,
+/* 626 */,
+/* 627 */,
+/* 628 */,
+/* 629 */,
+/* 630 */,
+/* 631 */,
+/* 632 */,
+/* 633 */,
+/* 634 */,
+/* 635 */,
+/* 636 */,
+/* 637 */,
+/* 638 */,
+/* 639 */,
+/* 640 */,
+/* 641 */,
+/* 642 */,
+/* 643 */,
+/* 644 */,
+/* 645 */,
+/* 646 */,
+/* 647 */,
+/* 648 */,
+/* 649 */,
+/* 650 */,
+/* 651 */,
+/* 652 */,
+/* 653 */,
+/* 654 */,
+/* 655 */,
+/* 656 */,
+/* 657 */,
+/* 658 */,
+/* 659 */,
+/* 660 */,
+/* 661 */,
+/* 662 */,
+/* 663 */,
+/* 664 */,
+/* 665 */,
+/* 666 */,
+/* 667 */,
+/* 668 */,
+/* 669 */,
+/* 670 */,
+/* 671 */,
+/* 672 */,
+/* 673 */,
+/* 674 */,
+/* 675 */,
+/* 676 */,
+/* 677 */,
+/* 678 */,
+/* 679 */,
+/* 680 */,
+/* 681 */,
+/* 682 */,
+/* 683 */,
+/* 684 */,
+/* 685 */,
+/* 686 */,
+/* 687 */,
+/* 688 */,
+/* 689 */,
+/* 690 */,
+/* 691 */,
+/* 692 */,
+/* 693 */,
+/* 694 */,
+/* 695 */,
+/* 696 */,
+/* 697 */,
+/* 698 */,
+/* 699 */,
+/* 700 */,
+/* 701 */,
+/* 702 */,
+/* 703 */,
+/* 704 */,
+/* 705 */,
+/* 706 */,
+/* 707 */,
+/* 708 */,
+/* 709 */,
+/* 710 */,
+/* 711 */,
+/* 712 */,
+/* 713 */,
+/* 714 */,
+/* 715 */,
+/* 716 */,
+/* 717 */,
+/* 718 */,
+/* 719 */,
+/* 720 */,
+/* 721 */,
+/* 722 */,
+/* 723 */,
+/* 724 */,
+/* 725 */,
+/* 726 */,
+/* 727 */,
+/* 728 */,
+/* 729 */,
+/* 730 */,
+/* 731 */,
+/* 732 */,
+/* 733 */,
+/* 734 */,
+/* 735 */,
+/* 736 */,
+/* 737 */,
+/* 738 */,
+/* 739 */,
+/* 740 */,
+/* 741 */,
+/* 742 */,
+/* 743 */,
+/* 744 */,
+/* 745 */,
+/* 746 */,
+/* 747 */,
+/* 748 */,
+/* 749 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(11);
+	var user_service_1 = __webpack_require__(468);
+	var org_service_1 = __webpack_require__(475);
+	var StarredOrgsComponent = (function () {
+	    function StarredOrgsComponent(userService, orgService) {
+	        this.userService = userService;
+	        this.orgService = orgService;
+	        this.orgs = [];
+	    }
+	    StarredOrgsComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	            console.log(_this.user.starred);
+	            _this.loadStarredOrgs(_this.user.starred);
+	        });
+	    };
+	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred) {
+	        var _this = this;
+	        this.orgService.loadStarredOrgs(starred)
+	            .subscribe(function (results) {
+	            _this.orgs = results;
+	            console.log("Starred orgs: ", _this.orgs);
+	        }, function (error) { return console.error(error); });
+	    };
+	    StarredOrgsComponent = __decorate([
+	        core_1.Component({
+	            selector: 'starred-orgs',
+	            templateUrl: 'app/starred-orgs.component.html',
+	            providers: [org_service_1.OrgService, user_service_1.UserService]
+	        }), 
+	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService])
+	    ], StarredOrgsComponent);
+	    return StarredOrgsComponent;
+	}());
+	exports.StarredOrgsComponent = StarredOrgsComponent;
 
 
 /***/ }

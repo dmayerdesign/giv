@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Org = require('../models/Org');
 
 /**
  * GET /login
@@ -363,6 +364,43 @@ exports.getUser = (req, res) => {
     }
   });
 };
+
+exports.star = (req, res) => {
+  let orgId = req.body.orgId;
+  let userId = req.body.userId;
+  let operator = function(action) {
+    if (action === "add") return 1;
+    if (action === "subtract") return -1;
+    else return 0;
+  }(req.params.action);
+  let updateQuery = {$inc:{"stars": operator}};
+  Org.findOneAndUpdate({_id: orgId}, updateQuery, {new: true}, function(err, org) {
+    if(err) {
+      res.json(err);
+      return console.log(err);
+    }
+    console.log(org);
+
+    User.findOne({_id: userId}, (err, user) => {
+      if(err) { res.json(err); return console.log(err); }
+      if (user.starred.indexOf(req.body.orgId) > -1) {
+        if (operator == -1) {
+          user.starred.splice(user.starred.indexOf(req.body.orgId), 1);
+        }
+      }
+      else if (operator == 1) {
+        user.starred.push(req.body.orgId);
+      }
+      user.save((err, user) => {
+        if(err) {
+          res.status(500).json(err);
+          return console.log(err);
+        }
+        res.status(200).json({org: org, user: user})
+      });
+    });
+  });
+}
 
 
 

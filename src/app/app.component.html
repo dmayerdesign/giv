@@ -10,13 +10,16 @@
       </li>
     </ul>
     <ul class="nav nav-right pull-right">
-      <li *ngIf="isLoggedIn" class="nav-item">
-    		<a class="nav-link"><img src="app/images/profile-icon.svg" height="18"><span>Your account</span></a>
-        <ul class="subnav">
+      <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
+    		<a class="nav-link" (click)="toggleAccountMenu()">
+          <img *ngIf="!user?.profile?.picture" height="18" src="app/images/profile-icon.svg">
+          <img *ngIf="user?.profile?.picture" height="18" [src]="user?.profile?.picture">
+          <span>Your account</span>
+        </a>
+        <ul *ngIf="showAccountMenu" class="subnav">
           <li class="subnav-item" (click)="logOut()"><i class="fa fa-lock"></i><span>Log out</span></li>
         </ul>
       </li>
-      <li *ngIf="isLoggedIn" class="nav-item"><img width="40" src="{{user?.profile?.picture || 'app/images/default-avatar.gif'}}"></li>
       <li *ngIf="!isLoggedIn" class="nav-item">
       	<a class="nav-link" (click)="logIn()"><img src="app/images/profile-icon.svg" height="18"><span>Log in</span></a>
       </li>

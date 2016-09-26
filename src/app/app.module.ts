@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
 import { AboutComponent } from './about.component';
-import { LibraryComponent } from './library.component';
+import { StarredOrgsComponent } from './starred-orgs.component';
 import { BrowseOrgsComponent } from './browse-orgs.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
@@ -33,7 +33,7 @@ const routing = RouterModule.forRoot([
   , { path: 'login', component: LoginComponent }
   , { path: 'signup', component: SignupComponent }
   , { path: 'about', component: AboutComponent }
-  , { path: 'library', component: LibraryComponent }
+  , { path: 'starred', component: StarredOrgsComponent }
   , { path: 'contact', component: ContactComponent }
   , { path: 'organization/i/:id', component: SingleOrgComponent }
   , { path: 'organization/:slug', component: SingleOrgComponent }
@@ -62,7 +62,7 @@ const routing = RouterModule.forRoot([
       , SingleOrgComponent
       , ManageOrgPageComponent
     	, AboutComponent
-      , LibraryComponent
+      , StarredOrgsComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES
       , CreatePostComponent

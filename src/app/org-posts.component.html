@@ -1,30 +1,33 @@
 <div class="posts-by-org" id="posts">
-	<header class="row col-md-12">
-		<h3>What they're up to</h3>
-		<search-box
-			class="search-box-container col-md-8 col-md-offset-2 clearfix"
-			*ngIf="(!org?._id || !isBrowsing) && !isLoading"
-			(update)="searchPosts($event)"
-			(focusChange)="toggleSearchBoxFocus($event)"
-			[ngClass]="{focused: searchBoxIsFocused}"
-			[collection]="searchPlaceholder"></search-box>
+	<header class="col-md-12">
+		<div class="header-inner row">
+			<h2 *ngIf="!org">What they're up to</h2>
+			<p *ngIf="!org" class="subtitle">People doing important work right now</p>
+			<search-box
+				class="search-box-container clearfix"
+				*ngIf="(!org?._id || !isBrowsing) && !isLoading"
+				(update)="searchPosts($event)"
+				(focusChange)="toggleSearchBoxFocus($event)"
+				[ngClass]="{focused: searchBoxIsFocused}"
+				[collection]="searchPlaceholder"></search-box>
+		</div>
 	</header>
 
 	<create-post *ngIf="user && (user?.permissions?.indexOf(org?.globalPermission) > -1) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 	
 	<!-- Posts -->
-	<div *ngIf="!viewingOne && !isLoading" class="posts">
+	<section *ngIf="!viewingOne && !isLoading" class="posts col-md-12">
 		<div #singlePost *ngFor="let post of posts" (click)="selectPost(post._id)">
 			<img *ngIf="post?.featuredImage?.length" [src]="post.featuredImage" width="100">
 			<h5 class="post-title">{{post.title}}</h5>
 		</div>
-	</div>
+	</section>
 
 	<!-- View Post -->
-	<div *ngIf="viewingOne && selectedPost">
+	<section *ngIf="viewingOne && selectedPost" class="col-md-12">
 		<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
 		<img *ngIf="selectedPost?.featuredImage?.length" [src]="selectedPost.featuredImage" width="100">
 		<h5>{{selectedPost.title}}</h5>
-	</div>
+	</section>
 
 </div>

@@ -31,6 +31,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	private orgs = [];
 	private featuredOrgs = [];
+	private starredOrgs = [];
 	private orgsLoaded:number = 20;
 	private orgsShowing:number;
 	private orgsSorting = {order: "-name"};
@@ -39,7 +40,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private viewingOrg:boolean = false;
 	private viewingFeaturedOrg:boolean = false;
 	private categoriesList:any;
-	private categoryFilter:string;
+	private categoryFilter:string = "";
 
 	private isLoading = true;
 	private isLoadingFeatured = true;
@@ -149,6 +150,8 @@ export class BrowseOrgsComponent implements OnInit {
 	searchOrgs(search:string) {
 		let query = {search: search, field: "name", bodyField: "description", limit: 20};
 
+		console.log(this.categoryFilter);
+
 		if (this.categoryFilter) {
 			query['filterField'] = "categories";
 			query['filterValue'] = this.categoryFilter;
@@ -168,6 +171,10 @@ export class BrowseOrgsComponent implements OnInit {
 
 	filterByCategory(category:string) {
 		this.categoryFilter = category;
+	}
+
+	clearCategoryFilter() {
+		this.categoryFilter = null;
 	}
 
 	showMore(increase:number, offset:number):void {
@@ -229,6 +236,31 @@ export class BrowseOrgsComponent implements OnInit {
 			this.selectedFeaturedOrg = null;
 			this.viewingFeaturedOrg = false;
 		}
+	}
+
+	orgIsStarred(org) {
+		if (this.user.starred.indexOf(org._id) === -1) return false;
+		else return true;
+	}
+
+	starOrg(orgId) {
+		this.http.put("/user/star/add", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+			data => {
+				this.user = data.user;
+				console.log(data.org);
+				console.log(data.user);
+			}
+		);
+	}
+
+	unstarOrg(orgId) {
+		this.http.put("/user/star/subtract", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+			data => {
+				this.user = data.user;
+				console.log(data.org);
+				console.log(data.user);
+			}
+		);
 	}
 
 }

@@ -178,6 +178,7 @@ mongoose.connection.on('connected', () => {
   **/
 
   app.get('/user/:id', userController.getUser);
+  app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
 
 
   // all other routes are handled by Angular
