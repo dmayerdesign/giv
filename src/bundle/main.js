@@ -65683,7 +65683,7 @@
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"item-details\">\n\t\t\t\t<img [hidden]=\"!hasCoverImage() || coverImageLinkBroken\" [src]=\"org.coverImage\" (error)=\"badLink($event)\" (success)=\"goodLink()\" width=\"260\">\n\t\t\t\t<div [hidden]=\"!hasCoverImage() || !coverImageLinkBroken\">Broken link :(</div>\n\t\t\t\t<div [hidden]=\"hasCoverImage()\">No image</div>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<img [hidden]=\"!hasCoverImage() || coverImageLinkBroken\" [src]=\"org.coverImage\" (error)=\"badLink($event)\" (success)=\"goodLink()\" width=\"260\">\n\t\t\t\t<div [hidden]=\"!hasCoverImage() || !coverImageLinkBroken\">Broken link :(</div>\n\t\t\t\t<div [hidden]=\"hasCoverImage()\">No image</div>\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])

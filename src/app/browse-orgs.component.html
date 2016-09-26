@@ -57,6 +57,7 @@
 			<header [ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}">
 				<img class="org-avatar" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
 				<h5>{{org.name}}</h5>
+				<p *ngIf="!selectedOrg || org._id !== selectedOrg._id">Hello lorem ipsum dolor sit amet {{org.description}}</p>
 				<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
 					<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
 					<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
