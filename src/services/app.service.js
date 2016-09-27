@@ -28,6 +28,20 @@ const uploadCoverImage = multer({
   limits: { fileSize: 3000000 }
 });
 
+const uploadOrgAvatar = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'giv-uploads',
+    acl: 'public-read',
+    key: function (req, file, callback) {
+      req.newPath = "avatars/orgs/" + req.params.orgId + "_" + Date.now().toString() + appendFileExt(file);
+      console.log("Uploading "); console.log(file);
+      callback(null, req.newPath);
+    }
+  }),
+  limits: { fileSize: 3000000 }
+});
+
 const attach = multer({
   storage: multerS3({
     s3: s3,
@@ -61,7 +75,8 @@ module.exports = {
     for (let i = 0; i < routes.length; i++) {
       let request = routes[i];
       if (request.middleware) {
-        if (request.middleware === "upload") app[request.method](request.uri, passportConfig.isAuthenticated, uploadCoverImage.any(), request.process);
+        if (request.middleware === "uploadCover") app[request.method](request.uri, passportConfig.isAuthenticated, uploadCoverImage.any(), request.process);
+        if (request.middleware === "uploadOrgAvatar") app[request.method](request.uri, passportConfig.isAuthenticated, uploadOrgAvatar.any(), request.process);
         if (request.middleware === "attach") app[request.method](request.uri, passportConfig.isAuthenticated, attach.any(), request.process);
         if (request.middleware === "passport") app[request.method](request.uri, passportConfig.isAuthenticated, request.process);
       }

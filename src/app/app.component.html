@@ -19,9 +19,7 @@
           <li class="subnav-item" (click)="logOut()"><i class="fa fa-lock"></i><span>Log out</span></li>
         </ul>
       </li>
-      <li *ngIf="!isLoggedIn" class="nav-item">
-      	<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()"><img src="app/images/profile-icon.svg" height="18"><span>Log in</span></a>
-      </li>
+      <button *ngIf="isLoggedIn" class="nav-item" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()">Join the community</button>
     </ul>
   </div>
 </nav>

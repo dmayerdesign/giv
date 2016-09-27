@@ -20,7 +20,7 @@ const orgSchema = new mongoose.Schema({
 	managers: [String],
 	
 	coverImage: String,
-	gravatar: String,
+	avatar: String,
 	gallery: [String],
 	posts: [String],
 	categories: [String]

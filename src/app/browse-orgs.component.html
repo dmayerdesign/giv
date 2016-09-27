@@ -33,9 +33,11 @@
 				<option *ngFor="let category of categoriesList" value="{{category}}">{{category}}</option>
 			</select>
 
-			<p class="info" *ngIf="orgsShowing">
+			<!-- <p class="info" *ngIf="orgsShowing">
 				Showing {{orgsShowing || ''}} organization<span *ngIf="orgsShowing != 1">s</span>
-				<button *ngIf="searchText" class="mini" (click)="clearOrgSearch()"><i class="fa fa-undo"></i>Clear search</button>
+			</p> -->
+			<p class="info" *ngIf="searchText">
+				<button class="mini" (click)="clearOrgSearch()"><i class="fa fa-undo"></i>Clear search</button>
 			</p>
 			<p class="info" *ngIf="categoryFilter">
 				Category: {{categoryFilter}}&nbsp;&nbsp;
@@ -104,8 +106,10 @@
 	</div>
 
 	<!-- LOADING -->
-  <div *ngIf="loadingOrgSearch" class="loading-org-search loader__figure"></div>
-  <p *ngIf="loadingOrgSearch" class="loading-org-search loader__label"><img src="images/logo-color-2x.png" width="30" alt="loading organizations"></p>
+	<div class="loader loading-org-search" *ngIf="loadingOrgSearch">
+	  <div class="loader__figure"></div>
+	  <p class="loader__label"><img src="images/logo-color-2x.png" width="30" alt="loading organizations"></p>
+	</div>
 </div>
 
 <div class="col-md-5 browse-posts" *ngIf="!isLoading">

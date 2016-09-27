@@ -114,7 +114,10 @@ export class ManageOrgPageComponent implements OnInit {
 
   checkForUniqueSlug($event) {
   	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
-  		if (data) this.slugIsValid = false;
+  		if (data) {
+  			this.slugIsValid = false;
+  			this.flash.show("Sorry, that identifier is taken", { cssClass: "error" });
+  		}
   		else this.slugIsValid = true;
   	});
   } 

@@ -169,10 +169,31 @@ exports.routes = [
   {
     method: "post",
     uri: "/edit-org/upload/cover-image/:orgId",
-    middleware: "upload",
+    middleware: "uploadCover",
     process: function(req, res, next) {
       let updateQuery = {$set:{}};
       updateQuery.$set.coverImage = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
+      //updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
+      Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
+        if(err) {
+          console.error(err);
+          res.send(400).json(err);
+        }
+        else {
+          console.log(obj.coverImage);
+          res.json(obj);
+        } 
+      });
+    }
+  },
+
+  {
+    method: "post",
+    uri: "/edit-org/upload/avatar/:orgId",
+    middleware: "uploadOrgAvatar",
+    process: function(req, res, next) {
+      let updateQuery = {$set:{}};
+      updateQuery.$set.avatar = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
       //updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {

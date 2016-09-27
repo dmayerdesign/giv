@@ -66125,8 +66125,10 @@
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
 	        this.http.get("/org/s/" + this.slug).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data)
+	            if (data) {
 	                _this.slugIsValid = false;
+	                _this.flash.show("Sorry, that identifier is taken", { cssClass: "error" });
+	            }
 	            else
 	                _this.slugIsValid = true;
 	        });
