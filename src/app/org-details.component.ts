@@ -7,7 +7,6 @@ import { UIHelper, Utilities } from './services/app.service';
 	selector: 'org-details',
 	template: `
 			<div class="org-details item-details">
-				<img [hidden]="!hasCoverImage() || coverImageLinkBroken" [src]="org.coverImage" (error)="badLink($event)" (success)="goodLink()" width="260">
 				<div [hidden]="!hasCoverImage() || !coverImageLinkBroken">Broken link :(</div>
 				<div [hidden]="hasCoverImage()">No image</div>
 				<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>

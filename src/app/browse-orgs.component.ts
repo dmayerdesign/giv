@@ -188,7 +188,6 @@ export class BrowseOrgsComponent implements OnInit {
 
 		this.orgService.loadOrgs(query).subscribe(
 			res => {
-				this.isLoading = false;
 				this.loadingOrgSearch = false;
 				console.log(res);
 				this.orgs = this.orgs.concat(res);
