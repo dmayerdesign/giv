@@ -7,9 +7,8 @@ import { UIHelper, Utilities } from './services/app.service';
 	selector: 'org-details',
 	template: `
 			<div class="org-details item-details">
-				<div [hidden]="!hasCoverImage() || !coverImageLinkBroken">Broken link :(</div>
-				<div [hidden]="hasCoverImage()">No image</div>
 				<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>
+				<button class="donate-button">Donate</button>
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities]
 })

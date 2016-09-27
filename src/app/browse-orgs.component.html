@@ -92,7 +92,10 @@
 			</div>
 		</div>
 		
-		<button id="show-more" class="row btn btn-default" (click)="showMore(10, orgs.length)">Show more</button>
+		<button id="show-more"
+				class="row btn btn-default"
+				(click)="showMore(10, orgs.length)"
+				[disabled]="loadingOrgSearch || isLoading">Show more</button>
 	</section>
 
 	<!-- LOADING -->

@@ -60,7 +60,7 @@ button, button:active, button:hover {
   background: #F4F9F8;
   /*background: linear-gradient(20deg, #53E4ED, #4fead1);*/
   background: #7fe4ca;
-  border: 0 none;
+  border: 0 none !important;
   border-radius: 2px;
   color: inherit;
   color: #fff;
@@ -80,11 +80,15 @@ button:hover {
 button:active {
   box-shadow: 0px 0px 1px rgba(20,20,20,0.1);
   background: #f0f5f4;
-  border-color: #dee0df;
 }
 
 button i {
   padding-right: 0.6em;
+}
+
+.donate-button {
+  font-size: 1.4em;
+  width: 100%;
 }
 
 /* Layout */
@@ -114,10 +118,14 @@ search-box + select {
   margin-right: 1em;
 }
 
+section section {
+  background: #fff;
+}
+
 /* Layout - org in browse */
 .orgs-list {
-  -webkit-transition: all 0.5s;
-  transition: all 0.5s;
+  -webkit-transition: all 0.7s;
+  transition: all 0.7s;
 }
 
 .orgs-list .org {
@@ -136,8 +144,8 @@ search-box + select {
 
 .org .header-inner {
   padding: 2em 1.5em;
-  -webkit-transition: all 0.5s ease-in-out;
-  transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.7s cubic-bezier(0.5,0,0.2,1);
+  transition: all 0.7s cubic-bezier(0,0.5,0.2,1);
   color: #fff;
   background-color: #bbccdd;
 }
@@ -195,7 +203,7 @@ search-box + select {
 
 .org .preview {
   opacity: 1;
-  transition: opacity 0.5s;
+  transition: opacity 0.7s;
 }
 
 .org .stars-preview {
@@ -211,9 +219,21 @@ search-box + select {
 
 .org.selected .preview {
   opacity: 0 !important;
-  transition: opacity 0.5s;
+  transition: opacity 0.7s;
 }
 
+.org org-posts h2 {
+  font-size: 1.5em;
+  font-weight: normal;
+}
+
+.org .posts-by-org {
+  padding: 0 1.5em;
+}
+
+.org-details {
+  padding: 1em 1.5em;
+}
 
 .browse-posts {
   padding-right: 0;
