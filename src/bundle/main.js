@@ -65392,7 +65392,12 @@
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        var query = { search: this.searchText, field: "name", bodyField: "description", limit: increase, offset: offset };
+	        var query = { limit: increase, offset: offset };
+	        if (search && search.length) {
+	            query['search'] = search;
+	            query['field'] = "name";
+	            query['bodyField'] = "description";
+	        }
 	        this.loadingOrgSearch = true;
 	        if (this.categoryFilter) {
 	            query['filterField'] = "categories";
@@ -65811,7 +65816,18 @@
 	    OrgPostsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        this.orgService.loadPosts({ search: this.searchText, field: "title", bodyField: "content", limit: increase, offset: offset }).subscribe(function (res) {
+	        var query = { limit: increase, offset: offset };
+	        if (search && search.length) {
+	            query['search'] = search;
+	            query['field'] = "title";
+	            query['bodyField'] = "content";
+	        }
+	        if (this.org && this.org._id) {
+	            query['filterField'] = "org";
+	            query['filterValue'] = this.org._id;
+	        }
+	        console.log("org posts query: ", query);
+	        this.orgService.loadPosts(query).subscribe(function (res) {
 	            _this.isLoading = false;
 	            console.log(res);
 	            _this.posts = _this.posts.concat(res);

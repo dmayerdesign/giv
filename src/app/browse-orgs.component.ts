@@ -178,7 +178,13 @@ export class BrowseOrgsComponent implements OnInit {
 
 	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
-		let query = {search: this.searchText, field: "name", bodyField: "description", limit: increase, offset: offset};
+		let query = {limit: increase, offset: offset};
+		if (search && search.length) {
+			query['search'] = search;
+			query['field'] = "name";
+			query['bodyField'] = "description";
+		}
+
 		this.loadingOrgSearch = true;
 
 		if (this.categoryFilter) {

@@ -137,8 +137,18 @@ export class OrgPostsComponent {
 
 	showMore(increase:number, offset:number) {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
-
-		this.orgService.loadPosts({search: this.searchText, field: "title", bodyField: "content", limit: increase, offset: offset}).subscribe(
+		let query = {limit: increase, offset: offset};
+		if (search && search.length) {
+			query['search'] = search;
+			query['field'] = "title";
+			query['bodyField'] = "content";
+		}
+		if (this.org && this.org._id) {
+			query['filterField'] = "org";
+			query['filterValue'] = this.org._id;
+		}
+		console.log("org posts query: ", query);
+		this.orgService.loadPosts(query).subscribe(
 			res => {
 				this.isLoading = false;
 				console.log(res);
