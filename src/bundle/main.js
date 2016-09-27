@@ -65463,6 +65463,9 @@
 	        var _this = this;
 	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
+	            _this.orgs.find(function (org) {
+	                return org._id === orgId;
+	            }).stars++;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -65471,6 +65474,9 @@
 	        var _this = this;
 	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
+	            _this.orgs.find(function (org) {
+	                return org._id === orgId;
+	            }).stars--;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });

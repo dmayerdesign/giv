@@ -223,7 +223,7 @@ section section {
 .org .stars-preview {
   position: absolute;
   z-index: 100;
-  bottom: 3.4em;
+  bottom: 3.2em;
   right: 3em;
   opacity: 0.8;
 
