@@ -168,6 +168,11 @@ export class BrowseOrgsComponent implements OnInit {
 		);
 	}
 
+	clearOrgSearch() {
+		this.searchOrgs('');
+		document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
+	}
+
 	filterByCategory(category:string) {
 		this.categoryFilter = category;
 	}

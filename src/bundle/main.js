@@ -65383,6 +65383,10 @@
 	            _this.searchText = search;
 	        }, function (error) { return console.error(error); });
 	    };
+	    BrowseOrgsComponent.prototype.clearOrgSearch = function () {
+	        this.searchOrgs('');
+	        document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
+	    };
 	    BrowseOrgsComponent.prototype.filterByCategory = function (category) {
 	        this.categoryFilter = category;
 	    };
@@ -65752,10 +65756,12 @@
 	        var _this = this;
 	        this.loadingPosts = true;
 	        var query;
+	        if (!this.org)
+	            query = { limit: 20, sort: "-dateCreated" };
 	        if (this.org)
 	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
-	        else
-	            query = { limit: 20, sort: "-dateCreated" };
+	        if (this.org && this.isBrowsing)
+	            query.limit = 4;
 	        if (search) {
 	            query.search = search;
 	            query.field = "title";

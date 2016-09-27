@@ -88,8 +88,13 @@ button i {
 }
 
 .donate-button {
-  font-size: 1.4em;
+  font-size: 1.3em;
   width: 100%;
+  background: linear-gradient(20deg, #53E4ED, #4fead1);
+}
+
+.donate-button:hover {
+  background: #4ae7ce;
 }
 
 /* Layout */
@@ -228,12 +233,13 @@ section section {
   font-weight: normal;
 }
 
-.org .posts-by-org {
+.org-expanded {
   padding: 0 1.5em;
 }
 
+.org .posts-by-org,
 .org-details {
-  padding: 1em 1.5em;
+  padding: 1em 0;
 }
 
 .browse-posts {
