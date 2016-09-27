@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     location: String,
     website: String,
     picture: String
+  },
+
+  interests: {
+    race: Number,
+    economy: Number,
+    environment: Number
   }
 }, { timestamps: true });
 

@@ -8,15 +8,18 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendEmail = (req, res) => {
-  // req.body = {
-  //   subject,
-  //   message,
-  //   toAddr,
-  //   toName,
-  //   fromAddr,
-  //   fromName,
-  //   redirectTo
-  // }
+  /***********
+  req.body =
+  {
+    subject,
+    message,
+    toAddr,
+    toName,
+    fromAddr,
+    fromName,
+    redirectTo
+  }
+  ************/
 
   req.assert('toName', '\'To\' name cannot be blank').notEmpty();
   req.assert('toAddr', '\'To\' email is not valid').isEmail();

@@ -19,6 +19,7 @@
 		<div class="row">
 			<h2>Organizations</h2>
 			<p class="subtitle">People doing important work right now</p>
+
 			<search-box
 			class="org-search-box search-box-container clearfix"
 			*ngIf="!isLoading"
@@ -26,11 +27,12 @@
 			(focusChange)="toggleSearchBoxFocus($event)"
 			[ngClass]="{focused: searchBoxIsFocused}"
 			[collection]="'organizations'"></search-box>
+
 			<select *ngIf="!isLoading"
-					[value]="categoryFilter"
-					(change)="filterByCategory($event.target.value); searchOrgs(searchText)">
-				<option value="">All categories</option>
-				<option *ngFor="let category of categoriesList" value="{{category}}">{{category}}</option>
+					[value]="categoryFilter?.id"
+					(change)="filterByCategory(getCategoryById($event.target.value))">
+				<option [value]="null" selected>All categories</option>
+				<option *ngFor="let category of categoriesList" [value]="category?.id">{{category?.name}}</option>
 			</select>
 
 			<!-- <p class="info" *ngIf="orgsShowing">
@@ -39,9 +41,9 @@
 			<p class="info" *ngIf="searchText">
 				<button class="mini" (click)="clearOrgSearch()"><i class="fa fa-undo"></i>Clear search</button>
 			</p>
-			<p class="info" *ngIf="categoryFilter">
-				Category: {{categoryFilter}}&nbsp;&nbsp;
-				<button class="mini" (click)="filterByCategory(''); searchOrgs(searchText)"><i class="fa fa-undo"></i>Clear filter</button>
+			<p class="info" *ngIf="categoryFilter.id">
+				Category: {{categoryFilter.name}}&nbsp;&nbsp;
+				<button class="mini" (click)="clearCategoryFilter()"><i class="fa fa-undo"></i>Clear filter</button>
 			</p>
 		</div>
 	</header>

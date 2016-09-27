@@ -40,7 +40,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private viewingOrg:boolean = false;
 	private viewingFeaturedOrg:boolean = false;
 	private categoriesList:any;
-	private categoryFilter:string = "";
+	private categoryFilter:any = {id: null};
 
 	private isLoading = true;
 	private isLoadingFeatured = true;
@@ -75,12 +75,21 @@ export class BrowseOrgsComponent implements OnInit {
 		!this.utilities.existsLocally('OrgsSorting')
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 			: this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
-
+	
 		this.orgService.loadOrgs({limit:20}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
 				this.takeCount(this.orgs);
+
+				this.paramsSub = this.route.params.subscribe(params => {
+					let categoryId = params['id'];
+					if (categoryId) {
+						this.categoryFilter = this.getCategoryById(categoryId) || {id: null};
+						this.filterByCategory(this.categoryFilter);
+						return;
+					}
+				});
 
 				/** Infinite scrolling! **/
 				let orgs = this.orgs;
@@ -101,13 +110,17 @@ export class BrowseOrgsComponent implements OnInit {
 			error => console.log(error)
 		);
 
-		this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
-			data => {
-				this.isLoadingFeatured = false;
-				this.featuredOrgs = data;
-			},
-			error => console.log(error)
-		);
+		// this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
+		// 	data => {
+		// 		this.isLoadingFeatured = false;
+		// 		this.featuredOrgs = data;
+		// 	},
+		// 	error => console.log(error)
+		// );
+	}
+
+	ngOnDestroy() {
+		this.paramsSub.unsubscribe();
 	}
 
 	ngDoCheck() {
@@ -149,14 +162,12 @@ export class BrowseOrgsComponent implements OnInit {
 	searchOrgs(search:string) {
 		let query = {search: search, field: "name", bodyField: "description", limit: 20};
 
-		console.log(this.categoryFilter);
-
-		if (this.categoryFilter) {
-			query['filterField'] = "categories";
-			query['filterValue'] = this.categoryFilter;
+		if (this.categoryFilter && this.categoryFilter.id) {
+			query['filterField'] = "categories.id";
+			query['filterValue'] = this.categoryFilter.id;
 		}
 		this.loadingOrgSearch = true;
-		console.log(query);
+
 		this.orgService.loadOrgs(query)
 			.subscribe(
 				results => {
@@ -173,12 +184,24 @@ export class BrowseOrgsComponent implements OnInit {
 		document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
 	}
 
-	filterByCategory(category:string) {
-		this.categoryFilter = category;
+	getCategoryById(id) {
+		return this.categoriesList.find((category) => {
+			if (category) return category.id === id;
+			else return false;
+		});
+	}
+
+	filterByCategory(category) {
+		this.categoryFilter = category || {id: null};
+		this.searchOrgs(this.searchText);
 	}
 
 	clearCategoryFilter() {
-		this.categoryFilter = null;
+		this.categoryFilter = {id: null};
+		this.searchOrgs(this.searchText);
+		if (window.location.href.indexOf("category") > -1) {
+			window.location.href = "";
+		}
 	}
 
 	showMore(increase:number, offset:number):void {
@@ -189,13 +212,11 @@ export class BrowseOrgsComponent implements OnInit {
 			query['field'] = "name";
 			query['bodyField'] = "description";
 		}
-
-		this.loadingOrgSearch = true;
-
-		if (this.categoryFilter) {
-			query['filterField'] = "categories";
-			query['filterValue'] = this.categoryFilter;
+		if (this.categoryFilter.id) {
+			query['filterField'] = "categories.id";
+			query['filterValue'] = this.categoryFilter.id;
 		}
+		this.loadingOrgSearch = true;
 
 		this.orgService.loadOrgs(query).subscribe(
 			res => {

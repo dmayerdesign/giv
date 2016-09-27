@@ -12,7 +12,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 	template: `
 			<div class="single-org" *ngIf="isLoaded">
 				<h4>{{org.name}}</h4>
-				<org-details [org]="org"></org-details>
+				<org-details [org]="org" [isSingle]="true"></org-details>
 								
 				<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
 

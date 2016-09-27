@@ -9,12 +9,14 @@ import { UIHelper, Utilities } from './services/app.service';
 			<div class="org-details item-details">
 				<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>
 				<button class="donate-button">Donate</button>
+				<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a href="#">{{category.name}}</a>&nbsp;</span></p>
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities]
 })
 
 export class OrgDetailsComponent implements OnInit {
 	@Input() org;
+	@Input() isSingle;
 	private coverImageLinkBroken:boolean = false;
 
 	constructor(

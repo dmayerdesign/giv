@@ -7,11 +7,12 @@ export class Categories {
 
 	list():any {
 		return [
-	    "Racial justice",
-	    "Environmental justice",
-	    "Reproductive rights",
-	    "Economic justice",
-	    "Other"
+	    { name: "Racial Justice", id: "racial" },
+	    { name: "LGBTQIA Justice", id: "lgbtqia" },
+	    { name: "Environmental Justice", id: "environmental" },
+	    { name: "Reproductive Rights", id: "reproductive" },
+	    { name: "Economic Justice", id: "economic" },
+	    { name: "Other", id: "other" }
 	  ];
 	}
 }

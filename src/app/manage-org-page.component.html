@@ -50,6 +50,16 @@
   				name="slug"
   				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
+  <div class="form-block">
+    <div *ngFor="let category of categories">
+      <input
+        type="checkbox"
+        [checked]="orgHasCategory(category)"
+        (change)="changeSelectedCategories(category, $event.target.checked)">
+      <label>{{category.name}}</label>
+    </div>
+    <button (click)="editOrg('categories', org.categories)"><i [hidden]="!loading_categories" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
 	<div class="form-block">
   	<button *ngIf="!org.featured" (click)="editOrg('featured', true)">Set featured org</button>
   	<button *ngIf="org.featured" (click)="editOrg('featured', false)">Unset featured org</button>

@@ -30,6 +30,7 @@ enableProdMode();
 
 const routing = RouterModule.forRoot([
     { path: 'browse', component: BrowseOrgsComponent }
+  , { path: 'category/:id', component: BrowseOrgsComponent }
   , { path: 'login', component: LoginComponent }
   , { path: 'signup', component: SignupComponent }
   , { path: 'about', component: AboutComponent }

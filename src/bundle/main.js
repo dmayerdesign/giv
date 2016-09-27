@@ -49936,6 +49936,7 @@
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
 	    { path: 'browse', component: browse_orgs_component_1.BrowseOrgsComponent },
+	    { path: 'category/:id', component: browse_orgs_component_1.BrowseOrgsComponent },
 	    { path: 'login', component: login_component_1.LoginComponent },
 	    { path: 'signup', component: signup_component_1.SignupComponent },
 	    { path: 'about', component: about_component_1.AboutComponent },
@@ -65286,7 +65287,7 @@
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
 	        this.viewingFeaturedOrg = false;
-	        this.categoryFilter = "";
+	        this.categoryFilter = { id: null };
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
 	        this.loadingOrgSearch = false;
@@ -65311,6 +65312,14 @@
 	            _this.isLoading = false;
 	            _this.orgs = data;
 	            _this.takeCount(_this.orgs);
+	            _this.paramsSub = _this.route.params.subscribe(function (params) {
+	                var categoryId = params['id'];
+	                if (categoryId) {
+	                    _this.categoryFilter = _this.getCategoryById(categoryId) || { id: null };
+	                    _this.filterByCategory(_this.categoryFilter);
+	                    return;
+	                }
+	            });
 	            /** Infinite scrolling! **/
 	            var orgs = _this.orgs;
 	            document.onscroll = function () {
@@ -65326,10 +65335,16 @@
 	                }
 	            };
 	        }, function (error) { return console.log(error); });
-	        this.orgService.loadOrgs({ limit: 6, filterField: "featured", filterValue: "true" }).subscribe(function (data) {
-	            _this.isLoadingFeatured = false;
-	            _this.featuredOrgs = data;
-	        }, function (error) { return console.log(error); });
+	        // this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
+	        // 	data => {
+	        // 		this.isLoadingFeatured = false;
+	        // 		this.featuredOrgs = data;
+	        // 	},
+	        // 	error => console.log(error)
+	        // );
+	    };
+	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
+	        this.paramsSub.unsubscribe();
 	    };
 	    BrowseOrgsComponent.prototype.ngDoCheck = function () {
 	        this.takeCount(this.$orgs);
@@ -65369,13 +65384,11 @@
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
 	        var query = { search: search, field: "name", bodyField: "description", limit: 20 };
-	        console.log(this.categoryFilter);
-	        if (this.categoryFilter) {
-	            query['filterField'] = "categories";
-	            query['filterValue'] = this.categoryFilter;
+	        if (this.categoryFilter && this.categoryFilter.id) {
+	            query['filterField'] = "categories.id";
+	            query['filterValue'] = this.categoryFilter.id;
 	        }
 	        this.loadingOrgSearch = true;
-	        console.log(query);
 	        this.orgService.loadOrgs(query)
 	            .subscribe(function (results) {
 	            _this.orgs = results;
@@ -65387,11 +65400,24 @@
 	        this.searchOrgs('');
 	        document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
 	    };
+	    BrowseOrgsComponent.prototype.getCategoryById = function (id) {
+	        return this.categoriesList.find(function (category) {
+	            if (category)
+	                return category.id === id;
+	            else
+	                return false;
+	        });
+	    };
 	    BrowseOrgsComponent.prototype.filterByCategory = function (category) {
-	        this.categoryFilter = category;
+	        this.categoryFilter = category || { id: null };
+	        this.searchOrgs(this.searchText);
 	    };
 	    BrowseOrgsComponent.prototype.clearCategoryFilter = function () {
-	        this.categoryFilter = null;
+	        this.categoryFilter = { id: null };
+	        this.searchOrgs(this.searchText);
+	        if (window.location.href.indexOf("category") > -1) {
+	            window.location.href = "";
+	        }
 	    };
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
@@ -65402,11 +65428,11 @@
 	            query['field'] = "name";
 	            query['bodyField'] = "description";
 	        }
-	        this.loadingOrgSearch = true;
-	        if (this.categoryFilter) {
-	            query['filterField'] = "categories";
-	            query['filterValue'] = this.categoryFilter;
+	        if (this.categoryFilter.id) {
+	            query['filterField'] = "categories.id";
+	            query['filterValue'] = this.categoryFilter.id;
 	        }
+	        this.loadingOrgSearch = true;
 	        this.orgService.loadOrgs(query).subscribe(function (res) {
 	            _this.loadingOrgSearch = false;
 	            console.log(res);
@@ -65699,10 +65725,14 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgDetailsComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgDetailsComponent.prototype, "isSingle", void 0);
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t\t<button class=\"donate-button\">Donate</button>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t\t<button class=\"donate-button\">Donate</button>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a href=\"#\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65938,11 +65968,12 @@
 	    }
 	    Categories.prototype.list = function () {
 	        return [
-	            "Racial justice",
-	            "Environmental justice",
-	            "Reproductive rights",
-	            "Economic justice",
-	            "Other"
+	            { name: "Racial Justice", id: "racial" },
+	            { name: "LGBTQIA Justice", id: "lgbtqia" },
+	            { name: "Environmental Justice", id: "environmental" },
+	            { name: "Reproductive Rights", id: "reproductive" },
+	            { name: "Economic Justice", id: "economic" },
+	            { name: "Other", id: "other" }
 	        ];
 	    };
 	    Categories = __decorate([
@@ -66025,7 +66056,7 @@
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\" [user]=\"user\"></org-posts>\n\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\" [isSingle]=\"true\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\" [user]=\"user\"></org-posts>\n\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
@@ -66055,10 +66086,11 @@
 	var http_1 = __webpack_require__(397);
 	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
+	var categories_service_1 = __webpack_require__(482);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash, http) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, helper, utilities, zone, flash, http, categoryService) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -66068,9 +66100,11 @@
 	        this.zone = zone;
 	        this.flash = flash;
 	        this.http = http;
+	        this.categoryService = categoryService;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
@@ -66150,6 +66184,9 @@
 	                value.toLowerCase();
 	            }
 	        }
+	        if (key === "categories") {
+	            value = this.org.categories;
+	        }
 	        this['loading_' + key] = true;
 	        this.orgService.editOrg({
 	            id: this.org._id,
@@ -66168,6 +66205,25 @@
 	            console.log(res);
 	        });
 	    };
+	    ManageOrgPageComponent.prototype.orgHasCategory = function (category) {
+	        var categoryInOrg = this.org.categories.filter(function (orgCategory) {
+	            return orgCategory.id === category.id;
+	        });
+	        if (categoryInOrg.length)
+	            return true;
+	        else
+	            return false;
+	    };
+	    ManageOrgPageComponent.prototype.changeSelectedCategories = function (category, add) {
+	        if (!this.org.categories)
+	            this.org['categories'] = []; // for old orgs without categories array already
+	        if (add) {
+	            this.org.categories.push(category);
+	        }
+	        else {
+	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
+	        }
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -66178,7 +66234,7 @@
 	            templateUrl: 'app/manage-org-page.component.html',
 	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, http_1.Http, categories_service_1.Categories])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());

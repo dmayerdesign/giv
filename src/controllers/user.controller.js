@@ -42,18 +42,8 @@ exports.postLogin = (req, res, next) => {
       if (err) { return next(err); }
       console.log(user);
       res.json(user);
-      //res.redirect(req.session.returnTo || '/');
     });
   })(req, res, next);
-};
-
-/**
- * GET /logout
- * Log out.
- */
-exports.logout = (req, res) => {
-  req.logout();
-  res.redirect('/');
 };
 
 /**
@@ -92,16 +82,6 @@ exports.postSignup = (req, res, next) => {
 };
 
 /**
- * GET /account
- * Profile page.
- */
-exports.getAccount = (req, res) => {
-  res.render('account/profile', {
-    title: 'Account Management'
-  });
-};
-
-/**
  * POST /account/profile
  * Update profile information.
  */
@@ -126,13 +106,12 @@ exports.postUpdateProfile = (req, res, next) => {
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
-          req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
-          return res.redirect('/account');
+          return res.json({errmsg: 'The email address you have entered is already associated with an account.' });
         }
+        res.json({errmsg: err});
         return next(err);
       }
-      req.flash('success', { msg: 'Profile information has been updated.' });
-      res.redirect('/account');
+      res.json(user);
     });
   });
 };
@@ -152,6 +131,18 @@ exports.postUpdatePassword = (req, res, next) => {
     return res.redirect('/account');
   }
 
+  passport.authenticate('local', (err, user, info) => {
+    if (err) { return next(err); }
+    if (!user) {
+      res.status(401).json({"errmsg": "Login was not valid"});
+    }
+    req.logIn(user, (err) => {
+      if (err) { return next(err); }
+      console.log(user);
+      res.json(user);
+    });
+  })(req, res, next);
+
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
     user.password = req.body.password;
@@ -170,9 +161,7 @@ exports.postUpdatePassword = (req, res, next) => {
 exports.postDeleteAccount = (req, res, next) => {
   User.remove({ _id: req.user.id }, (err) => {
     if (err) { return next(err); }
-    req.logout();
-    req.flash('info', { msg: 'Your account has been deleted.' });
-    res.redirect('/');
+    res.json({ success: 'Your account has been deleted.' });
   });
 };
 
@@ -195,26 +184,64 @@ exports.getOauthUnlink = (req, res, next) => {
 };
 
 /**
- * GET /reset/:token
- * Reset Password page.
+ * POST /forgot
+ * Create a random token, then the send user an email with a reset link.
  */
-exports.getReset = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
+exports.postForgot = (req, res, next) => {
+  req.assert('email', 'Please enter a valid email address.').isEmail();
+  req.sanitize('email').normalizeEmail({ remove_dots: false });
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    return res.json({errmsg: errors});
   }
-  User
-    .findOne({ passwordResetToken: req.params.token })
-    .where('passwordResetExpires').gt(Date.now())
-    .exec((err, user) => {
-      if (err) { return next(err); }
-      if (!user) {
-        req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-        return res.redirect('/forgot');
-      }
-      res.render('account/reset', {
-        title: 'Password Reset'
+
+  async.waterfall([
+    function (done) {
+      crypto.randomBytes(16, (err, buf) => {
+        const token = buf.toString('hex');
+        done(err, token);
       });
-    });
+    },
+    function (token, done) {
+      User.findOne({ email: req.body.email }, (err, user) => {
+        if (err) { return done(err); }
+        if (!user) {
+          return res.json({ errmsg: 'Account with that email address does not exist.' });
+        }
+        user.passwordResetToken = token;
+        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+        user.save((err) => {
+          done(err, token, user);
+        });
+      });
+    },
+    function (token, user, done) {
+      const transporter = nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USER,
+          pass: process.env.SENDGRID_PASSWORD
+        }
+      });
+      const mailOptions = {
+        to: user.email,
+        from: 'd.a.mayer92@gmail.com',
+        subject: 'Reset your password on Hackathon Starter',
+        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          http://${req.headers.host}/reset/${token}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`
+      };
+      transporter.sendMail(mailOptions, (err) => {
+        res.status(200).json({success: "An e-mail has been sent to " + user.email + " with further instructions." });
+        done(err);
+      });
+    }
+  ], (err) => {
+    if (err) { return next(err); }
+  });
 };
 
 /**
@@ -228,8 +255,7 @@ exports.postReset = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('back');
+    return res.json({errmsg: errors});
   }
 
   async.waterfall([
@@ -240,8 +266,7 @@ exports.postReset = (req, res, next) => {
         .exec((err, user) => {
           if (err) { return next(err); }
           if (!user) {
-            req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-            return res.redirect('back');
+            return res.json({ errmsg: 'Password reset token is invalid or has expired.' });
           }
           user.password = req.body.password;
           user.passwordResetToken = undefined;
@@ -264,95 +289,21 @@ exports.postReset = (req, res, next) => {
       });
       const mailOptions = {
         to: user.email,
-        from: 'hackathon@starter.com',
+        from: 'd.a.mayer92@gmail.com',
         subject: 'Your Hackathon Starter password has been changed',
         text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`
       };
       transporter.sendMail(mailOptions, (err) => {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });
-        done(err);
+        done(err, user);
       });
     }
   ], (err) => {
-    if (err) { return next(err); }
-    res.redirect('/');
-  });
-};
-
-/**
- * GET /forgot
- * Forgot Password page.
- */
-exports.getForgot = (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  res.render('account/forgot', {
-    title: 'Forgot Password'
-  });
-};
-
-/**
- * POST /forgot
- * Create a random token, then the send user an email with a reset link.
- */
-exports.postForgot = (req, res, next) => {
-  req.assert('email', 'Please enter a valid email address.').isEmail();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-  const errors = req.validationErrors();
-
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/forgot');
-  }
-
-  async.waterfall([
-    function (done) {
-      crypto.randomBytes(16, (err, buf) => {
-        const token = buf.toString('hex');
-        done(err, token);
-      });
-    },
-    function (token, done) {
-      User.findOne({ email: req.body.email }, (err, user) => {
-        if (err) { return done(err); }
-        if (!user) {
-          req.flash('errors', { msg: 'Account with that email address does not exist.' });
-          return res.redirect('/forgot');
-        }
-        user.passwordResetToken = token;
-        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-        user.save((err) => {
-          done(err, token, user);
-        });
-      });
-    },
-    function (token, user, done) {
-      const transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: process.env.SENDGRID_USER,
-          pass: process.env.SENDGRID_PASSWORD
-        }
-      });
-      const mailOptions = {
-        to: user.email,
-        from: 'hackathon@starter.com',
-        subject: 'Reset your password on Hackathon Starter',
-        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
-          Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
-          If you did not request this, please ignore this email and your password will remain unchanged.\n`
-      };
-      transporter.sendMail(mailOptions, (err) => {
-        req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
-        done(err);
-      });
+    if (err) {
+      console.log(err);
+      res.json({errmsg: err});
+      return next(err);
     }
-  ], (err) => {
-    if (err) { return next(err); }
-    res.redirect('/forgot');
+    res.json(user);
   });
 };
 
@@ -373,6 +324,7 @@ exports.star = (req, res) => {
     if (action === "subtract") return -1;
     else return 0;
   }(req.params.action);
+
   let updateQuery = {$inc:{"stars": operator}};
   if (req.params.action === "add") updateQuery.$push = {"starredBy": req.body.userId};
   if (req.params.action === "subtract") updateQuery.$pull = {"starredBy": req.body.userId};
@@ -404,65 +356,3 @@ exports.star = (req, res) => {
     });
   });
 }
-
-
-
-/**
- * Danny's login
- */
-
-// exports.login = (req, res, next) => {
-//   if (req.body.token && req.body.token.accessToken && req.body.token.accessToken.type === "facebook") { // If this is a Facebook login
-//     User.findOne({ facebook: req.body.id }, (err, existingUser) => {
-//       if (err) return console.log(err);
-//       if (existingUser) {
-//         res.json(existingUser);
-//         return;
-//       }
-//       User.findOne({ email: req.body.email }, (err, existingEmailUser) => {
-//         if (err) return console.log(err);
-//         if (existingEmailUser) {
-//           res.send("An account with this email already exists.");
-//         } else {
-//           const user = new User();
-//           user.email = req.body.email;
-//           user.facebook = req.body.id;
-//           user.tokens.push(req.body.token);
-//           user.profile.name = req.body.first_name + ' ' + req.body.last_name;
-//           user.profile.picture = `https://graph.facebook.com/${req.body.id}/picture?type=large`;
-//           user.save((err) => {
-//             if (err) return console.log(err);
-//             res.json(user);
-//           });
-//         }
-//       });
-//     });
-//   }
-//   else {
-//     req.assert('email', 'Email is not valid').isEmail();
-//     req.assert('password', 'Password cannot be blank').notEmpty();
-//     req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-//     const errors = req.validationErrors();
-
-//     if (errors) {
-//       res.json(errors);
-//     }
-
-//     User.findOne({ email: req.body.email }, (err, user) => {
-//       if (err) return console.log(err);
-//       if (user) {
-//         user.comparePassword(req.body.password, (err, isMatch) => {
-//           if (err) return console.log(err);
-//           if (isMatch) {
-//             res.json(user);
-//           }
-//           else {
-//             res.send("Incorrect password");
-//           }
-//         });
-//       }
-//     });
-//   }
-
-// };

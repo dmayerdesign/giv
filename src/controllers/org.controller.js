@@ -220,7 +220,8 @@ let editableInOrg = [
   "name",
   "description",
   "verified",
-  "featured"
+  "featured",
+  "categories"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.routes.push(editOrg(editableInOrg[i]));

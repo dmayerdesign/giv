@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
+import { Categories } from './services/categories.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { FlashMessagesService } from 'angular2-flash-messages';
 
@@ -18,7 +19,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 // __TO_DO__: add an external link option
 
 export class ManageOrgPageComponent implements OnInit {
-	@Input() org; // Declared as an Input in case you're including it inside another template like <manage-org-page [org]="org"></...>
+	@Input() org; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
@@ -30,24 +31,28 @@ export class ManageOrgPageComponent implements OnInit {
 	private name:string;
 	private description:string;
 
+	private categories = this.categoryService.list();
+
 	private loading_coverImage:boolean;
 	private loading_donateLink:boolean;
 	private loading_slug:boolean;
+	private loading_categories:boolean;
 	private slugIsValid:boolean = true;
 
 	uploadFile:any;
   uploadOptions:Object;
 
 	constructor(
-				private router: Router,
-				private route: ActivatedRoute,
-				private orgService: OrgService,
-				private userService: UserService,
-				private helper: UIHelper,
-				private utilities: Utilities,
-				private zone: NgZone,
-				private flash: FlashMessagesService,
-				private http: Http) { }
+				private router:Router,
+				private route:ActivatedRoute,
+				private orgService:OrgService,
+				private userService:UserService,
+				private helper:UIHelper,
+				private utilities:Utilities,
+				private zone:NgZone,
+				private flash:FlashMessagesService,
+				private http:Http,
+				private categoryService:Categories) { }
 
 	ngOnInit() {
 		this.userService.getLoggedInUser((err, user) => {
@@ -68,7 +73,6 @@ export class ManageOrgPageComponent implements OnInit {
 							}
 							this.org = data;
 							this.isLoaded = true;
-
 							
 							// for ng-upload
 							this.uploadOptions = {
@@ -122,7 +126,7 @@ export class ManageOrgPageComponent implements OnInit {
   	});
   } 
 
-  editOrg(key:string, value:string):void {
+  editOrg(key:string, value:any):void {
   	if (key === "slug") {
   		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
   		if (slugMatch) {
@@ -130,6 +134,10 @@ export class ManageOrgPageComponent implements OnInit {
   		} else {
   			value.toLowerCase();
   		}
+  	}
+
+  	if (key === "categories") {
+  		value = this.org.categories;
   	}
 
   	this['loading_' + key] = true;
@@ -149,6 +157,25 @@ export class ManageOrgPageComponent implements OnInit {
   		this.flash.show("Saved");
   		console.log(res);
   	});
+  }
+
+  orgHasCategory(category) {
+  	let categoryInOrg = this.org.categories.filter((orgCategory) => {
+  		return orgCategory.id === category.id;
+  	});
+
+  	if (categoryInOrg.length) return true;
+  	else return false;
+  }
+
+  changeSelectedCategories(category, add) {
+  	if (!this.org.categories) this.org['categories'] = []; // for old orgs without categories array already
+  	if (add) {
+  		this.org.categories.push(category);
+  	} 
+  	else {
+	  	this.org.categories.splice(this.org.categories.indexOf(category), 1);
+	  }
   }
 
 }

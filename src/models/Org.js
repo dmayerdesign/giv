@@ -23,7 +23,7 @@ const orgSchema = new mongoose.Schema({
 	avatar: String,
 	gallery: [String],
 	posts: [String],
-	categories: [String]
+	categories: Array
 });
 
 orgSchema.pre('save', function (next) {
