@@ -51,10 +51,6 @@ export class OrgPostsComponent {
 		this.loadPosts();
 	}
 
-	ngAfterContentInit() {
-		this.update.emit("init");
-	}
-
 	ngOnDestroy() {
 		if (this.querySub) this.querySub.unsubscribe();
 	}
@@ -81,6 +77,8 @@ export class OrgPostsComponent {
 				this.isLoading = false;
 				this.posts = data;
 				this.takeCount(this.posts);
+
+				this.update.emit("init");
 
 				console.log("posts: ", this.posts);
 				this.querySub = this.route.queryParams.subscribe(params => {

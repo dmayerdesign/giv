@@ -65803,9 +65803,6 @@
 	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
 	        this.loadPosts();
 	    };
-	    OrgPostsComponent.prototype.ngAfterContentInit = function () {
-	        this.update.emit("init");
-	    };
 	    OrgPostsComponent.prototype.ngOnDestroy = function () {
 	        if (this.querySub)
 	            this.querySub.unsubscribe();
@@ -65831,6 +65828,7 @@
 	            _this.isLoading = false;
 	            _this.posts = data;
 	            _this.takeCount(_this.posts);
+	            _this.update.emit("init");
 	            console.log("posts: ", _this.posts);
 	            _this.querySub = _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
