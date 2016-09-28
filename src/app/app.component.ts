@@ -57,6 +57,10 @@ export class AppComponent implements OnInit {
 		this.router.navigate(['/']);
 	}
 
+	signUp() {
+		this.router.navigate(['/signup']);
+	}
+
 	toggleAccountMenu() {
 		if (this.showAccountMenu) this.showAccountMenu = false;
 		else this.showAccountMenu = true;

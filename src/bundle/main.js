@@ -64608,6 +64608,9 @@
 	        this.flash.show("Bye!");
 	        this.router.navigate(['/']);
 	    };
+	    AppComponent.prototype.signUp = function () {
+	        this.router.navigate(['/signup']);
+	    };
 	    AppComponent.prototype.toggleAccountMenu = function () {
 	        if (this.showAccountMenu)
 	            this.showAccountMenu = false;
@@ -65278,10 +65281,9 @@
 	        this.categories = categories;
 	        this.$orgs = [];
 	        this.selectedOrg = null;
-	        this.selectedFeaturedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
-	        this.starredOrgs = [];
+	        this.featuredShowing = Math.floor(Math.random() * 5);
 	        this.orgsLoaded = 20;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
@@ -65337,13 +65339,11 @@
 	                }
 	            };
 	        }, function (error) { return console.log(error); });
-	        // this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
-	        // 	data => {
-	        // 		this.isLoadingFeatured = false;
-	        // 		this.featuredOrgs = data;
-	        // 	},
-	        // 	error => console.log(error)
-	        // );
+	        this.orgService.loadOrgs({ limit: 6, filterField: "featured", filterValue: "true" }).subscribe(function (data) {
+	            _this.isLoadingFeatured = false;
+	            _this.featuredOrgs = data;
+	            _this.featuredOrgs[_this.featuredShowing]['showing'] = true;
+	        }, function (error) { return console.log(error); });
 	    };
 	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
 	        this.paramsSub.unsubscribe();
@@ -65455,7 +65455,6 @@
 	        var findOrg = function (org) {
 	            return org._id === id;
 	        };
-	        this.selectedFeaturedOrg = this.orgs.find(findOrg);
 	        this.viewingFeaturedOrg = true;
 	    };
 	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
@@ -65468,12 +65467,6 @@
 	            this.viewingOrg = false;
 	            this.singleDetailsAreLoaded = false;
 	            this.singlePostsAreLoaded = false;
-	        }
-	    };
-	    BrowseOrgsComponent.prototype.deselectFeaturedOrg = function (e, id) {
-	        if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
-	            this.selectedFeaturedOrg = null;
-	            this.viewingFeaturedOrg = false;
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.orgIsStarred = function (org) {
@@ -65514,6 +65507,17 @@
 	            this.singlePostsAreLoaded = true;
 	        }
 	    };
+	    BrowseOrgsComponent.prototype.cycleFeatured = function (inc) {
+	        this.featuredOrgs[this.featuredShowing]['showing'] = false;
+	        this.featuredShowing += inc;
+	        if (this.featuredShowing === -1) {
+	            this.featuredShowing = 5;
+	        }
+	        if (this.featuredShowing === 6) {
+	            this.featuredShowing = 0;
+	        }
+	        this.featuredOrgs[this.featuredShowing]['showing'] = true;
+	    };
 	    __decorate([
 	        core_1.ViewChildren('singleItem'), 
 	        __metadata('design:type', Object)
@@ -65522,10 +65526,6 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], BrowseOrgsComponent.prototype, "selectedOrg", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], BrowseOrgsComponent.prototype, "selectedFeaturedOrg", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -65750,7 +65750,7 @@
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t\t<button class=\"donate-button\">Donate</button>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a href=\"#\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a href=\"#\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -66128,6 +66128,12 @@
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        this.callsToAction = [
+	            "Donate",
+	            "Support",
+	            "Help out",
+	            "Volunteer"
+	        ];
 	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
 	    }
@@ -66210,6 +66216,9 @@
 	        }
 	        if (key === "categories") {
 	            value = this.org.categories;
+	        }
+	        if (!value) {
+	            value = this[key] || this.org[key];
 	        }
 	        this['loading_' + key] = true;
 	        this.orgService.editOrg({

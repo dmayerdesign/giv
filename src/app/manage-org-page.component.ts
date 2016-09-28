@@ -31,6 +31,13 @@ export class ManageOrgPageComponent implements OnInit {
 	private name:string;
 	private description:string;
 
+	private callsToAction:Array<string> = [
+		"Donate",
+		"Support",
+		"Help out",
+		"Volunteer"
+	];
+
 	private categories = this.categoryService.list();
 
 	private loading_coverImage:boolean;
@@ -126,7 +133,7 @@ export class ManageOrgPageComponent implements OnInit {
   	});
   } 
 
-  editOrg(key:string, value:any):void {
+  editOrg(key:string, value?:any):void {
   	if (key === "slug") {
   		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
   		if (slugMatch) {
@@ -138,6 +145,10 @@ export class ManageOrgPageComponent implements OnInit {
 
   	if (key === "categories") {
   		value = this.org.categories;
+  	}
+
+  	if (!value) {
+  		value = this[key] || this.org[key];
   	}
 
   	this['loading_' + key] = true;

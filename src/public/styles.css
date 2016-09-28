@@ -97,6 +97,15 @@ button i {
   background: #4ae7ce;
 }
 
+.featured-org .donate-button {
+  position: absolute;
+  right: 3em;
+  top: 50%;
+  width: 16em;
+  margin-top: -1.3em;
+  font-size: 1em;
+}
+
 /* Layout */
 main {
 	padding-top: 6em;
@@ -223,12 +232,16 @@ section section {
 .org .stars-preview {
   position: absolute;
   z-index: 100;
-  bottom: 3.2em;
-  right: 3em;
+  bottom: 1.3em;
+  right: 1.5em;
   opacity: 0.8;
 
   font-size: 0.66em;
   font-weight: lighter;
+}
+
+.featured-org .stars-preview {
+  display: none;
 }
 
 .org.selected .preview {
@@ -258,9 +271,58 @@ section section {
   padding: 1em 0;
 }
 
+/* Featured orgs in browse */
+
+.featured-orgs {
+
+}
+
+.tab-label {
+  font-size: 0.8em;
+  position: absolute;
+    z-index: 101;
+    top: 0;
+    left: 0;
+  padding: 0.7em 1.3em;
+  background: #333;
+  border-radius: 2px;
+}
+
+.featured-orgs-inner {
+  position: relative;
+  padding-bottom: 10em;
+}
+
+.featured-org {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+
+  -webkit-transition: all 0.8s ease-out;
+  transition: all 0.8s ease-out;
+}
+
+.featured-org.hidden {
+  opacity: 0;
+  z-index: 99;
+}
+
+.featured-org .header-inner {
+  padding: 2.6em 1.5em;
+}
+
+
+
+/* Posts */
+
 .browse-posts {
   padding-right: 0;
 }
+
+
+/* Footer */
 
 footer {
   background: #ffffff;

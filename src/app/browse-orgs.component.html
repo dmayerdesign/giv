@@ -1,20 +1,38 @@
+<div class="featured-orgs col-md-12">
+	<button (click)="cycleFeatured(1)">+</button>
+	<button (click)="cycleFeatured(-1)">-</button>
+	<div class="featured-orgs-inner row">
+		<h4 class="tab-label">Featured</h4>
+		<section class="org featured-org single-item"
+				#singleItem
+				*ngFor="let org of featuredOrgs"
+				[ngClass]="{'hidden': !org.showing}">
+
+			<header
+					[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}">
+				<div class="header-inner" [ngClass]="{'has-cover-image': org.coverImage}">
+					<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
+					<div class="org-avatar"></div>
+
+					<h4>
+						<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+						<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+					</h4>
+					<p class="info">
+						<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
+						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+						&nbsp;{{org.stars}} people starred this
+					</p>
+					<p class="info inside-org preview">Hello lorem ipsum dolor sit amet {{org.description}}</p>
+
+					<button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
+				</div>
+			</header>
+		</section>
+	</div>
+</div>
+
 <div class="col-md-7 browse-orgs" *ngIf="!isLoading">
-<!-- 	<h2>Featured Organizations</h2>
-	<div class="single-item row"
-			*ngFor="let org of featuredOrgs"
-			(click)="viewFeaturedOrg(org._id)"
-			(clickOutside)="deselectFeaturedOrg($event, org._id)">
-		<h5>{{org.name}}</h5>
-		<p>{{org.stars}}</p>
-
-		<div class="org-expanded" *ngIf="viewingFeaturedOrg && org._id === selectedFeaturedOrg._id">
-			<org-details (update)="sendInfoMsg($event.body, $event.type)" [org]="selectedFeaturedOrg"></org-details>
-			<a *ngIf="org.slug" href="/organization/{{org.slug}}">View Org Page</a>
-			<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">View Org Page</a>
-			<org-posts [org]="selectedFeaturedOrg" [isBrowsing]="true"></org-posts>
-		</div>
-	</div> -->
-
 	<header class="row col-md-12">
 		<div class="row">
 			<h2>Organizations</h2>
@@ -56,6 +74,9 @@
 				No orgs to show. Try broadening your search.
 		</section>
 
+<!--**********
+		Orgs Loop
+		**********-->
 		<section class="org single-item row"
 				#singleItem
 				*ngFor="let org of orgs"

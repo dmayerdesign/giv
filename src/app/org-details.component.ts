@@ -8,7 +8,7 @@ import { UIHelper, Utilities } from './services/app.service';
 	template: `
 			<div class="org-details item-details">
 				<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>
-				<button class="donate-button">Donate</button>
+				<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
 				<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a href="#">{{category.name}}</a>&nbsp;</span></p>
 			</div>`,
 	providers: [OrgService, UIHelper, Utilities]

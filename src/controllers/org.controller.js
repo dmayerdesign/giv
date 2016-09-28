@@ -216,6 +216,7 @@ exports.routes = [
 let editableInOrg = [
   "coverImage",
   "donateLink",
+  "donateLinkCopy",
   "slug",
   "name",
   "description",
@@ -237,7 +238,7 @@ function editOrg(key) {
       updateQuery.$set[key] = req.body.value;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
         if(err) {
-          res.json(err);
+          res.json({errmsg: err});
           console.log(err);
         }
         console.log(org);

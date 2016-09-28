@@ -13,7 +13,7 @@ import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { Categories } from './services/categories.service';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Rx';
 
 @Component({
 	selector: 'orgs-list',
@@ -27,12 +27,11 @@ import { Observable } from 'rxjs';
 export class BrowseOrgsComponent implements OnInit {
 	@ViewChildren('singleItem') $orgs = [];
 	@Output() selectedOrg:any = null;
-	@Output() selectedFeaturedOrg:any = null;
 	@Output() user;
 
 	private orgs = [];
 	private featuredOrgs = [];
-	private starredOrgs = [];
+	private featuredShowing:number = Math.floor(Math.random() * 5);
 	private orgsLoaded:number = 20;
 	private orgsShowing:number;
 	private orgsSorting = {order: "-name"};
@@ -62,6 +61,8 @@ export class BrowseOrgsComponent implements OnInit {
 				private flash:FlashMessagesService,
 				private userService:UserService,
 				private categories:Categories) {
+
+
 	}
 
 	ngOnInit() {
@@ -113,13 +114,14 @@ export class BrowseOrgsComponent implements OnInit {
 			error => console.log(error)
 		);
 
-		// this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
-		// 	data => {
-		// 		this.isLoadingFeatured = false;
-		// 		this.featuredOrgs = data;
-		// 	},
-		// 	error => console.log(error)
-		// );
+		this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
+			data => {
+				this.isLoadingFeatured = false;
+				this.featuredOrgs = data;
+				this.featuredOrgs[this.featuredShowing]['showing'] = true;
+			},
+			error => console.log(error)
+		);
 	}
 
 	ngOnDestroy() {
@@ -248,7 +250,6 @@ export class BrowseOrgsComponent implements OnInit {
 		let findOrg = function(org) {
 			return org._id === id;
 		}
-		this.selectedFeaturedOrg = this.orgs.find(findOrg);
 		this.viewingFeaturedOrg = true;
 	}
 
@@ -262,13 +263,6 @@ export class BrowseOrgsComponent implements OnInit {
 			this.viewingOrg = false;
 			this.singleDetailsAreLoaded = false;
 			this.singlePostsAreLoaded = false;
-		}
-	}
-
-	deselectFeaturedOrg(e:Event, id:string):void {
-		if (this.viewingFeaturedOrg && this.selectedFeaturedOrg._id === id) {
-			this.selectedFeaturedOrg = null;
-			this.viewingFeaturedOrg = false;
 		}
 	}
 
@@ -313,6 +307,19 @@ export class BrowseOrgsComponent implements OnInit {
 		if (event == "init") {
 			this.singlePostsAreLoaded = true;
 		}
+	}
+
+	cycleFeatured(inc:number) {
+		this.featuredOrgs[this.featuredShowing]['showing'] = false;
+		this.featuredShowing += inc;
+
+		if (this.featuredShowing === -1) {
+			this.featuredShowing = 5;
+		}
+		if (this.featuredShowing === 6) {
+			this.featuredShowing = 0;
+		}
+		this.featuredOrgs[this.featuredShowing]['showing'] = true;
 	}
 
 }
