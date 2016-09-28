@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Input, Output, ViewChildren } from '@angular/core';
+import { Component, OnInit, AfterViewInit, AfterContentInit, OnDestroy, Input, Output, ViewChildren, EventEmitter } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrgService } from './services/org.service';
@@ -19,13 +19,13 @@ export class OrgPostsComponent {
 	@Input() org;
 	@Input() user;
 	@Input() isBrowsing:boolean;
+	@Output() update = new EventEmitter();
 	@ViewChildren('singlePost') $posts = [];
 
 	private posts:Array<any> = [];
 	private postsShowing:number;
 	private selectedPost:any = null;
 	private viewingOne:boolean = false;
-	//private isPermalink:boolean = false;
 	public postId:Observable<string>;
 	private querySub:Subscription;
 
@@ -36,7 +36,6 @@ export class OrgPostsComponent {
 	private isLoading = true;
 	private loadingPosts:boolean = false;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
-
 
 	constructor(
 				private router: Router,
@@ -50,6 +49,10 @@ export class OrgPostsComponent {
 	ngAfterViewInit() {
 		this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
 		this.loadPosts();
+	}
+
+	ngAfterContentInit() {
+		this.update.emit("init");
 	}
 
 	ngOnDestroy() {

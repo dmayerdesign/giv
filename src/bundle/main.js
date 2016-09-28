@@ -65286,13 +65286,15 @@
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
+	        this.orgExpanded = false;
 	        this.viewingFeaturedOrg = false;
 	        this.categoryFilter = { id: null };
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
 	        this.loadingOrgSearch = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
-	        this.infoMsg = new app_service_1.InfoMessage();
+	        this.singleDetailsAreLoaded = false;
+	        this.singlePostsAreLoaded = false;
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -65351,13 +65353,6 @@
 	    };
 	    BrowseOrgsComponent.prototype.takeCount = function (children) {
 	        this.orgsShowing = this.helper.takeCount(children);
-	    };
-	    BrowseOrgsComponent.prototype.sendInfoMsg = function (body, type, time) {
-	        var _this = this;
-	        if (time === void 0) { time = 3000; }
-	        this.infoMsg.body = body;
-	        this.infoMsg.type = type;
-	        window.setTimeout(function () { return _this.infoMsg.body = ""; }, time);
 	    };
 	    BrowseOrgsComponent.prototype.toggleOrder = function (attr) {
 	        if (this.orgsSorting.order.indexOf(attr) === -1) {
@@ -65471,6 +65466,8 @@
 	            console.log(this.selectedOrg);
 	            this.selectedOrg = null;
 	            this.viewingOrg = false;
+	            this.singleDetailsAreLoaded = false;
+	            this.singlePostsAreLoaded = false;
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.deselectFeaturedOrg = function (e, id) {
@@ -65506,6 +65503,16 @@
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
+	    };
+	    BrowseOrgsComponent.prototype.revealOrgDetails = function (event) {
+	        if (event == "init") {
+	            this.singleDetailsAreLoaded = true;
+	        }
+	    };
+	    BrowseOrgsComponent.prototype.revealOrgPosts = function (event) {
+	        if (event == "init") {
+	            this.singlePostsAreLoaded = true;
+	        }
 	    };
 	    __decorate([
 	        core_1.ViewChildren('singleItem'), 
@@ -65701,9 +65708,16 @@
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
+	        this.update = new core_1.EventEmitter();
 	        this.coverImageLinkBroken = false;
 	    }
 	    OrgDetailsComponent.prototype.ngOnInit = function () {
+	    };
+	    OrgDetailsComponent.prototype.ngAfterContentInit = function () {
+	        this.update.emit("init");
+	    };
+	    OrgDetailsComponent.prototype.ngOnDestroy = function () {
+	        this.update.emit("destroy");
 	    };
 	    OrgDetailsComponent.prototype.badLink = function ($event) {
 	        this.coverImageLinkBroken = true;
@@ -65729,6 +65743,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgDetailsComponent.prototype, "isSingle", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgDetailsComponent.prototype, "update", void 0);
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
@@ -65771,6 +65789,7 @@
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
+	        this.update = new core_1.EventEmitter();
 	        this.$posts = [];
 	        this.posts = [];
 	        this.selectedPost = null;
@@ -65783,6 +65802,9 @@
 	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
 	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
 	        this.loadPosts();
+	    };
+	    OrgPostsComponent.prototype.ngAfterContentInit = function () {
+	        this.update.emit("init");
 	    };
 	    OrgPostsComponent.prototype.ngOnDestroy = function () {
 	        if (this.querySub)
@@ -65896,6 +65918,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Boolean)
 	    ], OrgPostsComponent.prototype, "isBrowsing", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgPostsComponent.prototype, "update", void 0);
 	    __decorate([
 	        core_1.ViewChildren('singlePost'), 
 	        __metadata('design:type', Object)

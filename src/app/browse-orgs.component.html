@@ -93,9 +93,9 @@
 				<img src="app/images/x.svg" width="16" height="16" alt="exit">
 			</span>
 
-			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id">
-				<org-details (update)="sendInfoMsg($event.body, $event.type)" [org]="selectedOrg"></org-details>
-				<org-posts [org]="selectedOrg" [isBrowsing]="true"></org-posts>
+			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
+				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
+				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
 				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Read more</a>
 				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Read more</a>
 			</div>

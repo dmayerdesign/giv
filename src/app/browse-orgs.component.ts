@@ -13,6 +13,7 @@ import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { Categories } from './services/categories.service';
+import { Observable } from 'rxjs';
 
 @Component({
 	selector: 'orgs-list',
@@ -38,6 +39,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
 	private viewingOrg:boolean = false;
+	private orgExpanded:boolean = false;
 	private viewingFeaturedOrg:boolean = false;
 	private categoriesList:any;
 	private categoryFilter:any = {id: null};
@@ -48,7 +50,8 @@ export class BrowseOrgsComponent implements OnInit {
 	private paramsSub:Subscription;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
-	private infoMsg = new InfoMessage();
+	private singleDetailsAreLoaded:boolean = false;
+	private singlePostsAreLoaded:boolean = false;
 
 	constructor(
 				private http:Http,
@@ -129,12 +132,6 @@ export class BrowseOrgsComponent implements OnInit {
 
 	takeCount(children:any) {
 		this.orgsShowing = this.helper.takeCount(children);
-	}
-
-	sendInfoMsg(body, type, time = 3000) {
-		this.infoMsg.body = body;
-		this.infoMsg.type = type;
-		window.setTimeout(() => this.infoMsg.body = "", time);
 	}
 
 	toggleOrder(attr) {
@@ -263,6 +260,8 @@ export class BrowseOrgsComponent implements OnInit {
 			console.log(this.selectedOrg);
 			this.selectedOrg = null;
 			this.viewingOrg = false;
+			this.singleDetailsAreLoaded = false;
+			this.singlePostsAreLoaded = false;
 		}
 	}
 
@@ -302,6 +301,18 @@ export class BrowseOrgsComponent implements OnInit {
 				console.log(data.user);
 			}
 		);
+	}
+
+	revealOrgDetails(event) {
+		if (event == "init") {
+			this.singleDetailsAreLoaded = true;
+		}
+	}
+
+	revealOrgPosts(event) {
+		if (event == "init") {
+			this.singlePostsAreLoaded = true;
+		}
 	}
 
 }

@@ -242,7 +242,15 @@ section section {
 }
 
 .org-expanded {
+  opacity: 0;
   padding: 0 1.5em;
+
+  -webkit-transition: opacity 1s ease-out;
+  transition: opacity 1s ease-out;
+}
+
+.org-expanded.expanded {
+  opacity: 1;
 }
 
 .org .posts-by-org,

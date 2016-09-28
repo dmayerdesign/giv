@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterContentInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
@@ -17,6 +17,7 @@ import { UIHelper, Utilities } from './services/app.service';
 export class OrgDetailsComponent implements OnInit {
 	@Input() org;
 	@Input() isSingle;
+	@Output() update = new EventEmitter();
 	private coverImageLinkBroken:boolean = false;
 
 	constructor(
@@ -27,6 +28,14 @@ export class OrgDetailsComponent implements OnInit {
 
 	ngOnInit() {
 		
+	}
+
+	ngAfterContentInit() {
+		this.update.emit("init");
+	}
+
+	ngOnDestroy() {
+		this.update.emit("destroy");
 	}
 
 	badLink($event) {
