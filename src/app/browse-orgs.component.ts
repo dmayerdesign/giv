@@ -31,7 +31,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	private orgs = [];
 	private featuredOrgs = [];
-	private featuredShowing:number = Math.floor(Math.random() * 5);
+	private featuredShowing:number;
 	private orgsLoaded:number = 20;
 	private orgsShowing:number;
 	private orgsSorting = {order: "-name"};
@@ -118,6 +118,7 @@ export class BrowseOrgsComponent implements OnInit {
 			data => {
 				this.isLoadingFeatured = false;
 				this.featuredOrgs = data;
+				this.featuredShowing = Math.floor(Math.random() * (this.featuredOrgs.length - 1));
 				this.featuredOrgs[this.featuredShowing]['showing'] = true;
 			},
 			error => console.log(error)
@@ -314,9 +315,9 @@ export class BrowseOrgsComponent implements OnInit {
 		this.featuredShowing += inc;
 
 		if (this.featuredShowing === -1) {
-			this.featuredShowing = 5;
+			this.featuredShowing = (this.featuredOrgs.length - 1);
 		}
-		if (this.featuredShowing === 6) {
+		if (this.featuredShowing === this.featuredOrgs.length) {
 			this.featuredShowing = 0;
 		}
 		this.featuredOrgs[this.featuredShowing]['showing'] = true;

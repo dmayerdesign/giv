@@ -65283,7 +65283,6 @@
 	        this.selectedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
-	        this.featuredShowing = Math.floor(Math.random() * 5);
 	        this.orgsLoaded = 20;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
@@ -65342,6 +65341,7 @@
 	        this.orgService.loadOrgs({ limit: 6, filterField: "featured", filterValue: "true" }).subscribe(function (data) {
 	            _this.isLoadingFeatured = false;
 	            _this.featuredOrgs = data;
+	            _this.featuredShowing = Math.floor(Math.random() * (_this.featuredOrgs.length - 1));
 	            _this.featuredOrgs[_this.featuredShowing]['showing'] = true;
 	        }, function (error) { return console.log(error); });
 	    };
@@ -65511,9 +65511,9 @@
 	        this.featuredOrgs[this.featuredShowing]['showing'] = false;
 	        this.featuredShowing += inc;
 	        if (this.featuredShowing === -1) {
-	            this.featuredShowing = 5;
+	            this.featuredShowing = (this.featuredOrgs.length - 1);
 	        }
-	        if (this.featuredShowing === 6) {
+	        if (this.featuredShowing === this.featuredOrgs.length) {
 	            this.featuredShowing = 0;
 	        }
 	        this.featuredOrgs[this.featuredShowing]['showing'] = true;
