@@ -19,6 +19,7 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 				<org-posts [org]="org" [user]="user"></org-posts>
 
 			</div>`,
+	styleUrls: [ 'app/org.styles.css' ],
 	providers: [OrgService, UIHelper, Utilities],
 	directives: [ROUTER_DIRECTIVES]
 })

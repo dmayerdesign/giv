@@ -2,7 +2,6 @@ import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core'
 
 @Component({
 	selector: 'search-box',
-	styleUrls: ['app/search-box.component.css'],
 	template: `
 		<div class="search-box">
 			<input type="text"
@@ -11,7 +10,8 @@ import {Component, Input, Output, EventEmitter, ElementRef} from '@angular/core'
 					(focus)="focusChange.emit('focus')"
 					(blur)="focusChange.emit('blur')"
 					placeholder='Search {{collection}}'>
-		</div>`
+		</div>`,
+	styleUrls: ['app/search-box.component.css']
 })
 export class SearchBox {
 	@Output() update = new EventEmitter();

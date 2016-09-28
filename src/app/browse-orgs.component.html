@@ -1,7 +1,11 @@
 <div class="featured-orgs col-md-12">
-	<button (click)="cycleFeatured(1)">+</button>
-	<button (click)="cycleFeatured(-1)">-</button>
 	<div class="featured-orgs-inner row">
+
+		<div class="featured-carousel-nav">
+			<i class="fa fa-angle-left" (click)="cycleFeatured(-1)"></i>
+			<i class="fa fa-angle-right" (click)="cycleFeatured(1)"></i>
+		</div>
+
 		<h4 class="tab-label">Featured</h4>
 		<section class="org featured-org single-item"
 				#singleItem
@@ -23,7 +27,7 @@
 						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
 						&nbsp;{{org.stars}} people starred this
 					</p>
-					<p class="info inside-org preview">Hello lorem ipsum dolor sit amet {{org.description}}</p>
+					<p class="description info inside-org preview">Hello lorem ipsum dolor sit amet {{org.description}}</p>
 
 					<button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
 				</div>
@@ -67,8 +71,8 @@
 	</header>
 
 	<div class="row items-list orgs-list col-md-12"
-			*ngIf="!isEditing">
-			<!-- [ngClass]="{'loading-orgs': loadingOrgSearch}"> -->
+			*ngIf="!isEditing"
+			[ngClass]="{'loading-orgs': loadingOrgSearch, 'loading-more-orgs': loadingShowMoreOrgs}">
 
 		<section class="null-search" *ngIf="orgs.length === 0">
 				No orgs to show. Try broadening your search.
@@ -129,7 +133,9 @@
 	</div>
 
 	<!-- LOADING -->
-	<div class="loader loading-org-search" *ngIf="loadingOrgSearch">
+	<div class="loader loading-org-search"
+			[ngClass]="{'org-search-loader': loadingOrgSearch, 'show-more-loader': loadingShowMoreOrgs}"
+			*ngIf="loadingOrgSearch || loadingShowMoreOrgs">
 	  <div class="loader__figure"></div>
 	</div>
 </div>

@@ -1,0 +1,19 @@
+.search-box input {
+	display: block;
+	width: 100%;
+	padding: 0.4em 7.1em 0.28em 2.15em;
+	font-size: 1.5rem;
+	font-weight: 300;
+  color: #999194;
+
+  background: url('app/images/search-icon-2x.png') no-repeat 0.8em 50%;
+  background-size: 0.8em 0.8em;
+}
+
+input,
+search-box input:focus {
+	outline: none !important;
+	border: 0 none;
+	background-color: transparent;
+	box-shadow: none !important;
+}

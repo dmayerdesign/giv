@@ -16,9 +16,9 @@ import { Categories } from './services/categories.service';
 import { Observable } from 'rxjs/Rx';
 
 @Component({
-	selector: 'orgs-list',
+	selector: 'browse-orgs',
 	templateUrl: 'app/browse-orgs.component.html',
-	styleUrls: [ 'app/browse-orgs.component.css' ],
+	styleUrls: [ 'app/org.styles.css', 'app/browse-orgs.component.css' ],
 	providers: [OrgService, UIHelper, Utilities],
 	directives: [SearchBox, OrgDetailsComponent, OrgPostsComponent],
 	pipes: []
@@ -46,6 +46,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private isLoading = true;
 	private isLoadingFeatured = true;
 	private loadingOrgSearch = false;
+	private loadingShowMoreOrgs = false;
 	private paramsSub:Subscription;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
@@ -181,7 +182,8 @@ export class BrowseOrgsComponent implements OnInit {
 
 	clearOrgSearch() {
 		this.searchOrgs('');
-		document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
+		let searchInput = <HTMLInputElement>document.querySelector(".org-search-box input");
+		searchInput.value = "";
 	}
 
 	getCategoryById(id) {
@@ -216,11 +218,11 @@ export class BrowseOrgsComponent implements OnInit {
 			query['filterField'] = "categories.id";
 			query['filterValue'] = this.categoryFilter.id;
 		}
-		this.loadingOrgSearch = true;
+		this.loadingShowMoreOrgs = true;
 
 		this.orgService.loadOrgs(query).subscribe(
 			res => {
-				this.loadingOrgSearch = false;
+				this.loadingShowMoreOrgs = false;
 				console.log(res);
 				this.orgs = this.orgs.concat(res);
 				this.takeCount(this.$orgs);

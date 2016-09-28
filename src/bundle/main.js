@@ -64629,7 +64629,8 @@
 	    AppComponent = __decorate([
 	        core_1.Component({
 	            selector: 'app',
-	            templateUrl: 'app/app.component.html'
+	            templateUrl: 'app/app.component.html',
+	            styleUrls: ['app/app.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, user_service_1.UserService, angular2_flash_messages_1.FlashMessagesService, core_1.NgZone, router_1.Router, router_1.ActivatedRoute])
 	    ], AppComponent);
@@ -65293,6 +65294,7 @@
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
 	        this.loadingOrgSearch = false;
+	        this.loadingShowMoreOrgs = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	        this.singleDetailsAreLoaded = false;
 	        this.singlePostsAreLoaded = false;
@@ -65393,7 +65395,8 @@
 	    };
 	    BrowseOrgsComponent.prototype.clearOrgSearch = function () {
 	        this.searchOrgs('');
-	        document.querySelector(".org-search-box input").value = ""; // if there's a TypeScript validation error here, ignore it
+	        var searchInput = document.querySelector(".org-search-box input");
+	        searchInput.value = "";
 	    };
 	    BrowseOrgsComponent.prototype.getCategoryById = function (id) {
 	        return this.categoriesList.find(function (category) {
@@ -65427,9 +65430,9 @@
 	            query['filterField'] = "categories.id";
 	            query['filterValue'] = this.categoryFilter.id;
 	        }
-	        this.loadingOrgSearch = true;
+	        this.loadingShowMoreOrgs = true;
 	        this.orgService.loadOrgs(query).subscribe(function (res) {
-	            _this.loadingOrgSearch = false;
+	            _this.loadingShowMoreOrgs = false;
 	            console.log(res);
 	            _this.orgs = _this.orgs.concat(res);
 	            _this.takeCount(_this.$orgs);
@@ -65532,9 +65535,9 @@
 	    ], BrowseOrgsComponent.prototype, "user", void 0);
 	    BrowseOrgsComponent = __decorate([
 	        core_1.Component({
-	            selector: 'orgs-list',
+	            selector: 'browse-orgs',
 	            templateUrl: 'app/browse-orgs.component.html',
-	            styleUrls: ['app/browse-orgs.component.css'],
+	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [search_box_component_1.SearchBox, org_details_component_1.OrgDetailsComponent, org_posts_component_1.OrgPostsComponent],
 	            pipes: []
@@ -65674,8 +65677,8 @@
 	    SearchBox = __decorate([
 	        core_1.Component({
 	            selector: 'search-box',
-	            styleUrls: ['app/search-box.component.css'],
-	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>"
+	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>",
+	            styleUrls: ['app/search-box.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [core_1.ElementRef])
 	    ], SearchBox);
@@ -66081,6 +66084,7 @@
 	        core_1.Component({
 	            selector: 'single-org',
 	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\" [isSingle]=\"true\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\" [user]=\"user\"></org-posts>\n\n\t\t\t</div>",
+	            styleUrls: ['app/org.styles.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
