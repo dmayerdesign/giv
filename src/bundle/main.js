@@ -66065,6 +66065,12 @@
 	                    _this.org = data;
 	                    _this.isLoaded = true;
 	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
+	                    if (_this.org.videoLink) {
+	                        var matchId = _this.org.videoLink.match(/(embed)\/(.*)/);
+	                        if (matchId) {
+	                            _this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg';
+	                        }
+	                    }
 	                }, function (error) {
 	                    console.error(error);
 	                    _this.flash.show("This page doesn't exist");
@@ -66271,6 +66277,16 @@
 	        else {
 	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
 	        }
+	    };
+	    ManageOrgPageComponent.prototype.deleteOrg = function (id) {
+	        var _this = this;
+	        var orgId = id || this.org._id;
+	        this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data && data.success) {
+	                _this.router.navigate(['']);
+	                return _this.flash.show("Org was deleted");
+	            }
+	        });
 	    };
 	    __decorate([
 	        core_1.Input(), 

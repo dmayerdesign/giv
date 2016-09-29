@@ -25,6 +25,7 @@ export class SingleOrgComponent implements OnInit {
 	private isLoaded:boolean = false;
   private videoLink:any;
   private videoIsExpanded:boolean;
+  private videoBg:string;
 
 	constructor(
 				private router: Router,
@@ -56,6 +57,10 @@ export class SingleOrgComponent implements OnInit {
 						this.isLoaded = true;
 
 						this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
+						if (this.org.videoLink) {
+							let matchId = this.org.videoLink.match(/(embed)\/(.*)/);
+							if (matchId) { this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg'; }
+						}
 					},
 					error => {
 						console.error(error);

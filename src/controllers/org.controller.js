@@ -136,7 +136,7 @@ exports.routes = [
     process: function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
         if(err) return console.error(err);
-        res.sendStatus(200);
+        res.status(200).json({success: true});
       });
     }
   },

@@ -1,9 +1,16 @@
-<div *ngIf="org?.videoLink" class="featured-video" [ngClass]="{'expanded': videoIsExpanded}">
-	<iframe frameborder="0" height="100%" width="100%" 
-	  [src]="videoLink">
-	</iframe>
-	<button *ngIf="!videoIsExpanded" (click)="expandVideo()">Expand the video</button>
-	<button *ngIf="videoIsExpanded" (click)="minimizeVideo()">Minimize the video</button>
+<div class="video-container clearfix">
+	<div *ngIf="org?.videoLink"
+			class="featured-video"
+			[ngClass]="{'expanded': videoIsExpanded}"
+			[ngStyle]="{'background-image': 'url(' + videoBg + ')'}">
+		<iframe frameborder="0" height="100%" width="100%" 
+		  [src]="videoLink">
+		</iframe>
+	</div>
+	<div class="expand-video">
+		<button *ngIf="!videoIsExpanded" (click)="expandVideo()"><i class="fa fa-play"></i> Play the video</button>
+		<button *ngIf="videoIsExpanded" (click)="minimizeVideo()">Minimize the video</button>
+	</div>
 </div>
 <div *ngIf="!org?.videoLink && org?.coverImage"
 	class="cover-image"

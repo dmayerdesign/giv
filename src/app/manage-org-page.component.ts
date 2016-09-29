@@ -190,4 +190,14 @@ export class ManageOrgPageComponent implements OnInit {
 	  }
   }
 
+  deleteOrg(id) {
+  	let orgId = id || this.org._id;
+  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
+  		if (data && data.success) {
+  			this.router.navigate(['']);
+  			return this.flash.show("Org was deleted");
+  		}
+  	});
+  }
+
 }

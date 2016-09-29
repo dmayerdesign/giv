@@ -111,12 +111,3 @@ header .description.preview {
 .donate-button:hover {
   background: #4ae7ce;
 }
-
-.featured-org .donate-button {
-  position: absolute;
-  right: 3em;
-  top: 50%;
-  width: 16em;
-  margin-top: -1.3em;
-  font-size: 1em;
-}

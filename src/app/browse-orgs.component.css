@@ -73,7 +73,7 @@
 
 .featured-orgs-inner {
   position: relative;
-  height: 10.84em;
+  height: 12.84em;
   overflow: hidden;
 }
 
@@ -96,7 +96,7 @@
 
 .featured-org .header-inner {
   padding: 3.2em 1.5em 3em !important;
-  height: 11em;
+  height: 13em;
 }
 
 .featured-org .stars-preview {
@@ -128,4 +128,34 @@
 
 .featured-carousel-nav i:first-child {
   margin-right: 4.4em;
+}
+
+.featured-org .description {
+  display: inline-block;
+  width: 60%;
+  height: 4.4em;
+  overflow: hidden;
+}
+
+.featured-org .donate-button {
+  position: absolute;
+  right: 3em;
+  top: 50%;
+  width: 16em;
+  margin-top: -1.3em;
+  font-size: 1em;
+}
+
+@media screen and (max-width: 991px) {
+  .featured-org .header-inner > *:not(button):not(img) {
+    width: 60%;
+  }
+
+  .featured-org .donate-button {
+    width: 26%;
+  }
+
+  .featured-org .description {
+    height: 3em;
+  }
 }

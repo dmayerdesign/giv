@@ -5,7 +5,7 @@
       <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
         <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
       </li>
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+      <li *ngIf="isLoggedIn" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
         <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
       </li>
     </ul>

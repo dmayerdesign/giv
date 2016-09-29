@@ -6,20 +6,46 @@
 
 }
 
+.video-container {
+	position: relative;
+	overflow: hidden;
+}
+
 .featured-video, .cover-image {
 	width: 100%;
 	height: 18em;
 	position: relative;
 		z-index: -1;
-}
 
-.featured-video.expanded {
-	height: 30em;
-}
-
-.cover-image {
+	background-color: transparent;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	background-size: 100% 100%;
 	background-size: cover;
+}
+
+.featured-video {
+	filter: blur(4px);
+}
+
+.featured-video iframe {
+	opacity: 0;
+}
+
+.featured-video.expanded {
+	height: 30em;
+	z-index: 102;
+	filter: blur(0px);
+}
+
+.featured-video.expanded iframe {
+	opacity: 1;
+}
+
+.expand-video {
+	float: right;
+	position: absolute;
+		bottom: 0;
+		right: 0;
+	z-index: 103;
 }
