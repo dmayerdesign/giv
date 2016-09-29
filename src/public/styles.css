@@ -4,7 +4,7 @@
 
 body {
   font-family: Helvetica, 'Roboto', Arial, sans-serif;
-  margin-top: 15px;
+  margin: 0;
   background: #fcfeff;
   color: #999194;
 }
@@ -96,28 +96,9 @@ button i {
   padding-right: 0.6em;
 }
 
-.donate-button {
-  font-size: 1.3em;
-  width: 100%;
-  background: linear-gradient(20deg, #53E4ED, #4fead1);
-}
-
-.donate-button:hover {
-  background: #4ae7ce;
-}
-
-.featured-org .donate-button {
-  position: absolute;
-  right: 3em;
-  top: 50%;
-  width: 16em;
-  margin-top: -1.3em;
-  font-size: 1em;
-}
-
 /* Layout */
 main {
-	padding-top: 5em;
+	padding-top: 4.8em;
 }
 
 @media only screen and (min-width: 1200px) {
@@ -134,6 +115,11 @@ section section {
   background: #fff;
 }
 
+
+browse-orgs {
+  float: left;
+  margin-top: 1em;
+}
 
 
 /* Posts */

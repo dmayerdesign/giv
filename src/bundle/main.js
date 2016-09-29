@@ -65270,6 +65270,7 @@
 	var org_details_component_1 = __webpack_require__(479);
 	var org_posts_component_1 = __webpack_require__(480);
 	var categories_service_1 = __webpack_require__(482);
+	var truncate_pipe_1 = __webpack_require__(481);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, helper, utilities, route, flash, userService, categories) {
 	        this.http = http;
@@ -65540,7 +65541,7 @@
 	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [search_box_component_1.SearchBox, org_details_component_1.OrgDetailsComponent, org_posts_component_1.OrgPostsComponent],
-	            pipes: []
+	            pipes: [truncate_pipe_1.TruncatePipe]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, angular2_flash_messages_1.FlashMessagesService, user_service_1.UserService, categories_service_1.Categories])
 	    ], BrowseOrgsComponent);
@@ -65753,7 +65754,8 @@
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>\n\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a href=\"#\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>{{org.description}}</p>\n\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a [routerLink]=\"['', 'category', category.id]\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
+	            styleUrls: ['app/org.styles.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
@@ -65959,9 +65961,9 @@
 	var TruncatePipe = (function () {
 	    function TruncatePipe() {
 	    }
-	    TruncatePipe.prototype.transform = function (value, args) {
-	        var limit = (args.length > 0) ? parseInt(args[0], 10) : 100;
-	        var trail = (args.length > 1) ? args[1] : '...';
+	    TruncatePipe.prototype.transform = function (value, arg1, arg2) {
+	        var limit = arg1 ? parseInt(arg1, 10) : 200;
+	        var trail = arg2 || '...';
 	        return value.length > limit ? value.substring(0, limit) + trail : value;
 	    };
 	    TruncatePipe = __decorate([
@@ -66028,12 +66030,13 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
+	var platform_browser_1 = __webpack_require__(201);
 	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
-	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash) {
+	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash, sanitizer) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -66042,6 +66045,7 @@
 	        this.utilities = utilities;
 	        this.zone = zone;
 	        this.flash = flash;
+	        this.sanitizer = sanitizer;
 	        this.isLoaded = false;
 	    }
 	    SingleOrgComponent.prototype.ngOnInit = function () {
@@ -66060,6 +66064,7 @@
 	                    }
 	                    _this.org = data;
 	                    _this.isLoaded = true;
+	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
 	                }, function (error) {
 	                    console.error(error);
 	                    _this.flash.show("This page doesn't exist");
@@ -66076,6 +66081,12 @@
 	    SingleOrgComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
 	    };
+	    SingleOrgComponent.prototype.expandVideo = function () {
+	        this.videoIsExpanded = true;
+	    };
+	    SingleOrgComponent.prototype.minimizeVideo = function () {
+	        this.videoIsExpanded = false;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -66083,12 +66094,12 @@
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'single-org',
-	            template: "\n\t\t\t<div class=\"single-org\" *ngIf=\"isLoaded\">\n\t\t\t\t<h4>{{org.name}}</h4>\n\t\t\t\t<org-details [org]=\"org\" [isSingle]=\"true\"></org-details>\n\t\t\t\t\t\t\t\t\n\t\t\t\t<a *ngIf=\"user && user.permissions.indexOf(org.globalPermission) > -1\" href=\"/organization/manage/{{org?._id}}\">Manage</a>\n\n\t\t\t\t<org-posts [org]=\"org\" [user]=\"user\"></org-posts>\n\n\t\t\t</div>",
-	            styleUrls: ['app/org.styles.css'],
+	            templateUrl: 'app/single-org.component.html',
+	            styleUrls: ['app/org.styles.css', 'app/single-org.component.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, platform_browser_1.DomSanitizationService])
 	    ], SingleOrgComponent);
 	    return SingleOrgComponent;
 	}());

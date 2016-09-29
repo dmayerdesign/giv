@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import { DomSanitizationService, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
@@ -9,17 +10,8 @@ import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
 	selector: 'single-org',
-	template: `
-			<div class="single-org" *ngIf="isLoaded">
-				<h4>{{org.name}}</h4>
-				<org-details [org]="org" [isSingle]="true"></org-details>
-								
-				<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
-
-				<org-posts [org]="org" [user]="user"></org-posts>
-
-			</div>`,
-	styleUrls: [ 'app/org.styles.css' ],
+	templateUrl: 'app/single-org.component.html',
+	styleUrls: [ 'app/org.styles.css', 'app/single-org.component.css' ],
 	providers: [OrgService, UIHelper, Utilities],
 	directives: [ROUTER_DIRECTIVES]
 })
@@ -31,6 +23,8 @@ export class SingleOrgComponent implements OnInit {
 	private user;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
+  private videoLink:any;
+  private videoIsExpanded:boolean;
 
 	constructor(
 				private router: Router,
@@ -40,7 +34,8 @@ export class SingleOrgComponent implements OnInit {
 				private helper: UIHelper,
 				private utilities: Utilities,
 				private zone: NgZone,
-				private flash: FlashMessagesService) { }
+				private flash: FlashMessagesService,
+        private sanitizer: DomSanitizationService) { }
 
 	ngOnInit() {
 		if (this.org) {
@@ -59,6 +54,8 @@ export class SingleOrgComponent implements OnInit {
 						}
 						this.org = data;
 						this.isLoaded = true;
+
+						this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
 					},
 					error => {
 						console.error(error);
@@ -77,6 +74,14 @@ export class SingleOrgComponent implements OnInit {
 
 	ngOnDestroy() {
 		this.sub.unsubscribe();
+	}
+
+	expandVideo() {
+		this.videoIsExpanded = true;
+	}
+
+	minimizeVideo() {
+		this.videoIsExpanded = false;
 	}
 
 }

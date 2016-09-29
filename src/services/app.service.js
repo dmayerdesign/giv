@@ -71,7 +71,7 @@ const uploadProfilePic = multer({
 });
 
 module.exports = {
-  applyRoutes: function(app, routes) {
+  addRoutes: function(app, routes) {
     for (let i = 0; i < routes.length; i++) {
       let request = routes[i];
       if (request.middleware) {

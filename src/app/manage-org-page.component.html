@@ -21,26 +21,32 @@
           class="form-control"
           ngControl="name"
           name="name"
-          placeholder="Change the name of your page"><button (click)="editOrg('name', name)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Change the name of your page"><button (click)="editOrg('name')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <input [(ngModel)]="description"
           class="form-control"
           ngControl="description"
           name="description"
-          placeholder="Change the description of your page"><button (click)="editOrg('description', description)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Change the description of your page"><button (click)="editOrg('description')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
   	<input [(ngModel)]="coverImageLink"
   				class="form-control"
   				name="coverImageLink"
-  				placeholder="Change the cover image"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  				placeholder="Change the cover image"><button (click)="editOrg('coverImage')"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="form-block">
+    <input [(ngModel)]="videoLink"
+          class="form-control"
+          name="videoLink"
+          placeholder="Add a link to a youtube video"><button (click)="editOrg('videoLink')"><i [hidden]="!loading_videoLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
   	<input [(ngModel)]="donateLink"
   				class="form-control"
   				name="donateLink"
-  				placeholder="Change the main Donate link"><button (click)="editOrg('donateLink', donateLink)"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  				placeholder="Change the main Donate link"><button (click)="editOrg('donateLink')"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <select

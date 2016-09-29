@@ -4,9 +4,9 @@ import { Pipe } from '@angular/core'
   name: 'truncate'
 })
 export class TruncatePipe {
-  transform(value: string, args: string[]) : string {
-    let limit:number = (args.length > 0) ? parseInt(args[0], 10) : 100;
-    let trail:string = (args.length > 1) ? args[1] : '...';
+  transform(value:string, arg1:any, arg2:any):string {
+    let limit:number = arg1 ? parseInt(arg1, 10) : 200;
+    let trail:string = arg2 || '...';
 
     return value.length > limit ? value.substring(0, limit) + trail : value;
   }

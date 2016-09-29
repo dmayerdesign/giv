@@ -19,6 +19,10 @@
   /*background-image: linear-gradient(rgba(0,0,0,0.3) 30%, transparent 40%, transparent 50%, rgba(0,0,0,0.4) 80%);*/
 }
 
+.orgs-list .org .header-inner.has-cover-image {
+  background-color: rgba(0,0,0,0.5);
+}
+
 .org.selected .header-inner {
   padding: 8em 1.5em 1.2em;
 }
@@ -95,4 +99,24 @@
 
 header .description.preview {
   padding-left: 4.55em;
+}
+
+
+.donate-button {
+  font-size: 1.3em;
+  width: 100%;
+  background: linear-gradient(20deg, #53E4ED, #4fead1);
+}
+
+.donate-button:hover {
+  background: #4ae7ce;
+}
+
+.featured-org .donate-button {
+  position: absolute;
+  right: 3em;
+  top: 50%;
+  width: 16em;
+  margin-top: -1.3em;
+  font-size: 1em;
 }

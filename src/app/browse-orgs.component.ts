@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Subscription } from 'rxjs/Subscription';
 import { FlashMessagesService } from 'angular2-flash-messages';
+import { Observable } from 'rxjs/Rx';
 
 import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
@@ -13,7 +14,7 @@ import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { Categories } from './services/categories.service';
-import { Observable } from 'rxjs/Rx';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @Component({
 	selector: 'browse-orgs',
@@ -21,7 +22,7 @@ import { Observable } from 'rxjs/Rx';
 	styleUrls: [ 'app/org.styles.css', 'app/browse-orgs.component.css' ],
 	providers: [OrgService, UIHelper, Utilities],
 	directives: [SearchBox, OrgDetailsComponent, OrgPostsComponent],
-	pipes: []
+	pipes: [TruncatePipe]
 })
 
 export class BrowseOrgsComponent implements OnInit {

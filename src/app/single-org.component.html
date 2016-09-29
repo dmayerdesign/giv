@@ -1,0 +1,19 @@
+<div *ngIf="org?.videoLink" class="featured-video" [ngClass]="{'expanded': videoIsExpanded}">
+	<iframe frameborder="0" height="100%" width="100%" 
+	  [src]="videoLink">
+	</iframe>
+	<button *ngIf="!videoIsExpanded" (click)="expandVideo()">Expand the video</button>
+	<button *ngIf="videoIsExpanded" (click)="minimizeVideo()">Minimize the video</button>
+</div>
+<div *ngIf="!org?.videoLink && org?.coverImage"
+	class="cover-image"
+	[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"></div>
+<div class="single-org" *ngIf="isLoaded" [ngClass]="{ 'has-video': org?.videoLink }">
+	<h4>{{org.name}}</h4>
+	<org-details [org]="org" [isSingle]="true"></org-details>
+					
+	<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
+
+	<org-posts [org]="org" [user]="user"></org-posts>
+
+</div>

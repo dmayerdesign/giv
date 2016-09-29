@@ -6,6 +6,16 @@ const path = require('path');
 const mongoose = require('mongoose');
 const search = require('../services/search');
 
+/* For testing */
+const words = require('../services/sample-data/words');
+const categories = [
+  { name: "Racial Justice", id: "racial" },
+  { name: "LGBTQIA Justice", id: "lgbtqia" },
+  { name: "Environmental Justice", id: "environmental" },
+  { name: "Reproductive Rights", id: "reproductive" },
+  { name: "Economic Justice", id: "economic" },
+  { name: "Other", id: "other" }
+];
 
 const Org = require('../models/Org');
 
@@ -222,7 +232,8 @@ let editableInOrg = [
   "description",
   "verified",
   "featured",
-  "categories"
+  "categories",
+  "videoLink"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.routes.push(editOrg(editableInOrg[i]));
@@ -248,27 +259,53 @@ function editOrg(key) {
   }
 }
 
+
 exports.sample = function(next) {
   let newOrg = new Org({
-    "name": makeid(),
-    "slug": makeid(),
-    "email": makeid(),
+    "name": make('name'),
+    "description": make('desc'),
+    "categories": addCategories(),
     "verified": true,
-    "stars": Math.ceil(Math.random()*300)
+    "stars": Math.floor(Math.random()*20)
   });
+
   newOrg.save(function(err, obj) {
     if(err) return console.log(err);
     console.log(obj);
     next(err, obj);
   });
 
-  function makeid() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ     abcdefghijklmnopqrstuvwxyz-";
+  function addCategories() {
+    let newCats = [];
+    let catsLen = Math.ceil(Math.random() * 2);
+    let index = Math.floor(Math.random() * 6);
+    for (let i = 0; i < catsLen; i++) {
+      if ((index + i) < 6) {
+        newCats.push(categories[index + i]);
+      }
+    }
+    return newCats;
+  }
 
-    for( var i=0; i < 20; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
+  function make(what) {
+    let cleanWords = words.replace(/[^a-zA-Z.,]/g, "");
+    let wordsArr = words.split(" ");
+    let maxLen = (what === "name") ? 5 : 50;
+    let nameLen = Math.ceil(Math.random() * maxLen);
+    if (what === "desc") {
+      nameLen += 10;
+    }
+    let randomIndex = function() {
+      return Math.floor(Math.random() * wordsArr.length);
+    };
+    let str = [];
+    for (let i = 0; i < nameLen; i++) {
+      str.push(wordsArr[randomIndex()]);
+    }
+    str = str.join(" ");
+    let firstLetter = str.charAt(0);
+    str = str.slice(1);
+    str = firstLetter.toUpperCase() + str;
+    return str;
   }
 };

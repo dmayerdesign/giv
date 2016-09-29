@@ -1,11 +1,11 @@
 /* Loading animation */
 
 .org-search-loader {
-	top: 10em;
+	top: 12em;
 }
 
 .show-more-loader {
-	bottom: 1em;
+	bottom: -1em;
 }
 
 .orgs-list.loading-orgs {
@@ -27,7 +27,7 @@
 }
 
 .orgs-list .org {
-  margin-bottom: 0.6em;
+  margin-bottom: 0.55em;
   cursor: default;
   position: relative;
 }
@@ -95,7 +95,8 @@
 }
 
 .featured-org .header-inner {
-  padding: 3.1em 1.5em !important;
+  padding: 3.2em 1.5em 3em !important;
+  height: 11em;
 }
 
 .featured-org .stars-preview {
@@ -107,15 +108,15 @@
   position: absolute;
   width: 100%;
   height: 1em;
-  z-index: 101;
+  z-index: 102;
   left: 0;
-  bottom: 0;
+  top: 0.2em;
   overflow: visible;
 }
 
 .featured-carousel-nav i {
 	position: relative;
-		bottom: 2em;
+		top: 0;
 	box-sizing: content-box;
 	padding: 0.9em;
 	width: 0.8em;
@@ -123,4 +124,8 @@
 	color: #fff;
 	cursor: pointer;
 	font-size: 1.1em;
+}
+
+.featured-carousel-nav i:first-child {
+  margin-right: 4.4em;
 }

@@ -26,6 +26,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private progress:number = 0;
 
 	private coverImageLink:string;
+	private videoLink:string;
 	private donateLink:string;
 	private slug:string;
 	private name:string;

@@ -22,12 +22,13 @@ const orgSchema = new mongoose.Schema({
 	
 	coverImage: String,
 	avatar: String,
+	videoLink: String,
 	gallery: [String],
 	posts: [String],
 	categories: Array
 });
 
-orgSchema.pre('save', function (next) {
+orgSchema.pre('save', function(next) {
   const org = this;
   let makeid = function makeid() {
     let text = "";
@@ -44,7 +45,16 @@ orgSchema.pre('save', function (next) {
 	next();
 });
 
-
+orgSchema.pre('save', function(next) {
+	const org = this;
+	if (org.isNew || org.isModified("name")) {
+	  let firstChar = org.name.charAt(0).toLowerCase();
+	  if (firstChar.match(/[a-z]/)) {
+	  	org.avatar = "app/images/default-avatars/" + firstChar + ".png";
+	  }
+  }
+  next();
+});
 
 const Org = mongoose.model('Org', orgSchema);
 

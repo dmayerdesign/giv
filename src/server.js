@@ -30,7 +30,7 @@ if (env !== "PRODUCTION") dotenv.load({ path: '.env' });
 const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const s3 = new AWS.S3({params: {Bucket: 'fuse-uploads', Key: 'default'}});
+const s3 = new AWS.S3({params: {Bucket: 'giv-uploads', Key: 'default'}});
 
 /**
 * Security middleware
@@ -151,7 +151,7 @@ app.listen(app.get('port'), () => {
 });
 
 
-/** START fuse api **/
+/** START giv api **/
 mongoose.connection.on('error', () => {
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
@@ -162,12 +162,12 @@ mongoose.connection.on('connected', () => {
   /**
   ** Orgs
   **/
-  appService.applyRoutes(app, orgController.routes);
+  appService.addRoutes(app, orgController.routes);
 
   /**
   ** Posts
   **/
-  appService.applyRoutes(app, postController.routes);
+  appService.addRoutes(app, postController.routes);
 
   /**
   ** Users
@@ -248,6 +248,6 @@ mongoose.connection.on('connected', () => {
 
 
 
-/** END fuse api **/
+/** END giv api **/
 
 module.exports = app;

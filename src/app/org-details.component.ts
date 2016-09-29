@@ -7,10 +7,11 @@ import { UIHelper, Utilities } from './services/app.service';
 	selector: 'org-details',
 	template: `
 			<div class="org-details item-details">
-				<p>Hello lorem ipsum dolor sit amet {{org.description}}</p>
+				<p>{{org.description}}</p>
 				<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
-				<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a href="#">{{category.name}}</a>&nbsp;</span></p>
+				<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;</span></p>
 			</div>`,
+	styleUrls: [ 'app/org.styles.css' ],
 	providers: [OrgService, UIHelper, Utilities]
 })
 
