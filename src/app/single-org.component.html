@@ -1,26 +1,37 @@
-<div class="video-container clearfix">
-	<div *ngIf="org?.videoLink"
-			class="featured-video"
-			[ngClass]="{'expanded': videoIsExpanded}"
-			[ngStyle]="{'background-image': 'url(' + videoBg + ')'}">
-		<iframe frameborder="0" height="100%" width="100%" 
-		  [src]="videoLink">
-		</iframe>
+<div class="single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink }">
+	<div class="video-container clearfix">
+		<div *ngIf="org?.videoLink"
+				[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"
+				[ngStyle]="{'background-image': 'url(' + (org?.coverImage || videoBg) + ')'}">
+			<iframe frameborder="0" height="100%" width="100%" 
+			  [src]="videoLink">
+			</iframe>
+		</div>
+		<div class="expand-video">
+			<button *ngIf="!videoIsExpanded" (click)="expandVideo()" class="mini"><i class="fa fa-play"></i> Play the video</button>
+			<button *ngIf="videoIsExpanded" (click)="minimizeVideo()" class="mini"><i class="fa fa-angle-up"></i> Minimize the video</button>
+		</div>
 	</div>
-	<div class="expand-video">
-		<button *ngIf="!videoIsExpanded" (click)="expandVideo()"><i class="fa fa-play"></i> Play the video</button>
-		<button *ngIf="videoIsExpanded" (click)="minimizeVideo()">Minimize the video</button>
-	</div>
-</div>
-<div *ngIf="!org?.videoLink && org?.coverImage"
-	class="cover-image"
-	[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"></div>
-<div class="single-org" *ngIf="isLoaded" [ngClass]="{ 'has-video': org?.videoLink }">
-	<h4>{{org.name}}</h4>
+	<div *ngIf="!org?.videoLink && org?.coverImage"
+		class="cover-image"
+		[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"></div>
+
+	<header class="org-header">
+		<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
+
+		<h4>
+			<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+			<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+		</h4>
+		<p class="info">
+			<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
+			<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+			&nbsp;{{org.stars}} people starred this
+		</p>
+	</header>
 	<org-details [org]="org" [isSingle]="true"></org-details>
 					
 	<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
 
 	<org-posts [org]="org" [user]="user"></org-posts>
-
 </div>

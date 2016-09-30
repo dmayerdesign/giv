@@ -1,11 +1,3 @@
-.single-org {
-	padding-top: 1em;
-}
-
-.single-org.has-video {
-
-}
-
 .video-container {
 	position: relative;
 	overflow: hidden;
@@ -24,7 +16,8 @@
 	background-size: cover;
 }
 
-.featured-video {
+.featured-video:not(.cover-image) {
+	-webkit-filter: blur(4px);
 	filter: blur(4px);
 }
 
@@ -35,7 +28,8 @@
 .featured-video.expanded {
 	height: 30em;
 	z-index: 102;
-	filter: blur(0px);
+	-webkit-filter: none;
+	filter: none;
 }
 
 .featured-video.expanded iframe {
@@ -45,7 +39,12 @@
 .expand-video {
 	float: right;
 	position: absolute;
-		bottom: 0;
-		right: 0;
+		bottom: 1em;
+		right: 1em;
 	z-index: 103;
+	font-size: 0.8em;
+}
+
+.single-org header {
+	padding-top: 1em;
 }

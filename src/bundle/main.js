@@ -65962,9 +65962,13 @@
 	    function TruncatePipe() {
 	    }
 	    TruncatePipe.prototype.transform = function (value, arg1, arg2) {
-	        var limit = arg1 ? parseInt(arg1, 10) : 200;
-	        var trail = arg2 || '...';
-	        return value.length > limit ? value.substring(0, limit) + trail : value;
+	        if (value) {
+	            var limit = arg1 ? parseInt(arg1, 10) : 200;
+	            var trail = arg2 || '...';
+	            return value.length > limit ? value.substring(0, limit) + trail : value;
+	        }
+	        else
+	            return null;
 	    };
 	    TruncatePipe = __decorate([
 	        core_1.Pipe({
@@ -66030,15 +66034,17 @@
 	};
 	var core_1 = __webpack_require__(11);
 	var router_1 = __webpack_require__(336);
+	var http_1 = __webpack_require__(397);
 	var platform_browser_1 = __webpack_require__(201);
 	var org_service_1 = __webpack_require__(474);
 	var user_service_1 = __webpack_require__(468);
 	var app_service_1 = __webpack_require__(477);
 	var angular2_flash_messages_1 = __webpack_require__(461);
 	var SingleOrgComponent = (function () {
-	    function SingleOrgComponent(router, route, orgService, userService, helper, utilities, zone, flash, sanitizer) {
+	    function SingleOrgComponent(router, route, http, orgService, userService, helper, utilities, zone, flash, sanitizer) {
 	        this.router = router;
 	        this.route = route;
+	        this.http = http;
 	        this.orgService = orgService;
 	        this.userService = userService;
 	        this.helper = helper;
@@ -66093,6 +66099,34 @@
 	    SingleOrgComponent.prototype.minimizeVideo = function () {
 	        this.videoIsExpanded = false;
 	    };
+	    SingleOrgComponent.prototype.orgIsStarred = function (org) {
+	        if (this.user.starred.indexOf(org._id) === -1)
+	            return false;
+	        else
+	            return true;
+	    };
+	    SingleOrgComponent.prototype.starOrg = function (orgId) {
+	        var _this = this;
+	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.orgs.find(function (org) {
+	                return org._id === orgId;
+	            }).stars++;
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
+	    };
+	    SingleOrgComponent.prototype.unstarOrg = function (orgId) {
+	        var _this = this;
+	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.orgs.find(function (org) {
+	                return org._id === orgId;
+	            }).stars--;
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -66105,7 +66139,7 @@
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities],
 	            directives: [router_1.ROUTER_DIRECTIVES]
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, platform_browser_1.DomSanitizationService])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, http_1.Http, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, angular2_flash_messages_1.FlashMessagesService, platform_browser_1.DomSanitizationService])
 	    ], SingleOrgComponent);
 	    return SingleOrgComponent;
 	}());

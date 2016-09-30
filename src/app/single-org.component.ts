@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
+import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
 import { DomSanitizationService, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
@@ -30,6 +31,7 @@ export class SingleOrgComponent implements OnInit {
 	constructor(
 				private router: Router,
 				private route: ActivatedRoute,
+				private http: Http,
 				private orgService: OrgService,
 				private userService: UserService,
 				private helper: UIHelper,
@@ -87,6 +89,37 @@ export class SingleOrgComponent implements OnInit {
 
 	minimizeVideo() {
 		this.videoIsExpanded = false;
+	}
+
+	orgIsStarred(org) {
+		if (this.user.starred.indexOf(org._id) === -1) return false;
+		else return true;
+	}
+
+	starOrg(orgId) {
+		this.http.put("/user/star/add", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+			data => {
+				this.user = data.user;
+				this.orgs.find((org) => {
+					return org._id === orgId;
+				}).stars++;
+				console.log(data.org);
+				console.log(data.user);
+			}
+		);
+	}
+
+	unstarOrg(orgId) {
+		this.http.put("/user/star/subtract", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+			data => {
+				this.user = data.user;
+				this.orgs.find((org) => {
+					return org._id === orgId;
+				}).stars--;
+				console.log(data.org);
+				console.log(data.user);
+			}
+		);
 	}
 
 }
