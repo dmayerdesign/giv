@@ -6,10 +6,14 @@ import { UIHelper, Utilities } from './services/app.service';
 @Component({
 	selector: 'org-details',
 	template: `
-			<div class="org-details item-details">
-				<p>{{org.description}}</p>
-				<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
-				<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;</span></p>
+			<div [ngClass]="{'row': isSingle}">
+				<div class="org-details item-details" [ngClass]="{'col-md-6': isSingle}">
+					<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;</span></p>
+					<p>{{org.description}}</p>
+				</div>
+				<div [ngClass]="{'col-md-6': isSingle}">
+					<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
+				</div>
 			</div>`,
 	styleUrls: [ 'app/org.styles.css' ],
 	providers: [OrgService, UIHelper, Utilities]

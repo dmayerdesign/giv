@@ -1,4 +1,4 @@
-<div class="single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink }">
+<div class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink }">
 	<div class="video-container clearfix">
 		<div *ngIf="org?.videoLink"
 				[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"

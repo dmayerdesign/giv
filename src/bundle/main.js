@@ -65754,7 +65754,7 @@
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div class=\"org-details item-details\">\n\t\t\t\t<p>{{org.description}}</p>\n\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a [routerLink]=\"['', 'category', category.id]\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t</div>",
+	            template: "\n\t\t\t<div [ngClass]=\"{'row': isSingle}\">\n\t\t\t\t<div class=\"org-details item-details\" [ngClass]=\"{'col-md-6': isSingle}\">\n\t\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a [routerLink]=\"['', 'category', category.id]\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t\t\t<p>{{org.description}}</p>\n\t\t\t\t</div>\n\t\t\t\t<div [ngClass]=\"{'col-md-6': isSingle}\">\n\t\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t</div>\n\t\t\t</div>",
 	            styleUrls: ['app/org.styles.css'],
 	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
 	        }), 
@@ -66109,9 +66109,7 @@
 	        var _this = this;
 	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (org) {
-	                return org._id === orgId;
-	            }).stars++;
+	            _this.org.stars++;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -66120,9 +66118,7 @@
 	        var _this = this;
 	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (org) {
-	                return org._id === orgId;
-	            }).stars--;
+	            _this.org.stars--;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });

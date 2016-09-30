@@ -1,0 +1,21 @@
+Only in node_modules_archive: .DS_Store
+Only in node_modules_archive/.bin: ng-xi18n
+Only in node_modules_archive/.bin: ngc
+Only in node_modules_archive/.bin: tsickle
+Files node_modules/@angular/common/package.json and node_modules_archive/@angular/common/package.json differ
+Files node_modules/@angular/compiler/package.json and node_modules_archive/@angular/compiler/package.json differ
+Only in node_modules_archive/@angular: compiler-cli
+Files node_modules/@angular/core/package.json and node_modules_archive/@angular/core/package.json differ
+Files node_modules/@angular/http/package.json and node_modules_archive/@angular/http/package.json differ
+Files node_modules/@angular/platform-browser/package.json and node_modules_archive/@angular/platform-browser/package.json differ
+Files node_modules/@angular/platform-browser-dynamic/package.json and node_modules_archive/@angular/platform-browser-dynamic/package.json differ
+Only in node_modules_archive/@angular: tsc-wrapped
+Files node_modules/@angular/upgrade/package.json and node_modules_archive/@angular/upgrade/package.json differ
+Only in node_modules_archive: angular
+Only in node_modules_archive: angular-sanitize
+Only in node_modules_archive/angular2-flash-messages/node_modules: @angular
+Only in node_modules_archive: ng2-select
+Only in node_modules_archive: parse5
+Only in node_modules_archive: source-map-support
+Only in node_modules_archive: tsickle
+Only in node_modules_archive: videogular

@@ -100,9 +100,7 @@ export class SingleOrgComponent implements OnInit {
 		this.http.put("/user/star/add", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.find((org) => {
-					return org._id === orgId;
-				}).stars++;
+				this.org.stars++;
 				console.log(data.org);
 				console.log(data.user);
 			}
@@ -113,9 +111,7 @@ export class SingleOrgComponent implements OnInit {
 		this.http.put("/user/star/subtract", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.find((org) => {
-					return org._id === orgId;
-				}).stars--;
+				this.org.stars--;
 				console.log(data.org);
 				console.log(data.user);
 			}
