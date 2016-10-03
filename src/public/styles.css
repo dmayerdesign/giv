@@ -324,7 +324,44 @@ search-box + select {
 }
 
 
+#toasty {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+}
 
+.toast {
+  position: relative;
+  padding: 1em;
+  color: #fff;
+}
+
+.toasty-type-info {
+  background: blue;
+}
+
+.toasty-type-error {
+  background: red;
+}
+
+.toasty-type-success {
+  background: green;
+}
+
+.toast-text {
+  text-align: center;
+}
+
+.toast .close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  background: #000;
+}
 
 
 

@@ -7,19 +7,17 @@ import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { Categories } from './services/categories.service';
 import { UIHelper, Utilities } from './services/app.service';
-import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
 	selector: 'manage-org-page',
-	templateUrl: 'app/manage-org-page.component.html',
-	providers: [OrgService, UserService, UIHelper, Utilities]
+	templateUrl: 'app/manage-org-page.component.html'
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 // __TO_DO__: add an external link option
 
 export class ManageOrgPageComponent implements OnInit {
-	@Input() org; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
+	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
@@ -55,10 +53,9 @@ export class ManageOrgPageComponent implements OnInit {
 				private route:ActivatedRoute,
 				private orgService:OrgService,
 				private userService:UserService,
-				private helper:UIHelper,
+				private ui:UIHelper,
 				private utilities:Utilities,
 				private zone:NgZone,
-				private flash:FlashMessagesService,
 				private http:Http,
 				private categoryService:Categories) { }
 
@@ -69,14 +66,14 @@ export class ManageOrgPageComponent implements OnInit {
 				this.sub = this.route.params.subscribe(params => {
 					let id = params['id'];
 					if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-						this.flash.show("This page doesn't exist", {cssClass: "error"});
+						this.ui.flash("This page doesn't exist", "error");
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
 
 					this.orgService.loadOrg(id).subscribe(
 						data => {
 							if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-								this.flash.show("Either the page doesn't exist or you don't have permission to manage it", {cssClass: "error"});
+								this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
 								return this.router.navigate([''], { queryParams: {"404": true}});
 							}
 							this.org = data;
@@ -128,28 +125,28 @@ export class ManageOrgPageComponent implements OnInit {
   	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
   		if (data) {
   			this.slugIsValid = false;
-  			this.flash.show("Sorry, that identifier is taken", { cssClass: "error" });
+  			this.ui.flash("Sorry, that identifier is taken", "error");
   		}
   		else this.slugIsValid = true;
   	});
   } 
 
   editOrg(key:string, value?:any):void {
-  	if (key === "slug") {
-  		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
-  		if (slugMatch) {
-  			return this.flash.show("Your slug can only have lowercase letters, numbers, and hyphens", {cssClass: "error"});
-  		} else {
-  			value.toLowerCase();
-  		}
-  	}
-
   	if (key === "categories") {
   		value = this.org.categories;
   	}
 
-  	if (!value) {
+  	if (typeof value === "undefined") {
   		value = this[key] || this.org[key];
+  	}
+
+  	if (key === "slug") {
+  		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
+  		if (slugMatch) {
+  			return this.ui.flash("Your slug can only have lowercase letters, numbers, and hyphens", "error");
+  		} else {
+  			value = value.toLowerCase();
+  		}
   	}
 
   	this['loading_' + key] = true;
@@ -160,13 +157,13 @@ export class ManageOrgPageComponent implements OnInit {
   	}).subscribe(res => {
   		console.log(res);
   		if (res.errmsg) {
-  			this.flash.show("Save failed", {cssClass: "error"});
+  			this.ui.flash("Save failed", "error");
   			this['loading_' + key] = false;
   			return;
   		}
   		this.org = res;
   		this['loading_' + key] = false;
-  		this.flash.show("Saved");
+  		this.ui.flash("Saved", "success");
   		console.log(res);
   	});
   }
@@ -195,7 +192,7 @@ export class ManageOrgPageComponent implements OnInit {
   	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
   		if (data && data.success) {
   			this.router.navigate(['']);
-  			return this.flash.show("Org was deleted");
+  			return this.ui.flash("Org was deleted", "error");
   		}
   	});
   }

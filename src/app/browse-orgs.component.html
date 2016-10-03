@@ -121,6 +121,7 @@
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
 				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Read more</a>
 				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Read more</a>
+				<a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
 			</div>
 		</section>
 		

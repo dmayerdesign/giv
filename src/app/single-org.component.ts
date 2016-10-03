@@ -1,20 +1,17 @@
 import { Component, Input, OnInit, OnDestroy, NgZone } from '@angular/core';
-import { Router, ActivatedRoute, ROUTER_DIRECTIVES } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
-import { DomSanitizationService, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { UIHelper, Utilities } from './services/app.service';
-import { FlashMessagesService } from 'angular2-flash-messages';
 
 @Component({
 	selector: 'single-org',
 	templateUrl: 'app/single-org.component.html',
-	styleUrls: [ 'app/org.styles.css', 'app/single-org.component.css' ],
-	providers: [OrgService, UIHelper, Utilities],
-	directives: [ROUTER_DIRECTIVES]
+	styleUrls: [ 'app/org.styles.css', 'app/single-org.component.css' ]
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
@@ -34,11 +31,10 @@ export class SingleOrgComponent implements OnInit {
 				private http: Http,
 				private orgService: OrgService,
 				private userService: UserService,
-				private helper: UIHelper,
+				private ui: UIHelper,
 				private utilities: Utilities,
 				private zone: NgZone,
-				private flash: FlashMessagesService,
-        private sanitizer: DomSanitizationService) { }
+        private sanitizer: DomSanitizer) { }
 
 	ngOnInit() {
 		if (this.org) {
@@ -52,12 +48,13 @@ export class SingleOrgComponent implements OnInit {
 				this.orgService.loadOrg({id: id, slug: slug}).subscribe(
 					data => {
 						if (!data || !data._id) {
-							this.flash.show("This page doesn't exist");
+							this.ui.flash("This page doesn't exist", "error");
 							return this.router.navigate([''], { queryParams: {"404": true}});
 						}
 						this.org = data;
 						this.isLoaded = true;
 
+						this.org.videoLink = this.org.videoLink.replace("watch?v=", "v/");
 						this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
 						if (this.org.videoLink) {
 							let matchId = this.org.videoLink.match(/(embed)\/(.*)/);
@@ -66,7 +63,7 @@ export class SingleOrgComponent implements OnInit {
 					},
 					error => {
 						console.error(error);
-						this.flash.show("This page doesn't exist");
+						this.ui.flash("This page doesn't exist", "error");
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
 				);
@@ -116,6 +113,11 @@ export class SingleOrgComponent implements OnInit {
 				console.log(data.user);
 			}
 		);
+	}
+
+	userHasPermission(org) {
+		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
+		else return false;
 	}
 
 }

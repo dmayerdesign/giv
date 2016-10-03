@@ -1,23 +1,76 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Router } from '@angular/router';
-import { InfoMessage } from './services/app.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { UIHelper } from './services/app.service';
 import { EmailModel } from './services/email.service';
+import { Subscription } from 'rxjs/Subscription';
+import { OrgService } from './services/org.service';
+import { UserService } from './services/user.service';
 
 @Component({
 	selector: 'claim-org',
 	templateUrl: 'app/claim-org.component.html'
 })
 
-export class ClaimOrgComponent {
-	@Input() org:any;
+export class ClaimOrgComponent implements OnInit {
+	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
+	private sub:Subscription;
+	private isLoaded:boolean = false;
 	private inputs = new EmailModel();
-	private infoMsg = new InfoMessage();
 
 	constructor(private http:Http,
-							private router:Router) { }
+							private router:Router,
+							private route:ActivatedRoute,
+							private ui:UIHelper,
+							private orgService:OrgService,
+							private userService:UserService) { }
+
+
+	ngOnInit() {
+		this.userService.getLoggedInUser((err, user) => {
+			if (err) return console.error(err);
+			if (this.route.params) {
+				this.sub = this.route.params.subscribe(params => {
+					let id = params['id'];
+					if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+						this.ui.flash("This page doesn't exist", "error");
+						return this.router.navigate([''], { queryParams: {"404": true}});
+					}
+
+					this.orgService.loadOrg(id).subscribe(
+						data => {
+							if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
+								this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
+								return this.router.navigate([''], { queryParams: {"404": true}});
+							}
+							this.org = data;
+							this.isLoaded = true;
+						},
+						err => {
+							this.router.navigate([''], { queryParams: {"404": true}});
+							console.log("Error: ");
+							console.log(err);
+							return console.error(err);
+						}
+					);
+				});
+			}
+			else {
+				this.router.navigate(['../']);
+			}
+		});
+	}
+
+	ngOnDestroy() {
+		this.sub.unsubscribe();
+	}
 
 	submitForm() {
+		if (!this.org) {
+			this.router.navigate(['/']);
+			return this.ui.flash("There was an error finding the organization", "error");
+		}
+
 		this.inputs.subject = this.org.name + ' has been claimed by ' + this.inputs.fromName;
 		this.inputs.redirectTo = '/';
 		this.inputs.toName = 'Support';
@@ -28,20 +81,19 @@ export class ClaimOrgComponent {
 			.map((res:Response) => res.json())
 			.subscribe(
 				data => {
-					alert('no errors!');
+					if (data.errmsg) {
+						console.error(data.errmsg);
+						return this.ui.flash("Sorry, your message couldn't be sent.", "error");
+					}
+					this.ui.flash("Sent!", "success");
 					console.log(data);
-					this.router.navigate([data.redirectTo + JSON.stringify(data)]);
+					if (this.org.slug) this.router.navigate(['/organization', this.org.slug]);
+					else this.router.navigate(['/organization', 'i', this.org._id]);
 				},
 				err => {
 					console.log(err);
-					alert('not sent!');
+					this.ui.flash("Sorry, your message couldn't be sent.", "error");
 				});
-	}
-
-	sendInfoMsg(body, type, time = 3000) {
-		this.infoMsg.body = body;
-		this.infoMsg.type = type;
-		window.setTimeout(() => this.infoMsg.body = "", time);
 	}
 
 }

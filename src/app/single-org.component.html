@@ -31,7 +31,10 @@
 	</header>
 	<org-details [org]="org" [isSingle]="true"></org-details>
 					
-	<a *ngIf="user && user.permissions.indexOf(org.globalPermission) > -1" href="/organization/manage/{{org?._id}}">Manage</a>
-
+	<div *ngIf="userHasPermission(org)">
+		<a [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
+		<a [routerLink]="['/organization', 'claim', org?._id]">Is this your organization?</a>
+	</div>
+	
 	<org-posts [org]="org" [user]="user"></org-posts>
 </div>

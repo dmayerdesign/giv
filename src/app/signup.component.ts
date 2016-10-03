@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { FlashMessagesService } from 'angular2-flash-messages';
+import { UIHelper } from './services/app.service';
 import { UserService } from './services/user.service';
 
 @Component({
@@ -17,11 +17,11 @@ export class SignupComponent implements OnInit {
 	constructor(private http:Http,
 							private router:Router,
 							private userService:UserService,
-							private flash:FlashMessagesService) {
+							private ui:UIHelper) {
 
 		if (localStorage['profile']) {
 			this.router.navigate(['/']);
-			this.flash.show("You're already logged in!");
+			this.ui.flash("You're already logged in!", "error");
 		}
 	}
 
@@ -31,26 +31,32 @@ export class SignupComponent implements OnInit {
 
   signup() {
     for (let field in this.formModel) {
-    	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.flash.show("Oops! You need to fill out your " + field, {cssClass: "error"});
+    	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.ui.flash("Oops! You need to fill out your " + field, "error");
     }
     if (this.formModel.email && this.formModel.password && this.formModel.confirmPassword) {
-    	if (this.formModel.password !== this.formModel.confirmPassword) return this.flash.show("Oops! Your passwords didn't match", {cssClass: "error"});
+    	if (this.formModel.password !== this.formModel.confirmPassword) return this.ui.flash("Oops! Your passwords didn't match", "error");
     	
       this.http.post('/signup', this.formModel).map(res => res.json()).subscribe(data => {
         if (data.errmsg) {
-          this.flash.show("There's already an account with this email in our system.");
+          this.ui.flash(data.errmsg);
           return this.router.navigate(["/login"]);
         }
-    		localStorage.setItem('profile', JSON.stringify(data));
-        this.isLoggedIn = true;
-        this.userService.confirmLogin(data);
-        this.flash.show("Welcome!");
-      	console.log(data);
-        this.router.navigate(['/']);
+        this.http.post('/login', {email: this.formModel.email, password: this.formModel.password}).map(res => res.json()).subscribe(data => {
+      		if (data.errmsg) {
+            this.ui.flash(data.errmsg);
+            return this.router.navigate(["/"]);
+          }
+          localStorage.setItem('profile', JSON.stringify(data));
+          this.isLoggedIn = true;
+          this.userService.confirmLogin(data);
+          this.ui.flash("Welcome!", "success");
+        	console.log(data);
+          this.router.navigate(['/']);
+        });
       });
     } else {
     	console.error("The form model was undefined.");
-      this.flash.show("Something went wrong", {cssClass: "error"});
+      this.ui.flash("Something went wrong", "error");
     }
   }
 }

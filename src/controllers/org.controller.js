@@ -245,15 +245,28 @@ function editOrg(key) {
     uri: '/edit-org/'+key+'/:orgId',
     middleware: "passport",
     process: function(req, res) {
-      let updateQuery = {$set:{}};
-      updateQuery.$set[key] = req.body.value;
-      Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
+      // let updateQuery = {$set:{}};
+      // updateQuery.$set[key] = req.body.value;
+      Org.findOne({_id: req.params.orgId}, function(err, org) {
         if(err) {
           res.json({errmsg: err});
           console.log(err);
         }
-        console.log(org);
-        res.status(200).json(org);
+        if(org) {
+          console.log("key: ", key);
+          console.log("value: ", req.body.value);
+          org[key] = req.body.value;
+          org.save((err, org) => {
+            if(err) {
+              res.json({errmsg: err});
+              console.log(err);
+            }
+            if(org) {
+              console.log(org);
+              res.status(200).json(org);
+            }
+          });
+        }        
       });
     }
   }

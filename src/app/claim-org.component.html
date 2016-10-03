@@ -1,4 +1,4 @@
-<h3>Claim {{org}}</h3>
+<h3>Claim {{org?.name}}</h3>
 <p>Let us know you're a representative for this organization so we can let you manage its Giv page</p>
 <form (submit)="submitForm()" #contactForm="ngForm">
 	<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">

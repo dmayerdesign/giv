@@ -4,12 +4,11 @@ import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Subscription } from 'rxjs/Subscription';
-import { FlashMessagesService } from 'angular2-flash-messages';
 import { Observable } from 'rxjs/Rx';
 
 import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
-import { UIHelper, Utilities, InfoMessage } from './services/app.service';
+import { UIHelper, Utilities } from './services/app.service';
 import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
@@ -19,10 +18,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
 @Component({
 	selector: 'browse-orgs',
 	templateUrl: 'app/browse-orgs.component.html',
-	styleUrls: [ 'app/org.styles.css', 'app/browse-orgs.component.css' ],
-	providers: [OrgService, UIHelper, Utilities],
-	directives: [SearchBox, OrgDetailsComponent, OrgPostsComponent],
-	pipes: [TruncatePipe]
+	styleUrls: [ 'app/org.styles.css', 'app/browse-orgs.component.css' ]
 })
 
 export class BrowseOrgsComponent implements OnInit {
@@ -57,18 +53,14 @@ export class BrowseOrgsComponent implements OnInit {
 	constructor(
 				private http:Http,
 				private orgService:OrgService,
-				private helper:UIHelper,
+				private ui:UIHelper,
 				private utilities:Utilities,
 				private route:ActivatedRoute,
-				private flash:FlashMessagesService,
 				private userService:UserService,
-				private categories:Categories) {
-
-
-	}
+				private categories:Categories) { }
 
 	ngOnInit() {
-		this.helper.setTitle("Browse organizations");
+		this.ui.setTitle("Browse organizations");
 		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
@@ -105,10 +97,7 @@ export class BrowseOrgsComponent implements OnInit {
 					let height = Math.max( body.scrollHeight, body.offsetHeight, 
 		                       		 	 html.scrollHeight, html.offsetHeight, html.clientHeight );
 					let winHeight = window.innerHeight;
-					console.log(height);
-					console.log(document.body.scrollTop);
-					if (document.body.scrollTop === (height - winHeight)) {
-						console.log(orgs);
+					if (document.body.scrollTop === (height - winHeight) && document.getElementById("show-more")) {
 						document.getElementById("show-more").click();
 					}
 				};
@@ -120,8 +109,10 @@ export class BrowseOrgsComponent implements OnInit {
 			data => {
 				this.isLoadingFeatured = false;
 				this.featuredOrgs = data;
-				this.featuredShowing = Math.floor(Math.random() * (this.featuredOrgs.length - 1));
-				this.featuredOrgs[this.featuredShowing]['showing'] = true;
+				if (this.featuredOrgs && this.featuredOrgs.length) {
+					this.featuredShowing = Math.floor(Math.random() * (this.featuredOrgs.length - 1));
+					this.featuredOrgs[this.featuredShowing]['showing'] = true;
+				}
 			},
 			error => console.log(error)
 		);
@@ -136,7 +127,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	takeCount(children:any) {
-		this.orgsShowing = this.helper.takeCount(children);
+		this.orgsShowing = this.ui.takeCount(children);
 	}
 
 	toggleOrder(attr) {
@@ -324,6 +315,11 @@ export class BrowseOrgsComponent implements OnInit {
 			this.featuredShowing = 0;
 		}
 		this.featuredOrgs[this.featuredShowing]['showing'] = true;
+	}
+
+	userHasPermission(org) {
+		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
+		else return false;
 	}
 
 }

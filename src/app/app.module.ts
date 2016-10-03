@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UPLOAD_DIRECTIVES } from 'ng2-uploader';
-import { FlashMessagesModule } from 'angular2-flash-messages';
+import { ToastyModule } from 'ng2-toasty';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login.component';
@@ -16,6 +16,7 @@ import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
+import { ClaimOrgComponent } from './claim-org.component';
 import { CreatePostComponent } from './create-post.component';
 import { SearchBox } from './search-box.component';
 import { ContactComponent } from './contact.component';
@@ -24,6 +25,9 @@ import { UserService } from './services/user.service';
 import { SearchService } from './services/search.service';
 import { ClickOutsideModule } from 'ng2-click-outside';
 import { Categories } from './services/categories.service';
+import { OrgService } from './services/org.service';
+import { UIHelper, Utilities } from './services/app.service';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 import { enableProdMode } from '@angular/core';
 enableProdMode();
@@ -39,6 +43,7 @@ const routing = RouterModule.forRoot([
   , { path: 'organization/i/:id', component: SingleOrgComponent }
   , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
+  , { path: 'organization/claim/:id', component: ClaimOrgComponent }
   , { path: '', component: BrowseOrgsComponent }
   , { path: '*', component: BrowseOrgsComponent }
 ]); // the order of this array matters
@@ -51,29 +56,34 @@ const routing = RouterModule.forRoot([
       ,	FormsModule
       ,	ReactiveFormsModule
       , ClickOutsideModule
-      , FlashMessagesModule
+      , ToastyModule.forRoot()
     ],
     declarations: [
         AppComponent
       , LoginComponent
       , SignupComponent
       , BrowseOrgsComponent
+      , SearchBox
       , OrgDetailsComponent
       , OrgPostsComponent
       , SingleOrgComponent
       , ManageOrgPageComponent
+      , ClaimOrgComponent
     	, AboutComponent
       , StarredOrgsComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES
       , CreatePostComponent
+      , TruncatePipe
     ],
     providers: [
         Title
       , UserService
-      , SearchBox
       , SearchService
       , Categories
+      , OrgService
+      , UIHelper
+      , Utilities
     ],
     bootstrap: [AppComponent]
 })

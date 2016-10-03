@@ -31,7 +31,7 @@ exports.sendEmail = (req, res) => {
 
   if (errors) {
     req.flash('errors', errors);
-    return res.redirect(req.body.redirectTo || '/');
+    return res.json({errmsg: "There was an error sending the email", redirectTo: req.body.redirectTo || '/'});
   }
 
   const mailOptions = {
@@ -45,7 +45,7 @@ exports.sendEmail = (req, res) => {
     if (err) {
       console.log(err.message);
       req.flash('errors', { msg: err.message });
-      return res.json({error: err, redirectTo: req.body.redirectTo || '/'});
+      return res.json({errmsg: err, redirectTo: req.body.redirectTo || '/'});
     }
     req.flash('success', { msg: 'Email has been sent successfully!' });
     res.json({message: 'Success!', redirectTo: req.body.redirectTo || '/'});

@@ -59,8 +59,7 @@ exports.postSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
-    res.status(500).json({"errmsg": "Couldn't sign up"});
+    res.status(500).json({errmsg: "Couldn't sign up"});
     return console.log(errors);
   }
 
@@ -72,7 +71,7 @@ exports.postSignup = (req, res, next) => {
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (err) { return next(err); }
     if (existingUser) {
-      return res.json({"errmsg": 'Account with that email address already exists.' });
+      return res.json({errmsg: 'An account with that email address already exists.' });
     }
     user.save((err) => {
       if (err) { return next(err); }

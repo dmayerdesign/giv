@@ -29,7 +29,7 @@ const orgSchema = new mongoose.Schema({
 });
 
 orgSchema.pre('save', function(next) {
-  const org = this;
+  let org = this;
   let makeid = function makeid() {
     let text = "";
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
@@ -37,6 +37,10 @@ orgSchema.pre('save', function(next) {
     return text;
   }
   if (org.isNew || org.isModified("name")) {
+  	let firstChar = org.name.charAt(0).toLowerCase();
+	  if (firstChar.match(/[a-z]/)) {
+	  	org.avatar = "app/images/default-avatars/" + firstChar + ".png";
+	  }
 	  org.slug = org.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "-");
   }
   if (org.isNew) {
@@ -46,12 +50,9 @@ orgSchema.pre('save', function(next) {
 });
 
 orgSchema.pre('save', function(next) {
-	const org = this;
-	if (org.isNew || org.isModified("name")) {
-	  let firstChar = org.name.charAt(0).toLowerCase();
-	  if (firstChar.match(/[a-z]/)) {
-	  	org.avatar = "app/images/default-avatars/" + firstChar + ".png";
-	  }
+	let org = this;
+	if (org.isNew || org.isModified("videoLink")) {
+		if (org.videoLink) org.videoLink = org.videoLink.replace("watch?v=", "v/");
   }
   next();
 });

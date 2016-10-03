@@ -10,9 +10,7 @@ import 'rxjs/add/operator/map';
 
 @Component({
 	selector: 'org-posts',
-	templateUrl: 'app/org-posts.component.html',
-	providers: [OrgService, UIHelper, Utilities],
-	pipes: [ TruncatePipe ]
+	templateUrl: 'app/org-posts.component.html'
 })
 
 export class OrgPostsComponent {

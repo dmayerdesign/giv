@@ -3,7 +3,7 @@ import { Http } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { UserService } from './services/user.service';
-import { FlashMessagesService } from 'angular2-flash-messages';
+import { UIHelper } from './services/app.service';
 
 @Component({
 	selector: 'app',
@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
 
 	constructor(private http:Http,
 							private userService:UserService,
-							private flash:FlashMessagesService,
+							private ui:UIHelper,
 							private zone:NgZone,
 							private router:Router,
 							private route:ActivatedRoute) {
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
 	logOut() {
 		localStorage.removeItem('profile');
 		this.isLoggedIn = false;
-		this.flash.show("Bye!");
+		this.ui.flash("Bye!", "success");
 		this.router.navigate(['/']);
 	}
 

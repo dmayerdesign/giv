@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FlashMessagesService } from 'angular2-flash-messages';
 import { UserService } from './services/user.service';
 import { Subscription } from 'rxjs/Subscription';
+import { UIHelper } from './services/app.service';
 //import { FacebookService, FacebookLoginResponse, FacebookApiMethod } from 'ng2-facebook-sdk/dist';
 
 @Component({
@@ -23,7 +23,8 @@ export class LoginComponent implements OnInit {
 							private router:Router,
               private route:ActivatedRoute,
 							private userService:UserService,
-							private flash:FlashMessagesService) {
+							private ui:UIHelper
+              ) {
 
 		if (localStorage['profile']) {
 			this.router.navigate(['/']);
@@ -52,12 +53,12 @@ export class LoginComponent implements OnInit {
 
   login() {
     for (let field in this.formModel) {
-    	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.flash.show("Oops! You need to enter your " + field);
+    	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.ui.flash("Oops! You need to enter your " + field, "error");
     }
     if (this.formModel.email && this.formModel.password) {
     	this.http.post('/login', this.formModel).map(res => res.json()).subscribe(data => {
         console.log(data);
-        if (!data["_id"]) return this.flash.show("Login failed", { cssClass: "error" });
+        if (!data["_id"]) return this.ui.flash("Login failed", "error");
     		localStorage.setItem('profile', JSON.stringify(data));
         this.isLoggedIn = true;
         this.userService.confirmLogin(data);
@@ -72,7 +73,7 @@ export class LoginComponent implements OnInit {
         }); 
       }, error => {
         console.log(error);
-        this.flash.show("That account doesn't exist", { cssClass: "error" });
+        this.ui.flash("That account doesn't exist", "error");
       });
     } else {
     	console.error("The form model was undefined.");

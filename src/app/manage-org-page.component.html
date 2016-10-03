@@ -1,11 +1,11 @@
 <div class="manage-org-page" *ngIf="isLoaded">
-	<a *ngIf="org.slug" href="/organization/{{org.slug}}">Back to page</a>
-	<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Back to page</a>
+	<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
+	<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
 	<h4>Manage {{org.name}}</h4>
 	<img [src]="org.coverImage" width="200">
 
   <button (click)="deleteOrg()">Delete this org</button>
-	
+
 	<div class="form-block">
 		<input type="file"
 			class="form-control"
@@ -36,7 +36,7 @@
   	<input [(ngModel)]="coverImageLink"
   				class="form-control"
   				name="coverImageLink"
-  				placeholder="Change the cover image"><button (click)="editOrg('coverImage')"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  				placeholder="Change the cover image"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <input [(ngModel)]="videoLink"

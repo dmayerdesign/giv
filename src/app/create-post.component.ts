@@ -5,7 +5,6 @@ import { Http } from '@angular/http';
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { UIHelper, Utilities } from './services/app.service';
-import { FlashMessagesService } from 'angular2-flash-messages';
 
 interface post {
 	authorId: string,
@@ -51,10 +50,9 @@ export class CreatePostComponent implements OnInit {
 				private route:ActivatedRoute,
 				private orgService:OrgService,
 				private userService:UserService,
-				private helper:UIHelper,
+				private ui:UIHelper,
 				private utilities:Utilities,
 				private zone:NgZone,
-				private flash:FlashMessagesService,
 				private http:Http) { }
 
 	ngOnInit() {
@@ -103,7 +101,7 @@ export class CreatePostComponent implements OnInit {
   	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
   		console.log("New post: ", res);
   		if (res.errmsg) {
-  			this.flash.show("Save failed", {cssClass: "error"});
+  			this.ui.flash("Save failed", "error");
   			this.savingPost = false;
   			return;
   		}
@@ -111,7 +109,7 @@ export class CreatePostComponent implements OnInit {
   		this.update.emit(this.org);
   		this.savingPost = false;
   		this.post = new Post();
-  		this.flash.show("Saved");
+  			this.ui.flash("Saved", "success");
   		console.log(res);
   	});
   }

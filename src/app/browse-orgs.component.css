@@ -85,8 +85,8 @@
   width: 100%;
   border: 0 none;
 
-  -webkit-transition: all 0.8s ease-out;
-  transition: all 0.8s ease-out;
+  -webkit-transition: all 0.8s;
+  transition: all 0.8s;
 }
 
 .featured-org.hidden {
