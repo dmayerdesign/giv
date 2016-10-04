@@ -10,7 +10,7 @@
 		[ngClass]="{focused: searchBoxIsFocused}"
 		[collection]="searchPlaceholder"></search-box>
 
-	<create-post *ngIf="user && (user?.permissions?.indexOf(org?.globalPermission) > -1) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
+	<create-post *ngIf="user && org && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 	
 	<!-- Posts -->
 	<section *ngIf="!viewingOne && !loadingPosts" class="posts col-md-12">

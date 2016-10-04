@@ -17,6 +17,7 @@ import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
 import { ClaimOrgComponent } from './claim-org.component';
+import { CreateOrgComponent } from './create-org.component';
 import { CreatePostComponent } from './create-post.component';
 import { SearchBox } from './search-box.component';
 import { ContactComponent } from './contact.component';
@@ -40,6 +41,7 @@ const routing = RouterModule.forRoot([
   , { path: 'about', component: AboutComponent }
   , { path: 'starred', component: StarredOrgsComponent }
   , { path: 'contact', component: ContactComponent }
+  , { path: 'organization/create', component: CreateOrgComponent }
   , { path: 'organization/i/:id', component: SingleOrgComponent }
   , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
@@ -73,6 +75,7 @@ const routing = RouterModule.forRoot([
       , StarredOrgsComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES
+      , CreateOrgComponent
       , CreatePostComponent
       , TruncatePipe
     ],

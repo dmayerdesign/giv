@@ -25,7 +25,6 @@ exports.sendEmail = (req, res) => {
   req.assert('toAddr', '\'To\' email is not valid').isEmail();
   req.assert('fromName', '\'From\' name cannot be blank').notEmpty();
   req.assert('fromAddr', '\'From\' email is not valid').isEmail();
-  req.assert('message', 'Message cannot be blank').notEmpty();
 
   const errors = req.validationErrors();
 
@@ -34,20 +33,23 @@ exports.sendEmail = (req, res) => {
     return res.json({errmsg: "There was an error sending the email", redirectTo: req.body.redirectTo || '/'});
   }
 
-  const mailOptions = {
+  let mailOptions = {
     to: `${req.body.toName} <${req.body.toAddr}>`,
     from: `${req.body.fromName} <${req.body.fromAddr}>`,
-    subject: req.body.subject,
-    text: req.body.message
+    subject: req.body.subject
   };
+  if (req.body.message) {
+    mailOptions.text = req.body.message;
+  }
+  if (req.body.html) {
+    mailOptions.html = req.body.html;
+  }
 
   transporter.sendMail(mailOptions, (err) => {
     if (err) {
       console.log(err.message);
-      req.flash('errors', { msg: err.message });
       return res.json({errmsg: err, redirectTo: req.body.redirectTo || '/'});
     }
-    req.flash('success', { msg: 'Email has been sent successfully!' });
     res.json({message: 'Success!', redirectTo: req.body.redirectTo || '/'});
   });
 };

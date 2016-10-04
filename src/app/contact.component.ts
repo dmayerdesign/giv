@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { InfoMessage } from './services/app.service';
 import { EmailModel } from './services/email.service';
+import { UIHelper } from './services/app.service';
 
 @Component({
 	selector: 'contact',
@@ -11,10 +11,10 @@ import { EmailModel } from './services/email.service';
 
 export class ContactComponent {
 	private inputs = new EmailModel();
-	private infoMsg = new InfoMessage();
 
 	constructor(private http:Http,
-							private router:Router) { }
+							private router:Router,
+							private ui:UIHelper) { }
 
 	submitForm() {
 		this.inputs.subject = 'Contact Form | Fuse';
@@ -27,20 +27,18 @@ export class ContactComponent {
 			.map((res:Response) => res.json())
 			.subscribe(
 				data => {
-					alert('no errors!');
+					if (data.errmsg) {
+						console.error(data.errmsg);
+						return this.ui.flash("Couldn't send your message", "error");
+					}
+					this.ui.flash("Sent!", "success");
 					console.log(data);
-					this.router.navigate([data.redirectTo + JSON.stringify(data)]);
+					this.router.navigate(['/']);
 				},
 				err => {
 					console.log(err);
-					alert('not sent!');
+					this.ui.flash("Couldn't send your message", "error");
 				});
-	}
-
-	sendInfoMsg(body, type, time = 3000) {
-		this.infoMsg.body = body;
-		this.infoMsg.type = type;
-		window.setTimeout(() => this.infoMsg.body = "", time);
 	}
 
 }

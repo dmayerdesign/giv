@@ -20,7 +20,8 @@ const categories = [
 const Org = require('../models/Org');
 
 exports.routes = [
-  { method: "get",
+  { // GET ORGS
+    method: "get",
     uri: "/orgs/get",
     process: function(req, res) {
       var dbQuery = {};
@@ -64,7 +65,8 @@ exports.routes = [
     }
   },
 
-  { method: "get",
+  { // GET STARRED
+    method: "get",
     uri: "/orgs/get/starred",
     process: function(req, res) {
       var dbQuery = {};
@@ -81,8 +83,8 @@ exports.routes = [
     }
   },
 
-  // count all
-  { method: "get",
+  { // GET COUNT
+    method: "get",
     uri: '/orgs/count',
     process: function(req, res) {
       Org.count(function(err, count) {
@@ -92,14 +94,17 @@ exports.routes = [
     }
   },
 
-  // create
-  { method: "post",
+  { // CREATE
+    method: "post",
     uri: '/org',
     middleware: "passport",
     process: function(req, res) {
       var obj = new Org(req.body);
       obj.save(function(err, obj) {
-        if(err) return console.error(err);
+        if(err) {
+          res.json({errmsg: "Couldn't create your organization. It's possible that one already exists with the same name."});
+          return console.error(err);
+        }
         console.log(obj);
         res.status(200).json(obj);
       });
@@ -221,7 +226,7 @@ exports.routes = [
 ];
 
 /*
-** Edit Organization (refactored code)
+** Edit Organization
 */
 let editableInOrg = [
   "coverImage",

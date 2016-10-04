@@ -1,21 +1,23 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+// adminToken: h2u81eg7wr3h9uijk8
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  name: String,
   facebook: String,
   tokens: Array,
 
+  adminToken: String,
   permissions: [String],
   uniqueClicks: [String],
   starred: [String],
 
   profile: {
-    name: String,
     gender: String,
     location: String,
     website: String,

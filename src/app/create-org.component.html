@@ -1,0 +1,54 @@
+  <h3>Submit your organization</h3>
+
+  <div class="form-block">
+    <input [(ngModel)]="org.name"
+          class="form-control"
+          name="name"
+          placeholder="What is your organization called?">
+  </div>
+  <div class="form-block">
+    <textarea [(ngModel)]="org.description"
+          class="form-control"
+          name="description"
+          placeholder="Describe your organization in a few sentences"></textarea>
+  </div>
+  <div class="form-block">
+    <input [(ngModel)]="org.website"
+          class="form-control"
+          name="website"
+          placeholder="Your organization's website">
+  </div>
+  <div class="form-block">
+    <input [(ngModel)]="org.donateLink"
+          class="form-control"
+          name="donate"
+          placeholder="A link to donate to your organization">
+  </div>
+  <h5>Select all categories that apply to your organization</h5>
+  <div class="form-block">
+    <div *ngFor="let category of categories">
+      <input
+        type="checkbox"
+        [checked]="orgHasCategory(category)"
+        (change)="changeSelectedCategories(category, $event.target.checked)">
+      <label>{{category.name}}</label>
+    </div>
+  </div>
+
+  <h4>Tell us about yourself</h4>
+
+  <div class="form-block">
+    <input [(ngModel)]="roleDescription"
+          class="form-control"
+          name="message"
+          placeholder="Describe your role in this organization">
+  </div>
+
+<!--
+  CREATOR
+  DONATE LINK
+  WEBSITE
+  CATEGORIES
+-->
+
+  <button (click)="submitOrg(org)">Submit organization</button>
