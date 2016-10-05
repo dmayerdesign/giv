@@ -26,7 +26,7 @@
 						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
 						&nbsp;{{org.stars}} people starred this
 					</p>
-					<p class="description info inside-org preview">{{org.description | truncate:300}}</p>
+					<p class="description info inside-org preview">{{org.description | truncate:280}}</p>
 
 					<button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
 				</div>
@@ -77,9 +77,9 @@
 				No orgs to show. Try broadening your search.
 		</section>
 
-<!--**********
+	<!--*******
 		Orgs Loop
-		**********-->
+		*********-->
 		<section class="org single-item row"
 				#singleItem
 				*ngFor="let org of orgs"
@@ -90,26 +90,29 @@
 					[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"
 					(click)="viewOrg($event, org._id)">
 				<div class="header-inner" [ngClass]="{'has-cover-image': org.coverImage}">
-					<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
+					<div class="inside-org header-left">
+						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+					</div>
+					<div class="inside-org header-right">
+						<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
-					<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+						<p class="info preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
+						<p class="stars-preview preview info inside-org">
+							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
+							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
+							<strong class="inside-org">{{org.stars}}</strong>
+						</p>
 
-					<p class="info inside-org preview" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:180}}</p>
-					<p class="stars-preview inside-org preview info">
-						<strong>{{org.stars}}</strong>
-							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star"></i>
-							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o"></i>
-					</p>
-
-					<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
-						<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
-						<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
-					</h4>
-					<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-						<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
-						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
-						&nbsp;{{org.stars}} people starred this
-					</p>
+						<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+							<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+						</h4>
+						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
+							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+							&nbsp;{{org.stars}} people starred this
+						</p>
+					</div>
 				</div>
 			</header>
 			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">

@@ -27,13 +27,25 @@
   padding: 8em 1.5em 1.2em;
 }
 
+.header-inner .header-left {
+  float: left;
+  width: 2.5em;
+}
+
+.header-inner .header-right {
+  padding-left: 3.6em;
+}
+
 .org-avatar {
   float: left;
   position: relative;
     top: 0.1em;
-  background: #333;
-  width: 2.8em;
-  height: 2.8em;
+  background-color: #333;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 2.5em;
+  height: 2.5em;
   margin-right: 0.8em;
   border-radius: 0.1em;
   border: 1px solid #F1F6F5;
@@ -73,14 +85,15 @@
 
 .org .preview {
   opacity: 1;
-  transition: opacity 0.7s;
+  -webkit-transition: all 0.7s cubic-bezier(0.5,0,0.2,1);
+  transition: all 0.7s cubic-bezier(0,0.5,0.2,1);
 }
 
 .org .stars-preview {
   position: absolute;
   z-index: 100;
-  bottom: 1.3em;
-  right: 1.5em;
+  top: 7.58em;
+  left: 2.4em;
   opacity: 0.8;
 
   font-size: 0.66em;
@@ -92,9 +105,16 @@
   transition: opacity 0.7s;
 }
 
-.org org-posts h2 {
-  font-size: 1.5em;
-  font-weight: normal;
+.org.selected .stars-preview {
+  top: 18em;
+}
+
+.org-details p {
+  margin-top: 1.2em;
+}
+
+.posts-by-org.browsing {
+  margin-top: 1.4em;
 }
 
 header .description.preview {

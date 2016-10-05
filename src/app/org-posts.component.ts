@@ -10,7 +10,8 @@ import 'rxjs/add/operator/map';
 
 @Component({
 	selector: 'org-posts',
-	templateUrl: 'app/org-posts.component.html'
+	templateUrl: 'app/org-posts.component.html',
+	styleUrls: ['app/org-posts.component.css', 'app/org.styles.css']
 })
 
 export class OrgPostsComponent {
@@ -26,6 +27,7 @@ export class OrgPostsComponent {
 	private viewingOne:boolean = false;
 	public postId:Observable<string>;
 	private querySub:Subscription;
+	private orgAvatars = {};
 
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -75,6 +77,12 @@ export class OrgPostsComponent {
 				this.isLoading = false;
 				this.posts = data;
 				this.takeCount(this.posts);
+
+				if (!this.org) {
+					this.posts.forEach(post => {
+						this.getOrgAvatarByPost(post);
+					});
+				}
 
 				this.update.emit("init");
 
@@ -130,6 +138,11 @@ export class OrgPostsComponent {
 					this.loadingPosts = false;
 					this.isLoading = false;
 					this.searchText = search;
+					if (!this.org) {
+						this.posts.forEach(post => {
+							this.getOrgAvatarByPost(post);
+						});
+					}	
 				},
 				error => console.error(error)
 		);
@@ -154,6 +167,11 @@ export class OrgPostsComponent {
 				console.log(res);
 				this.posts = this.posts.concat(res);
 				this.takeCount(this.$posts);
+				if (!this.org) {
+					this.posts.forEach(post => {
+						this.getOrgAvatarByPost(post);
+					});
+				}
 			},
 			error => console.log(error)
 		);
@@ -172,6 +190,12 @@ export class OrgPostsComponent {
 		if (this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
+	}
+
+	getOrgAvatarByPost(post) {
+		this.orgService.loadOrg(post.org).subscribe(org => {
+			this.orgAvatars[post._id] = org.avatar;
+		});
 	}
 
 }

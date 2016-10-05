@@ -17,6 +17,7 @@ import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
 import { ClaimOrgComponent } from './claim-org.component';
+import { VerifyOrgsComponent } from './verify-orgs.component';
 import { CreateOrgComponent } from './create-org.component';
 import { CreatePostComponent } from './create-post.component';
 import { SearchBox } from './search-box.component';
@@ -46,6 +47,7 @@ const routing = RouterModule.forRoot([
   , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
   , { path: 'organization/claim/:id', component: ClaimOrgComponent }
+  , { path: 'verify-organizations', component: VerifyOrgsComponent }
   , { path: '', component: BrowseOrgsComponent }
   , { path: '*', component: BrowseOrgsComponent }
 ]); // the order of this array matters
@@ -71,6 +73,7 @@ const routing = RouterModule.forRoot([
       , SingleOrgComponent
       , ManageOrgPageComponent
       , ClaimOrgComponent
+      , VerifyOrgsComponent
     	, AboutComponent
       , StarredOrgsComponent
       , ContactComponent

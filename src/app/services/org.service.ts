@@ -5,7 +5,7 @@ import { SearchService } from './search.service';
 interface EditInterface {
 		id?: string;
     key?: string;
-   	value?: string;
+   	value?: any;
 }
 
 @Injectable()
@@ -17,6 +17,10 @@ export class OrgService {
 
 	loadOrgs(options) {
 		return this.search.loadSearchableData("/orgs/get", options);
+	}
+
+	loadUnverifiedOrgs(options) {
+		return this.search.loadSearchableData("/orgs/unverified/get", options);
 	}
 
 	loadStarredOrgs(starred) {

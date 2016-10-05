@@ -1,0 +1,82 @@
+<div class="col-md-7 browse-orgs" *ngIf="!isLoading">
+	<header class="row col-md-12">
+		<div class="row">
+			<h2>Organizations</h2>
+			<p class="subtitle">People doing important work right now</p>
+
+			<search-box
+			class="org-search-box search-box-container clearfix"
+			*ngIf="!isLoading"
+			(update)="searchOrgs($event)"
+			(focusChange)="toggleSearchBoxFocus($event)"
+			[ngClass]="{focused: searchBoxIsFocused}"
+			[collection]="'organizations'"></search-box>
+
+			<p class="info" *ngIf="searchText">
+				<button class="mini" (click)="clearOrgSearch()"><i class="fa fa-undo"></i>Clear search</button>
+			</p>
+		</div>
+	</header>
+
+	<div class="row items-list orgs-list col-md-12"
+			*ngIf="!isEditing"
+			[ngClass]="{'loading-orgs': loadingOrgSearch, 'loading-more-orgs': loadingShowMoreOrgs}">
+
+		<section class="null-search" *ngIf="orgs.length === 0">
+				No orgs to show. Try broadening your search.
+		</section>
+
+<!--**********
+		Orgs Loop
+		**********-->
+		<section class="org single-item row"
+				#singleItem
+				*ngFor="let org of orgs"
+				(clickOutside)="deselectOrg($event, org._id)"
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id}">
+
+			<header
+					[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"
+					(click)="viewOrg($event, org._id)">
+				<div class="header-inner" [ngClass]="{'has-cover-image': org.coverImage}">
+					<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
+
+					<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+
+					<p class="info inside-org preview" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:180}}</p>
+
+					<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
+						<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+						<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+					</h4>
+				</div>
+			</header>
+			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">
+				<img src="app/images/x.svg" width="16" height="16" alt="exit">
+			</span>
+
+			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded}">
+				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
+				<button (click)="verifyOrg(org)">Verify this org</button>
+			</div>
+		</section>
+		
+		<button id="show-more"
+				class="row btn btn-default"
+				(click)="showMore(25, orgs.length)"
+				[disabled]="loadingOrgSearch || isLoading">Show more</button>
+	</div>
+
+	<!-- LOADING -->
+	<div class="loader loading-org-search"
+			[ngClass]="{'org-search-loader': loadingOrgSearch, 'show-more-loader': loadingShowMoreOrgs}"
+			*ngIf="loadingOrgSearch || loadingShowMoreOrgs">
+	  <div class="loader__figure"></div>
+	</div>
+</div>
+
+<div class="loader" *ngIf="isLoading">
+  <div class="loader__figure"></div>
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="30" alt="loading organizations"></p>
+</div>
+

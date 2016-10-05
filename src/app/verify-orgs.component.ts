@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -10,7 +10,6 @@ import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { SearchBox } from './search-box.component';
 import { OrgDetailsComponent } from './org-details.component';
-import { Categories } from './services/categories.service';
 import { TruncatePipe } from './pipes/truncate.pipe';
 
 @Component({
@@ -26,13 +25,10 @@ export class VerifyOrgsComponent implements OnInit {
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
 	private viewingOrg:boolean = false;
-	private categoriesList:any;
-	private categoryFilter:any = {id: null};
 
 	private isLoading = true;
 	private loadingOrgSearch = false;
 	private loadingShowMoreOrgs = false;
-	private paramsSub:Subscription;
 
 	private singleDetailsAreLoaded:boolean = false;
 
@@ -42,52 +38,29 @@ export class VerifyOrgsComponent implements OnInit {
 				private ui:UIHelper,
 				private utilities:Utilities,
 				private route:ActivatedRoute,
-				private userService:UserService,
-				private categories:Categories) { }
+				private router:Router,
+				private userService:UserService) { }
 
 	ngOnInit() {
 		this.ui.setTitle("Verify organizations");
-		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
+			if (!this.isAdmin(user)) {
+				this.router.navigate(['/']);
+				return this.ui.flash("You don't have permission to do that!", "error");
+			}
 			this.user = user;
 			console.log("User: ", user);
 		});
 	
-		this.orgService.loadOrgs({limit:20}).subscribe(
+		this.orgService.loadUnverifiedOrgs({limit: 100}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
-
-				this.paramsSub = this.route.params.subscribe(params => {
-					let categoryId = params['id'];
-					if (categoryId) {
-						this.categoryFilter = this.getCategoryById(categoryId) || {id: null};
-						this.filterByCategory(this.categoryFilter);
-						return;
-					}
-				});
-
-				/** Infinite scrolling! **/
-				let orgs = this.orgs;
-				document.onscroll = function() {
-					let body = document.body;
-		    	let html = document.documentElement;
-					let height = Math.max( body.scrollHeight, body.offsetHeight, 
-		                       		 	 html.scrollHeight, html.offsetHeight, html.clientHeight );
-					let winHeight = window.innerHeight;
-					if (document.body.scrollTop === (height - winHeight) && document.getElementById("show-more")) {
-						document.getElementById("show-more").click();
-					}
-				};
 			},
 			error => console.log(error)
 		);
-	}
-
-	ngOnDestroy() {
-		this.paramsSub.unsubscribe();
 	}
 
 	isAscending(order:string) {
@@ -99,15 +72,11 @@ export class VerifyOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		let query = {search: search, field: "name", bodyField: "description", limit: 20};
+		let query = {search: search, field: "name", bodyField: "description", limit: 100};
 
-		if (this.categoryFilter && this.categoryFilter.id) {
-			query['filterField'] = "categories.id";
-			query['filterValue'] = this.categoryFilter.id;
-		}
 		this.loadingOrgSearch = true;
 
-		this.orgService.loadOrgs(query)
+		this.orgService.loadUnverifiedOrgs(query)
 			.subscribe(
 				results => {
 					this.orgs = results;
@@ -124,26 +93,6 @@ export class VerifyOrgsComponent implements OnInit {
 		searchInput.value = "";
 	}
 
-	getCategoryById(id) {
-		return this.categoriesList.find((category) => {
-			if (category) return category.id === id;
-			else return false;
-		});
-	}
-
-	filterByCategory(category) {
-		this.categoryFilter = category || {id: null};
-		this.searchOrgs(this.searchText);
-	}
-
-	clearCategoryFilter() {
-		this.categoryFilter = {id: null};
-		this.searchOrgs(this.searchText);
-		if (window.location.href.indexOf("category") > -1) {
-			window.location.href = "";
-		}
-	}
-
 	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
 		let query = {limit: increase, offset: offset};
@@ -152,13 +101,9 @@ export class VerifyOrgsComponent implements OnInit {
 			query['field'] = "name";
 			query['bodyField'] = "description";
 		}
-		if (this.categoryFilter.id) {
-			query['filterField'] = "categories.id";
-			query['filterValue'] = this.categoryFilter.id;
-		}
 		this.loadingShowMoreOrgs = true;
 
-		this.orgService.loadOrgs(query).subscribe(
+		this.orgService.loadUnverifiedOrgs(query).subscribe(
 			res => {
 				this.loadingShowMoreOrgs = false;
 				console.log(res);
@@ -198,22 +143,6 @@ export class VerifyOrgsComponent implements OnInit {
 		}
 	}
 
-	unstarOrg(orgId) {
-		this.http.put("/user/star/subtract", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
-			data => {
-				this.user = data.user;
-				this.orgs.find((org) => {
-					return org._id === orgId;
-				}).stars--;
-				this.featuredOrgs.find((org) => {
-					return org._id === orgId;
-				}).stars--;
-				console.log(data.org);
-				console.log(data.user);
-			}
-		);
-	}
-
 	revealOrgDetails(event) {
 		if (event == "init") {
 			this.singleDetailsAreLoaded = true;
@@ -221,8 +150,32 @@ export class VerifyOrgsComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
+		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
+	}
+
+	isAdmin(user) {
+		if (user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		else return false;
+	}
+
+	verifyOrg(org) {
+		let orgIndex = this.orgs.indexOf(org);
+		this.orgService.editOrg({
+  		id: org._id,
+  		key: "verified",
+  		value: true
+  	}).subscribe(res => {
+  		console.log(res);
+  		if (res.errmsg) {
+  			this.ui.flash("Verification failed", "error");
+  			return;
+  		}
+  		this.orgs.splice(orgIndex, 1);
+  		this.ui.flash("Verified", "success");
+  		console.log(res);
+  	});
 	}
 
 }

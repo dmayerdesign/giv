@@ -65,6 +65,52 @@ exports.routes = [
     }
   },
 
+  { // GET UNVERIFIED ORGS
+    method: "get",
+    uri: "/orgs/unverified/get",
+    middleware: "passport",
+    process: function(req, res) {
+      var dbQuery = {};
+      var dbQuery2 = null;
+      if (req.query.search) {
+        dbQuery = search(req.query.search, req.query.field);
+      }
+      if (req.query.bodyField) {
+        dbQuery2 = search(req.query.search, req.query.bodyField);
+      }
+      if (req.query.filterField) {
+        dbQuery[req.query.filterField] = req.query.filterValue;
+        if (dbQuery2)
+          dbQuery2[req.query.filterField] = req.query.filterValue;
+      }
+      dbQuery.verified = false;
+
+      console.log(req.query);
+      console.log("Query 1", dbQuery);
+      console.log("Query 2", dbQuery2);
+
+      if (dbQuery2) {
+        Org.find().or([dbQuery, dbQuery2])
+        .sort(req.query.sort || "-dateCreated")
+        .skip(+req.query.offset)
+        .limit(+req.query.limit)
+        .exec((err, docs) => {
+          if(err) return console.error(err);
+          res.json(docs);
+        })
+      }
+      else {
+        Org.find(dbQuery, (err, docs) => {
+          if(err) return console.error(err);
+          res.json(docs);
+        })
+        .sort("-dateCreated")
+        .skip(+req.query.offset)
+        .limit(+req.query.limit);
+      }
+    }
+  },
+
   { // GET STARRED
     method: "get",
     uri: "/orgs/get/starred",
@@ -111,6 +157,7 @@ exports.routes = [
     }
   },
 
+  // GET SINGLE
   {
     method: "get",
     uri: "/org/:id",
