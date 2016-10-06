@@ -117,7 +117,7 @@ app.use(function(req, res, next) {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
+//app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 /* For ng2 */
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/scripts', express.static(__dirname + '/../node_modules'));

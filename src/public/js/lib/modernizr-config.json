@@ -1,0 +1,20 @@
+{
+  "minify": true,
+  "options": [
+    "setClasses"
+  ],
+  "feature-detects": [
+    "test/canvas",
+    "test/video",
+    "test/css/animations",
+    "test/css/backgroundsize",
+    "test/css/backgroundsizecover",
+    "test/css/boxsizing",
+    "test/css/flexbox",
+    "test/css/fontface",
+    "test/css/transforms",
+    "test/css/transforms3d",
+    "test/css/transitions",
+    "test/svg/asimg"
+  ]
+}

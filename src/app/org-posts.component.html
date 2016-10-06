@@ -1,28 +1,32 @@
 <div class="clearfix posts-container" [attr.id]="!isBrowsing ? 'posts' : null" [ngClass]="{'posts-by-org': org, 'browsing': isBrowsing}">
 
-	<h4 *ngIf="org && isBrowsing">What they're up to</h4>
-	<h2 *ngIf="!org || !isBrowsing">What they're up to</h2>
-	<p *ngIf="!org" class="subtitle">See where your money's going</p>
-	<search-box
-		class="search-box-container clearfix"
-		*ngIf="(!org?._id || !isBrowsing) && !isLoading"
-		(update)="searchPosts($event)"
-		(focusChange)="toggleSearchBoxFocus($event)"
-		[ngClass]="{focused: searchBoxIsFocused}"
-		[collection]="searchPlaceholder"></search-box>
+	<header>
+		<h4 *ngIf="org && isBrowsing">What they're up to</h4>
+		<h2 *ngIf="!org || !isBrowsing">What they're up to</h2>
+		<p *ngIf="!org" class="subtitle">See where your money's going</p>
+		<search-box
+			class="search-box-container clearfix"
+			*ngIf="(!org?._id || !isBrowsing) && !isLoading"
+			(update)="searchPosts($event)"
+			(focusChange)="toggleSearchBoxFocus($event)"
+			[ngClass]="{focused: searchBoxIsFocused}"
+			[collection]="searchPlaceholder"></search-box>
+	</header>
 
-	<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
-	
 	<!-- Posts -->
 	<section *ngIf="!viewingOne && !loadingPosts" class="posts col-md-12">
+		<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 		<div #singlePost
 				class="post clearfix"
 				[ngClass]="{'has-featured-image': post?.featuredImage?.length}"
-				*ngFor="let post of posts"
-				(click)="selectPost(post._id)">
-			<div *ngIf="!org" [ngStyle]="{'background-image': 'url(' + orgAvatars[post._id] + ')'}" class="post-avatar bg-image"></div>
+				*ngFor="let post of posts">
+			<div *ngIf="!org"
+					[ngStyle]="{'background-image': 'url(' + orgsByPost[post._id]?.avatar + ')'}"
+					class="org-avatar bg-image"
+					(click)="selectPost(post._id)"></div>
 			<div class="post-inner">
-				<h5 class="post-title">{{post.title}}</h5>
+				<p class="post-meta" *ngIf="!org"><strong class="post-org">{{orgsByPost[post._id]?.name}}</strong><span class="post-date">{{orgsByPost[post._id]?.dateCreated | date: MMMEEEEd}}</span></p>
+				<h5 class="post-title" (click)="selectPost(post._id)">{{post.title}}</h5>
 				<p class="post-content">{{post.content | truncate:100}}</p>
 			</div>
 		</div>

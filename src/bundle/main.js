@@ -52507,7 +52507,7 @@
 	        this.posts = [];
 	        this.selectedPost = null;
 	        this.viewingOne = false;
-	        this.orgAvatars = {};
+	        this.orgsByPost = {};
 	        this.searchBoxIsFocused = false;
 	        this.isLoading = true;
 	        this.loadingPosts = false;
@@ -52644,7 +52644,7 @@
 	    OrgPostsComponent.prototype.getOrgAvatarByPost = function (post) {
 	        var _this = this;
 	        this.orgService.loadOrg(post.org).subscribe(function (org) {
-	            _this.orgAvatars[post._id] = org.avatar;
+	            _this.orgsByPost[post._id] = org;
 	        });
 	    };
 	    __decorate([
@@ -52801,6 +52801,12 @@
 	            return true;
 	        else
 	            return false;
+	    };
+	    SingleOrgComponent.prototype.toggleOptionsMenu = function () {
+	        this.showOptionsMenu = this.showOptionsMenu ? false : true;
+	    };
+	    SingleOrgComponent.prototype.closeOptionsMenu = function () {
+	        this.showOptionsMenu = false;
 	    };
 	    __decorate([
 	        core_1.Input(), 

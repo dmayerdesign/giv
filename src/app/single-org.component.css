@@ -1,3 +1,7 @@
+.org {
+	position: relative;
+}
+
 .video-container {
 	position: relative;
 	overflow: hidden;
@@ -9,9 +13,16 @@
 	position: relative;
 		z-index: -1;
 
-	background-color: transparent;
-	background-repeat: no-repeat;
+	background-color: #995599;
+	background-image: url('app/images/cover-icons-overlay.png');
+	background-size: 14em auto;
+	background-repeat: repeat;
 	background-position: 50% 50%;
+}
+
+.has-cover-image .cover-image,
+.has-video .featured-video {
+	background-repeat: no-repeat;
 	background-size: 100% 100%;
 	background-size: cover;
 }
@@ -46,7 +57,16 @@
 }
 
 .single-org header {
-  margin-top: -4.8em;
-  margin-left: 1.5em;
+	margin-top: -4.8em;
   margin-bottom: 3em;
+	margin-left: 1.5em;
+
+	color: #fff;
+}
+
+.options-menu {
+	position: absolute;
+	top: 1em;
+	right: 1em;
+	z-index: 101;
 }

@@ -1,8 +1,8 @@
-<div class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink }">
+<div class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink, 'has-cover-image': org.coverImage }">
 	<div class="video-container clearfix">
 		<div *ngIf="org?.videoLink"
 				[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"
-				[ngStyle]="{'background-image': 'url(' + (org?.coverImage || videoBg) + ')'}">
+				[ngStyle]="{'background-image': 'url(' + (org?.coverImage || videoBg || 'app/images/cover-icons-overlay.png') + ')'}">
 			<iframe frameborder="0" height="100%" width="100%" 
 			  [src]="videoLink">
 			</iframe>
@@ -15,10 +15,14 @@
 	<div *ngIf="!org?.videoLink && org?.coverImage"
 		class="cover-image"
 		[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"></div>
+	<div *ngIf="!org?.videoLink && !org?.coverImage"
+		class="cover-image"
+		style="background-image: url('app/images/cover-icons-overlay.png')"></div>
+
+		
 
 	<header class="org-header">
-		<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
-
+		<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
 		<h4>
 			<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
 			<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
@@ -30,11 +34,15 @@
 		</p>
 	</header>
 	<org-details [org]="org" [isSingle]="true"></org-details>
-					
-	<div *ngIf="userHasPermission(org)">
-		<a [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
-		<a [routerLink]="['/organization', 'claim', org?._id]">Is this your organization?</a>
-	</div>
-	
 	<org-posts [org]="org" [user]="user"></org-posts>
+
+	<div class="options-menu" (clickOutside)="closeOptionsMenu()">
+		<button class="icon-btn" (click)="toggleOptionsMenu()">
+			<img src="app/images/options.svg" alt="options">
+		</button>
+		<ul *ngIf="showOptionsMenu" class="submenu">
+			<li><a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
+			<li><a *ngIf="user && !userHasPermission(org)" [routerLink]="['/organization', 'claim', org?._id]">Is this your organization?</a></li>
+		</ul>
+	</div>
 </div>

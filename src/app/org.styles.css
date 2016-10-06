@@ -1,6 +1,7 @@
-.org header {
+header {
   position: relative;
   background-size: cover;
+  background-repeat: no-repeat;
   background-position: 50%;
 
   text-shadow: 0px 1px 2px rgba(0,0,0,0.2)
@@ -14,12 +15,11 @@
   background-color: #bbccdd;
 }
 
-.org .header-inner.has-cover-image {
+.has-cover-image .header-inner {
   background-color: rgba(0,0,0,0.2);
-  /*background-image: linear-gradient(rgba(0,0,0,0.3) 30%, transparent 40%, transparent 50%, rgba(0,0,0,0.4) 80%);*/
 }
 
-.orgs-list .org .header-inner.has-cover-image {
+.orgs-list .has-cover-image .header-inner {
   background-color: rgba(0,0,0,0.5);
 }
 
@@ -68,13 +68,13 @@
     top: 0.08em;
 }
 
-.org h4 {
+header h4 {
   font-family: Helvetica, "Roboto", sans-serif;
   font-weight: normal;
   margin-bottom: 0.2em;
 }
 
-.org h4 a, .org h4 a:hover {
+header h4 a, header h4 a:hover {
   text-decoration: none;
   color: #fff;
 }
@@ -123,6 +123,7 @@ header .description.preview {
 
 
 .donate-button {
+  font-family: 'Hind', Helvetica, Arial, sans-serif;
   font-size: 1.3em;
   width: 100%;
   background: linear-gradient(20deg, #53E4ED, #4fead1);

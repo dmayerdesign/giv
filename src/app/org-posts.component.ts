@@ -27,7 +27,7 @@ export class OrgPostsComponent {
 	private viewingOne:boolean = false;
 	public postId:Observable<string>;
 	private querySub:Subscription;
-	private orgAvatars = {};
+	private orgsByPost = {};
 
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -194,7 +194,7 @@ export class OrgPostsComponent {
 
 	getOrgAvatarByPost(post) {
 		this.orgService.loadOrg(post.org).subscribe(org => {
-			this.orgAvatars[post._id] = org.avatar;
+			this.orgsByPost[post._id] = org;
 		});
 	}
 

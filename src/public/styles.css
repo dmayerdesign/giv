@@ -27,6 +27,11 @@ h4 {
   font-size: 1.5em;
 }
 
+a, a:hover {
+  color: #999194;
+  color: inherit;
+}
+
 select {
   margin-bottom: 0.6em;
   min-width: 10rem;
@@ -94,6 +99,27 @@ button:active {
 
 button i {
   padding-right: 0.6em;
+}
+
+.icon-btn, .icon-btn:hover, .icon-btn:focus, .icon-btn:active {
+  outline: 0 none;
+  border: 0 none;
+  width: 2em;
+  height: 2em;
+  padding: 0;
+  border-radius: 4em;
+  background: transparent;
+  box-shadow: none;
+}
+
+.icon-btn:hover, .icon-btn:active {
+  background: rgba(0,0,0,0.1);
+}
+
+.icon-btn img, .icon-btn i {
+  height: 1.2em;
+  width: auto;
+  text-align: center;
 }
 
 /* Layout */
@@ -257,7 +283,10 @@ button.nav-item:hover {
 	vertical-align: middle;
 }
 
-.nav-link > img {
+.nav-link img,
+.nav-link i,
+.subnav img,
+.subnav i {
 	padding-right: 0.8em;
 }
 
@@ -267,9 +296,24 @@ button.nav-item:hover {
 
 /* subnav */
 
-.subnav {
+.subnav,
+.submenu {
   position: absolute;
+    bottom: -2.2em;
+  padding: 1em 1em 1em 1.6em;
+  width: 100%;
+  margin-left: -1.5em;
+  background: #43d4dD;
+  border-radius: 2px;
+  list-style: none;
+  box-shadow: 0px 2px 4px rgba(20,20,20,0.1);
+}
 
+.subnav li,
+.submenu li {
+  cursor: pointer;
+  font-size: 0.8em;
+  color: #fff;
 }
 
 /* SEARCH BOX CONTAINER */

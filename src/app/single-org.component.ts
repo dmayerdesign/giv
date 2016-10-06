@@ -24,6 +24,7 @@ export class SingleOrgComponent implements OnInit {
   private videoLink:any;
   private videoIsExpanded:boolean;
   private videoBg:string;
+  private showOptionsMenu:boolean;
 
 	constructor(
 				private router: Router,
@@ -119,6 +120,14 @@ export class SingleOrgComponent implements OnInit {
 		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
+	}
+
+	toggleOptionsMenu() {
+		this.showOptionsMenu = this.showOptionsMenu ? false : true;
+	}
+
+	closeOptionsMenu() {
+		this.showOptionsMenu = false;
 	}
 
 }
