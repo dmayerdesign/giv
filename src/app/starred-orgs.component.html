@@ -1,9 +1,67 @@
 <div class="col-md-7">
 	<h2>Your Starred</h2>
-	<section class="row">
-		<div class="col-md-12"
-				*ngFor="let org of orgs">
-			<h4>{{org.name}}</h4>
-		</div>
-	</section>
+	
+	<div class="row items-list orgs-list col-md-12"
+			[ngClass]="{'loading-orgs': loadingOrgSearch, 'loading-more-orgs': loadingShowMoreOrgs}">
+
+		<section class="null-search" *ngIf="orgs.length === 0">
+				<p>No orgs to show. Try broadening your search.</p>
+		</section>
+
+	<!--*******
+		Orgs Loop
+		*********-->
+		<section class="org single-item row"
+				#singleItem
+				*ngFor="let org of orgs"
+				(clickOutside)="deselectOrg($event, org._id)"
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
+
+			<header
+					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
+					(click)="viewOrg($event, org._id)">
+				<div class="header-inner">
+					<div class="inside-org header-left">
+						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+					</div>
+					<div class="inside-org header-right">
+						<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+
+						<p class="info preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
+						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
+							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
+							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
+							<strong class="inside-org">{{org.stars}}</strong>
+						</p>
+
+						<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
+							<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+						</h4>
+						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
+							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+							&nbsp;{{org.stars}} people starred this
+						</p>
+					</div>
+				</div>
+			</header>
+			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">
+				<img src="app/images/x.svg" width="16" height="16" alt="exit">
+			</span>
+
+			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
+				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
+				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
+				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Read more</a>
+				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Read more</a>
+				<a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
+			</div>
+		</section>
+		
+		<button id="show-more"
+				class="row btn btn-default"
+				(click)="showMore(10, orgs.length)"
+				[disabled]="loadingOrgSearch || isLoading">Show more</button>
+	</div>
 </div>

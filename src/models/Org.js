@@ -38,7 +38,7 @@ orgSchema.pre('save', function(next) {
   }
   if (org.isNew || org.isModified("name")) {
   	let firstChar = org.name.charAt(0).toLowerCase();
-	  if (firstChar.match(/[a-z]/)) {
+	  if (firstChar.match(/[a-z0-9]/)) {
 	  	org.avatar = "app/images/default-avatars/" + firstChar + ".png";
 	  }
 	  org.slug = org.name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "-");

@@ -31,7 +31,7 @@
 			</div>
 		</div>
 		<div class="null-search" *ngIf="posts.length === 0">
-				No posts to show. Try broadening your search.
+				<p>No posts to show. Try broadening your search.</p>
 		</div>
 
 		<button *ngIf="posts.length > 19" id="show-more" class="row btn btn-default" (click)="showMore(10, posts.length)">Show more</button>

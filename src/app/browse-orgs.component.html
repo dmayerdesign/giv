@@ -70,11 +70,10 @@
 	</header>
 
 	<div class="row items-list orgs-list col-md-12"
-			*ngIf="!isEditing"
 			[ngClass]="{'loading-orgs': loadingOrgSearch, 'loading-more-orgs': loadingShowMoreOrgs}">
 
 		<section class="null-search" *ngIf="orgs.length === 0">
-				No orgs to show. Try broadening your search.
+				<p>No orgs to show. Try broadening your search.</p>
 		</section>
 
 	<!--*******
@@ -97,7 +96,7 @@
 						<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
 						<p class="info preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
-						<p class="stars-preview preview info inside-org">
+						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
 							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
 							<strong class="inside-org">{{org.stars}}</strong>

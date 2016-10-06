@@ -1,9 +1,17 @@
 .org header {
   position: relative;
+  background-color: #995599;
+  background-size: 14em auto;
+  background-repeat: repeat;
+  background-position: 50% 50%;
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.2)
+}
+
+.has-cover-image header,
+.has-video header {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50%;
-  text-shadow: 0px 1px 2px rgba(0,0,0,0.2)
 }
 
 .org .header-inner {
@@ -69,7 +77,7 @@
 }
 
 header h4 {
-  font-family: Helvetica, "Roboto", sans-serif;
+  font-family: "Hind", Helvetica, "Roboto", sans-serif;
   font-weight: normal;
   margin-bottom: 0.2em;
 }

@@ -32,13 +32,6 @@
   position: relative;
 }
 
-.org header {
-  background-color: #995599;
-  background-size: 14em auto;
-  background-repeat: repeat;
-  background-position: 50% 50%;
-}
-
 .has-cover-image header,
 .has-video header {
   background-size: 100%;
@@ -87,8 +80,11 @@
 
 .featured-orgs-inner {
   position: relative;
-  height: 12.84em;
+  height: 12.94em;
   overflow: hidden;
+
+  border: 2px solid #F1F6F5;
+  border-radius: 4px;
 }
 
 .featured-org {
@@ -98,6 +94,7 @@
   z-index: 100;
   width: 100%;
   border: 0 none;
+  border-radius: 0;
 
   -webkit-transition: all 0.8s;
   transition: all 0.8s;
