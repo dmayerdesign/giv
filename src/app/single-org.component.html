@@ -12,12 +12,10 @@
 			<button *ngIf="videoIsExpanded" (click)="minimizeVideo()" class="mini"><i class="fa fa-angle-up"></i> Minimize the video</button>
 		</div>
 	</div>
-	<div *ngIf="!org?.videoLink && org?.coverImage"
+	<div *ngIf="!org?.videoLink"
 		class="cover-image"
-		[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"></div>
-	<div *ngIf="!org?.videoLink && !org?.coverImage"
-		class="cover-image"
-		style="background-image: url('app/images/cover-icons-overlay.png')"></div>
+		[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
+	</div>
 
 		
 

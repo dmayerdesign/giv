@@ -13,7 +13,7 @@
 				[ngClass]="{'hidden': !org.showing, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
 
 			<header
-					[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}">
+					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
 				<div class="header-inner">
 					<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
 
@@ -28,7 +28,7 @@
 					</p>
 					<p class="description info inside-org preview">{{org.description | truncate:280}}</p>
 
-					<button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
+					<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
 				</div>
 			</header>
 		</section>
@@ -87,7 +87,7 @@
 				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
 
 			<header
-					[ngStyle]="{'background-image': 'url(' + org.coverImage + ')'}"
+					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
 					(click)="viewOrg($event, org._id)">
 				<div class="header-inner">
 					<div class="inside-org header-left">

@@ -16,7 +16,7 @@
           <span>Your account</span>
         </a>
         <ul *ngIf="showAccountMenu" class="subnav">
-          <li class="subnav-item" (click)="logOut()"><i class="fa fa-lock"></i><span>Log out</span></li>
+          <li class="subnav-item" (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></li>
         </ul>
       </li>
       <li *ngIf="!isLoggedIn" class="nav-item">
@@ -35,7 +35,7 @@
 
 <footer>
   <small><a (mouseover)="navOver($event)" (mouseout)="navOut($event)" target="_blank" href="https://github.com/dmayerdesign">Made with <i class="fa fa-heart"></i> by Danny Mayer</a></small>
-  <small>Icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a> and <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> and from <a href="https://icons8.com/web-app/14099/Settings">Icons8</a> (<a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>)</small>
+  <small>Icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a> and <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> and by <a href="https://icons8.com/web-app/14099/Settings">Icons8</a> (<a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>)</small>
 </footer>
 
 <ng2-toasty></ng2-toasty>

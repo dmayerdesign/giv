@@ -32,6 +32,20 @@
   position: relative;
 }
 
+.org header {
+  background-color: #995599;
+  background-size: 14em auto;
+  background-repeat: repeat;
+  background-position: 50% 50%;
+}
+
+.has-cover-image header,
+.has-video header {
+  background-size: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .org-expanded {
   opacity: 0;
   padding: 0 1.5em;
