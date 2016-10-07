@@ -1,6 +1,6 @@
 .org header {
   position: relative;
-  background-color: #995599;
+  background-color: #5D8BD5;
   background-size: 14em auto;
   background-repeat: repeat;
   background-position: 50% 50%;
@@ -19,7 +19,6 @@
   -webkit-transition: all 0.7s cubic-bezier(0.5,0,0.2,1);
   transition: all 0.7s cubic-bezier(0,0.5,0.2,1);
   color: #fff;
-  /*background-color: #bbccdd;*/
   background-color: rgba(0,0,0,0.2);
 }
 

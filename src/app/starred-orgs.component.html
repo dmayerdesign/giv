@@ -1,11 +1,11 @@
 <div class="col-md-7">
 	<h2>Your Starred</h2>
-	
+
 	<div class="row items-list orgs-list col-md-12"
-			[ngClass]="{'loading-orgs': loadingOrgSearch, 'loading-more-orgs': loadingShowMoreOrgs}">
+			[ngClass]="{'loading-more-orgs': loadingShowMoreOrgs}">
 
 		<section class="null-search" *ngIf="orgs.length === 0">
-				<p>No orgs to show. Try broadening your search.</p>
+				<p>No organizations to show. Star some, and watch them appear here!</p>
 		</section>
 
 	<!--*******
@@ -39,8 +39,8 @@
 							<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
-							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)"><i class="fa fa-star-o"></i></span>
+							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>
 					</div>
@@ -58,10 +58,5 @@
 				<a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
 			</div>
 		</section>
-		
-		<button id="show-more"
-				class="row btn btn-default"
-				(click)="showMore(10, orgs.length)"
-				[disabled]="loadingOrgSearch || isLoading">Show more</button>
 	</div>
 </div>

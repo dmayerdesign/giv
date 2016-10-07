@@ -16,7 +16,7 @@
           <span>Your account</span>
         </a>
         <ul *ngIf="showAccountMenu" class="subnav">
-          <li class="subnav-item" (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></li>
+          <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
         </ul>
       </li>
       <li *ngIf="!isLoggedIn" class="nav-item">

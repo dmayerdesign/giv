@@ -27,7 +27,7 @@ h4 {
   font-size: 1.5em;
 }
 
-a, a:hover {
+a, a:hover, a:active, a:link, a:visited, a:link:active, a:visited:active {
   color: #999194;
   color: inherit;
 }
@@ -95,6 +95,14 @@ button:hover {
 button:active {
   box-shadow: 0px 0px 1px rgba(20,20,20,0.1);
   background: #f0f5f4;
+}
+
+#show-more {
+  width: 100%;
+}
+
+#show-more.loading {
+  opacity: 0.25;
 }
 
 button i {
@@ -184,6 +192,7 @@ footer a:hover {
 .navbar {
 	background: linear-gradient(20deg, #53E4ED, #4AEFB3);
 	padding: 0;
+  border-radius: 0 !important;
 }
 
 h1.masthead-logo {
@@ -237,7 +246,9 @@ ul.nav {
 	height: 3px;
 }
 
-.nav-link {
+.nav-link, .nav-link:link, .nav-link:active, .nav-link:visited,
+.nav-link:link:active, .nav-link:visited:active,
+.active .nav-link {
 	color: #fff;
 	font-size: 0.8em;
 	font-weight: 300;
@@ -250,7 +261,7 @@ a.nav-link:not([href]):not([tabindex]) {
 	cursor: pointer;
 }
 
-.active .nav-link, .nav-link:focus, .nav-link:active {
+.active .nav-link, .nav-link:active {
 	color: #fff;
 }
 
@@ -301,8 +312,8 @@ button.nav-item:hover {
   position: absolute;
     bottom: -2.2em;
     z-index: 101;
-  padding: 1em 1em 1em 1.6em;
-  width: 100%;
+  padding: 0.2em 0;
+  width: 9em;
   margin-left: -1.5em;
   background: #43d4dD;
   border-radius: 2px;
@@ -310,11 +321,23 @@ button.nav-item:hover {
   box-shadow: 0px 2px 4px rgba(20,20,20,0.1);
 }
 
-.subnav li,
-.submenu li {
+.subnav a,
+.submenu a {
+  display: block;
+  padding: 0.8em 0.8em 0.8em 1.2em;
   cursor: pointer;
   font-size: 0.8em;
-  color: #fff;
+  color: #fff !important;
+}
+
+.subnav a:hover,
+.submenu a:hover,
+.subnav a:active,
+.submenu a:active,
+.subnav a:focus,
+.submenu a:focus {
+  color: #fff !important;
+  text-decoration: underline !important;
 }
 
 /* SEARCH BOX CONTAINER */

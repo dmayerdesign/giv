@@ -34,7 +34,9 @@
 				<p>No posts to show. Try broadening your search.</p>
 		</div>
 
-		<button *ngIf="posts.length > 19" id="show-more" class="row btn btn-default" (click)="showMore(10, posts.length)">Show more</button>
+		<button *ngIf="posts.length > 19"
+				id="show-more"
+				(click)="showMore(10, posts.length)">Show more</button>
 	</section>
 
 	<!-- View Post -->

@@ -5,7 +5,12 @@
 }
 
 .show-more-loader {
-	bottom: -1em;
+	bottom: -0.65em;
+  margin-left: -0.9em;
+}
+
+.show-more-loader .loader__figure {
+  top: 48%;
 }
 
 .orgs-list.loading-orgs {

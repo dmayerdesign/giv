@@ -13,7 +13,7 @@
 	position: relative;
 		z-index: -1;
 
-	background-color: #995599;
+	background-color: #5D8BD5;
 	background-size: 14em auto;
 	background-repeat: repeat;
 	background-position: 50% 50%;
@@ -66,7 +66,20 @@
 
 .options-menu {
 	position: absolute;
-	top: 1em;
-	right: 1em;
-	z-index: 101;
+		top: 1em;
+		right: 1em;
+		z-index: 101;
+	width: 9em;
+}
+
+.options-menu .icon-btn {
+	position: absolute;
+		top: 0;
+		right: 0;
+}
+
+.options-menu .submenu {
+	bottom: auto;
+	top: 2.4em;
+	right: 0;
 }

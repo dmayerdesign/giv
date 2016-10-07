@@ -51896,13 +51896,17 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
 	var user_service_1 = __webpack_require__(68);
 	var org_service_1 = __webpack_require__(75);
 	var StarredOrgsComponent = (function () {
-	    function StarredOrgsComponent(userService, orgService) {
+	    function StarredOrgsComponent(userService, orgService, http) {
 	        this.userService = userService;
 	        this.orgService = orgService;
+	        this.http = http;
 	        this.orgs = [];
+	        this.loadingShowMoreOrgs = false;
+	        this.viewingOrg = false;
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -51914,7 +51918,7 @@
 	            _this.loadStarredOrgs(_this.user.starred);
 	        });
 	    };
-	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred) {
+	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred, cb) {
 	        var _this = this;
 	        this.orgService.loadStarredOrgs(starred)
 	            .subscribe(function (results) {
@@ -51922,13 +51926,67 @@
 	            console.log("Starred orgs: ", _this.orgs);
 	        }, function (error) { return console.error(error); });
 	    };
+	    StarredOrgsComponent.prototype.viewOrg = function (e, id) {
+	        var findOrg = function (org) {
+	            return org._id === id;
+	        };
+	        this.selectedOrg = this.orgs.find(findOrg);
+	        this.viewingOrg = true;
+	        console.log(this.selectedOrg);
+	    };
+	    StarredOrgsComponent.prototype.deselectOrg = function (e, id) {
+	        console.log(e.target.className);
+	        if (e.target.className.indexOf("inside-org") > -1)
+	            return;
+	        if (this.viewingOrg && this.selectedOrg._id === id) {
+	            console.log(this.selectedOrg);
+	            this.selectedOrg = null;
+	            this.viewingOrg = false;
+	            this.singleDetailsAreLoaded = false;
+	            this.singlePostsAreLoaded = false;
+	        }
+	    };
+	    StarredOrgsComponent.prototype.orgIsStarred = function (org) {
+	        if (this.user.starred.indexOf(org._id) === -1)
+	            return false;
+	        else
+	            return true;
+	    };
+	    StarredOrgsComponent.prototype.unstarOrg = function (org) {
+	        var _this = this;
+	        var orgIndex = this.orgs.indexOf(org);
+	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.orgs.splice(orgIndex, 1);
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
+	    };
+	    StarredOrgsComponent.prototype.revealOrgDetails = function (event) {
+	        if (event == "init") {
+	            this.singleDetailsAreLoaded = true;
+	        }
+	    };
+	    StarredOrgsComponent.prototype.revealOrgPosts = function (event) {
+	        if (event == "init") {
+	            this.singlePostsAreLoaded = true;
+	        }
+	    };
+	    StarredOrgsComponent.prototype.userHasPermission = function (org) {
+	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	            return true;
+	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
+	            return true;
+	        else
+	            return false;
+	    };
 	    StarredOrgsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'starred-orgs',
 	            templateUrl: 'app/starred-orgs.component.html',
-	            providers: [org_service_1.OrgService, user_service_1.UserService]
+	            styleUrls: ['app/browse-orgs.component.css', 'app/org.styles.css']
 	        }), 
-	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService])
+	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService, http_1.Http])
 	    ], StarredOrgsComponent);
 	    return StarredOrgsComponent;
 	}());
@@ -52278,29 +52336,29 @@
 	        else
 	            return true;
 	    };
-	    BrowseOrgsComponent.prototype.starOrg = function (orgId) {
+	    BrowseOrgsComponent.prototype.starOrg = function (org) {
 	        var _this = this;
-	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (org) {
-	                return org._id === orgId;
+	            _this.orgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
 	            }).stars++;
-	            _this.featuredOrgs.find(function (org) {
-	                return org._id === orgId;
+	            _this.featuredOrgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
 	            }).stars++;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
 	    };
-	    BrowseOrgsComponent.prototype.unstarOrg = function (orgId) {
+	    BrowseOrgsComponent.prototype.unstarOrg = function (org) {
 	        var _this = this;
-	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (org) {
-	                return org._id === orgId;
+	            _this.orgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
 	            }).stars--;
-	            _this.featuredOrgs.find(function (org) {
-	                return org._id === orgId;
+	            _this.featuredOrgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
 	            }).stars--;
 	            console.log(data.org);
 	            console.log(data.user);

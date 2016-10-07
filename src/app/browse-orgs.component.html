@@ -18,12 +18,12 @@
 					<img class="org-avatar inside-org" *ngIf="org.avatar" [src]="org.avatar" [alt]="org.name">
 
 					<h4>
-						<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
-						<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+						<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">{{org.name}}</a>
+						<a *ngIf="!org.slug" [routerLink]="['/organization', org._id]">{{org.name}}</a>
 					</h4>
 					<p class="info">
-						<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
-						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+						<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
+						<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 						&nbsp;{{org.stars}} people starred this
 					</p>
 					<p class="description info inside-org preview">{{org.description | truncate:280}}</p>
@@ -103,12 +103,12 @@
 						</p>
 
 						<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
-							<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+							<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">{{org.name}}</a>
+							<a *ngIf="!org.slug" [routerLink]="['/organization', org._id]">{{org.name}}</a>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
-							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
+							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
+							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>
 					</div>
@@ -121,15 +121,15 @@
 			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
 				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
-				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Read more</a>
-				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Read more</a>
+				<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">Read more</a>
+				<a *ngIf="!org.slug" [routerLink]="['/organization', org._id]">Read more</a>
 				<a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
 			</div>
 		</section>
 		
 		<button id="show-more"
-				class="row btn btn-default"
 				(click)="showMore(10, orgs.length)"
+				[ngClass]="{'loading': loadingShowMoreOrgs}"
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>
 	</div>
 

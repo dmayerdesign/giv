@@ -4,17 +4,18 @@
     "setClasses"
   ],
   "feature-detects": [
-    "test/canvas",
-    "test/video",
-    "test/css/animations",
-    "test/css/backgroundsize",
-    "test/css/backgroundsizecover",
-    "test/css/boxsizing",
-    "test/css/flexbox",
-    "test/css/fontface",
-    "test/css/transforms",
-    "test/css/transforms3d",
-    "test/css/transitions",
-    "test/svg/asimg"
+    "canvas",
+    "video",
+    "css/animations",
+    "css/backgroundsize",
+    "css/backgroundsizecover",
+    "css/boxsizing",
+    "css/flexbox",
+    "css/fontface",
+    "css/transforms",
+    "css/transforms3d",
+    "css/transitions",
+    "svg/asimg",
+    "touchevents"
   ]
 }

@@ -39,8 +39,8 @@
 			<img src="app/images/options.svg" alt="options">
 		</button>
 		<ul *ngIf="showOptionsMenu" class="submenu">
-			<li><a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
-			<li><a *ngIf="user && !userHasPermission(org)" [routerLink]="['/organization', 'claim', org?._id]">Is this your organization?</a></li>
+			<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
+			<li *ngIf="user && !userHasPermission(org)"><a [routerLink]="['/organization', 'claim', org?._id]">Is this your organization?</a></li>
 		</ul>
 	</div>
 </div>
