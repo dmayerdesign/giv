@@ -57,9 +57,23 @@
         name="donateLinkCopy"
         class="form-control">
       <option
-        *ngFor="let copy of callsToAction"
-        [value]="copy">{{copy}}</option>
+        *ngFor="let callToAction of callsToAction"
+        [value]="copy">{{callToAction}}</option>
     </select>
+  </div>
+  <div class="form-block">
+    <h5>Enter up to 3 additional ways for people to help</h5>
+    <div *ngFor="let otherLink of otherLinks; let i = index">
+      <input [(ngModel)]="otherLink.copy"
+            class="form-control"
+            name="otherLink{{i}}Copy"
+            placeholder="Briefly describe the link">
+      <input [(ngModel)]="otherLink.href"
+            class="form-control"
+            name="otherLink{{i}}Href"
+            placeholder="Enter the URL where you want to lead people">
+    </div>
+    <button (click)="editOrg('otherLinks')"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
   	<input [(ngModel)]="slug"

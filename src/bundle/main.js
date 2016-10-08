@@ -52043,8 +52043,8 @@
 	    OrgService.prototype.editOrg = function (options) {
 	        return this.http.put("/edit-org/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
 	    };
-	    OrgService.prototype.editPost = function (options) {
-	        return this.http.put("/edit-post/" + options.key + "/" + options.id, { value: options.value }).map(function (res) { return res.json(); });
+	    OrgService.prototype.editPost = function (post) {
+	        return this.http.put("/edit-post/" + post._id, post).map(function (res) { return res.json(); });
 	    };
 	    OrgService = __decorate([
 	        core_1.Injectable(), 
@@ -52481,6 +52481,7 @@
 	        this.utilities = utilities;
 	        this.update = new core_1.EventEmitter();
 	        this.coverImageLinkBroken = false;
+	        this.truncateDescription = 300;
 	    }
 	    OrgDetailsComponent.prototype.ngOnInit = function () {
 	    };
@@ -52506,6 +52507,18 @@
 	            return false;
 	        }
 	    };
+	    OrgDetailsComponent.prototype.descriptionIsLong = function () {
+	        if (this.org.description.length > 300)
+	            return true;
+	        else
+	            return false;
+	    };
+	    OrgDetailsComponent.prototype.readMore = function () {
+	        this.truncateDescription = 0;
+	    };
+	    OrgDetailsComponent.prototype.readLess = function () {
+	        this.truncateDescription = 300;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -52521,9 +52534,8 @@
 	    OrgDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org-details',
-	            template: "\n\t\t\t<div [ngClass]=\"{'row': isSingle}\">\n\t\t\t\t<div class=\"org-details item-details\" [ngClass]=\"{'col-md-6': isSingle}\">\n\t\t\t\t\t<p class=\"org-categories\" *ngIf=\"isSingle\">Categories: <span *ngFor=\"let category of org.categories\"><a [routerLink]=\"['', 'category', category.id]\">{{category.name}}</a>&nbsp;</span></p>\n\t\t\t\t\t<p>{{org.description}}</p>\n\t\t\t\t</div>\n\t\t\t\t<div [ngClass]=\"{'col-md-6': isSingle}\">\n\t\t\t\t\t<a [href]=\"org.donateLink\" target=\"_blank\"><button class=\"donate-button\">{{org.donateLinkCopy || 'Donate'}}</button></a>\n\t\t\t\t</div>\n\t\t\t</div>",
-	            styleUrls: ['app/org.styles.css'],
-	            providers: [org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities]
+	            templateUrl: 'app/org-details.component.html',
+	            styleUrls: ['app/org-details.component.css', 'app/org.styles.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
 	    ], OrgDetailsComponent);
@@ -52553,12 +52565,12 @@
 	var app_service_1 = __webpack_require__(70);
 	__webpack_require__(81);
 	var OrgPostsComponent = (function () {
-	    function OrgPostsComponent(router, route, http, orgService, helper, utilities) {
+	    function OrgPostsComponent(router, route, http, orgService, ui, utilities) {
 	        this.router = router;
 	        this.route = route;
 	        this.http = http;
 	        this.orgService = orgService;
-	        this.helper = helper;
+	        this.ui = ui;
 	        this.utilities = utilities;
 	        this.update = new core_1.EventEmitter();
 	        this.$posts = [];
@@ -52570,6 +52582,7 @@
 	        this.isLoading = true;
 	        this.loadingPosts = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
+	        this.isEditing = false;
 	    }
 	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
 	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
@@ -52634,7 +52647,7 @@
 	        this.selectedPost = null;
 	    };
 	    OrgPostsComponent.prototype.takeCount = function (children) {
-	        this.postsShowing = this.helper.takeCount(children);
+	        this.postsShowing = this.ui.takeCount(children);
 	    };
 	    OrgPostsComponent.prototype.searchPosts = function (search) {
 	        var _this = this;
@@ -52704,6 +52717,26 @@
 	        this.orgService.loadOrg(post.org).subscribe(function (org) {
 	            _this.orgsByPost[post._id] = org;
 	        });
+	    };
+	    OrgPostsComponent.prototype.editPost = function () {
+	        if (this.userHasPermission(this.org))
+	            this.isEditing = true;
+	        else
+	            this.ui.flash("Sorry, you don't have permission to do that", "error");
+	    };
+	    OrgPostsComponent.prototype.savePost = function (post) {
+	        var _this = this;
+	        if (post && this.isEditing) {
+	            this.orgService.editPost(post).subscribe(function (post) {
+	                _this.ui.flash("Saved", "success");
+	                _this.selectedPost = post;
+	                _this.isEditing = false;
+	            }, function (error) {
+	                console.error(error);
+	                _this.ui.flash("Couldn't edit your post", "error");
+	                _this.isEditing = false;
+	            });
+	        }
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -52924,6 +52957,11 @@
 	            "Help out",
 	            "Volunteer"
 	        ];
+	        this.otherLinks = [
+	            { copy: null, href: null },
+	            { copy: null, href: null },
+	            { copy: null, href: null }
+	        ];
 	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
 	    }
@@ -53011,6 +53049,14 @@
 	            else {
 	                value = value.toLowerCase();
 	            }
+	        }
+	        if (key === "otherLinks") {
+	            value = [];
+	            this.otherLinks.forEach(function (otherLink) {
+	                if (otherLink.href) {
+	                    value.push(otherLink);
+	                }
+	            });
 	        }
 	        this['loading_' + key] = true;
 	        this.orgService.editOrg({
@@ -53925,13 +53971,13 @@
 	    function TruncatePipe() {
 	    }
 	    TruncatePipe.prototype.transform = function (value, arg1, arg2) {
-	        if (value) {
+	        if (value && arg1 !== 0) {
 	            var limit = arg1 ? parseInt(arg1, 10) : 200;
 	            var trail = arg2 || '...';
 	            return value.length > limit ? value.substring(0, limit) + trail : value;
 	        }
 	        else
-	            return null;
+	            return value;
 	    };
 	    TruncatePipe = __decorate([
 	        core_1.Pipe({

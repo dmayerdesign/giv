@@ -47,7 +47,7 @@ export class OrgService {
 		return this.http.put("/edit-org/" + options.key + "/" + options.id, {value: options.value}).map(res => res.json());
 	}
 
-	editPost(options: EditInterface) {
-		return this.http.put("/edit-post/" + options.key + "/" + options.id, {value: options.value}).map(res => res.json());
+	editPost(post) {
+		return this.http.put("/edit-post/" + post._id, post).map(res => res.json());
 	}
 }

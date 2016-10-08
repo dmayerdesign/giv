@@ -7,7 +7,10 @@ const postSchema = new mongoose.Schema({
 	featuredImage: String,
 	likes: Number,
 	org: {type: String, index: true},
+	
 	dateCreated: {type: Date, default: Date.now()},
+	dateUpdated: Date,
+
 	imageBucket: String
 });
 

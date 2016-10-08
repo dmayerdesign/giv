@@ -5,18 +5,8 @@ import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
 	selector: 'org-details',
-	template: `
-			<div [ngClass]="{'row': isSingle}">
-				<div class="org-details item-details" [ngClass]="{'col-md-6': isSingle}">
-					<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;</span></p>
-					<p>{{org.description}}</p>
-				</div>
-				<div [ngClass]="{'col-md-6': isSingle}">
-					<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
-				</div>
-			</div>`,
-	styleUrls: [ 'app/org.styles.css' ],
-	providers: [OrgService, UIHelper, Utilities]
+	templateUrl: 'app/org-details.component.html',
+	styleUrls: [ 'app/org-details.component.css', 'app/org.styles.css' ]
 })
 
 export class OrgDetailsComponent implements OnInit {
@@ -24,6 +14,7 @@ export class OrgDetailsComponent implements OnInit {
 	@Input() isSingle;
 	@Output() update = new EventEmitter();
 	private coverImageLinkBroken:boolean = false;
+	private truncateDescription:number = 300;
 
 	constructor(
 				private http: Http,
@@ -56,6 +47,19 @@ export class OrgDetailsComponent implements OnInit {
 				&& this.org.coverImage.length) { return true; }
 		else if (!this.org.coverImage
 				|| !this.org.coverImage.length) { return false; }
+	}
+
+	descriptionIsLong() {
+		if (this.org.description.length > 300) return true;
+		else return false;
+	}
+
+	readMore() {
+		this.truncateDescription = 0;
+	}
+
+	readLess() {
+		this.truncateDescription = 300;
 	}
 
 }

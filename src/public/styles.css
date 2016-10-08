@@ -32,6 +32,24 @@ a, a:hover, a:active, a:link, a:visited, a:link:active, a:visited:active {
   color: inherit;
 }
 
+a:hover .fa-heart {
+  color: #cc0000;
+}
+
+p {
+  font-size: 0.8em;
+  margin-bottom: 0.7em;
+}
+
+p.info {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+
+.subtitle {
+  margin-top: -0.5em;
+}
+
 select {
   margin-bottom: 0.6em;
   min-width: 10rem;
@@ -47,27 +65,6 @@ select {
 select:focus {
   outline: 0 none !important;
   border-color: #d3F0F3;
-}
-
-a:hover .fa-heart {
-  color: #cc0000;
-}
-
-/*a:hover, a:focus, a:active {
-  opacity: 0.9;
-}*/
-
-p {
-  font-size: 0.8em;
-}
-
-p.info {
-  margin-top: 0.4em;
-  margin-bottom: 0.4em;
-}
-
-.subtitle {
-  margin-top: -0.5em;
 }
 
 /* Buttons and forms */

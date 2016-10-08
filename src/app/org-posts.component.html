@@ -43,7 +43,16 @@
 	<section *ngIf="viewingOne && selectedPost" class="col-md-12">
 		<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
 		<img *ngIf="selectedPost?.featuredImage?.length" [src]="selectedPost.featuredImage" width="100">
-		<h5>{{selectedPost.title}}</h5>
+		<div *ngIf="!isEditing">
+			<h5>{{selectedPost.title}}</h5>
+			<p>{{selectedPost.content}}</p>
+		</div>
+		<button *ngIf="userHasPermission(org)" (click)="editPost()">Edit</button>
+		<div *ngIf="isEditing">
+			<input [(ngModel)]="selectedPost.title">
+			<textarea [(ngModel)]="selectedPost.content"></textarea>
+			<button (click)="savePost(selectedPost)">Save</button>
+		</div>
 	</section>
 
 </div>

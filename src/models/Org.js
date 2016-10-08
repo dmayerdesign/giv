@@ -8,6 +8,9 @@ const orgSchema = new mongoose.Schema({
 	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,
 	donateLinkCopy: {type: String, default: "Donate"},
+	otherLinks: [
+		{copy: String, href: String}
+	],
 	website: String,
 	facebook: String,
 	stars: Number,

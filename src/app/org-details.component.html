@@ -1,0 +1,18 @@
+<div [ngClass]="{'row': isSingle}">
+	<div class="org-details item-details" [ngClass]="{'col-md-6': isSingle}">
+		<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;</span></p>
+		<p>{{org.description | truncate: truncateDescription}}</p>
+		<p class="read-more" *ngIf="descriptionIsLong()">
+			<span *ngIf="truncateDescription !== 0" (click)="readMore()">Show more</span>
+			<span *ngIf="truncateDescription == 0" (click)="readLess()">Show less</span>
+		</p>
+	</div>
+	<div [ngClass]="{'col-md-6': isSingle}">
+		<a class="donate-link" [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
+		<div class="other-links" *ngIf="isSingle">
+			<a *ngFor="let otherLink of org.otherLinks"
+					target="_blank"
+					[href]="otherLink.href">{{otherLink.copy}}</a>
+		</div>
+	</div>
+</div>

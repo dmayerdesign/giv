@@ -66,7 +66,7 @@
   right: 0;
   z-index: 100;
   color: #fff;
-  padding: 1.2em;
+  padding: 1em 1.2em;
 }
 
 .org .star i {
@@ -78,7 +78,8 @@
 header h4 {
   font-family: "Hind", Helvetica, "Roboto", sans-serif;
   font-weight: normal;
-  margin-bottom: 0.2em;
+  margin-bottom: 0;
+  line-height: 1;
 }
 
 header h4 a, header h4 a:hover {
@@ -116,10 +117,6 @@ header h4 a, header h4 a:hover {
   top: 18em;
 }
 
-.org-details p {
-  margin-top: 1.2em;
-}
-
 .posts-by-org.browsing {
   margin-top: 1.4em;
 }
@@ -128,6 +125,9 @@ header .description.preview {
   padding-left: 4.55em;
 }
 
+.donate-link {
+  display: block;
+}
 
 .donate-button {
   font-family: 'Hind', Helvetica, Arial, sans-serif;
@@ -137,5 +137,9 @@ header .description.preview {
 }
 
 .donate-button:hover {
-  background: #4ae7ce;
+  background: #53E4ED;
+}
+
+.org-categories a {
+  font-weight: bold;
 }

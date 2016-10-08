@@ -37,12 +37,14 @@ export class OrgPostsComponent {
 	private loadingPosts:boolean = false;
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
+	private isEditing:boolean = false;
+
 	constructor(
 				private router: Router,
 				private route: ActivatedRoute,
 				private http: Http,
 				private orgService: OrgService,
-				private helper: UIHelper,
+				private ui: UIHelper,
 				private utilities: Utilities) {
 	}
 
@@ -120,7 +122,7 @@ export class OrgPostsComponent {
 	}
 
 	takeCount(children:any) {
-		this.postsShowing = this.helper.takeCount(children);
+		this.postsShowing = this.ui.takeCount(children);
 	}
 
 	searchPosts(search:string) {
@@ -196,6 +198,27 @@ export class OrgPostsComponent {
 		this.orgService.loadOrg(post.org).subscribe(org => {
 			this.orgsByPost[post._id] = org;
 		});
+	}
+
+	editPost() {
+		if (this.userHasPermission(this.org)) this.isEditing = true;
+		else this.ui.flash("Sorry, you don't have permission to do that", "error");
+	}
+
+	savePost(post) {
+		if (post && this.isEditing) {
+			this.orgService.editPost(post).subscribe(
+				post => {
+					this.ui.flash("Saved", "success");
+					this.selectedPost = post;
+					this.isEditing = false;
+				},
+				error => {
+					console.error(error);
+					this.ui.flash("Couldn't edit your post", "error");
+					this.isEditing = false;
+				});
+		}
 	}
 
 }

@@ -94,18 +94,6 @@ exports.routes = [
   },
 
   {
-    method: "put",
-    uri: "/post/:id",
-    middleware: "passport",
-    process: function(req, res) {
-      Post.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
-      });
-    }
-  },
-
-  {
     method: "delete",
     uri: "/post/:id",
     middleware: "passport",
@@ -113,6 +101,22 @@ exports.routes = [
       Post.findOneAndRemove({_id: req.params.id}, function(err) {
         if(err) return console.error(err);
         res.sendStatus(200);
+      });
+    }
+  },
+
+  {
+    method: "put",
+    uri: "/edit-post/:id",
+    middleware: "passport",
+    process: function(req, res) {
+      Post.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function (err, post) {
+        if(err) {
+          res.json({errmsg: err});
+          return console.log(err);
+        }
+        console.log(post);
+        res.status(200).json(post);
       });
     }
   },
@@ -129,34 +133,3 @@ exports.routes = [
     }
   }
 ];
-
-/*
-** Edit Post (refactored code)
-*/
-let editableInPost = [
-  "title",
-  "content"
-];
-for (let i = 0; i < editableInPost.length; i++) {
-  exports.routes.push(editPost(editableInPost[i]));
-}
-// helper function to edit post
-function editPost(key) {
-  return {
-    method: "put",
-    uri: '/edit-post/'+key+'/:postId',
-    middleware: "passport",
-    process: function(req, res) {
-      let updateQuery = {$set:{}};
-      updateQuery.$set[key] = req.body.value;
-      Post.findOneAndUpdate({_id: req.params.postId}, updateQuery, {new: true}, function(err, post) {
-        if(err) {
-          res.json(err);
-          console.log(err);
-        }
-        console.log(post);
-        res.status(200).json(post);
-      });
-    }
-  }
-}

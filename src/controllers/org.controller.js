@@ -279,6 +279,7 @@ let editableInOrg = [
   "coverImage",
   "donateLink",
   "donateLinkCopy",
+  "otherLinks",
   "slug",
   "name",
   "description",

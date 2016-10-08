@@ -37,6 +37,12 @@ export class ManageOrgPageComponent implements OnInit {
 		"Volunteer"
 	];
 
+	private otherLinks:Array<any> = [
+		{copy: null, href: null},
+		{copy: null, href: null},
+		{copy: null, href: null}
+	];
+
 	private categories = this.categoryService.list();
 
 	private loading_coverImage:boolean;
@@ -149,6 +155,15 @@ export class ManageOrgPageComponent implements OnInit {
   		} else {
   			value = value.toLowerCase();
   		}
+  	}
+
+  	if (key === "otherLinks") {
+  		value = [];
+  		this.otherLinks.forEach(otherLink => {
+  			if (otherLink.href) {
+  				value.push(otherLink);
+  			}
+  		});
   	}
 
   	this['loading_' + key] = true;
