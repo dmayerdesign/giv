@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UIHelper } from './services/app.service';
-import { EmailModel } from './services/email.service';
+import { HtmlEmailModel } from './services/email.service';
 import { Subscription } from 'rxjs/Subscription';
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
@@ -16,7 +16,9 @@ export class ClaimOrgComponent implements OnInit {
 	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
 	private sub:Subscription;
 	private isLoaded:boolean = false;
-	private inputs = new EmailModel();
+	private inputs = new HtmlEmailModel();
+	private message:string;
+	private user:any;
 
 	constructor(private http:Http,
 							private router:Router,
@@ -28,7 +30,12 @@ export class ClaimOrgComponent implements OnInit {
 
 	ngOnInit() {
 		this.userService.getLoggedInUser((err, user) => {
-			if (err) return console.error(err);
+			if (err) console.error(err);
+			if (!user || err) {
+				this.ui.flash("You have to be logged in to do that!", "error");
+				return this.router.navigate(['/']);
+			}
+			this.user = user;
 			if (this.route.params) {
 				this.sub = this.route.params.subscribe(params => {
 					let id = params['id'];
@@ -39,12 +46,6 @@ export class ClaimOrgComponent implements OnInit {
 
 					this.orgService.loadOrg(id).subscribe(
 						data => {
-							if (user.adminToken !== 'h2u81eg7wr3h9uijk8') {
-								if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-									this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
-									return this.router.navigate([''], { queryParams: {"404": true}});
-								}
-							}
 							this.org = data;
 							this.isLoaded = true;
 						},
@@ -77,6 +78,15 @@ export class ClaimOrgComponent implements OnInit {
 		this.inputs.redirectTo = '/';
 		this.inputs.toName = 'Support';
 		this.inputs.toAddr = 'd.a.mayer92@gmail.com';
+		this.inputs.html = `
+		<doctype html>
+		<html>
+		<body>
+			<p><strong>User:</strong><br><pre>${this.user._id}</pre></p>
+			<p><strong>Org:</strong><br><pre>${JSON.stringify(this.org)}</pre></p>
+			<p><strong>Message:</strong><br>${this.message}</p>
+		</body>
+		</html>`;
 		console.log(this.inputs);
 
 		this.http.post('/contact-form', this.inputs)

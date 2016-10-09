@@ -178,6 +178,7 @@
 
 .featured-carousel-nav-dots span.selected {
   opacity: 1;
+  color: #fff !important;
 }
 
 .featured-org .description {

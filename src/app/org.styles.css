@@ -1,13 +1,19 @@
-.starred-orgs header {
+.starred-orgs header,
+.recommended-orgs header {
   margin-bottom: 0.2em;
 }
 
-.starred-orgs h2 {
+.starred-orgs h2,
+.recommended-orgs h2 {
   margin-top: 0.4em;
 }
 
 .orgs-list section.org {
   border: 0 none;
+}
+
+.recommended-orgs .org {
+  font-size: 0.9em;
 }
 
 .org header {
@@ -46,7 +52,7 @@
 }
 
 .org.selected .header-inner {
-  padding: 8em 1.5em 1.2em;
+  padding: 8em 1.5em 0.8em;
 }
 
 .header-inner .header-left {

@@ -53100,13 +53100,18 @@
 	        this.orgService = orgService;
 	        this.userService = userService;
 	        this.isLoaded = false;
-	        this.inputs = new email_service_1.EmailModel();
+	        this.inputs = new email_service_1.HtmlEmailModel();
 	    }
 	    ClaimOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
-	                return console.error(err);
+	                console.error(err);
+	            if (!user || err) {
+	                _this.ui.flash("You have to be logged in to do that!", "error");
+	                return _this.router.navigate(['/']);
+	            }
+	            _this.user = user;
 	            if (_this.route.params) {
 	                _this.sub = _this.route.params.subscribe(function (params) {
 	                    var id = params['id'];
@@ -53115,12 +53120,6 @@
 	                        return _this.router.navigate([''], { queryParams: { "404": true } });
 	                    }
 	                    _this.orgService.loadOrg(id).subscribe(function (data) {
-	                        if (user.adminToken !== 'h2u81eg7wr3h9uijk8') {
-	                            if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-	                                _this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
-	                                return _this.router.navigate([''], { queryParams: { "404": true } });
-	                            }
-	                        }
 	                        _this.org = data;
 	                        _this.isLoaded = true;
 	                    }, function (err) {
@@ -53149,6 +53148,7 @@
 	        this.inputs.redirectTo = '/';
 	        this.inputs.toName = 'Support';
 	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
+	        this.inputs.html = "\n\t\t<doctype html>\n\t\t<html>\n\t\t<body>\n\t\t\t<p><strong>User:</strong><br><pre>" + this.user._id + "</pre></p>\n\t\t\t<p><strong>Org:</strong><br><pre>" + JSON.stringify(this.org) + "</pre></p>\n\t\t\t<p><strong>Message:</strong><br>" + this.message + "</p>\n\t\t</body>\n\t\t</html>";
 	        console.log(this.inputs);
 	        this.http.post('/contact-form', this.inputs)
 	            .map(function (res) { return res.json(); })
