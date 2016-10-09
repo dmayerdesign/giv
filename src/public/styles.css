@@ -337,6 +337,16 @@ button.nav-item:hover {
   text-decoration: underline !important;
 }
 
+@media only screen and (max-width: 599px) {
+  .nav-item span {
+    display: none;
+  }
+
+  .nav-link img, .nav-link i {
+    padding-right: 0;
+  }
+}
+
 /* SEARCH BOX CONTAINER */
 
 search-box + select {

@@ -312,6 +312,12 @@ export class BrowseOrgsComponent implements OnInit {
 		this.featuredOrgs[this.featuredShowing]['showing'] = true;
 	}
 
+	showFeatured(index:number) {
+		this.featuredOrgs[this.featuredShowing]['showing'] = false;
+		this.featuredShowing = index;
+		this.featuredOrgs[this.featuredShowing]['showing'] = true;
+	}
+
 	userHasPermission(org) {
 		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;

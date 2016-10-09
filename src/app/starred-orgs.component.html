@@ -1,7 +1,8 @@
-<div class="col-md-7">
+<div class="starred-orgs col-md-7">
 	<header class="row col-md-12">
 		<div class="row">
 			<h2>Starred by you</h2>
+			<p class="subtitle">Here you can keep track of organizations you like</p>
 		</div>
 	</header>
 
@@ -29,7 +30,7 @@
 						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
 					</div>
 					<div class="inside-org header-right">
-						<h4 class="inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
 						<p class="info preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
 						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
@@ -38,12 +39,13 @@
 							<strong class="inside-org">{{org.stars}}</strong>
 						</p>
 
-						<h4 *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
-							<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
+						<h4 class="org-name" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">{{org.name}}</a>
+							<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">{{org.name}}</a>
+							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)"><i class="fa fa-star-o"></i></span>
+							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>
@@ -57,9 +59,10 @@
 			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
 				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
-				<a *ngIf="org.slug" href="/organization/{{org.slug}}">Read more</a>
-				<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">Read more</a>
-				<a *ngIf="userHasPermission(org)" [routerLink]="['/organization', 'manage', org?._id]">Manage</a>
+				<p class="read-more more-posts">
+					<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
+					<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
+				</p>
 			</div>
 		</section>
 	</div>

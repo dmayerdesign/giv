@@ -1,10 +1,23 @@
+.starred-orgs header {
+  margin-bottom: 0.2em;
+}
+
+.starred-orgs h2 {
+  margin-top: 0.4em;
+}
+
+.orgs-list section.org {
+  border: 0 none;
+}
+
 .org header {
   position: relative;
   background-color: #5D8BD5;
   background-size: 14em auto;
   background-repeat: repeat;
   background-position: 50% 50%;
-  text-shadow: 0px 1px 2px rgba(0,0,0,0.2)
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+  border-radius: 2px;
 }
 
 .has-cover-image header,
@@ -82,13 +95,19 @@ header h4 {
   line-height: 1;
 }
 
-header h4 a, header h4 a:hover {
+header h4 > a, header h4 > a:hover {
+  display: inline-block;
+  line-height: 1;
   text-decoration: none;
   color: #fff;
+  max-height: 1em;
+  overflow: hidden;
 }
 
 .org header .info {
-  margin-bottom: 0;
+  margin-top: -0.1em;
+  margin-bottom: 0.5em;
+  white-space: nowrap;
 }
 
 .org .preview {
@@ -122,7 +141,7 @@ header h4 a, header h4 a:hover {
 }
 
 header .description.preview {
-  padding-left: 4.55em;
+  padding-left: 4.5em;
 }
 
 .donate-link {
@@ -142,4 +161,13 @@ header .description.preview {
 
 .org-categories a {
   font-weight: bold;
+}
+
+.read-more, .read-less {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
 }

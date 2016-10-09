@@ -1,6 +1,27 @@
-.read-more, .read-less {
-	margin-top: 0;
-	font-weight: bold;
-	cursor: pointer;
+.in-list .org-details {
+	padding: 1em 0;
+}
+
+.other-links {
+	padding-top: 1.5em;
+}
+
+.other-links h5 {
+	margin-bottom: 0.1em;
+}
+
+.other-links ul {
+	list-style: none;
+	padding-left: 0.5em;
+	border-left: 3px solid #eeF2F1;
+}
+
+.other-links li a {
+	font-size: 0.8em;
 	text-decoration: underline;
+	font-weight: bold;
+}
+
+.other-links li a:hover {
+	text-decoration: none;
 }

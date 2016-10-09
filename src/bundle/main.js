@@ -52385,6 +52385,11 @@
 	        }
 	        this.featuredOrgs[this.featuredShowing]['showing'] = true;
 	    };
+	    BrowseOrgsComponent.prototype.showFeatured = function (index) {
+	        this.featuredOrgs[this.featuredShowing]['showing'] = false;
+	        this.featuredShowing = index;
+	        this.featuredOrgs[this.featuredShowing]['showing'] = true;
+	    };
 	    BrowseOrgsComponent.prototype.userHasPermission = function (org) {
 	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
 	            return true;

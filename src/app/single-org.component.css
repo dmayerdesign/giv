@@ -64,6 +64,17 @@
 	color: #fff;
 }
 
+.org-name {
+	font-weight: normal;
+	margin-bottom: 0;
+	line-height: 1;
+	font-size: 2em;
+}
+
+header .stars {
+	margin-top: 0;
+}
+
 .options-menu {
 	position: absolute;
 		top: 1em;

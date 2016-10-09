@@ -19,11 +19,8 @@
 
 	<header class="org-header">
 		<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-		<h4>
-			<a *ngIf="org.slug" href="/organization/{{org.slug}}">{{org.name}}</a>
-			<a *ngIf="!org.slug" href="/organization/i/{{org._id}}">{{org.name}}</a>
-		</h4>
-		<p class="info">
+		<h1 class="org-name">{{org.name}}</h1>
+		<p class="info stars">
 			<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
 			<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
 			&nbsp;{{org.stars}} people starred this
