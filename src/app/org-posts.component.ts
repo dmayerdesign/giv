@@ -61,7 +61,7 @@ export class OrgPostsComponent {
 		this.loadingPosts = true;
 		let query:any;
 
-		if (!this.org) query = {limit: 20, sort: "-dateCreated"}
+		if (!this.org) query = {limit: 30, sort: "-dateCreated"}
 		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated"};
 		if (this.org && this.isBrowsing) query.limit = 4;
 
