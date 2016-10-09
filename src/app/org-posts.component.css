@@ -11,6 +11,13 @@
 .posts {
 	padding-top: 0.2em;
 	padding-bottom: 0.5em;
+
+	-webkit-transition: opacity 0.3s;
+	transition: opacity 0.3s
+}
+
+.posts.is-loading {
+	opacity: 0.4;
 }
 
 .posts-by-org .posts-title {

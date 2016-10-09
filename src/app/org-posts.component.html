@@ -15,7 +15,7 @@
 	</header>
 
 	<!-- Posts -->
-	<section *ngIf="!viewingOne && !loadingPosts" class="posts col-md-12">
+	<section *ngIf="!viewingOne" class="posts col-md-12" [ngClass]="{'is-loading': loadingPosts}">
 		<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 		<div #singlePost
 				class="post clearfix"
