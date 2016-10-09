@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, AfterContentInit, OnDestroy, Input, Output, ViewChildren, EventEmitter } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
+import { Http, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
@@ -80,11 +80,7 @@ export class OrgPostsComponent {
 				this.posts = data;
 				this.takeCount(this.posts);
 
-				if (!this.org) {
-					this.posts.forEach(post => {
-						this.getOrgAvatarByPost(post);
-					});
-				}
+				if (!this.org) this.getOrgAvatarsByPost();
 
 				this.update.emit("init");
 
@@ -140,11 +136,7 @@ export class OrgPostsComponent {
 					this.loadingPosts = false;
 					this.isLoading = false;
 					this.searchText = search;
-					if (!this.org) {
-						this.posts.forEach(post => {
-							this.getOrgAvatarByPost(post);
-						});
-					}	
+					if (!this.org) this.getOrgAvatarsByPost();
 				},
 				error => console.error(error)
 		);
@@ -169,11 +161,7 @@ export class OrgPostsComponent {
 				console.log(res);
 				this.posts = this.posts.concat(res);
 				this.takeCount(this.$posts);
-				if (!this.org) {
-					this.posts.forEach(post => {
-						this.getOrgAvatarByPost(post);
-					});
-				}
+				if (!this.org) this.getOrgAvatarsByPost();
 			},
 			error => console.log(error)
 		);
@@ -194,9 +182,33 @@ export class OrgPostsComponent {
 		else return false;
 	}
 
-	getOrgAvatarByPost(post) {
-		this.orgService.loadOrg(post.org).subscribe(org => {
-			this.orgsByPost[post._id] = org;
+	getOrgAvatarsByPost() {
+		let query: {
+			getSome: boolean,
+			ids: any
+		} = {
+			getSome: true,
+			ids: []
+		};
+		let params: URLSearchParams = new URLSearchParams();
+		params.set("getSome", "true");
+		let i = 0;
+		while (i < this.posts.length) {
+			query.ids.push(this.posts[i].org);
+			i++;
+		}
+		params.set("ids", query.ids.join(","));
+		console.log(query);
+		this.http.get("/orgs/get", {search: params}).map(res => res.json()).subscribe(orgs => {
+			console.log("Post orgs", orgs);
+			this.posts.forEach(post => {
+				let owner = orgs.find((org) => {
+					return org._id === post.org;
+				});
+				this.orgsByPost[post._id] = owner;
+			});
+		}, err => {
+			console.error(err);
 		});
 	}
 

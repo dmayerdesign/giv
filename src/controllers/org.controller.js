@@ -26,6 +26,19 @@ exports.routes = [
     process: function(req, res) {
       var dbQuery = {};
       var dbQuery2 = null;
+
+      console.log("Initial query", console.log(req.query));
+
+      if (req.query.getSome) {
+        dbQuery['$or'] = [];
+        let ids = req.query.ids.split(",");
+        let i = 0;
+        while (i < ids.length) {
+          dbQuery.$or.push({_id: ids[i]});
+          i++;
+        }
+      }
+
       if (req.query.search) {
         dbQuery = search(req.query.search, req.query.field);
       }

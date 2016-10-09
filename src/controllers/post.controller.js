@@ -9,6 +9,9 @@ const search = require('../services/search'); // helper function for creating a 
 const Post = require('../models/Post');
 const Org = require('../models/Org');
 
+/* For testing */
+const words = require('../services/sample-data/words');
+
 exports.routes = [
   { method: "get",
     uri: "/posts/get",
@@ -133,3 +136,45 @@ exports.routes = [
     }
   }
 ];
+
+exports.sample = function(next) {
+  let newPost = new Post({
+    "title": make('name'),
+    "content": make('desc'),
+    "likes": Math.floor(Math.random()*10)
+  });
+
+  Org.count(function(err, count) {
+    var rand = Math.floor(Math.random() * count);
+    Org.findOne().skip(rand).exec((err, org) => {
+      newPost.org = org._id;
+      newPost.save(function(err, obj) {
+        if(err) return console.log(err);
+        console.log(obj);
+        if (next) next(err, obj);
+      });
+    });
+  });
+
+  function make(what) {
+    let cleanWords = words.replace(/[^a-zA-Z.,]/g, "");
+    let wordsArr = words.split(" ");
+    let maxLen = (what === "name") ? 5 : 50;
+    let nameLen = Math.ceil(Math.random() * maxLen);
+    if (what === "desc") {
+      nameLen += 60;
+    }
+    let randomIndex = function() {
+      return Math.floor(Math.random() * wordsArr.length);
+    };
+    let str = [];
+    for (let i = 0; i < nameLen; i++) {
+      str.push(wordsArr[randomIndex()]);
+    }
+    str = str.join(" ");
+    let firstLetter = str.charAt(0);
+    str = str.slice(1);
+    str = firstLetter.toUpperCase() + str;
+    return str;
+  }
+};
