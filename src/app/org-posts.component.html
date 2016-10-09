@@ -1,8 +1,9 @@
-<div class="clearfix posts-container" [attr.id]="!isBrowsing ? 'posts' : null" [ngClass]="{'posts-by-org': org, 'browsing': isBrowsing}">
+<div class="clearfix posts-container col-md-12" [attr.id]="!isBrowsing ? 'posts' : null" [ngClass]="{'posts-by-org': org, 'browsing': isBrowsing}">
 
-	<header>
-		<h4 *ngIf="org && isBrowsing">What they're up to</h4>
-		<h2 *ngIf="!org || !isBrowsing">What they're up to</h2>
+	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
+		<h4 class="posts-title" *ngIf="org">What we're up to</h4>
+		<h2 class="posts-title" *ngIf="!org && isBrowsing">What they're up to</h2>
+
 		<p *ngIf="!org" class="subtitle">See where your money's going</p>
 		<search-box
 			class="search-box-container clearfix"

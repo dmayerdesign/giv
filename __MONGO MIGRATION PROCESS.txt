@@ -1,3 +1,3 @@
 cd /data/db
 mongodump --db fuse --out /data/db/backup
-mongorestore -h ds035776.mlab.com:35776 -d circle -u dannymayer -p Kounice372 /data/db/backup/fuse
+mongorestore -h ds035776.mlab.com:35776 -d fuse -u dannymayer -p Kounice372 /data/db/backup/fuse

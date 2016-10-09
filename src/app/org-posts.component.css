@@ -1,3 +1,9 @@
+.posts-container.posts-by-org {
+	background: #f4f9f8;
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+}
+
 .posts-container header {
 	margin-bottom: 0.7em;
 }
@@ -5,6 +11,10 @@
 .posts {
 	padding-top: 0.2em;
 	padding-bottom: 0.5em;
+}
+
+.posts-by-org .posts-title {
+	font-weight: 500;
 }
 
 .post {

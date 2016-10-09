@@ -51679,7 +51679,7 @@
 	        this.ui = ui;
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
-	            this.ui.flash("You're already logged in!", "error");
+	            this.ui.flash("You're already logged in!", "info");
 	        }
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
@@ -52469,48 +52469,52 @@
 	        this.isEditing = false;
 	    }
 	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
-	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
-	        this.loadPosts();
-	    };
-	    OrgPostsComponent.prototype.ngOnDestroy = function () {
-	        if (this.querySub)
-	            this.querySub.unsubscribe();
-	    };
-	    OrgPostsComponent.prototype.loadPosts = function (increase, offset, search) {
 	        var _this = this;
-	        this.loadingPosts = true;
-	        var query;
-	        if (!this.org)
-	            query = { limit: 30, sort: "-dateCreated" };
-	        if (this.org)
-	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
-	        if (this.org && this.isBrowsing)
-	            query.limit = 4;
-	        if (search) {
-	            query.search = search;
-	            query.field = "title";
-	            query.bodyField = "content";
-	        }
-	        console.log("query: ", query);
-	        this.orgService.loadPosts(query).subscribe(function (data) {
-	            _this.loadingPosts = false;
-	            _this.isLoading = false;
+	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
+	        this.loadPosts(null, 0, 0, function (data) {
 	            _this.posts = data;
-	            _this.takeCount(_this.posts);
-	            if (!_this.org)
-	                _this.getOrgAvatarsByPost();
-	            _this.update.emit("init");
-	            console.log("posts: ", _this.posts);
 	            _this.querySub = _this.route.queryParams.subscribe(function (params) {
 	                if (params['viewpost']) {
 	                    _this.selectPost(params['viewpost']);
 	                    window.location.href += "#posts";
 	                }
 	            });
-	        }, function (error) { return console.log(error); });
+	        });
 	    };
-	    OrgPostsComponent.prototype.updatePosts = function (org) {
-	        this.loadPosts(org);
+	    OrgPostsComponent.prototype.ngOnDestroy = function () {
+	        if (this.querySub)
+	            this.querySub.unsubscribe();
+	    };
+	    OrgPostsComponent.prototype.loadPosts = function (search, increase, offset, next) {
+	        var _this = this;
+	        this.loadingPosts = true;
+	        var query = {};
+	        if (increase)
+	            query['limit'] = increase;
+	        if (offset)
+	            query['offset'] = offset;
+	        if (!this.org)
+	            query = { limit: 30, sort: "-dateCreated" };
+	        if (this.org)
+	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
+	        if (this.org && this.isBrowsing)
+	            query['limit'] = 4;
+	        if (search) {
+	            query['search'] = search;
+	            query['field'] = "title";
+	            query['bodyField'] = "content";
+	        }
+	        console.log("query: ", query);
+	        this.orgService.loadPosts(query).subscribe(function (data) {
+	            _this.posts = data;
+	            _this.loadingPosts = false;
+	            _this.isLoading = false;
+	            _this.takeCount(_this.posts);
+	            if (!_this.org)
+	                _this.getOrgAvatarsByPost();
+	            _this.update.emit("init");
+	            next(data);
+	        }, function (error) { return console.log(error); });
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        console.log(id);
@@ -52532,44 +52536,16 @@
 	    };
 	    OrgPostsComponent.prototype.searchPosts = function (search) {
 	        var _this = this;
-	        var query = { search: search, field: "title", bodyField: "content", limit: 20 };
-	        if (this.org && this.org._id) {
-	            query['filterField'] = "org";
-	            query['filterValue'] = this.org._id;
-	        }
-	        this.loadingPosts = true;
-	        this.orgService.loadPosts(query)
-	            .subscribe(function (results) {
-	            _this.posts = results;
-	            _this.loadingPosts = false;
-	            _this.isLoading = false;
+	        this.loadPosts(search, 0, 0, function (data) {
 	            _this.searchText = search;
-	            if (!_this.org)
-	                _this.getOrgAvatarsByPost();
-	        }, function (error) { return console.error(error); });
+	        });
 	    };
 	    OrgPostsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        var query = { limit: increase, offset: offset };
-	        if (search && search.length) {
-	            query['search'] = search;
-	            query['field'] = "title";
-	            query['bodyField'] = "content";
-	        }
-	        if (this.org && this.org._id) {
-	            query['filterField'] = "org";
-	            query['filterValue'] = this.org._id;
-	        }
-	        console.log("org posts query: ", query);
-	        this.orgService.loadPosts(query).subscribe(function (res) {
-	            _this.isLoading = false;
-	            console.log(res);
-	            _this.posts = _this.posts.concat(res);
-	            _this.takeCount(_this.$posts);
-	            if (!_this.org)
-	                _this.getOrgAvatarsByPost();
-	        }, function (error) { return console.log(error); });
+	        this.loadPosts(search, increase, offset, function (data) {
+	            _this.posts = _this.posts.concat(data);
+	        });
 	    };
 	    OrgPostsComponent.prototype.toggleSearchBoxFocus = function (event) {
 	        if (event == 'focus') {
@@ -52853,11 +52829,6 @@
 	            "Help out",
 	            "Volunteer"
 	        ];
-	        this.otherLinks = [
-	            { copy: null, href: null },
-	            { copy: null, href: null },
-	            { copy: null, href: null }
-	        ];
 	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
 	    }
@@ -52882,6 +52853,7 @@
 	                        }
 	                        _this.org = data;
 	                        _this.isLoaded = true;
+	                        _this.restoreOtherLinks();
 	                        // for ng-upload
 	                        _this.uploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
@@ -52948,7 +52920,7 @@
 	        }
 	        if (key === "otherLinks") {
 	            value = [];
-	            this.otherLinks.forEach(function (otherLink) {
+	            this.org.otherLinks.forEach(function (otherLink) {
 	                if (otherLink.href) {
 	                    value.push(otherLink);
 	                }
@@ -52964,11 +52936,13 @@
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
 	                _this['loading_' + key] = false;
+	                _this.restoreOtherLinks();
 	                return;
 	            }
 	            _this.org = res;
 	            _this['loading_' + key] = false;
 	            _this.ui.flash("Saved", "success");
+	            _this.restoreOtherLinks();
 	            console.log(res);
 	        });
 	    };
@@ -53000,6 +52974,16 @@
 	                return _this.ui.flash("Org was deleted", "error");
 	            }
 	        });
+	    };
+	    ManageOrgPageComponent.prototype.restoreOtherLinks = function () {
+	        // for editing
+	        var addNullOtherLinks = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
+	        if (addNullOtherLinks === 3)
+	            this.org.otherLinks = [];
+	        while (addNullOtherLinks > 0) {
+	            this.org.otherLinks.push({ copy: null, href: null });
+	            addNullOtherLinks--;
+	        }
 	    };
 	    __decorate([
 	        core_1.Input(), 

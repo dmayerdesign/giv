@@ -50,54 +50,54 @@ export class OrgPostsComponent {
 
 	ngAfterViewInit() {
 		this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
-		this.loadPosts();
+		this.loadPosts(null, 0, 0, data => {
+			this.posts = data;
+			this.querySub = this.route.queryParams.subscribe(params => {
+				if (params['viewpost']) {
+					this.selectPost(params['viewpost']);
+					window.location.href += "#posts";
+				}
+			});
+		});
 	}
 
 	ngOnDestroy() {
 		if (this.querySub) this.querySub.unsubscribe();
 	}
 
-	loadPosts(increase?:number, offset?:number, search?:string) {
+	loadPosts(search?:string, increase?:number, offset?:number, next?) {
 		this.loadingPosts = true;
-		let query:any;
+		let query = {};
+		if (increase) query['limit'] = increase;
+		if (offset) query['offset'] = offset;
 
 		if (!this.org) query = {limit: 30, sort: "-dateCreated"}
 		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated"};
-		if (this.org && this.isBrowsing) query.limit = 4;
+		if (this.org && this.isBrowsing) query['limit'] = 4;
 
 		if (search) {
-			query.search = search;
-			query.field = "title";
-			query.bodyField = "content";
+			query['search'] = search;
+			query['field'] = "title";
+			query['bodyField'] = "content";
 		}
 
 		console.log("query: ", query);
 
 		this.orgService.loadPosts(query).subscribe(
 			data => {
+				this.posts = data;
 				this.loadingPosts = false;
 				this.isLoading = false;
-				this.posts = data;
+				
 				this.takeCount(this.posts);
-
 				if (!this.org) this.getOrgAvatarsByPost();
 
 				this.update.emit("init");
 
-				console.log("posts: ", this.posts);
-				this.querySub = this.route.queryParams.subscribe(params => {
-					if (params['viewpost']) {
-						this.selectPost(params['viewpost']);
-						window.location.href += "#posts";
-					}
-				});
+				next(data);
 			},
 			error => console.log(error)
 		);
-	}
-
-	updatePosts(org?:any) {
-		this.loadPosts(org);
 	}
 
 	selectPost(id:any) {
@@ -122,49 +122,16 @@ export class OrgPostsComponent {
 	}
 
 	searchPosts(search:string) {
-		let query = {search: search, field: "title", bodyField: "content", limit: 20};
-		
-		if (this.org && this.org._id) {
-			query['filterField'] = "org";
-			query['filterValue'] = this.org._id;
-		}
-		this.loadingPosts = true;
-		this.orgService.loadPosts(query)
-			.subscribe(
-				results => {
-					this.posts = results;
-					this.loadingPosts = false;
-					this.isLoading = false;
-					this.searchText = search;
-					if (!this.org) this.getOrgAvatarsByPost();
-				},
-				error => console.error(error)
-		);
+		this.loadPosts(search, 0, 0, data => {
+			this.searchText = search;
+		});
 	}
 
 	showMore(increase:number, offset:number) {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
-		let query = {limit: increase, offset: offset};
-		if (search && search.length) {
-			query['search'] = search;
-			query['field'] = "title";
-			query['bodyField'] = "content";
-		}
-		if (this.org && this.org._id) {
-			query['filterField'] = "org";
-			query['filterValue'] = this.org._id;
-		}
-		console.log("org posts query: ", query);
-		this.orgService.loadPosts(query).subscribe(
-			res => {
-				this.isLoading = false;
-				console.log(res);
-				this.posts = this.posts.concat(res);
-				this.takeCount(this.$posts);
-				if (!this.org) this.getOrgAvatarsByPost();
-			},
-			error => console.log(error)
-		);
+		this.loadPosts(search, increase, offset, data => {
+			this.posts = this.posts.concat(data);
+		});
 	}
 
 	toggleSearchBoxFocus(event:string) {

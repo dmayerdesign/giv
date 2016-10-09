@@ -14,7 +14,6 @@ import { UIHelper, Utilities } from './services/app.service';
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
-// __TO_DO__: add an external link option
 
 export class ManageOrgPageComponent implements OnInit {
 	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
@@ -35,12 +34,6 @@ export class ManageOrgPageComponent implements OnInit {
 		"Support",
 		"Help out",
 		"Volunteer"
-	];
-
-	private otherLinks:Array<any> = [
-		{copy: null, href: null},
-		{copy: null, href: null},
-		{copy: null, href: null}
 	];
 
 	private categories = this.categoryService.list();
@@ -86,6 +79,7 @@ export class ManageOrgPageComponent implements OnInit {
 							}
 							this.org = data;
 							this.isLoaded = true;
+							this.restoreOtherLinks();
 							
 							// for ng-upload
 							this.uploadOptions = {
@@ -101,8 +95,7 @@ export class ManageOrgPageComponent implements OnInit {
 							console.log(err);
 							return console.error(err);
 						}
-					);
-					
+					);					
 				});
 			}
 			else {
@@ -159,7 +152,7 @@ export class ManageOrgPageComponent implements OnInit {
 
   	if (key === "otherLinks") {
   		value = [];
-  		this.otherLinks.forEach(otherLink => {
+  		this.org.otherLinks.forEach(otherLink => {
   			if (otherLink.href) {
   				value.push(otherLink);
   			}
@@ -176,11 +169,13 @@ export class ManageOrgPageComponent implements OnInit {
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
   			this['loading_' + key] = false;
+  			this.restoreOtherLinks();
   			return;
   		}
   		this.org = res;
   		this['loading_' + key] = false;
   		this.ui.flash("Saved", "success");
+  		this.restoreOtherLinks();
   		console.log(res);
   	});
   }
@@ -212,6 +207,16 @@ export class ManageOrgPageComponent implements OnInit {
   			return this.ui.flash("Org was deleted", "error");
   		}
   	});
+  }
+
+  restoreOtherLinks() {
+  	// for editing
+		let addNullOtherLinks:number = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
+		if (addNullOtherLinks === 3) this.org.otherLinks = [];
+		while (addNullOtherLinks > 0) {
+			this.org.otherLinks.push({copy: null, href: null});
+			addNullOtherLinks--;
+		}
   }
 
 }

@@ -1,4 +1,4 @@
-@import 'https://fonts.googleapis.com/css?family=Roboto:300,400,700|Hind:300,400,700';
+@import 'https://fonts.googleapis.com/css?family=Roboto:300,400,700|Hind:300,400,500,600';
 
 /* Typography */
 
@@ -25,6 +25,7 @@ h2 {
 
 h4 {
   font-size: 1.5em;
+  font-weight: 500;
 }
 
 a, a:hover, a:active, a:link, a:visited, a:link:active, a:visited:active {
@@ -141,6 +142,10 @@ section, .search-box {
   background: #F4F9F8;
   border: 2px solid #F1F6F5;
   border-radius: 2px;
+}
+
+.posts-by-org .search-box {
+  background: #fff;
 }
 
 section section {

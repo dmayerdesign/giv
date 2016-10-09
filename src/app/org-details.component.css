@@ -1,4 +1,13 @@
-.in-list .org-details {
+.org-details {
+	padding: 1.2em 0;
+	margin-bottom: 1em;
+
+	background: #f4f9f8;
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+}
+
+.in-list .org-details-content {
 	padding: 1em 0;
 }
 
@@ -12,8 +21,15 @@
 
 .other-links ul {
 	list-style: none;
+	padding-left: 0;
+	padding-top: 0.4em;
+}
+
+.other-links li {
 	padding-left: 0.5em;
-	border-left: 3px solid #eeF2F1;
+	border-left: 3px solid #e7eceb;
+	margin-bottom: 0.4em;
+	line-height: 1.1;
 }
 
 .other-links li a {

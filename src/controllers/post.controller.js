@@ -27,6 +27,8 @@ exports.routes = [
       }
       if (req.query.filterField) {
         dbQuery[req.query.filterField] = req.query.filterValue;
+        if (dbQuery2)
+          dbQuery2[req.query.filterField] = req.query.filterValue;
       }
 
       if (dbQuery2) {

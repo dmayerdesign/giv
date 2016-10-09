@@ -21,7 +21,7 @@ export class SignupComponent implements OnInit {
 
 		if (localStorage['profile']) {
 			this.router.navigate(['/']);
-			this.ui.flash("You're already logged in!", "error");
+			this.ui.flash("You're already logged in!", "info");
 		}
 	}
 

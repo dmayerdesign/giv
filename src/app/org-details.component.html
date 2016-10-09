@@ -1,23 +1,25 @@
-<div [ngClass]="{'row in-single': isSingle, 'in-list': !isSingle}">
-	<div class="org-details item-details" [ngClass]="{'col-md-6': isSingle}">
-		<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories; let i = index;"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;<span *ngIf="(i+1) < org?.categories.length">|&nbsp;</span></span></p>
-		<p>{{org.description | truncate: truncateDescription}}</p>
-		<p class="read-more" *ngIf="isSingle && descriptionIsLong()">
-			<span *ngIf="truncateDescription !== 0" (click)="readMore()">Show more</span>
-			<span *ngIf="truncateDescription == 0" (click)="readLess()">Show less</span>
-		</p>
-		<p class="read-more" *ngIf="!isSingle && org?.slug"><a [routerLink]="['/organization', org.slug]">Read more</a></p>
-		<p class="read-more" *ngIf="!isSingle && !org?.slug"><a [routerLink]="['/organization', 'i', org._id]">Read more</a></p>
-	</div>
-	<div [ngClass]="{'col-md-6': isSingle}">
-		<a class="donate-link" [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
-		<div class="other-links" *ngIf="isSingle && org?.otherLinks?.length">
-			<h5>Other ways to help</h5>
-			<ul>
-				<li *ngFor="let otherLink of org.otherLinks">
-					<a target="_blank" [href]="otherLink.href">{{otherLink.copy}}</a>
-				</li>
-			</ul>
+<div class="org-details clearfix" [ngClass]="{'in-single': isSingle, 'in-list': !isSingle}">
+	<div class="col-md-12">
+		<div class="org-details-content item-details" [ngClass]="{'col-md-6': isSingle}">
+			<p class="org-categories" *ngIf="isSingle">Categories: <span *ngFor="let category of org.categories; let i = index;"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;<span *ngIf="(i+1) < org?.categories.length">|&nbsp;</span></span></p>
+			<p>{{org.description | truncate: truncateDescription}}</p>
+			<p class="read-more" *ngIf="isSingle && descriptionIsLong()">
+				<span *ngIf="truncateDescription !== 0" (click)="readMore()">Show more</span>
+				<span *ngIf="truncateDescription == 0" (click)="readLess()">Show less</span>
+			</p>
+			<p class="read-more" *ngIf="!isSingle && org?.slug"><a [routerLink]="['/organization', org.slug]">Read more</a></p>
+			<p class="read-more" *ngIf="!isSingle && !org?.slug"><a [routerLink]="['/organization', 'i', org._id]">Read more</a></p>
+		</div>
+		<div class="org-details-ctas" [ngClass]="{'col-md-6': isSingle}">
+			<a class="donate-link" [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
+			<div class="other-links" *ngIf="isSingle && org?.otherLinks?.length">
+				<h4>Other ways to help</h4>
+				<ul>
+					<li *ngFor="let otherLink of org.otherLinks">
+						<a target="_blank" [href]="otherLink.href">{{otherLink.copy}}</a>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </div>

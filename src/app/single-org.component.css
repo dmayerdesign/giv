@@ -57,8 +57,8 @@
 
 .single-org header {
 	margin-top: -4.8em;
-  margin-bottom: 3em;
-	margin-left: 1.5em;
+  margin-bottom: 1.3em;
+	margin-left: 1.8em;
 
 	background: transparent;
 	color: #fff;
@@ -66,9 +66,10 @@
 
 .org-name {
 	font-weight: normal;
-	margin-bottom: 0;
+	margin-bottom: 0.1em;
 	line-height: 1;
-	font-size: 2em;
+	font-size: 1.8em;
+	font-weight: 500;
 }
 
 header .stars {

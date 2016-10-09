@@ -56,6 +56,10 @@
   opacity: 1;
 }
 
+.featured-org h4 {
+  font-size: 1.8em;
+}
+
 .org-name span {
   position: relative;
     top: -0.5em;
@@ -185,9 +189,9 @@
   position: absolute;
   right: 3em;
   top: 50%;
-  width: 16em;
+  width: 14em;
   margin-top: -1.3em;
-  font-size: 1em;
+  font-size: 1.1em;
 }
 
 @media screen and (max-width: 991px) {
