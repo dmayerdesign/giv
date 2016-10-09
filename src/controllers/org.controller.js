@@ -27,7 +27,7 @@ exports.routes = [
       var dbQuery = {};
       var dbQuery2 = null;
 
-      console.log("Initial query", console.log(req.query));
+      console.log("Initial query", req.query);
 
       if (req.query.getSome) {
         dbQuery['$or'] = [];
@@ -45,18 +45,26 @@ exports.routes = [
       if (req.query.bodyField) {
         dbQuery2 = search(req.query.search, req.query.bodyField);
       }
-      if (req.query.filterField) {
+      if (req.query.filterField && req.query.filterValue) {
         dbQuery[req.query.filterField] = req.query.filterValue;
         if (dbQuery2)
           dbQuery2[req.query.filterField] = req.query.filterValue;
       }
       dbQuery.verified = true;
 
+      if (req.query.not) {
+        dbQuery["_id"] = { $nin: [] };
+        let arrayOfIdsToExclude = req.query.not.split(",");
+        arrayOfIdsToExclude.forEach(id => {
+          dbQuery._id.$nin.push(id);
+        });
+      }
+
       console.log(req.query);
       console.log("Query 1", dbQuery);
       console.log("Query 2", dbQuery2);
 
-      if (dbQuery2) {
+      if (dbQuery2 && typeof dbQuery2 !== "undefined") {
         Org.find().or([dbQuery, dbQuery2])
         .sort(req.query.sort || "-stars")
         .skip(+req.query.offset)

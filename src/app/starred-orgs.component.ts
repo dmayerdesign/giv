@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Http } from '@angular/http';
 import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
+import { UIHelper } from './services/app.service';
+import { SearchService } from './services/search.service';
 
 @Component({
 	selector: 'starred-orgs',
@@ -12,14 +14,18 @@ import { OrgService } from './services/org.service';
 export class StarredOrgsComponent implements OnInit {
 	private user:any;
 	private orgs = [];
+	private recommended = [];
+	private recommendedOrgsAreLoaded:boolean = false;
 	private loadingShowMoreOrgs:boolean = false;
 	private viewingOrg:boolean = false;
-	private selectedOrg:any;
+	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
 	private singlePostsAreLoaded:boolean;
 
 	constructor(private userService:UserService,
 							private orgService:OrgService,
+							private search:SearchService,
+							private ui:UIHelper,
 							private http:Http) { }
 
 	ngOnInit() {
@@ -27,16 +33,17 @@ export class StarredOrgsComponent implements OnInit {
 			if (err) return console.error(err);
 			this.user = user;
 			console.log(this.user.starred);
-			this.loadStarredOrgs(this.user.starred);
+			this.loadOrgs(this.user.starred);
 		});
 	}
 
-	loadStarredOrgs(starred:any, cb?:any) {
+	loadOrgs(starred:any, cb?:any) {
 		this.orgService.loadStarredOrgs(starred)
 			.subscribe(
 				results => {
 					this.orgs = results;
 					console.log("Starred orgs: ", this.orgs);
+					this.loadRecommendations();
 				},
 				error => console.error(error)
 		);
@@ -46,7 +53,7 @@ export class StarredOrgsComponent implements OnInit {
 		let findOrg = function(org) {
 			return org._id === id;
 		}
-		this.selectedOrg = this.orgs.find(findOrg);
+		this.selectedOrg = this.recommended.find(findOrg) || this.orgs.find(findOrg);
 		this.viewingOrg = true;
 		console.log(this.selectedOrg);
 	}
@@ -67,6 +74,18 @@ export class StarredOrgsComponent implements OnInit {
 	orgIsStarred(org) {
 		if (this.user.starred.indexOf(org._id) === -1) return false;
 		else return true;
+	}
+
+	starOrg(org) {
+		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+			data => {
+				this.user = data.user;
+				this.orgs.push(data.org);
+				this.recommended.splice(this.recommended.indexOf(org), 1);
+				console.log(data.org);
+				console.log(data.user);
+			}
+		);
 	}
 
 	unstarOrg(org) {
@@ -97,6 +116,60 @@ export class StarredOrgsComponent implements OnInit {
 		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
+	}
+
+	loadRecommendations() {
+		let interests = [];
+		let query = {};
+		for (let interest in this.user.interests) {
+      interests.push([interest, this.user.interests[interest]]);
+		}
+		interests.sort((a, b) => {
+        return b[1] - a[1];
+    });
+
+    console.log(interests);
+
+		if (!interests || !interests.length) {
+			return this.recommendedOrgsAreLoaded = true;
+		}
+
+    query['filterField'] = "categories.id";
+    query['filterValue'] = interests[0] && interests[0][0];
+    query['limit'] = 4;
+    query['sort'] = "-stars";
+    query['not'] = [];
+    this.orgs.forEach(org => {
+    	query['not'].push(org._id);
+    });
+
+    console.log("Query: ", query);
+
+    this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
+    	orgs.forEach(org => {
+    		this.recommended.push(org);
+    	});
+
+    	if (!interests[1] || !interests[1][0]) return this.recommendedOrgsAreLoaded = true;
+
+    	query['filterValue'] = interests[1][0];
+    	query['limit'] = 2;
+    	this.orgs.forEach(org => {
+	    	if (query['not'].indexOf(org._id) < 0) query['not'].push(org._id);
+	    });
+    	this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
+	    	orgs.forEach(org => {
+	    		this.recommended.push(org);
+	    	});
+	    	this.recommendedOrgsAreLoaded = true;
+	    }, err => {
+	    	this.ui.flash("Something went wrong while loading your recommendation", "error");
+	    	return console.error(err);
+	    });
+    }, err => {
+    	this.ui.flash("Sorry, we couldn't load your recommendations", "error");
+    	return console.error(err);
+    });
 	}
 
 }

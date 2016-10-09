@@ -142,7 +142,9 @@
   left: 0;
   top: 0.2em;
   overflow: visible;
-  color: #fff;
+
+  color: rgba(255,255,255,0.6);
+  text-shadow: 0px -1px 0px rgba(50,50,50,0.2);
 }
 
 .featured-carousel-nav i {

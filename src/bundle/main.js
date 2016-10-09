@@ -51778,14 +51778,21 @@
 	var http_1 = __webpack_require__(55);
 	var user_service_1 = __webpack_require__(68);
 	var org_service_1 = __webpack_require__(75);
+	var app_service_1 = __webpack_require__(70);
+	var search_service_1 = __webpack_require__(76);
 	var StarredOrgsComponent = (function () {
-	    function StarredOrgsComponent(userService, orgService, http) {
+	    function StarredOrgsComponent(userService, orgService, search, ui, http) {
 	        this.userService = userService;
 	        this.orgService = orgService;
+	        this.search = search;
+	        this.ui = ui;
 	        this.http = http;
 	        this.orgs = [];
+	        this.recommended = [];
+	        this.recommendedOrgsAreLoaded = false;
 	        this.loadingShowMoreOrgs = false;
 	        this.viewingOrg = false;
+	        this.selectedOrg = null;
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -51794,22 +51801,23 @@
 	                return console.error(err);
 	            _this.user = user;
 	            console.log(_this.user.starred);
-	            _this.loadStarredOrgs(_this.user.starred);
+	            _this.loadOrgs(_this.user.starred);
 	        });
 	    };
-	    StarredOrgsComponent.prototype.loadStarredOrgs = function (starred, cb) {
+	    StarredOrgsComponent.prototype.loadOrgs = function (starred, cb) {
 	        var _this = this;
 	        this.orgService.loadStarredOrgs(starred)
 	            .subscribe(function (results) {
 	            _this.orgs = results;
 	            console.log("Starred orgs: ", _this.orgs);
+	            _this.loadRecommendations();
 	        }, function (error) { return console.error(error); });
 	    };
 	    StarredOrgsComponent.prototype.viewOrg = function (e, id) {
 	        var findOrg = function (org) {
 	            return org._id === id;
 	        };
-	        this.selectedOrg = this.orgs.find(findOrg);
+	        this.selectedOrg = this.recommended.find(findOrg) || this.orgs.find(findOrg);
 	        this.viewingOrg = true;
 	        console.log(this.selectedOrg);
 	    };
@@ -51830,6 +51838,16 @@
 	            return false;
 	        else
 	            return true;
+	    };
+	    StarredOrgsComponent.prototype.starOrg = function (org) {
+	        var _this = this;
+	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.orgs.push(data.org);
+	            _this.recommended.splice(_this.recommended.indexOf(org), 1);
+	            console.log(data.org);
+	            console.log(data.user);
+	        });
 	    };
 	    StarredOrgsComponent.prototype.unstarOrg = function (org) {
 	        var _this = this;
@@ -51859,13 +51877,62 @@
 	        else
 	            return false;
 	    };
+	    StarredOrgsComponent.prototype.loadRecommendations = function () {
+	        var _this = this;
+	        var interests = [];
+	        var query = {};
+	        for (var interest in this.user.interests) {
+	            interests.push([interest, this.user.interests[interest]]);
+	        }
+	        interests.sort(function (a, b) {
+	            return b[1] - a[1];
+	        });
+	        console.log(interests);
+	        if (!interests || !interests.length) {
+	            return this.recommendedOrgsAreLoaded = true;
+	        }
+	        query['filterField'] = "categories.id";
+	        query['filterValue'] = interests[0] && interests[0][0];
+	        query['limit'] = 4;
+	        query['sort'] = "-stars";
+	        query['not'] = [];
+	        this.orgs.forEach(function (org) {
+	            query['not'].push(org._id);
+	        });
+	        console.log("Query: ", query);
+	        this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
+	            orgs.forEach(function (org) {
+	                _this.recommended.push(org);
+	            });
+	            if (!interests[1] || !interests[1][0])
+	                return _this.recommendedOrgsAreLoaded = true;
+	            query['filterValue'] = interests[1][0];
+	            query['limit'] = 2;
+	            _this.orgs.forEach(function (org) {
+	                if (query['not'].indexOf(org._id) < 0)
+	                    query['not'].push(org._id);
+	            });
+	            _this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
+	                orgs.forEach(function (org) {
+	                    _this.recommended.push(org);
+	                });
+	                _this.recommendedOrgsAreLoaded = true;
+	            }, function (err) {
+	                _this.ui.flash("Something went wrong while loading your recommendation", "error");
+	                return console.error(err);
+	            });
+	        }, function (err) {
+	            _this.ui.flash("Sorry, we couldn't load your recommendations", "error");
+	            return console.error(err);
+	        });
+	    };
 	    StarredOrgsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'starred-orgs',
 	            templateUrl: 'app/starred-orgs.component.html',
 	            styleUrls: ['app/browse-orgs.component.css', 'app/org.styles.css']
 	        }), 
-	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService, http_1.Http])
+	        __metadata('design:paramtypes', [user_service_1.UserService, org_service_1.OrgService, search_service_1.SearchService, app_service_1.UIHelper, http_1.Http])
 	    ], StarredOrgsComponent);
 	    return StarredOrgsComponent;
 	}());
@@ -51977,6 +52044,8 @@
 	            params.set("offset", options.offset.toString());
 	        if (this.stringIsSet(options.sort))
 	            params.set("sort", options.sort);
+	        if (options.not && options.not.length)
+	            params.set("not", options.not.join(","));
 	        console.log(params);
 	        return this.http.get(uri, {
 	            search: params,

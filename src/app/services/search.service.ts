@@ -24,6 +24,8 @@ export class SearchService {
     if (this.numberIsSet(options.offset)) params.set("offset", options.offset.toString());
     if (this.stringIsSet(options.sort)) params.set("sort", options.sort);
 
+    if (options.not && options.not.length) params.set("not", options.not.join(","));
+
     console.log(params);
 
     return this.http.get(uri, {

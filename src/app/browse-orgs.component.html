@@ -87,7 +87,7 @@
 				#singleItem
 				*ngFor="let org of orgs"
 				(clickOutside)="deselectOrg($event, org._id)"
-				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg?._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
 
 			<header
 					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"

@@ -24,11 +24,7 @@ const userSchema = new mongoose.Schema({
     picture: String
   },
 
-  interests: {
-    race: Number,
-    economy: Number,
-    environment: Number
-  }
+  interests: {}
 }, { timestamps: true });
 
 /**

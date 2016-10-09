@@ -20,7 +20,75 @@
 				#singleItem
 				*ngFor="let org of orgs"
 				(clickOutside)="deselectOrg($event, org._id)"
-				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg?._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
+
+			<header
+					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
+					(click)="viewOrg($event, org._id)">
+				<div class="header-inner">
+					<div class="inside-org header-left">
+						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+					</div>
+					<div class="inside-org header-right">
+						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
+
+						<p class="preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
+						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
+							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
+							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
+							<strong class="inside-org">{{org.stars}}</strong>
+						</p>
+
+						<h4 class="org-name" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">{{org.name}}</a>
+							<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">{{org.name}}</a>
+							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
+						</h4>
+						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<span class="star starred" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
+							&nbsp;{{org.stars}} people starred this
+						</p>
+					</div>
+				</div>
+			</header>
+			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">
+				<img src="app/images/x.svg" width="16" height="16" alt="exit">
+			</span>
+
+			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
+				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
+				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
+				<p class="read-more more-posts">
+					<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
+					<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
+				</p>
+			</div>
+		</section>
+	</div>
+</div>
+
+<div *ngIf="recommendedOrgsAreLoaded"
+		class="starred-orgs col-md-5">
+	<header class="row col-md-12">
+		<div class="row">
+			<h2>Recommended for you</h2>
+			<p class="subtitle">We think you might like these orgs</p>
+		</div>
+	</header>
+
+	<section class="row col-md-12 null-search" *ngIf="!recommended.length">
+			<p>No organizations to show. Star some, and watch recommendations appear here!</p>
+	</section>
+
+	<div *ngIf="recommended?.length" class="row items-list orgs-list col-md-12">
+	<!--*******
+		Orgs Loop
+		*********-->
+		<section class="org single-item row"
+				#singleItem
+				*ngFor="let org of recommended"
+				(clickOutside)="deselectOrg($event, org._id)"
+				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg?._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
 
 			<header
 					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
@@ -67,3 +135,4 @@
 		</section>
 	</div>
 </div>
+

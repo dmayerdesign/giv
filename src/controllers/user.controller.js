@@ -330,27 +330,42 @@ exports.star = (req, res) => {
   
   Org.findOneAndUpdate({_id: orgId}, updateQuery, {new: true}, function(err, org) {
     if(err) {
-      res.json(err);
+      res.json({errmsg: err});
       return console.log(err);
     }
     console.log(org);
 
     User.findOne({_id: userId}, (err, user) => {
-      if(err) { res.json(err); return console.log(err); }
-      if (user.starred.indexOf(req.body.orgId) > -1) {
+      if(err) {
+        res.json({errmsg: err});
+        return console.log(err);
+      }
+      if (user.starred.indexOf(orgId) > -1) {
         if (operator == -1) {
-          user.starred.splice(user.starred.indexOf(req.body.orgId), 1);
+          user.starred.splice(user.starred.indexOf(orgId), 1);
+          org.categories.forEach((category, index, arr) => {
+            if (user.interests && user.interests[category.id]) user.interests[category.id]--;
+          });
         }
       }
       else if (operator == 1) {
-        user.starred.push(req.body.orgId);
+        user.starred.push(orgId);
+        org.categories.forEach((category, index, arr) => {
+          if (!user.interests) user.interests = {};
+
+          if (user.interests[category.id]) user.interests[category.id]++;
+          else user.interests[category.id] = 1;
+        });
       }
+      console.log("New interests: ", user.interests);
+
       user.save((err, user) => {
         if(err) {
-          res.status(500).json(err);
+          res.status(500).json({errmsg: err});
           return console.log(err);
         }
-        res.status(200).json({org: org, user: user})
+        console.log(user);
+        res.status(200).json({org: org, user: user});
       });
     });
   });
