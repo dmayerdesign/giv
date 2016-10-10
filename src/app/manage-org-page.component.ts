@@ -59,6 +59,7 @@ export class ManageOrgPageComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
+		this.ui.setTitle("GIV | Manage");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			if (this.route.params) {

@@ -29,6 +29,7 @@ export class ClaimOrgComponent implements OnInit {
 
 
 	ngOnInit() {
+		this.ui.setTitle("GIV | Claim an organization");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) console.error(err);
 			if (!user || err) {

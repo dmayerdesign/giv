@@ -37911,6 +37911,7 @@
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
 	    { path: 'browse', component: browse_orgs_component_1.BrowseOrgsComponent },
+	    { path: 'null', redirectTo: '' },
 	    { path: 'category/:id', component: browse_orgs_component_1.BrowseOrgsComponent },
 	    { path: 'login', component: login_component_1.LoginComponent },
 	    { path: 'signup', component: signup_component_1.SignupComponent },
@@ -51599,6 +51600,7 @@
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
+	        this.ui.setTitle("GIV | Login");
 	        this.getQueryParams(function (data) { return console.log(data); });
 	    };
 	    LoginComponent.prototype.ngOnDestroy = function () {
@@ -51796,6 +51798,7 @@
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
+	        this.ui.setTitle("GIV | Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -51834,27 +51837,37 @@
 	        }
 	    };
 	    StarredOrgsComponent.prototype.orgIsStarred = function (org) {
-	        if (this.user.starred.indexOf(org._id) === -1)
+	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
 	            return false;
 	        else
 	            return true;
 	    };
 	    StarredOrgsComponent.prototype.starOrg = function (org) {
 	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.push(data.org);
-	            _this.recommended.splice(_this.recommended.indexOf(org), 1);
+	            var orgToStar = _this.orgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
+	            });
+	            if (orgToStar)
+	                orgToStar.stars++;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
 	    };
 	    StarredOrgsComponent.prototype.unstarOrg = function (org) {
 	        var _this = this;
-	        var orgIndex = this.orgs.indexOf(org);
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.splice(orgIndex, 1);
+	            var orgToStar = _this.orgs.find(function (thisOrg) {
+	                return thisOrg._id === org._id;
+	            });
+	            if (orgToStar)
+	                orgToStar.stars--;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52096,7 +52109,6 @@
 	        this.route = route;
 	        this.userService = userService;
 	        this.categories = categories;
-	        this.$orgs = [];
 	        this.selectedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
@@ -52114,7 +52126,7 @@
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("Browse organizations");
+	        this.ui.setTitle("GIV | Browse organizations");
 	        this.categoriesList = this.categories.list();
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
@@ -52129,7 +52141,6 @@
 	        this.orgService.loadOrgs({ limit: 20 }).subscribe(function (data) {
 	            _this.isLoading = false;
 	            _this.orgs = data;
-	            _this.takeCount(_this.orgs);
 	            _this.paramsSub = _this.route.params.subscribe(function (params) {
 	                var categoryId = params['id'];
 	                if (categoryId) {
@@ -52162,12 +52173,12 @@
 	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
 	        this.paramsSub.unsubscribe();
 	    };
-	    BrowseOrgsComponent.prototype.ngDoCheck = function () {
-	        this.takeCount(this.$orgs);
-	    };
-	    BrowseOrgsComponent.prototype.takeCount = function (children) {
-	        this.orgsShowing = this.ui.takeCount(children);
-	    };
+	    // ngDoCheck() {
+	    // 	this.takeCount(this.$orgs);
+	    // }
+	    // takeCount(children:any) {
+	    // 	this.orgsShowing = this.ui.takeCount(children);
+	    // }
 	    BrowseOrgsComponent.prototype.toggleOrder = function (attr) {
 	        if (this.orgsSorting.order.indexOf(attr) === -1) {
 	            this.orgsSorting.order = '-' + attr;
@@ -52220,6 +52231,8 @@
 	    };
 	    BrowseOrgsComponent.prototype.filterByCategory = function (category) {
 	        this.categoryFilter = category || { id: null };
+	        if (category == 'all')
+	            this.categoryFilter = { id: null };
 	        this.searchOrgs(this.searchText);
 	    };
 	    BrowseOrgsComponent.prototype.clearCategoryFilter = function () {
@@ -52247,7 +52260,6 @@
 	            _this.loadingShowMoreOrgs = false;
 	            console.log(res);
 	            _this.orgs = _this.orgs.concat(res);
-	            _this.takeCount(_this.$orgs);
 	        }, function (error) { return console.log(error); });
 	    };
 	    BrowseOrgsComponent.prototype.toggleSearchBoxFocus = function (event) {
@@ -52279,35 +52291,47 @@
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.orgIsStarred = function (org) {
-	        if (this.user.starred.indexOf(org._id) === -1)
+	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
 	            return false;
 	        else
 	            return true;
 	    };
 	    BrowseOrgsComponent.prototype.starOrg = function (org) {
 	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (thisOrg) {
+	            var orgToStar = _this.orgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
-	            }).stars++;
-	            _this.featuredOrgs.find(function (thisOrg) {
+	            });
+	            if (orgToStar)
+	                orgToStar.stars++;
+	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
-	            }).stars++;
+	            });
+	            if (featuredOrgToStar)
+	                orgToStar.stars++;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
 	    };
 	    BrowseOrgsComponent.prototype.unstarOrg = function (org) {
 	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.orgs.find(function (thisOrg) {
+	            var orgToStar = _this.orgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
-	            }).stars--;
-	            _this.featuredOrgs.find(function (thisOrg) {
+	            });
+	            if (orgToStar)
+	                orgToStar.stars--;
+	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
-	            }).stars--;
+	            });
+	            if (featuredOrgToStar)
+	                orgToStar.stars--;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52346,10 +52370,6 @@
 	        else
 	            return false;
 	    };
-	    __decorate([
-	        core_1.ViewChildren('singleItem'), 
-	        __metadata('design:type', Object)
-	    ], BrowseOrgsComponent.prototype, "$orgs", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -52625,7 +52645,7 @@
 	        }
 	    };
 	    OrgPostsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
@@ -52803,27 +52823,27 @@
 	        this.videoIsExpanded = false;
 	    };
 	    SingleOrgComponent.prototype.orgIsStarred = function (org) {
-	        if (this.user.starred.indexOf(org._id) === -1)
+	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
 	            return false;
 	        else
 	            return true;
 	    };
-	    SingleOrgComponent.prototype.starOrg = function (orgId) {
+	    SingleOrgComponent.prototype.starOrg = function (org) {
 	        var _this = this;
-	        this.http.put("/user/star/add", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	        if (!this.user)
+	            return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
 	            _this.org.stars++;
-	            console.log(data.org);
-	            console.log(data.user);
 	        });
 	    };
-	    SingleOrgComponent.prototype.unstarOrg = function (orgId) {
+	    SingleOrgComponent.prototype.unstarOrg = function (org) {
 	        var _this = this;
-	        this.http.put("/user/star/subtract", { orgId: orgId, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	        if (!this.user)
+	            return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
 	            _this.org.stars--;
-	            console.log(data.org);
-	            console.log(data.user);
 	        });
 	    };
 	    SingleOrgComponent.prototype.userHasPermission = function (org) {
@@ -52839,6 +52859,12 @@
 	    };
 	    SingleOrgComponent.prototype.closeOptionsMenu = function () {
 	        this.showOptionsMenu = false;
+	    };
+	    SingleOrgComponent.prototype.claimOrg = function () {
+	        if (this.user && this.userHasPermission(this.org))
+	            this.router.navigate(['/organization', 'claim', this.org._id]);
+	        else
+	            this.ui.flash("Sign up for free or log in to claim this organization", "info");
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -52903,6 +52929,7 @@
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
+	        this.ui.setTitle("GIV | Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53104,6 +53131,7 @@
 	    }
 	    ClaimOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
+	        this.ui.setTitle("GIV | Claim an organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                console.error(err);
@@ -53435,6 +53463,7 @@
 	    }
 	    CreateOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
+	        this.ui.setTitle("GIV | Add your organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err) {
 	                console.error(err);

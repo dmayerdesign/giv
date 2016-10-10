@@ -2,16 +2,20 @@
 	position: relative;
 }
 
-.video-container {
+.banner-container {
 	position: relative;
 	overflow: hidden;
+}
+
+.banner-container {
+	background: #000;
 }
 
 .featured-video, .cover-image {
 	width: 100%;
 	height: 18em;
 	position: relative;
-		z-index: -1;
+		z-index: 0;
 
 	background-color: #5D8BD5;
 	background-size: 14em auto;
@@ -24,6 +28,7 @@
 	background-repeat: no-repeat;
 	background-size: 100% 100%;
 	background-size: cover;
+	opacity: 0.7;
 }
 
 .featured-video:not(.cover-image) {
@@ -40,6 +45,7 @@
 	z-index: 102;
 	-webkit-filter: none;
 	filter: none;
+	opacity: 1 !important;
 }
 
 .featured-video.expanded iframe {
@@ -55,13 +61,21 @@
 	font-size: 0.8em;
 }
 
+.expand-video.is-expanded {
+	bottom: 3.6em;
+}
+
 .single-org header {
-	margin-top: -4.8em;
+	margin-top: -4.5em;
   margin-bottom: 1.3em;
 	margin-left: 1.8em;
 
 	background: transparent;
 	color: #fff;
+}
+
+.single-org header-inner {
+
 }
 
 .org-name {
@@ -95,3 +109,4 @@ header .stars {
 	top: 2.4em;
 	right: 0;
 }
+

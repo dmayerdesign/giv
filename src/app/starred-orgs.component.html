@@ -6,11 +6,21 @@
 		</div>
 	</header>
 
+	<div *ngIf="!user" class="row col-md-12">
+		<div class="row">
+			<section class="null-search">
+				<p>Log in to begin starring your favorite organizations, and watch them appear here.</p>
+			</section>
+			<button class="big-button" [routerLink]="['/login']">Log in</button>
+		</div>
+	</div>
+
 	<div class="row items-list orgs-list col-md-12"
+			*ngIf="user"
 			[ngClass]="{'loading-more-orgs': loadingShowMoreOrgs}">
 
 		<section class="null-search" *ngIf="orgs.length === 0">
-				<p>No organizations to show. Star some, and watch them appear here!</p>
+			<p>No organizations to show. Star some, and watch them appear here!</p>
 		</section>
 
 	<!--*******
@@ -26,16 +36,23 @@
 					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
 					(click)="viewOrg($event, org._id)">
 				<div class="header-inner">
-					<div class="inside-org header-left">
+					<div *ngIf="viewingOrg" class="inside-org header-left">
+						<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">
+							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+						</a>
+						<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">
+							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+						</a>
+					</div>
+					<div *ngIf="!viewingOrg" class="inside-org header-left">
 						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
 					</div>
 					<div class="inside-org header-right">
 						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
-						<p class="preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
+						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
 						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
-							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
 							<strong class="inside-org">{{org.stars}}</strong>
 						</p>
 
@@ -45,7 +62,7 @@
 							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<span class="star starred" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
+							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>
 					</div>
@@ -67,7 +84,7 @@
 	</div>
 </div>
 
-<div *ngIf="recommendedOrgsAreLoaded"
+<div *ngIf="user && recommendedOrgsAreLoaded"
 		class="recommended-orgs col-md-5">
 	<header class="row col-md-12">
 		<div class="row">
@@ -94,16 +111,24 @@
 					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
 					(click)="viewOrg($event, org._id)">
 				<div class="header-inner">
-					<div class="inside-org header-left">
+					<div *ngIf="viewingOrg" class="inside-org header-left">
+						<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">
+							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+						</a>
+						<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">
+							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+						</a>
+					</div>
+					<div *ngIf="!viewingOrg" class="inside-org header-left">
 						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
 					</div>
 					<div class="inside-org header-right">
 						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
-						<p class="preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:150}}</p>
+						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
 						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
-							<i *ngIf="user && !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
+							<i *ngIf="!orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
 							<strong class="inside-org">{{org.stars}}</strong>
 						</p>
 
@@ -113,7 +138,7 @@
 							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<span class="star unstarred" *ngIf="user && !orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
+							<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>

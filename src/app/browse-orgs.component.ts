@@ -21,7 +21,6 @@ import { TruncatePipe } from './pipes/truncate.pipe';
 })
 
 export class BrowseOrgsComponent implements OnInit {
-	@ViewChildren('singleItem') $orgs = [];
 	@Output() selectedOrg:any = null;
 	@Output() user;
 
@@ -29,7 +28,6 @@ export class BrowseOrgsComponent implements OnInit {
 	private featuredOrgs = [];
 	private featuredShowing:number;
 	private orgsLoaded:number = 20;
-	private orgsShowing:number;
 	private orgsSorting = {order: "-name"};
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -56,7 +54,7 @@ export class BrowseOrgsComponent implements OnInit {
 				private categories:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("Browse organizations");
+		this.ui.setTitle("GIV | Browse organizations");
 		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
@@ -74,7 +72,6 @@ export class BrowseOrgsComponent implements OnInit {
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
-				this.takeCount(this.orgs);
 
 				this.paramsSub = this.route.params.subscribe(params => {
 					let categoryId = params['id'];
@@ -118,13 +115,13 @@ export class BrowseOrgsComponent implements OnInit {
 		this.paramsSub.unsubscribe();
 	}
 
-	ngDoCheck() {
-		this.takeCount(this.$orgs);
-	}
+	// ngDoCheck() {
+	// 	this.takeCount(this.$orgs);
+	// }
 
-	takeCount(children:any) {
-		this.orgsShowing = this.ui.takeCount(children);
-	}
+	// takeCount(children:any) {
+	// 	this.orgsShowing = this.ui.takeCount(children);
+	// }
 
 	toggleOrder(attr) {
 		if (this.orgsSorting.order.indexOf(attr) === -1) {
@@ -183,6 +180,7 @@ export class BrowseOrgsComponent implements OnInit {
 
 	filterByCategory(category) {
 		this.categoryFilter = category || {id: null};
+		if (category == 'all') this.categoryFilter = {id: null}; 
 		this.searchOrgs(this.searchText);
 	}
 
@@ -213,7 +211,6 @@ export class BrowseOrgsComponent implements OnInit {
 				this.loadingShowMoreOrgs = false;
 				console.log(res);
 				this.orgs = this.orgs.concat(res);
-				this.takeCount(this.$orgs);
 			},
 			error => console.log(error)
 		);
@@ -251,36 +248,48 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	orgIsStarred(org) {
-		if (this.user.starred.indexOf(org._id) === -1) return false;
+		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(org) {
+	starOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.find((thisOrg) => {
+
+				let orgToStar = this.orgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
-				}).stars++;
-				this.featuredOrgs.find((thisOrg) => {
+				});
+				if (orgToStar) orgToStar.stars++;
+				
+				let featuredOrgToStar = this.featuredOrgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
-				}).stars++;
+				});
+				if (featuredOrgToStar) orgToStar.stars++;
+
 				console.log(data.org);
 				console.log(data.user);
 			}
 		);
 	}
 
-	unstarOrg(org) {
+	unstarOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.find((thisOrg) => {
+
+				let orgToStar = this.orgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
-				}).stars--;
-				this.featuredOrgs.find((thisOrg) => {
+				});
+				if (orgToStar) orgToStar.stars--;
+
+				let featuredOrgToStar = this.featuredOrgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
-				}).stars--;
+				});
+				if (featuredOrgToStar) orgToStar.stars--;
+
 				console.log(data.org);
 				console.log(data.user);
 			}

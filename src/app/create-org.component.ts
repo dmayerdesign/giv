@@ -60,6 +60,7 @@ export class CreateOrgComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
+		this.ui.setTitle("GIV | Add your organization");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) {
 				console.error(err);

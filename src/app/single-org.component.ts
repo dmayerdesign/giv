@@ -90,28 +90,26 @@ export class SingleOrgComponent implements OnInit {
 	}
 
 	orgIsStarred(org) {
-		if (this.user.starred.indexOf(org._id) === -1) return false;
+		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(orgId) {
-		this.http.put("/user/star/add", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+	starOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
+		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
 				this.org.stars++;
-				console.log(data.org);
-				console.log(data.user);
 			}
 		);
 	}
 
-	unstarOrg(orgId) {
-		this.http.put("/user/star/subtract", {orgId: orgId, userId: this.user._id}).map(res => res.json()).subscribe(
+	unstarOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
+		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
 				this.org.stars--;
-				console.log(data.org);
-				console.log(data.user);
 			}
 		);
 	}
@@ -128,6 +126,13 @@ export class SingleOrgComponent implements OnInit {
 
 	closeOptionsMenu() {
 		this.showOptionsMenu = false;
+	}
+
+	claimOrg() {
+		if (this.user && this.userHasPermission(this.org))
+			this.router.navigate(['/organization', 'claim', this.org._id]);
+		else
+			this.ui.flash("Sign up for free or log in to claim this organization", "info");
 	}
 
 }

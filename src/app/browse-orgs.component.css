@@ -69,9 +69,12 @@
   font-weight: bold;
 }
 
+.description {
+  margin-bottom: 0;
+}
+
 .more-posts {
-  font-size: 0.7em;
-  padding: 0.7em 1.65em 0;
+  padding: 0.7em 0;
 }
 
 /* Featured orgs in browse */
@@ -171,7 +174,7 @@
 
 .featured-carousel-nav-dots span {
   display: inline-block;
-  padding: 0 0.05em;
+  padding: 0 0.07em;
   opacity: 0.6;
   cursor: pointer;
 }

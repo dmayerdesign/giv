@@ -1,41 +1,43 @@
-<nav class="navbar">
-  <div class="container">
-    <h1 class="masthead-logo"><img src="images/logo-2x.png" alt="Giv"></h1>
-    <ul class="nav nav-left pull-left">
-      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
-      </li>
-      <li *ngIf="isLoggedIn" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
-      </li>
-    </ul>
-    <ul class="nav nav-right pull-right">
-      <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
-    		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
-          <img *ngIf="!user?.profile?.picture" height="18" [src]="user?.profile?.picture || 'app/images/profile-icon.svg'" style="position:relative; left:4px;">
-          <span>Your account</span>
-        </a>
-        <ul *ngIf="showAccountMenu" class="subnav">
-          <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
-        </ul>
-      </li>
-      <li *ngIf="!isLoggedIn" class="nav-item">
-        <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()">
-          <span>Log in</span>
-        </a>
-      </li>
-      <button *ngIf="!isLoggedIn" class="nav-item" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="signUp()">Join the community</button>
-    </ul>
-  </div>
-</nav>
+<div class="app-container">
+  <nav class="navbar">
+    <div class="container">
+      <h1 class="masthead-logo"><img src="images/logo-2x.png" alt="Giv"></h1>
+      <ul class="nav nav-left pull-left">
+        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
+        </li>
+        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
+        </li>
+      </ul>
+      <ul class="nav nav-right pull-right">
+        <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
+      		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
+            <img *ngIf="!user?.profile?.picture" height="18" [src]="user?.profile?.picture || 'app/images/profile-icon.svg'" style="position:relative; left:4px;">
+            <span>Your account</span>
+          </a>
+          <ul *ngIf="showAccountMenu" class="subnav">
+            <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
+          </ul>
+        </li>
+        <li *ngIf="!isLoggedIn" class="nav-item">
+          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()">
+            <span>Log in</span>
+          </a>
+        </li>
+        <button *ngIf="!isLoggedIn" class="nav-item" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="signUp()">Join the community</button>
+      </ul>
+    </div>
+  </nav>
 
-<main class="main container">
-	<router-outlet></router-outlet>
-</main>
+  <main class="main container">
+  	<router-outlet></router-outlet>
+  </main>
 
-<footer>
-  <small><a (mouseover)="navOver($event)" (mouseout)="navOut($event)" target="_blank" href="https://github.com/dmayerdesign">Made with <i class="fa fa-heart"></i> by Danny Mayer</a></small>
-  <small>Icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a> and <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> and by <a href="https://icons8.com/web-app/14099/Settings">Icons8</a> (<a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>)</small>
-</footer>
+  <footer>
+    <small><a (mouseover)="navOver($event)" (mouseout)="navOut($event)" target="_blank" href="https://github.com/dmayerdesign">Made with <i class="fa fa-heart"></i> by Danny Mayer</a></small>
+    <small>Icons by <a href="http://www.freepik.com" title="Freepik">Freepik</a> and <a href="http://www.flaticon.com/authors/gregor-cresnar" title="Gregor Cresnar">Gregor Cresnar</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> and by <a href="https://icons8.com/web-app/14099/Settings">Icons8</a> (<a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>)</small>
+  </footer>
 
-<ng2-toasty></ng2-toasty>
+  <ng2-toasty></ng2-toasty>
+</div>

@@ -7,8 +7,17 @@
 	border-bottom-right-radius: 2px;
 }
 
+.in-single .org-details {
+		padding-top: 1.4em;
+}
+
 .org-details.in-list {
 	padding: 0;
+}
+
+.org-details.in-list > div {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
 }
 
 .in-list .org-details-content {
@@ -19,7 +28,7 @@
 	padding-top: 1.5em;
 }
 
-.other-links h5 {
+.other-links h4 {
 	margin-bottom: 0.1em;
 }
 

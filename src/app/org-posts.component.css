@@ -1,7 +1,11 @@
 .posts-container.posts-by-org {
-	background: #f4f9f8;
+	background: #F2F7F6;
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;
+}
+
+.posts-by-org section {
+	background-color: #fff;
 }
 
 .posts-container header {

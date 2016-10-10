@@ -1,0 +1,32 @@
+.app-container {
+	position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
+	width: 100%;
+	min-height: 100%;
+	padding-bottom: 5em;
+}
+
+/* Footer */
+
+footer {
+  position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 102;
+  width: 100%;
+
+  background: #ffffff;
+  font-size: 0.8em;
+  text-align: center;
+  padding: 1.2em;
+}
+
+footer, footer a {
+  color: #d8d3d5;
+}
+
+footer a:hover {
+  color: #b8b3b5;
+}

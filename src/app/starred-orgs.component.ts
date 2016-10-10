@@ -29,6 +29,7 @@ export class StarredOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
+		this.ui.setTitle("GIV | Manage");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
@@ -72,28 +73,38 @@ export class StarredOrgsComponent implements OnInit {
 	}
 
 	orgIsStarred(org) {
-		if (this.user.starred.indexOf(org._id) === -1) return false;
+		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(org) {
+	starOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.push(data.org);
-				this.recommended.splice(this.recommended.indexOf(org), 1);
+
+				let orgToStar = this.orgs.find((thisOrg) => {
+					return thisOrg._id === org._id;
+				});
+				if (orgToStar) orgToStar.stars++;
+
 				console.log(data.org);
 				console.log(data.user);
 			}
 		);
 	}
 
-	unstarOrg(org) {
-		let orgIndex = this.orgs.indexOf(org);
+	unstarOrg(org):void {
+		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
 		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.orgs.splice(orgIndex, 1);
+
+				let orgToStar = this.orgs.find((thisOrg) => {
+					return thisOrg._id === org._id;
+				});
+				if (orgToStar) orgToStar.stars--;
+
 				console.log(data.org);
 				console.log(data.user);
 			}

@@ -144,7 +144,7 @@ export class OrgPostsComponent {
 	}
 
 	userHasPermission(org) {
-		if (this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}

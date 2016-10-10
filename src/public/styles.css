@@ -21,6 +21,8 @@ h1, h2, h3 {
 h2 {
   font-size: 2.2em;
   letter-spacing: -0.5px;
+  color: rgba(120,110,116,0.65) !important;
+  text-shadow: 0 -1px 0px rgba(255,255,255,1), 0 0.5px 0px rgba(20,13,16,0.2);
 }
 
 h4 {
@@ -69,17 +71,16 @@ select:focus {
 }
 
 /* Buttons and forms */
-button, button:active, button:hover {
-  background: #F4F9F8;
-  /*background: linear-gradient(20deg, #53E4ED, #4fead1);*/
-  background: #7fe4ca;
+button, button:active, button:focus, button:hover {
+  background: linear-gradient(20deg, #1AE3EF, #0DED9C);
   border: 0 none !important;
   border-radius: 2px;
-  color: inherit;
-  color: #fff;
   outline: none !important;
   padding: 0.6em 1em;
   font-weight: 500;
+  color: inherit;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0px -1px 0px rgba(80,80,80,0.1);
 }
 
 button.mini, button.mini:active, button.mini:hover {
@@ -88,14 +89,18 @@ button.mini, button.mini:active, button.mini:hover {
 
 button:hover {
   box-shadow: 0px 1px 3px rgba(50,50,50,0.1);
-  background: #6fd4ba;
+  background: linear-gradient(20deg, #0AD3DF, #0DDD8C);
 }
 
 button:active {
   box-shadow: 0px 0px 1px rgba(20,20,20,0.1);
-  background: #f0f5f4;
 }
 
+.big-button, .big-button:active, .big-button:focus, .big-button:hover {
+  padding: 0.8em 1em;
+}
+
+.big-button,
 #show-more {
   width: 100%;
 }
@@ -117,9 +122,10 @@ button i {
   border-radius: 4em;
   background: transparent;
   box-shadow: none;
+  text-shadow: 0px 1px 1px rgba(50,50,50,0.3);
 }
 
-.icon-btn:hover, .icon-btn:active {
+.icon-btn:hover, .icon-btn:active, .icon-btn.active {
   background: rgba(0,0,0,0.1);
 }
 
@@ -140,13 +146,17 @@ main {
 }
 
 section, .search-box {
-  background: #F4F9F8;
-  border: 2px solid #F1F6F5;
+  background: #F2F7F6;
+  border: 2px solid #F0F5F4;
   border-radius: 2px;
 }
 
 .posts-by-org .search-box {
   background: #fff;
+}
+
+.posts-container .search-box input {
+  padding-right: 0 !important;
 }
 
 section section {
@@ -173,27 +183,10 @@ browse-orgs {
 }
 
 
-/* Footer */
-
-footer {
-  background: #ffffff;
-  font-size: 0.8em;
-  text-align: center;
-  padding: 1.2em;
-}
-
-footer, footer a {
-  color: #d8d3d5;
-}
-
-footer a:hover {
-  color: #b8b3b5;
-}
-
 /* Masthead */
 
 .navbar {
-  background: linear-gradient(20deg, #53E4ED, #4AEFB3);
+  background: linear-gradient(20deg, #1AE3EF, #0DED9C);
   padding: 0;
   border-radius: 0 !important;
 }
@@ -259,7 +252,9 @@ ul.nav {
   color: #fff;
   font-size: 0.8em;
   font-weight: 300;
-  text-shadow: 0px 1px 4px rgba(0,0,0,0.1);
+/*  text-shadow: 0px 1px 4px rgba(0,0,0,0.1);
+*/  
+  text-shadow: 0 0.5px 0px rgba(20,13,16,0.5);
 }
 
 .nav-link:hover,
@@ -403,6 +398,20 @@ search-box + select {
   text-align: center;
 }
 
+.null-search {
+  padding: 1.5em 1.5em 1.5em 5em;
+  margin-bottom: 0.5em;
+  color: #aba4a9;
+
+  background: url("app/images/see-no-evil-monkey.png") no-repeat 1.7em 50%;
+  background-size: 2em auto;
+}
+
+.null-search p {
+  position: relative;
+  top: 0.3em;
+}
+
 
 /* Org Page */
 .single-org .item-details, .single-org .posts-by-org {
@@ -528,6 +537,12 @@ search-box + select {
   animation: loader-label 2s infinite ease-out;
 }
 
+.app-loader .loader__label {
+  -webkit-animation: app-loader-label 2s infinite ease-out;
+  -moz-animation: app-loader-label 2s infinite ease-out;
+  animation: app-loader-label 2s infinite ease-out;
+}
+
 @-webkit-keyframes loader-figure {
   0% {
     height: 4px;
@@ -601,6 +616,40 @@ search-box + select {
   }
   50% {
     opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@-webkit-keyframes app-loader-label {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+@-moz-keyframes app-loader-label {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+@keyframes app-loader-label {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
   }
   100% {
     opacity: 0.35;
