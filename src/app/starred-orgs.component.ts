@@ -29,7 +29,7 @@ export class StarredOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV | Manage");
+		this.ui.setTitle("GIV | Your starred");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;

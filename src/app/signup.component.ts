@@ -26,6 +26,7 @@ export class SignupComponent implements OnInit {
 	}
 
   ngOnInit() {
+    this.ui.setTitle("GIV | Sign up");
   	this.formModel = {email: null, password: null, confirmPassword: null};
   }
 
