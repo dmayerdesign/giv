@@ -51,7 +51,8 @@
 <div class="col-md-7 browse-orgs" *ngIf="!isLoading">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Organizations</h2>
+			<h2><span *ngIf="categoryFilter?.name">{{categoryFilter?.name}} </span>
+			<span [ngClass]="{'to-uppercase': !categoryFilter || !categoryFilter.name}">o</span>rganizations</h2>
 			<p class="subtitle">People doing important work right now</p>
 
 			<search-box
@@ -142,10 +143,6 @@
 			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
 				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
-				<p class="read-more more-posts col-md-12">
-					<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
-					<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
-				</p>
 			</div>
 		</section>
 		

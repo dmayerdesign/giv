@@ -5,13 +5,13 @@ import { UIHelper } from './services/app.service';
 import { UserService } from './services/user.service';
 
 @Component({
-	selector: 'login'
-, templateUrl: 'app/signup.component.html'
+	selector: 'signup',
+  templateUrl: 'app/signup.component.html'
 })
 
 export class SignupComponent implements OnInit {
-	private formModel:{email: string, password: string, confirmPassword: string};
-	private user:any;
+	private formModel:{email: string, password: string, confirmPassword: string} = {email: null, password: null, confirmPassword: null};
+  private user:any;
   private isLoggedIn:boolean;
 
 	constructor(private http:Http,
@@ -26,8 +26,7 @@ export class SignupComponent implements OnInit {
 	}
 
   ngOnInit() {
-    this.ui.setTitle("GIV | Sign up");
-  	this.formModel = {email: null, password: null, confirmPassword: null};
+    this.ui.setTitle("GIV :: Sign up");
   }
 
   signup() {

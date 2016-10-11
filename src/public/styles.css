@@ -53,6 +53,10 @@ p.info {
   margin-top: -0.5em;
 }
 
+.to-uppercase {
+  text-transform: uppercase;
+}
+
 select {
   margin-bottom: 0.6em;
   min-width: 10rem;

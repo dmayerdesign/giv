@@ -54,7 +54,7 @@ export class SingleOrgComponent implements OnInit {
 						}
 						this.org = data;
 						this.isLoaded = true;
-						this.ui.setTitle("GIV | " + this.org.name);
+						this.ui.setTitle("GIV :: " + this.org.name);
 
 						if (this.org.videoLink) {
 							this.org.videoLink = this.org.videoLink.replace("watch?v=", "v/");

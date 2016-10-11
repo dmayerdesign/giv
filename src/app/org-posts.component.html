@@ -1,8 +1,11 @@
-<div class="clearfix posts-container" [attr.id]="!isBrowsing ? 'posts' : null" [ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'col-md-12': org && !isBrowsing}">
+<div class="clearfix posts-container"
+		*ngIf="posts?.length"
+		[attr.id]="!isBrowsing ? 'posts' : null"
+		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'col-md-12': org && !isBrowsing}">
 
 	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
-		<h4 class="posts-title" *ngIf="org">What we're up to</h4>
-		<h2 class="posts-title" *ngIf="!org && isBrowsing">What they're up to</h2>
+		<h4 class="posts-title" *ngIf="org">Updates</h4>
+		<h2 class="posts-title" *ngIf="!org && isBrowsing">Updates</h2>
 
 		<p *ngIf="!org" class="subtitle">See where your money's going</p>
 		<search-box
@@ -55,5 +58,10 @@
 				<button (click)="savePost(selectedPost)">Save</button>
 			</div>
 		</section>
+
+		<p *ngIf="org && isBrowsing" class="read-more more-posts pull-left">
+			<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
+			<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
+		</p>
 	</div>
 </div>

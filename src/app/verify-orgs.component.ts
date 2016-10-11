@@ -42,7 +42,7 @@ export class VerifyOrgsComponent implements OnInit {
 				private userService:UserService) { }
 
 	ngOnInit() {
-		this.ui.setTitle("Verify organizations");
+		this.ui.setTitle("GIV :: Verify organizations");
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);

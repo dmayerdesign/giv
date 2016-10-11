@@ -51600,7 +51600,7 @@
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
-	        this.ui.setTitle("GIV | Login");
+	        this.ui.setTitle("GIV :: Login");
 	        this.getQueryParams(function (data) { return console.log(data); });
 	    };
 	    LoginComponent.prototype.ngOnDestroy = function () {
@@ -51679,13 +51679,14 @@
 	        this.router = router;
 	        this.userService = userService;
 	        this.ui = ui;
+	        this.formModel = { email: null, password: null, confirmPassword: null };
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
 	            this.ui.flash("You're already logged in!", "info");
 	        }
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
-	        this.formModel = { email: null, password: null, confirmPassword: null };
+	        this.ui.setTitle("GIV :: Sign up");
 	    };
 	    SignupComponent.prototype.signup = function () {
 	        var _this = this;
@@ -51722,7 +51723,7 @@
 	    };
 	    SignupComponent = __decorate([
 	        core_1.Component({
-	            selector: 'login',
+	            selector: 'signup',
 	            templateUrl: 'app/signup.component.html'
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, app_service_1.UIHelper])
@@ -51798,7 +51799,7 @@
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Manage");
+	        this.ui.setTitle("GIV :: Your starred");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -52126,7 +52127,7 @@
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Browse organizations");
+	        this.ui.setTitle("GIV :: Browse organizations");
 	        this.categoriesList = this.categories.list();
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
@@ -52411,11 +52412,11 @@
 	    }
 	    Categories.prototype.list = function () {
 	        return [
-	            { name: "Racial Justice", id: "racial" },
-	            { name: "LGBTQIA Justice", id: "lgbtqia" },
-	            { name: "Environmental Justice", id: "environmental" },
-	            { name: "Reproductive Rights", id: "reproductive" },
-	            { name: "Economic Justice", id: "economic" },
+	            { name: "Racial justice", id: "racial" },
+	            { name: "LGBTQIA justice", id: "lgbtqia" },
+	            { name: "Environmental justice", id: "environmental" },
+	            { name: "Reproductive rights", id: "reproductive" },
+	            { name: "Economic justice", id: "economic" },
 	            { name: "Other", id: "other" }
 	        ];
 	    };
@@ -52792,6 +52793,7 @@
 	                    }
 	                    _this.org = data;
 	                    _this.isLoaded = true;
+	                    _this.ui.setTitle("GIV :: " + _this.org.name);
 	                    if (_this.org.videoLink) {
 	                        _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "v/");
 	                        _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
@@ -52929,7 +52931,7 @@
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Manage");
+	        this.ui.setTitle("GIV :: Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53131,7 +53133,7 @@
 	    }
 	    ClaimOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Claim an organization");
+	        this.ui.setTitle("GIV :: Claim an organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                console.error(err);
@@ -53270,7 +53272,7 @@
 	    }
 	    VerifyOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("Verify organizations");
+	        this.ui.setTitle("GIV :: Verify organizations");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53781,18 +53783,28 @@
 	        this.http = http;
 	        this.router = router;
 	        this.ui = ui;
-	        this.inputs = new email_service_1.EmailModel();
+	        this.inputs = {};
+	        if (this.options && this.options.html && typeof this.options.html !== "undefined")
+	            this.inputs = new email_service_1.HtmlEmailModel();
+	        else
+	            this.inputs = new email_service_1.EmailModel();
 	    }
 	    ContactComponent.prototype.submitForm = function () {
 	        var _this = this;
-	        this.inputs.subject = 'Contact Form | Fuse';
+	        this.inputs.subject = (this.options && this.options.subject) || 'Contact Form | GIV';
 	        this.inputs.redirectTo = '/';
-	        this.inputs.toName = 'Support';
-	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
+	        this.inputs.toName = this.inputs.toName || (this.options && this.options.toName) || 'Support';
+	        this.inputs.toAddr = this.inputs.toAddr || (this.options && this.options.toAddr) || 'd.a.mayer92@gmail.com';
+	        if (!this.inputs.fromName || typeof this.inputs.fromName === "undefined")
+	            this.inputs.fromName = this.options && this.options.fromName;
+	        if (!this.inputs.fromAddr || typeof this.inputs.fromAddr === "undefined")
+	            this.inputs.fromAddr = this.options && this.options.fromAddr;
 	        console.log(this.inputs);
-	        this.http.post('/contact-form', this.inputs)
-	            .map(function (res) { return res.json(); })
+	        this.http.post((this.options && this.options.url) || '/contact-form', this.inputs).map(function (res) { return res.json(); })
 	            .subscribe(function (data) {
+	            if (_this.options && _this.options.callback) {
+	                return _this.options.callback(null, data);
+	            }
 	            if (data.errmsg) {
 	                console.error(data.errmsg);
 	                return _this.ui.flash("Couldn't send your message", "error");
@@ -53802,9 +53814,16 @@
 	            _this.router.navigate(['/']);
 	        }, function (err) {
 	            console.log(err);
+	            if (_this.options.callback) {
+	                return _this.options.callback(err);
+	            }
 	            _this.ui.flash("Couldn't send your message", "error");
 	        });
 	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], ContactComponent.prototype, "options", void 0);
 	    ContactComponent = __decorate([
 	        core_1.Component({
 	            selector: 'contact',

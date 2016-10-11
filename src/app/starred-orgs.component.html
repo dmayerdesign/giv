@@ -1,7 +1,7 @@
 <div class="starred-orgs col-md-7">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Starred by you</h2>
+			<h2>Starred</h2>
 			<p class="subtitle">Here you can keep track of organizations you like</p>
 		</div>
 	</header>
@@ -75,10 +75,6 @@
 			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
 				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
-				<p class="read-more more-posts">
-					<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
-					<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
-				</p>
 			</div>
 		</section>
 	</div>
@@ -88,7 +84,7 @@
 		class="recommended-orgs col-md-5">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Recommended for you</h2>
+			<h2>Recommended</h2>
 			<p class="subtitle">We think you might like these orgs</p>
 		</div>
 	</header>
@@ -152,10 +148,6 @@
 			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded && singlePostsAreLoaded}">
 				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
 				<org-posts (update)="revealOrgPosts($event)" [org]="selectedOrg" [isBrowsing]="true"></org-posts>
-				<p class="read-more more-posts">
-					<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
-					<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
-				</p>
 			</div>
 		</section>
 	</div>

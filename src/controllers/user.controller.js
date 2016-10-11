@@ -6,19 +6,6 @@ const User = require('../models/User');
 const Org = require('../models/Org');
 
 /**
- * GET /login
- * Login page.
- */
-exports.getLogin = (req, res) => {
-  if (req.user) {
-    return res.redirect('/');
-  }
-  res.render('account/login', {
-    title: 'Login'
-  });
-};
-
-/**
  * POST /login
  * Sign in using email and password.
  */
@@ -30,13 +17,13 @@ exports.postLogin = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    return res.status(401).json({"errmsg": "Login was not valid"});
+    return res.status(401).json({errmsg: "Login was not valid"});
   }
 
   passport.authenticate('local', (err, user, info) => {
     if (err) { return next(err); }
     if (!user) {
-      res.status(401).json({"errmsg": "Login was not valid"});
+      res.status(401).json({errmsg: "Login was not valid"});
     }
     req.logIn(user, (err) => {
       if (err) { return next(err); }
@@ -226,7 +213,7 @@ exports.postForgot = (req, res, next) => {
       });
       const mailOptions = {
         to: user.email,
-        from: 'd.a.mayer92@gmail.com',
+        from: 'GIV Support <d.a.mayer92@gmail.com>',
         subject: 'Reset your password on GIV',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n

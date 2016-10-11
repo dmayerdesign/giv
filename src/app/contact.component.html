@@ -1,6 +1,21 @@
 <form (submit)="submitForm()" #contactForm="ngForm">
-	<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">
-	<input [(ngModel)]="inputs.fromAddr" type="email" name="email" placeholder="your email address">
-	<textarea [(ngModel)]="inputs.message" name="message" placeholder="your message"></textarea>
+
+	<div *ngIf="!options">
+		<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">
+		<input [(ngModel)]="inputs.fromAddr" type="email" name="email" placeholder="your email address">
+		<textarea [(ngModel)]="inputs.message" name="message" placeholder="your message"></textarea>
+	</div>
+
+	<div *ngIf="options">
+		<input *ngIf="options.outgoing && options.fields.name" [(ngModel)]="inputs.toName" type="text" name="name" placeholder="your name">
+		<input *ngIf="!options.outgoing && options.fields.name" [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">
+		<input *ngIf="options.outgoing && options.fields.email" [(ngModel)]="inputs.toAddr" type="email" name="email" placeholder="your email address">
+		<input *ngIf="!options.outgoing && options.fields.email" [(ngModel)]="inputs.fromAddr" type="email" name="email" placeholder="your email address">
+		<input *ngIf="options.fields.confirmEmail" [(ngModel)]="inputs.confirmEmail" type="email" name="confirmEmail" placeholder="confirm your email address">
+		<input *ngIf="options.fields.password" [(ngModel)]="inputs.password" type="password" name="password" placeholder="your password">
+		<input *ngIf="options.fields.confirmPassword" [(ngModel)]="inputs.confirmPassword" type="password" name="confirmPassword" placeholder="your password again">
+		<textarea *ngIf="options.fields.message" [(ngModel)]="inputs.message" name="message" placeholder="your message"></textarea>
+	</div>
+
 	<button>Submit</button>
 </form>

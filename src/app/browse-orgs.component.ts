@@ -54,7 +54,7 @@ export class BrowseOrgsComponent implements OnInit {
 				private categories:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV | Browse organizations");
+		this.ui.setTitle("GIV :: Browse organizations");
 		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
