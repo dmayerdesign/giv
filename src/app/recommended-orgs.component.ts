@@ -5,6 +5,25 @@ import { OrgService } from './services/org.service';
 import { UIHelper } from './services/app.service';
 import { SearchService } from './services/search.service';
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
 @Component({
 	selector: 'recommended-orgs',
 	templateUrl: 'app/recommended-orgs.component.html',
@@ -172,7 +191,7 @@ export class RecommendedOrgsComponent implements OnInit {
 	    	orgs.forEach(org => {
 	    		this.recommended.push(org);
 	    	});
-	    	this.recommended.shuffle(); // Added Array.prototype.shuffle in public/js/lib/pre-scripts.js
+	    	shuffle(this.recommended);
 	    	this.recommendedOrgsAreLoaded = true;
 	    }, err => {
 	    	this.ui.flash("Something went wrong while loading your recommendation", "error");
