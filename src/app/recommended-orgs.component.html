@@ -1,35 +1,24 @@
-<div class="starred-orgs mobile-tab desktop-tab col-md-8"
-		[ngClass]="{'active': showStarredMobileTab}">
+<div *ngIf="user && recommendedOrgsAreLoaded"
+		class="recommended-orgs col-md-8"
+		[ngClass]="{'in-single': org, 'in-starred': inStarred}">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Starred <span class="desktop-tab-button" (click)="showRecommended()">Recommended</span></h2>
-			<p class="subtitle">Here you can keep track of organizations you like</p>
+			<h2>Recommended <span *ngIf="inStarred" class="desktop-tab-button" (click)="showStarred()">Starred</span></h2>
+			<p class="subtitle">We think you might like these orgs</p>
 		</div>
 	</header>
 
-	<div *ngIf="!user" class="row col-md-12">
-		<div class="row">
-			<section class="null-search">
-				<p>Log in to begin starring your favorite organizations, and watch them appear here.</p>
-			</section>
-			<button class="big-button" [routerLink]="['/login']">Log in</button>
-		</div>
-	</div>
+	<section class="row col-md-12 null-search" *ngIf="!recommended.length">
+			<p>No organizations to show. Star some, and watch recommendations appear here!</p>
+	</section>
 
-	<div class="row items-list orgs-list col-md-12"
-			*ngIf="user"
-			[ngClass]="{'loading-more-orgs': loadingShowMoreOrgs}">
-
-		<section class="null-search" *ngIf="orgs.length === 0">
-			<p>No organizations to show. Star some, and watch them appear here!</p>
-		</section>
-
+	<div *ngIf="recommended?.length" class="row items-list orgs-list col-md-12">
 	<!--*******
 		Orgs Loop
 		*********-->
 		<section class="org single-item row"
 				#singleItem
-				*ngFor="let org of orgs"
+				*ngFor="let org of recommended"
 				(clickOutside)="deselectOrg($event, org._id)"
 				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg?._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
 
@@ -54,6 +43,7 @@
 						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
 						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
+							<i *ngIf="!orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
 							<strong class="inside-org">{{org.stars}}</strong>
 						</p>
 
@@ -63,6 +53,7 @@
 							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
+							<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars}} people starred this
 						</p>
@@ -80,8 +71,3 @@
 		</section>
 	</div>
 </div>
-
-<div class="mobile-tab desktop-tab" [ngClass]="{'active': showRecommendedMobileTab}">
-	<recommended-orgs (tabChange)="showStarred($event)" [orgs]="orgs" [inStarred]="true"></recommended-orgs>
-</div>
-

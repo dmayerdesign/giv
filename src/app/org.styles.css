@@ -12,7 +12,7 @@
   border: 0 none;
 }
 
-.recommended-orgs .org {
+.recommended-orgs:not(.in-starred) .org {
   font-size: 0.9em;
 }
 
@@ -151,14 +151,6 @@ header h4 > a, header h4 > a:hover {
   margin-top: 1.4em;
 }
 
-/*header .description.preview {
-  padding-left: 4.5em;
-}
-
-.featured-org header .description {
-  padding-left: 4.3em;
-}*/
-
 .donate-link {
   display: block;
 }
@@ -187,12 +179,30 @@ header h4 > a, header h4 > a:hover {
 }
 
 .browse-posts,
-.recommended-orgs {
+.recommended-orgs,
+.starred-orgs {
   padding-right: 0;
 }
 
-.recommended-orgs {
+/*.recommended-orgs {
   padding-left: 30px;
+}*/
+
+.desktop-tab {
+  display: none;
+}
+.desktop-tab.active {
+  display: block;
+}
+.desktop-tab-button {
+  display: inline-block;
+  cursor: pointer;
+  padding-left: 0.2em;
+  font-size: 0.8em;
+  opacity: 0.5;
+}
+.desktop-tab-button:hover {
+  opacity: 0.7;
 }
 
 @media only screen and (max-width: 767px) {

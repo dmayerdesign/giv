@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', function (next) {
+userSchema.pre('save', function(next) {
   const user = this;
   if (user.isNew || user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
@@ -44,6 +44,15 @@ userSchema.pre('save', function (next) {
   }
   else return next();
 });
+
+userSchema.pre('save', function(next) {
+  if (this.isModified('interests')) {
+    for (interest in this.interests) {
+      if (this.interests[interest]) this.interests[interest] -= 0.01;
+    }
+  }
+  next();
+})
 
 /**
  * Helper method for validating user's password.

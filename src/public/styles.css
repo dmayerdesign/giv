@@ -324,6 +324,7 @@ button.nav-item:hover {
 .submenu {
   position: absolute;
     bottom: -2.2em;
+    right: 0;
     z-index: 101;
   padding: 0.2em 0;
   width: 9em;
@@ -354,7 +355,7 @@ button.nav-item:hover {
 }
 
 @media only screen and (max-width: 599px) {
-  .nav-item span {
+  .nav-item > a span {
     display: none;
   }
 

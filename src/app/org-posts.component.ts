@@ -56,7 +56,7 @@ export class OrgPostsComponent {
 			this.querySub = this.route.queryParams.subscribe(params => {
 				if (params['viewpost']) {
 					this.selectPost(params['viewpost']);
-					window.location.href += "#posts";
+					window.setTimeout(() => { window.location.href += "#posts" }, 500);
 				}
 			});
 		});

@@ -17,7 +17,7 @@ import { UIHelper, Utilities } from './services/app.service';
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 
 export class SingleOrgComponent implements OnInit {
-	@Input() org;
+	private org;
 	private user;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
@@ -38,43 +38,41 @@ export class SingleOrgComponent implements OnInit {
         private sanitizer: DomSanitizer) { }
 
 	ngOnInit() {
-		if (this.org) {
-			this.isLoaded = true;
-		}
-		else {
-			this.sub = this.route.params.subscribe(params => {
-				let id = params['id'];
-				let slug = params['slug'];
+		this.sub = this.route.params.subscribe(params => {
+			let id = params['id'];
+			let slug = params['slug'];
 
-				this.orgService.loadOrg({id: id, slug: slug}).subscribe(
-					data => {
-						if (!data || !data._id) {
-							this.ui.flash("This page doesn't exist", "error");
-							return this.router.navigate([''], { queryParams: {"404": true}});
-						}
-						this.org = data;
-						this.isLoaded = true;
-						this.ui.setTitle("GIV :: " + this.org.name);
-
-						if (this.org.videoLink) {
-							this.org.videoLink = this.org.videoLink.replace("watch?v=", "v/");
-							this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
-							let matchId = this.org.videoLink.match(/(embed)\/(.*)/);
-							if (matchId) { this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg'; }
-						}
-					},
-					error => {
-						console.error(error);
+			this.orgService.loadOrg({id: id, slug: slug}).subscribe(
+				data => {
+					if (!data || !data._id) {
 						this.ui.flash("This page doesn't exist", "error");
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
-				);
-			});
-		}
+					this.org = data;
+					this.isLoaded = true;
+					this.ui.setTitle("GIV :: " + this.org.name);
 
-		this.userService.getLoggedInUser((err, user) => {
-			if(err) return console.error(err);
-			this.user = user;
+					if (this.org.videoLink) {
+						this.org.videoLink = this.org.videoLink.replace("watch?v=", "v/");
+						this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
+						let matchId = this.org.videoLink.match(/(embed)\/(.*)/);
+						if (matchId) { this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg'; }
+					}
+
+					this.userService.getLoggedInUser((err, user) => {
+						if(err) return console.error(err);
+						this.user = user;
+						this.http.post("/interests", {userId: user._id, categories: this.org.categories, increment: 1})
+							.map(res => res.json())
+							.subscribe(data => console.log(data), err => console.error(err));
+					});
+				},
+				error => {
+					console.error(error);
+					this.ui.flash("This page doesn't exist", "error");
+					return this.router.navigate([''], { queryParams: {"404": true}});
+				}
+			);
 		});
 	}
 

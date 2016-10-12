@@ -11,6 +11,7 @@ import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
 import { AboutComponent } from './about.component';
 import { StarredOrgsComponent } from './starred-orgs.component';
+import { RecommendedOrgsComponent } from './recommended-orgs.component';
 import { BrowseOrgsComponent } from './browse-orgs.component';
 import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
@@ -77,6 +78,7 @@ const routing = RouterModule.forRoot([
       , VerifyOrgsComponent
     	, AboutComponent
       , StarredOrgsComponent
+      , RecommendedOrgsComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES
       , CreateOrgComponent

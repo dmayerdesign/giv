@@ -337,7 +337,7 @@ export class BrowseOrgsComponent implements OnInit {
 		else return false;
 	}
 
-	showOrgs() {
+	showOrgs(e) {
 		this.showOrgsMobileTab = true;
 		this.showUpdatesMobileTab = false;
 	}

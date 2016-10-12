@@ -302,6 +302,43 @@ exports.getUser = (req, res) => {
   });
 };
 
+exports.showInterest = (req, res) => {
+  let userId = req.body.userId;
+  let categories = req.body.categories;
+  let increment = req.body.increment || 0;
+
+  console.log("INTEREST REQUEST: ", userId, categories, increment);
+
+  User.findOne({_id: userId}, (err, user) => {
+    if(err) {
+      res.json({errmsg: err});
+      return console.log(err);
+    }
+    categories.forEach((category, index, arr) => {
+      if (category.id === "other") {
+        increment = 0.1;
+      }
+      if (!user.interests) user.interests = {};
+      if (user.interests[category.id]) {
+        user.interests[category.id] += increment;
+      }
+      else user.interests[category.id] = increment;
+    });
+    
+    console.log("INTERESTS: ", user.interests);
+
+    user.markModified("interests");
+    user.save((err, user) => {
+      if(err) {
+        res.status(500).json({errmsg: err});
+        return console.log(err);
+      }
+      console.log(user);
+      res.status(200).json(user);
+    });
+  });
+};
+
 exports.star = (req, res) => {
   let orgId = req.body.orgId;
   let userId = req.body.userId;
@@ -320,6 +357,7 @@ exports.star = (req, res) => {
       res.json({errmsg: err});
       return console.log(err);
     }
+    if (!org) return res.json({errmsg: "Org lookup failed"});
     console.log(org);
 
     User.findOne({_id: userId}, (err, user) => {
@@ -331,7 +369,10 @@ exports.star = (req, res) => {
         if (operator == -1) {
           user.starred.splice(user.starred.indexOf(orgId), 1);
           org.categories.forEach((category, index, arr) => {
-            if (user.interests && user.interests[category.id]) user.interests[category.id]--;
+            if (user.interests && user.interests[category.id]) {
+              if (category.id === "other") user.interests[category.id]-=0.2;
+              else user.interests[category.id]-=5;
+            }
           });
         }
       }
@@ -339,13 +380,16 @@ exports.star = (req, res) => {
         user.starred.push(orgId);
         org.categories.forEach((category, index, arr) => {
           if (!user.interests) user.interests = {};
-
-          if (user.interests[category.id]) user.interests[category.id]++;
-          else user.interests[category.id] = 1;
+          if (user.interests[category.id]) {
+              if (category.id === "other") user.interests[category.id]+=0.2;
+              else user.interests[category.id]+=5;
+            }
+          else user.interests[category.id] = category.id === "other" ? 0.2 : 5;
         });
       }
       console.log("New interests: ", user.interests);
 
+      user.markModified("interests");
       user.save((err, user) => {
         if(err) {
           res.status(500).json({errmsg: err});

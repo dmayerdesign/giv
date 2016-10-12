@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
@@ -6,17 +6,19 @@ import { UIHelper } from './services/app.service';
 import { SearchService } from './services/search.service';
 
 @Component({
-	selector: 'starred-orgs',
-	templateUrl: 'app/starred-orgs.component.html',
-	styleUrls: ['app/browse-orgs.component.css', 'app/org.styles.css']
+	selector: 'recommended-orgs',
+	templateUrl: 'app/recommended-orgs.component.html',
+	styleUrls: ['app/recommended-orgs.component.css', 'app/browse-orgs.component.css', 'app/org.styles.css']
 })
 
-export class StarredOrgsComponent implements OnInit {
+export class RecommendedOrgsComponent implements OnInit {
+	@Input() orgs = [];
+	@Input() org:any;
+	@Input() inStarred:boolean;
+	@Output() tabChange = new EventEmitter();
 	private user:any;
-	private orgs = [];
 	private recommended = [];
 	private recommendedOrgsAreLoaded:boolean = false;
-	private loadingShowMoreOrgs:boolean = false;
 	private viewingOrg:boolean = false;
 	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
@@ -31,25 +33,12 @@ export class StarredOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Your starred");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
 			console.log(this.user.starred);
-			this.loadOrgs(this.user.starred);
+			this.loadRecommendations();
 		});
-	}
-
-	loadOrgs(starred:any, cb?:any) {
-		this.orgService.loadStarredOrgs(starred)
-			.subscribe(
-				results => {
-					this.orgs = results;
-					console.log("Starred orgs: ", this.orgs);
-					this.loadRecommendations();
-				},
-				error => console.error(error)
-		);
 	}
 
 	viewOrg(e:any, id:string):void {
@@ -155,6 +144,12 @@ export class StarredOrgsComponent implements OnInit {
     this.orgs.forEach(org => {
     	query['not'].push(org._id);
     });
+    this.user.starred.forEach(orgId => {
+    	query['not'].push(orgId);
+    });
+    if (this.org) {
+    	query['not'].push(this.org._id);
+    }
 
     console.log("Query: ", query);
 
@@ -177,6 +172,7 @@ export class StarredOrgsComponent implements OnInit {
 	    	orgs.forEach(org => {
 	    		this.recommended.push(org);
 	    	});
+	    	this.recommended.shuffle(); // Added Array.prototype.shuffle in public/js/lib/pre-scripts.js
 	    	this.recommendedOrgsAreLoaded = true;
 	    }, err => {
 	    	this.ui.flash("Something went wrong while loading your recommendation", "error");
@@ -188,14 +184,8 @@ export class StarredOrgsComponent implements OnInit {
     });
 	}
 
-	showStarred(e) {
-		this.showRecommendedMobileTab = false;
-		this.showStarredMobileTab = true;
-	}
-
-	showRecommended() {
-		this.showRecommendedMobileTab = true;
-		this.showStarredMobileTab = false;
+	showStarred() {
+		this.tabChange.emit("");
 	}
 
 }

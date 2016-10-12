@@ -66,16 +66,20 @@
 }
 
 .single-org header {
-	margin-top: -4.5em;
-  margin-bottom: 1.3em;
+	position: relative;
+	height: 18em;
+	margin-top: -18em;
+  margin-bottom: 0;
 	margin-left: 1.8em;
 
 	background: transparent;
 	color: #fff;
 }
 
-.single-org header-inner {
-
+.single-org .org-header-inner {
+	width: 100%;
+	position: absolute;
+		bottom: 1.1em;
 }
 
 .org-name {
@@ -84,6 +88,10 @@
 	line-height: 1;
 	font-size: 1.8em;
 	font-weight: 500;
+}
+
+header h1, header .stars {
+	padding-left: 3.2rem;
 }
 
 header .stars {
@@ -109,4 +117,5 @@ header .stars {
 	top: 2.4em;
 	right: 0;
 }
+
 

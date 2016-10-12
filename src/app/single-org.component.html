@@ -19,24 +19,27 @@
 	</div>
 
 	<header class="org-header">
-		<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-		<h1 class="org-name">{{org.name}}</h1>
-		<p class="info stars">
-			<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org._id)"><i class="fa fa-star-o"></i></span>
-			<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org._id)"><i class="fa fa-star"></i></span>
-			&nbsp;{{org.stars}} people starred this
-		</p>
+		<div class="org-header-inner">
+			<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+			<h1 class="org-name">{{org.name}}</h1>
+			<p class="info stars">
+				<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
+				<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
+				&nbsp;{{org.stars}} people starred this
+			</p>
+		</div>
+
+		<div class="options-menu" (clickOutside)="closeOptionsMenu()">
+			<button class="icon-btn" (click)="toggleOptionsMenu()" [ngClass]="{'active': showOptionsMenu}">
+				<img src="app/images/options.svg" alt="options">
+			</button>
+			<ul *ngIf="showOptionsMenu" class="submenu">
+				<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
+				<li><a (click)="claimOrg()">Is this your organization?</a></li>
+			</ul>
+		</div>
 	</header>
 	<org-details [org]="org" [isSingle]="true"></org-details>
 	<org-posts [org]="org" [user]="user"></org-posts>
-
-	<div class="options-menu" (clickOutside)="closeOptionsMenu()">
-		<button class="icon-btn" (click)="toggleOptionsMenu()" [ngClass]="{'active': showOptionsMenu}">
-			<img src="app/images/options.svg" alt="options">
-		</button>
-		<ul *ngIf="showOptionsMenu" class="submenu">
-			<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
-			<li><a (click)="claimOrg()">Is this your organization?</a></li>
-		</ul>
-	</div>
+	<recommended-orgs (tabChange)="showStarred($event)" [org]="org"></recommended-orgs>
 </div>
