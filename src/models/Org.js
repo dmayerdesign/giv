@@ -4,6 +4,7 @@ const orgSchema = new mongoose.Schema({
 	name: {type: String, index: true},
 	slug: {type: String, trim: true, unique: true},
 	description: {type: String, index: true},
+	type: String,
 	creator: String,
 	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,

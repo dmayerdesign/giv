@@ -90,7 +90,7 @@
     top: 0;
     left: 0;
   width: 100%;
-  padding: 2em 0 0;
+  padding: 2.8em 0 0;
   color: #fff;
   text-align: center;
   text-transform: uppercase;
@@ -101,7 +101,7 @@
 
 .featured-orgs-inner {
   position: relative;
-  height: 13.94em;
+  height: 15.94em;
   overflow: hidden;
   border-radius: 4px;
 }
@@ -125,8 +125,8 @@
 }
 
 .featured-org .header-inner {
-  padding: 3.2em 1.5em 3em !important;
-  height: 14em;
+  padding: 4.8em 1.5em 3em !important;
+  height: 16em;
 }
 
 .featured-org .stars-preview {
@@ -141,7 +141,7 @@
   height: 1em;
   z-index: 102;
   left: 0;
-  top: 0.2em;
+  top: 0.8em;
   overflow: visible;
 
   color: rgba(255,255,255,0.6);
@@ -152,8 +152,11 @@
 	position: relative;
 		top: 0;
 	box-sizing: content-box;
-	padding: 0.9em;
+	padding: 0.6em 0.8em;
+  margin-top: 0.3em;
 	width: 0.8em;
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
 
 	color: #fff;
 	cursor: pointer;
@@ -161,7 +164,7 @@
 }
 
 .featured-carousel-nav i:first-child {
-  margin-right: 4.4em;
+  margin-right: 5em;
 }
 
 .featured-carousel-nav-dots {
@@ -200,18 +203,19 @@
 
 @media screen and (max-width: 991px) {
   .featured-orgs-inner {
-    height: 14.94em;
+    height: 16.94em;
   }
 
   .featured-org .header-inner {
-    height: 15em;
+    height: 17em;
   }
 
   .featured-org .header-right {
     width: 60%;
   }
 
-  .featured-org h4 a {
+  .featured-org h4 a,
+  .featured-org h4 a:hover {
     max-height: 1.9em;
   }
 

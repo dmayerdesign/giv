@@ -139,12 +139,6 @@ button i {
   text-align: center;
 }
 
-@media only screen and (max-width: 579px) {
-  main {
-    font-size: 0.9em;
-  }
-}
-
 
 /* Layout */
 main {
@@ -192,11 +186,11 @@ browse-orgs {
   background-size: cover;
 }
 
-
-/* Posts */
-
-.browse-posts {
-  padding-right: 0;
+@media only screen and (max-width: 579px) {
+  main {
+    margin-top: 1.8em;
+    font-size: 0.9em;
+  }
 }
 
 
@@ -455,25 +449,30 @@ search-box + select {
   bottom: 0;
   left: 0;
   z-index: 9999;
-  width: 100%;
+  width: 98%;
+  margin: 0 1% 1em;
 }
 
 .toast {
   position: relative;
-  padding: 1em;
+  font-size: 0.9em;
+  padding: 1.3em 0;
   color: #fff;
+  text-shadow: 0px -1px 0px rgba(80,80,80,0.1);
+  border: 2px solid rgba(50,50,50,0.1);
+  border-radius: 5px;
 }
 
 .toasty-type-info {
-  background: blue;
+  background: #1AD3DF;
 }
 
 .toasty-type-error {
-  background: red;
+  background: #EF5352;
 }
 
 .toasty-type-success {
-  background: green;
+  background: #44E49A;
 }
 
 .toast-text {
@@ -481,12 +480,14 @@ search-box + select {
 }
 
 .toast .close-button {
+  cursor: pointer;
   position: absolute;
   right: 0;
   top: 0;
-  width: 20px;
-  height: 20px;
-  background: #000;
+  width: 24px;
+  height: 24px;
+  background: rgba(0,0,0,0.1) url('app/images/small-x.png') no-repeat 56% 44%;
+  background-size: 8px auto;
 }
 
 

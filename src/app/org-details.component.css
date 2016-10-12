@@ -54,3 +54,9 @@
 .other-links li a:hover {
 	text-decoration: none;
 }
+
+.org-type {
+	font-size: 0.75em;
+	opacity: 0.5;
+	font-weight: bold;
+}

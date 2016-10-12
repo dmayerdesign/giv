@@ -170,6 +170,9 @@ export class StarredOrgsComponent implements OnInit {
     	this.orgs.forEach(org => {
 	    	if (query['not'].indexOf(org._id) < 0) query['not'].push(org._id);
 	    });
+	    this.recommended.forEach(org => {
+	    	if (query['not'].indexOf(org._id) < 0) query['not'].push(org._id);
+	    });
     	this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
 	    	orgs.forEach(org => {
 	    		this.recommended.push(org);

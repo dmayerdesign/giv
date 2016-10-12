@@ -186,10 +186,22 @@ header h4 > a, header h4 > a:hover {
   display: none;
 }
 
+.browse-posts,
+.recommended-orgs {
+  padding-right: 0;
+}
+
+.recommended-orgs {
+  padding-left: 30px;
+}
 
 @media only screen and (max-width: 767px) {
   .mobile-tab {
     display: none;
+  }
+  .mobile-tab:not(.browse-orgs) {
+    padding-right: 0;
+    padding-left: 0;
   }
   .mobile-tab.active {
     display: block;
@@ -215,10 +227,14 @@ header h4 > a, header h4 > a:hover {
 }
 
 @media only screen and (max-width: 579px) {
-  .browse-orgs > header,
-  .starred-orgs > header {
+  .browse-orgs > header {
     padding-right: 30px;
     padding-left: 30px;
+  }
+  .starred-orgs > header,
+  .recommended-orgs > header {
+    padding-right: 45px;
+    padding-left: 45px;
   }
 
   .org-search-box {

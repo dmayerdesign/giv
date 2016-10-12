@@ -51928,6 +51928,10 @@
 	                if (query['not'].indexOf(org._id) < 0)
 	                    query['not'].push(org._id);
 	            });
+	            _this.recommended.forEach(function (org) {
+	                if (query['not'].indexOf(org._id) < 0)
+	                    query['not'].push(org._id);
+	            });
 	            _this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
 	                orgs.forEach(function (org) {
 	                    _this.recommended.push(org);
