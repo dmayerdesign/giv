@@ -84,4 +84,9 @@
 	margin-top: 0.8em !important;
 }
 
-
+@media only screen and (max-width: 579px) {
+	.posts-container.browsing > header {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}

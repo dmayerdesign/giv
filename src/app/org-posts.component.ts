@@ -19,6 +19,7 @@ export class OrgPostsComponent {
 	@Input() user;
 	@Input() isBrowsing:boolean;
 	@Output() update = new EventEmitter();
+	@Output() tabChange = new EventEmitter();
 	@ViewChildren('singlePost') $posts = [];
 
 	private posts:Array<any> = [];
@@ -198,6 +199,10 @@ export class OrgPostsComponent {
 					this.isEditing = false;
 				});
 		}
+	}
+
+	showOrgs() {
+		this.tabChange.emit("");
 	}
 
 }

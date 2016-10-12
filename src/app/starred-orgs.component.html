@@ -1,7 +1,8 @@
-<div class="starred-orgs col-md-7">
+<div class="starred-orgs mobile-tab col-md-7"
+		[ngClass]="{'active': showStarredMobileTab}">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Starred</h2>
+			<h2>Starred <span class="mobile-tab-button" (click)="showRecommended()">Recommended</span></h2>
 			<p class="subtitle">Here you can keep track of organizations you like</p>
 		</div>
 	</header>
@@ -81,10 +82,11 @@
 </div>
 
 <div *ngIf="user && recommendedOrgsAreLoaded"
-		class="recommended-orgs col-md-5">
+		class="recommended-orgs mobile-tab col-md-5"
+		[ngClass]="{'active': showRecommendedMobileTab}">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Recommended</h2>
+			<h2>Recommended <span class="mobile-tab-button" (click)="showStarred()">Starred</span></h2>
 			<p class="subtitle">We think you might like these orgs</p>
 		</div>
 	</header>

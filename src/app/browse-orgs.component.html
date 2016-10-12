@@ -48,11 +48,16 @@
 	</div>
 </div>
 
-<div class="col-md-7 browse-orgs" *ngIf="!isLoading">
+<div class="col-md-7 browse-orgs mobile-tab"
+		*ngIf="!isLoading"
+		[ngClass]="{'active': showOrgsMobileTab}">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2><span *ngIf="categoryFilter?.name">{{categoryFilter?.name}} </span>
-			<span [ngClass]="{'to-uppercase': !categoryFilter || !categoryFilter.name}">o</span>rganizations</h2>
+			<h2>
+				<span *ngIf="categoryFilter?.name">{{categoryFilter?.name}} </span>
+				<span [ngClass]="{'to-uppercase': !categoryFilter || !categoryFilter.name}">o</span>rganizations
+				<span class="mobile-tab-button" (click)="showUpdates()"> Updates</span>
+			</h2>
 			<p class="subtitle">People doing important work right now</p>
 
 			<search-box
@@ -161,8 +166,10 @@
 	</div>
 </div>
 
-<div class="col-md-5 browse-posts" *ngIf="!isLoading">
-	<org-posts [user]="user" [isBrowsing]="true"></org-posts>
+<div class="col-md-5 browse-posts mobile-tab"
+		*ngIf="!isLoading"
+		[ngClass]="{'active': showUpdatesMobileTab}">
+	<org-posts (tabChange)="showOrgs($event)" [user]="user" [isBrowsing]="true"></org-posts>
 </div>
 
 <!-- LOADING COMPONENT -->

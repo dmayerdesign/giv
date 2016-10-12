@@ -111,7 +111,7 @@ header h4 > a, header h4 > a:hover {
   line-height: 1;
   text-decoration: none;
   color: #fff;
-  max-height: 1em;
+  max-height: 0.9em;
   overflow: hidden;
 }
 
@@ -180,4 +180,54 @@ header h4 > a, header h4 > a:hover {
   font-weight: bold;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.mobile-tab-button {
+  display: none;
+}
+
+
+@media only screen and (max-width: 767px) {
+  .mobile-tab {
+    display: none;
+  }
+  .mobile-tab.active {
+    display: block;
+  }
+
+  .mobile-tab-button {
+    display: inline-block;
+    cursor: pointer;
+    padding-left: 0.2em;
+    font-size: 0.8em;
+    opacity: 0.5;
+  }
+  .mobile-tab-button:hover {
+    opacity: 0.7;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .browse-posts,
+  .recommended-orgs {
+    padding-left: 0;
+  }
+}
+
+@media only screen and (max-width: 579px) {
+  .browse-orgs > header,
+  .starred-orgs > header {
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+
+  .org-search-box {
+    font-size: 0.9em;
+  }
+
+  search-box + select {
+    float: none;
+    margin-top: 0.7em;
+    font-size: 1.05em;
+  }
 }

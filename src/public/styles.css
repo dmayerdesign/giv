@@ -139,14 +139,27 @@ button i {
   text-align: center;
 }
 
+@media only screen and (max-width: 579px) {
+  main {
+    font-size: 0.9em;
+  }
+}
+
+
 /* Layout */
 main {
-  /*padding-top: 4.75em;*/
   margin-top: 1em;
 }
 
 @media only screen and (min-width: 1200px) {
 
+}
+
+@media only screen and (max-width: 579px) {
+  main.container {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
 
 section, .search-box {

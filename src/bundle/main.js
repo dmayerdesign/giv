@@ -51796,6 +51796,8 @@
 	        this.loadingShowMoreOrgs = false;
 	        this.viewingOrg = false;
 	        this.selectedOrg = null;
+	        this.showStarredMobileTab = true;
+	        this.showRecommendedMobileTab = false;
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -51939,6 +51941,14 @@
 	            _this.ui.flash("Sorry, we couldn't load your recommendations", "error");
 	            return console.error(err);
 	        });
+	    };
+	    StarredOrgsComponent.prototype.showStarred = function () {
+	        this.showRecommendedMobileTab = false;
+	        this.showStarredMobileTab = true;
+	    };
+	    StarredOrgsComponent.prototype.showRecommended = function () {
+	        this.showRecommendedMobileTab = true;
+	        this.showStarredMobileTab = false;
 	    };
 	    StarredOrgsComponent = __decorate([
 	        core_1.Component({
@@ -52124,6 +52134,8 @@
 	        this.loadingShowMoreOrgs = false;
 	        this.singleDetailsAreLoaded = false;
 	        this.singlePostsAreLoaded = false;
+	        this.showUpdatesMobileTab = false;
+	        this.showOrgsMobileTab = true;
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -52153,6 +52165,8 @@
 	            /** Infinite scrolling! **/
 	            var orgs = _this.orgs;
 	            document.onscroll = function () {
+	                if (!_this.showOrgsMobileTab)
+	                    return;
 	                var body = document.body;
 	                var html = document.documentElement;
 	                var height = Math.max(body.scrollHeight, body.offsetHeight, html.scrollHeight, html.offsetHeight, html.clientHeight);
@@ -52371,6 +52385,14 @@
 	        else
 	            return false;
 	    };
+	    BrowseOrgsComponent.prototype.showOrgs = function () {
+	        this.showOrgsMobileTab = true;
+	        this.showUpdatesMobileTab = false;
+	    };
+	    BrowseOrgsComponent.prototype.showUpdates = function () {
+	        this.showOrgsMobileTab = false;
+	        this.showUpdatesMobileTab = true;
+	    };
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -52547,6 +52569,7 @@
 	        this.ui = ui;
 	        this.utilities = utilities;
 	        this.update = new core_1.EventEmitter();
+	        this.tabChange = new core_1.EventEmitter();
 	        this.$posts = [];
 	        this.posts = [];
 	        this.selectedPost = null;
@@ -52700,6 +52723,9 @@
 	            });
 	        }
 	    };
+	    OrgPostsComponent.prototype.showOrgs = function () {
+	        this.tabChange.emit("");
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -52716,6 +52742,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], OrgPostsComponent.prototype, "update", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgPostsComponent.prototype, "tabChange", void 0);
 	    __decorate([
 	        core_1.ViewChildren('singlePost'), 
 	        __metadata('design:type', Object)

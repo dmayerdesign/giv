@@ -21,6 +21,8 @@ export class StarredOrgsComponent implements OnInit {
 	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
 	private singlePostsAreLoaded:boolean;
+	private showStarredMobileTab:boolean = true;
+	private showRecommendedMobileTab:boolean = false;
 
 	constructor(private userService:UserService,
 							private orgService:OrgService,
@@ -181,6 +183,16 @@ export class StarredOrgsComponent implements OnInit {
     	this.ui.flash("Sorry, we couldn't load your recommendations", "error");
     	return console.error(err);
     });
+	}
+
+	showStarred() {
+		this.showRecommendedMobileTab = false;
+		this.showStarredMobileTab = true;
+	}
+
+	showRecommended() {
+		this.showRecommendedMobileTab = true;
+		this.showStarredMobileTab = false;
 	}
 
 }

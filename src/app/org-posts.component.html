@@ -5,7 +5,7 @@
 
 	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
 		<h4 class="posts-title" *ngIf="org">Updates</h4>
-		<h2 class="posts-title" *ngIf="!org && isBrowsing">Updates</h2>
+		<h2 class="posts-title" *ngIf="!org && isBrowsing">Updates <span class="mobile-tab-button" (click)="showOrgs()">Organizations</span></h2>
 
 		<p *ngIf="!org" class="subtitle">See where your money's going</p>
 		<search-box

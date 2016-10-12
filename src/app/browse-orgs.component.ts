@@ -44,6 +44,9 @@ export class BrowseOrgsComponent implements OnInit {
 	private singleDetailsAreLoaded:boolean = false;
 	private singlePostsAreLoaded:boolean = false;
 
+	private showUpdatesMobileTab:boolean = false;
+	private showOrgsMobileTab:boolean = true;
+
 	constructor(
 				private http:Http,
 				private orgService:OrgService,
@@ -84,7 +87,8 @@ export class BrowseOrgsComponent implements OnInit {
 
 				/** Infinite scrolling! **/
 				let orgs = this.orgs;
-				document.onscroll = function() {
+				document.onscroll = ():void => {
+					if (!this.showOrgsMobileTab) return;
 					let body = document.body;
 		    	let html = document.documentElement;
 					let height = Math.max( body.scrollHeight, body.offsetHeight, 
@@ -331,6 +335,16 @@ export class BrowseOrgsComponent implements OnInit {
 		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
+	}
+
+	showOrgs() {
+		this.showOrgsMobileTab = true;
+		this.showUpdatesMobileTab = false;
+	}
+
+	showUpdates() {
+		this.showOrgsMobileTab = false;
+		this.showUpdatesMobileTab = true;
 	}
 
 }
