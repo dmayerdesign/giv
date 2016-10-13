@@ -36,6 +36,7 @@ export class CreatePostComponent implements OnInit {
 	@Input() org;
 	@Input() user;
 	@Output() update = new EventEmitter();
+	@Output() postAdd = new EventEmitter();
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 	private savingPost:boolean = false;
@@ -97,21 +98,8 @@ export class CreatePostComponent implements OnInit {
   }
 
   createPost(newPost:post):void {
-  	this.savingPost = true;
-  	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
-  		console.log("New post: ", res);
-  		if (res.errmsg) {
-  			this.ui.flash("Save failed", "error");
-  			this.savingPost = false;
-  			return;
-  		}
-  		this.org = res;
-  		this.update.emit(this.org);
-  		this.savingPost = false;
-  		this.post = new Post();
-  			this.ui.flash("Saved", "success");
-  		console.log(res);
-  	});
+  	this.postAdd.emit(newPost);
+  	this.post = new Post();
   }
 
 }

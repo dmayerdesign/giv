@@ -105,7 +105,11 @@ export class StarredOrgsComponent implements OnInit {
 				let orgToStar = this.orgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
 				});
+				let orgIndex = this.orgs.indexOf(orgToStar);
 				if (orgToStar) orgToStar.stars--;
+				
+				// Special for this component
+				this.orgs.splice(orgIndex, 1);
 
 				console.log(data.org);
 				console.log(data.user);

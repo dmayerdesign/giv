@@ -203,13 +203,15 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   deleteOrg(id) {
-  	let orgId = id || this.org._id;
-  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
-  		if (data && data.success) {
-  			this.router.navigate(['']);
-  			return this.ui.flash("Org was deleted", "error");
-  		}
-  	});
+  	if (window.confirm("Are you sure you want to delete this organization? This can't be undone.")) {
+	  	let orgId = id || this.org._id;
+	  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
+	  		if (data && data.success) {
+	  			this.router.navigate(['']);
+	  			return this.ui.flash("Org was deleted", "error");
+	  		}
+	  	});
+	  }
   }
 
   restoreOtherLinks() {

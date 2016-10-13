@@ -52,7 +52,7 @@ userSchema.pre('save', function(next) {
     }
   }
   next();
-})
+});
 
 /**
  * Helper method for validating user's password.

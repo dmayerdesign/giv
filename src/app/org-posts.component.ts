@@ -24,6 +24,7 @@ export class OrgPostsComponent {
 
 	private posts:Array<any> = [];
 	private postsShowing:number;
+	private savingPost:boolean = false;
 	private selectedPost:any = null;
 	private viewingOne:boolean = false;
 	public postId:Observable<string>;
@@ -200,6 +201,25 @@ export class OrgPostsComponent {
 				});
 		}
 	}
+
+	createPost(newPost:post):void {
+  	this.savingPost = true;
+  	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
+  		console.log("New post: ", res);
+  		if (res.errmsg) {
+  			this.ui.flash("Save failed", "error");
+  			this.savingPost = false;
+  			return;
+  		}
+  		this.org = res;
+  		this.org.posts = res.posts;
+  		this.update.emit(this.org);
+  		this.savingPost = false;
+  		
+  		this.ui.flash("Saved", "success");
+  		console.log(res);
+  	});
+  }
 
 	showOrgs() {
 		this.tabChange.emit("");

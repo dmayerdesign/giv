@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const orgSchema = new mongoose.Schema({
 	name: {type: String, index: true},
 	slug: {type: String, trim: true, unique: true},
-	description: {type: String, index: true},
+	description: String,
 	type: String,
 	creator: String,
 	dateCreated: {type: Date, default: Date.now()},
@@ -39,6 +39,11 @@ orgSchema.pre('save', function(next) {
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
     for( var i=0; i < 10; i++ ) text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
+  }
+  if (org.otherLinks && org.otherLinks.length)
+  	org.otherLinks[0] = {copy: "Visit our website", href: org.website};
+  else {
+  	org.otherLinks.push({copy: "Visit our website", href: org.website});
   }
   if (org.isNew || org.isModified("name")) {
   	let firstChar = org.name.charAt(0).toLowerCase();

@@ -54,6 +54,7 @@
 						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
 						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
+							<i *ngIf="!org.stars || !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
 							<strong class="inside-org">{{org.stars}}</strong>
 						</p>
 
@@ -64,7 +65,7 @@
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-							&nbsp;{{org.stars || '0'}} people starred this
+							&nbsp;{{org.stars || '0'}} starred this
 						</p>
 					</div>
 				</div>

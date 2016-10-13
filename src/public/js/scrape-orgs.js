@@ -1,15 +1,6 @@
 !function() {
 	var Scrape = (function() {
 		function Scrape(selector) {
-			// var doctype = document.implementation.createDocumentType( 'html', '', '');
-			// var dom = document.implementation.createDocument('', 'html', doctype);
-			// var head = dom.createElement( 'head' );
-			// var body = dom.createElement( 'body' );
-			// dom.documentElement.appendChild(head);
-			// dom.documentElement.appendChild(body);
-			// dom.querySelector("body").innerHTML = string;
-			// this.body = dom.querySelector("body");
-
 			this.body = document.querySelector(selector);
 		}
 		

@@ -98,7 +98,7 @@ export class SingleOrgComponent implements OnInit {
 		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars++;
+				this.org.stars = this.org.stars ? this.org.stars+1 : 1;
 			}
 		);
 	}
@@ -108,7 +108,7 @@ export class SingleOrgComponent implements OnInit {
 		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars--;
+				this.org.stars = this.org.stars ? this.org.stars-1 : 0;
 			}
 		);
 	}
@@ -133,5 +133,23 @@ export class SingleOrgComponent implements OnInit {
 		else
 			this.ui.flash("Sign up for free or log in to claim this organization", "info");
 	}
+
+	createPost(newPost:post):void {
+  	this.savingPost = true;
+  	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
+  		console.log("New post: ", res);
+  		if (res.errmsg) {
+  			this.ui.flash("Save failed", "error");
+  			this.savingPost = false;
+  			return;
+  		}
+  		this.org = res;
+  		this.update.emit(this.org);
+  		this.savingPost = false;
+  		this.post = new Post();
+  			this.ui.flash("Saved", "success");
+  		console.log(res);
+  	});
+  }
 
 }

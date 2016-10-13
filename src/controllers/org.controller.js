@@ -404,7 +404,7 @@ exports.insert = function(orgs, next) {
     let newOrg = new Org(org);
     newOrg.verified = true;
     newOrg.description = " ";
-    newOrg.categories = [{id: newOrg.category, name: "Environmental justice"}];
+    newOrg.categories = [{id: "environmental", name: "Environmental justice"}];
     delete newOrg.category;
 
     newOrg.save(function(err, obj) {

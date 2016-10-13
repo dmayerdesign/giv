@@ -1,3 +1,4 @@
+<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)" (postAdd)="createPost($event)"></create-post>
 <div class="clearfix posts-container"
 		*ngIf="posts?.length"
 		[attr.id]="!isBrowsing ? 'posts' : null"
@@ -20,7 +21,6 @@
 	<!-- Posts -->
 	<div [ngClass]="{'col-md-12': org && !isBrowsing}">
 		<section *ngIf="!viewingOne && posts?.length" class="posts col-md-12" [ngClass]="{'is-loading': loadingPosts}">
-			<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)"></create-post>
 			<div #singlePost
 					class="post clearfix"
 					[ngClass]="{'has-featured-image': post?.featuredImage?.length}"

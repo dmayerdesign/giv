@@ -318,7 +318,10 @@ exports.showInterest = (req, res) => {
       if (category.id === "other") {
         increment = 0.1;
       }
-      if (!user.interests) user.interests = {};
+      if (!user.interests || !user.interests.length) {
+        user.interests = {};
+        user.interests[category._id] = 0;
+      }
       if (user.interests[category.id]) {
         user.interests[category.id] += increment;
       }
@@ -369,6 +372,10 @@ exports.star = (req, res) => {
         if (operator == -1) {
           user.starred.splice(user.starred.indexOf(orgId), 1);
           org.categories.forEach((category, index, arr) => {
+            if (!user.interests || !user.interests.length) {
+              user.interests = {};
+              user.interests[category._id] = 0;
+            }
             if (user.interests && user.interests[category.id]) {
               if (category.id === "other") user.interests[category.id]-=0.2;
               else user.interests[category.id]-=5;

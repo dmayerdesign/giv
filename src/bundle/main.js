@@ -51877,8 +51877,11 @@
 	            var orgToStar = _this.orgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
 	            });
+	            var orgIndex = _this.orgs.indexOf(orgToStar);
 	            if (orgToStar)
 	                orgToStar.stars--;
+	            // Special for this component
+	            _this.orgs.splice(orgIndex, 1);
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52198,7 +52201,7 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (orgToStar)
-	                orgToStar.stars++;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 0;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52213,7 +52216,7 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (orgToStar)
-	                orgToStar.stars--;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52559,12 +52562,12 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (orgToStar)
-	                orgToStar.stars++;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 1;
 	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
 	            });
 	            if (featuredOrgToStar)
-	                orgToStar.stars++;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 1;
 	            console.log(orgToStar);
 	        });
 	    };
@@ -52578,12 +52581,12 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (orgToStar)
-	                orgToStar.stars--;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
 	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
 	                return thisOrg._id === org._id;
 	            });
 	            if (featuredOrgToStar)
-	                orgToStar.stars--;
+	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52809,6 +52812,7 @@
 	        this.tabChange = new core_1.EventEmitter();
 	        this.$posts = [];
 	        this.posts = [];
+	        this.savingPost = false;
 	        this.selectedPost = null;
 	        this.viewingOne = false;
 	        this.orgsByPost = {};
@@ -52960,6 +52964,24 @@
 	            });
 	        }
 	    };
+	    OrgPostsComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        this.savingPost = true;
+	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log("New post: ", res);
+	            if (res.errmsg) {
+	                _this.ui.flash("Save failed", "error");
+	                _this.savingPost = false;
+	                return;
+	            }
+	            _this.org = res;
+	            _this.org.posts = res.posts;
+	            _this.update.emit(_this.org);
+	            _this.savingPost = false;
+	            _this.ui.flash("Saved", "success");
+	            console.log(res);
+	        });
+	    };
 	    OrgPostsComponent.prototype.showOrgs = function () {
 	        this.tabChange.emit("");
 	    };
@@ -53101,7 +53123,7 @@
 	            return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.org.stars++;
+	            _this.org.stars = _this.org.stars ? _this.org.stars + 1 : 1;
 	        });
 	    };
 	    SingleOrgComponent.prototype.unstarOrg = function (org) {
@@ -53110,7 +53132,7 @@
 	            return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
 	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.user = data.user;
-	            _this.org.stars--;
+	            _this.org.stars = _this.org.stars ? _this.org.stars - 1 : 0;
 	        });
 	    };
 	    SingleOrgComponent.prototype.userHasPermission = function (org) {
@@ -53132,6 +53154,24 @@
 	            this.router.navigate(['/organization', 'claim', this.org._id]);
 	        else
 	            this.ui.flash("Sign up for free or log in to claim this organization", "info");
+	    };
+	    SingleOrgComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        this.savingPost = true;
+	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log("New post: ", res);
+	            if (res.errmsg) {
+	                _this.ui.flash("Save failed", "error");
+	                _this.savingPost = false;
+	                return;
+	            }
+	            _this.org = res;
+	            _this.update.emit(_this.org);
+	            _this.savingPost = false;
+	            _this.post = new Post();
+	            _this.ui.flash("Saved", "success");
+	            console.log(res);
+	        });
 	    };
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
@@ -53326,13 +53366,15 @@
 	    };
 	    ManageOrgPageComponent.prototype.deleteOrg = function (id) {
 	        var _this = this;
-	        var orgId = id || this.org._id;
-	        this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data && data.success) {
-	                _this.router.navigate(['']);
-	                return _this.ui.flash("Org was deleted", "error");
-	            }
-	        });
+	        if (window.confirm("Are you sure you want to delete this organization? This can't be undone.")) {
+	            var orgId = id || this.org._id;
+	            this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                if (data && data.success) {
+	                    _this.router.navigate(['']);
+	                    return _this.ui.flash("Org was deleted", "error");
+	                }
+	            });
+	        }
 	    };
 	    ManageOrgPageComponent.prototype.restoreOtherLinks = function () {
 	        // for editing
@@ -53871,6 +53913,7 @@
 	        this.zone = zone;
 	        this.http = http;
 	        this.update = new core_1.EventEmitter();
+	        this.postAdd = new core_1.EventEmitter();
 	        this.stillWorking = false;
 	        this.progress = 0;
 	        this.savingPost = false;
@@ -53916,22 +53959,8 @@
 	        });
 	    };
 	    CreatePostComponent.prototype.createPost = function (newPost) {
-	        var _this = this;
-	        this.savingPost = true;
-	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            console.log("New post: ", res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Save failed", "error");
-	                _this.savingPost = false;
-	                return;
-	            }
-	            _this.org = res;
-	            _this.update.emit(_this.org);
-	            _this.savingPost = false;
-	            _this.post = new Post();
-	            _this.ui.flash("Saved", "success");
-	            console.log(res);
-	        });
+	        this.postAdd.emit(newPost);
+	        this.post = new Post();
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -53945,6 +53974,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], CreatePostComponent.prototype, "update", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "postAdd", void 0);
 	    CreatePostComponent = __decorate([
 	        core_1.Component({
 	            selector: 'create-post',

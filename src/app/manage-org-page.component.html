@@ -26,11 +26,12 @@
           placeholder="Change the name of your page"><button (click)="editOrg('name')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
-    <input [(ngModel)]="description"
+    <textarea [(ngModel)]="description"
           class="form-control"
           ngControl="description"
           name="description"
-          placeholder="Change the description of your page"><button (click)="editOrg('description')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Change the description of your page"></textarea>
+      <button (click)="editOrg('description')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <input [(ngModel)]="avatarLink"

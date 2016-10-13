@@ -265,12 +265,14 @@ export class BrowseOrgsComponent implements OnInit {
 				let orgToStar = this.orgs.find(thisOrg => {
 					return thisOrg._id === org._id;
 				});
-				if (orgToStar) orgToStar.stars++;
+				if (orgToStar)
+					orgToStar.stars = orgToStar.stars ? orgToStar.stars+1 : 1;
 				
 				let featuredOrgToStar = this.featuredOrgs.find(thisOrg => {
 					return thisOrg._id === org._id;
 				});
-				if (featuredOrgToStar) orgToStar.stars++;
+				if (featuredOrgToStar)
+					orgToStar.stars = orgToStar.stars ? orgToStar.stars+1 : 1;
 
 				console.log(orgToStar);
 			}
@@ -286,12 +288,14 @@ export class BrowseOrgsComponent implements OnInit {
 				let orgToStar = this.orgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
 				});
-				if (orgToStar) orgToStar.stars--;
+				if (orgToStar)
+					orgToStar.stars = orgToStar.stars ? orgToStar.stars-1 : 0;
 
 				let featuredOrgToStar = this.featuredOrgs.find((thisOrg) => {
 					return thisOrg._id === org._id;
 				});
-				if (featuredOrgToStar) orgToStar.stars--;
+				if (featuredOrgToStar)
+					orgToStar.stars = orgToStar.stars ? orgToStar.stars-1 : 0;
 
 				console.log(data.org);
 				console.log(data.user);
