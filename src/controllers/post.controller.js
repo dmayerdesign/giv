@@ -71,18 +71,17 @@ exports.routes = [
     //middleware: "passport",
     process: function(req, res) {
       console.log(req.body);
-      var obj = new Post(req.body);
-      obj.save(function(err, obj) {
-        if(err) return console.error(err);
-        console.log(obj);
-        Org.findById(obj.org, function(err, org) {
-          if(err) return console.error(err);
-          org.posts.push(obj._id);
-          org.save((err, org) => {
-            if(err) return res.status(500).json(err);
-            res.status(200).json(org);
-          })
-        })
+      var newPost = new Post(req.body);
+      Post.create(newPost, function(err, post) {
+        if(err) return console.log(err);
+        console.log(post);
+        Org.findOneAndUpdate(post.org, { $push: { "posts": post._id } }, {new: true}, function(err, org) {
+          if(err) {
+            console.log(err);
+            return res.status(500).json({errmsg: err});
+          }
+          res.status(200).json(post);
+        });
       });
     }
   },
@@ -104,8 +103,11 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Post.findOneAndRemove({_id: req.params.id}, function(err) {
-        if(err) return console.error(err);
-        res.sendStatus(200);
+        if(err) {
+          console.error(err);
+          return res.status(500).json({errmsg: err});
+        }
+        res.status(200).json({success: "Post was deleted"});
       });
     }
   },
@@ -115,13 +117,22 @@ exports.routes = [
     uri: "/edit-post/:id",
     middleware: "passport",
     process: function(req, res) {
-      Post.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function (err, post) {
+      Post.findOne({_id: req.params.id}, function (err, post) {
         if(err) {
           res.json({errmsg: err});
           return console.log(err);
         }
-        console.log(post);
-        res.status(200).json(post);
+        for (let field in req.body) {
+          post[field] = req.body[field];
+        }
+        post.save((err, post) => {
+          if(err) {
+            res.json({errmsg: err});
+            return console.log(err);
+          }
+          console.log(post);
+          res.status(200).json(post);
+        });
       });
     }
   },

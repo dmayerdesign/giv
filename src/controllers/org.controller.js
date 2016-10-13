@@ -52,6 +52,7 @@ exports.routes = [
           dbQuery2[req.query.filterField] = req.query.filterValue;
       }
       dbQuery.verified = true;
+      if (dbQuery2) dbQuery2.verified = true;
 
       if (req.query.not) {
         dbQuery["_id"] = { $nin: [] };
@@ -321,9 +322,9 @@ function editOrg(key) {
     uri: '/edit-org/'+key+'/:orgId',
     middleware: "passport",
     process: function(req, res) {
-      // let updateQuery = {$set:{}};
-      // updateQuery.$set[key] = req.body.value;
-      Org.findOne({_id: req.params.orgId}, function(err, org) {
+      let updateQuery = {$set:{}};
+      updateQuery.$set[key] = req.body.value;
+      Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
         if(err) {
           res.json({errmsg: err});
           console.log(err);
@@ -331,18 +332,16 @@ function editOrg(key) {
         if(org) {
           console.log("key: ", key);
           console.log("value: ", req.body.value);
-          org[key] = req.body.value;
-          org.save((err, org) => {
-            if(err) {
-              res.json({errmsg: err});
-              console.log(err);
-            }
-            if(org) {
-              console.log(org);
-              res.status(200).json(org);
-            }
-          });
-        }        
+
+          if(err) {
+            res.json({errmsg: err});
+            console.log(err);
+          }
+          if(org) {
+            console.log(org);
+            res.status(200).json(org);
+          }
+        }       
       });
     }
   }
@@ -404,7 +403,7 @@ exports.insert = function(orgs, next) {
     let newOrg = new Org(org);
     newOrg.verified = true;
     newOrg.description = " ";
-    newOrg.categories = [{id: "environmental", name: "Environmental justice"}];
+    newOrg.categories = [{id: org.category, name: org.categoryName}];
     delete newOrg.category;
 
     newOrg.save(function(err, obj) {

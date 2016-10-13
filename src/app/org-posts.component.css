@@ -4,8 +4,18 @@
 	border-top-right-radius: 2px;
 }
 
+.single {
+	padding-top: 2em;
+	padding-bottom: 2em;
+}
+
 .posts-by-org section {
 	background-color: #fff;
+}
+
+.single section {
+	padding-right: 30px;
+	padding-left: 30px;
 }
 
 .posts-container header {
@@ -27,11 +37,19 @@
 .posts-by-org .posts-title {
 	font-weight: 500;
 }
+.single .posts-title {
+	margin-bottom: 0.4em;
+}
 
 .post {
 	padding: 1em 0 0.7em;
 }
-
+.single-post {
+	padding-bottom: 2em;
+}
+.single .post {
+	padding: 1.3em 0;
+}
 .post:not(:last-child) {
 	border-bottom: 2px solid #edF2F1;
 }
@@ -45,15 +63,26 @@
 }
 
 .post-meta {
+	font-size: 0.75em;
+	font-weight: bold;
 	margin-bottom: 0;
 }
-
-.post-date {
-	display: inline-block;
-	margin-left: 0.4em;
+.single-post .post-meta {
+	margin-top: -0.2em;
+	margin-bottom: 0.55em;
 }
 
-.post-title {
+.post-org {
+	opacity: 0.8;
+}
+.post-org span {
+	opacity: 0.6;
+}
+.post-date {
+	opacity: 0.5;
+}
+
+.post .post-title {
 	cursor: pointer;
 	margin-bottom: 0.2em;
 	
@@ -61,6 +90,10 @@
 	font-size: 1.1em;
 	font-weight: bold;
 	text-decoration: underline;
+}
+
+.single-post .post-title {
+	font-weight: 500;
 }
 
 .post-content {
@@ -82,6 +115,24 @@
 
 .read-more {
 	margin-top: 0.8em !important;
+}
+
+.back-btn {
+	display: block;
+	font-size: 0.75em;
+	font-weight: bold;
+	padding: 1.5em 0;
+}
+
+.back-btn i {
+	padding-right: 0.2em;
+}
+
+.featured-image {
+	width: 100%;
+	height: 18em;
+	max-width: 32em;
+	margin-bottom: 1em;
 }
 
 @media only screen and (max-width: 579px) {

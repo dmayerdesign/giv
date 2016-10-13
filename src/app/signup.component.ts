@@ -24,8 +24,8 @@ export class SignupComponent implements OnInit {
 			this.ui.flash("You're already logged in!", "info");
 		}
     // FOR DEMO MODE
-    // else this.router.navigate(['/']);
-    // this.ui.flash("Sorry—user accounts aren't available in the demo");
+    else this.router.navigate(['/']);
+    this.ui.flash("Sorry—user accounts aren't available in the demo");
 	}
 
   ngOnInit() {

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
 	authorId: {type: String},
 	title: {type: String, index: true},
-	content: {type: String, index: true},
+	content: {type: String},
 	featuredImage: String,
 	likes: Number,
 	org: {type: String, index: true},

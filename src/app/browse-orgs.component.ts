@@ -88,7 +88,7 @@ export class BrowseOrgsComponent implements OnInit {
 				/** Infinite scrolling! **/
 				let orgs = this.orgs;
 				document.onscroll = ():void => {
-					if (!this.showOrgsMobileTab) return;
+					if (!this.showOrgsMobileTab || this.orgs.length < 20) return;
 					let body = document.body;
 		    	let html = document.documentElement;
 					let height = Math.max( body.scrollHeight, body.offsetHeight, 

@@ -25,7 +25,7 @@
 			<p class="info stars">
 				<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 				<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-				&nbsp;{{org.stars || '0'}} people starred this
+				&nbsp;{{org.stars || '0'}} starred this
 			</p>
 		</div>
 

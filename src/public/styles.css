@@ -49,6 +49,10 @@ p.info {
   margin-bottom: 0.4em;
 }
 
+p a {
+  font-weight: bold;
+}
+
 .subtitle {
   margin-top: -0.5em;
 }
@@ -422,16 +426,6 @@ search-box + select {
 .null-search p {
   position: relative;
   top: 0.3em;
-}
-
-
-/* Org Page */
-.single-org .item-details, .single-org .posts-by-org {
-  /*height: 800px;*/
-}
-
-.single-org #posts {
-  padding-top: 40px; /* For anchor links */
 }
 
 

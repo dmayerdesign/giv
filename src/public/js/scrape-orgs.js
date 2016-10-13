@@ -48,6 +48,7 @@
 
 	var options = {
 		category: "environmental",
+		categoryName: "Environmental justice",
 		orgSelector: ".solutions-bullets li",
 		name: "a",
 		website: "a"

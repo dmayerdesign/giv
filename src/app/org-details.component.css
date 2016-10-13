@@ -7,8 +7,12 @@
 	border-bottom-right-radius: 2px;
 }
 
+.in-single .org-details-content {
+	padding-bottom: 1em;
+}
+
 .in-single .org-details {
-		padding-top: 1.4em;
+	padding-top: 1.4em;
 }
 
 .org-details.in-list {

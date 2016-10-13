@@ -108,6 +108,7 @@ export class OrgPostsComponent {
 		if (!this.isBrowsing) {
 			this.viewingOne = true;
 			this.selectedPost = this.posts.find(post => post._id === id);
+			this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 		}
 		else {
 			this.router.navigate(['/organization/i', this.posts.find(post => post._id === id).org], {queryParams: { viewpost: id } });
@@ -192,6 +193,7 @@ export class OrgPostsComponent {
 				post => {
 					this.ui.flash("Saved", "success");
 					this.selectedPost = post;
+					this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 					this.isEditing = false;
 				},
 				error => {
@@ -202,17 +204,34 @@ export class OrgPostsComponent {
 		}
 	}
 
-	createPost(newPost:post):void {
+	deletePost(post):void {
+		this.http.delete('/post/' + post._id).map(res => res.json()).subscribe(res => {
+			if (res.errmsg) {
+  			this.ui.flash("Delete failed", "error");
+  			return;
+  		}
+  		this.posts.splice(this.posts.indexOf(post), 1);
+  		this.org.posts.splice(this.org.posts.indexOf(post._id), 1);
+  		this.update.emit(this.org);
+  		this.viewingOne = false;
+  		this.selectedPost = null;
+  		this.ui.flash("Deleted", "info");
+		}, error => {
+			this.ui.flash("Delete failed", "error");
+  		return;
+		});
+	}
+
+	createPost(newPost):void {
   	this.savingPost = true;
   	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
-  		console.log("New post: ", res);
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
   			this.savingPost = false;
   			return;
   		}
-  		this.org = res;
-  		this.org.posts = res.posts;
+  		this.posts.push(res);
+  		this.org.posts.push(res._id);
   		this.update.emit(this.org);
   		this.savingPost = false;
   		
@@ -223,6 +242,18 @@ export class OrgPostsComponent {
 
 	showOrgs() {
 		this.tabChange.emit("");
+	}
+
+	treatContent(content):string {
+		let url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
+		if (url) {
+    	url = url[0];
+    } else {
+    	return content;
+    }
+    let shortenedUrl = (url.length > 40) ? url.slice(0, 40) + "..." : url;
+    console.log("URL:", url);
+    return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	}
 
 }

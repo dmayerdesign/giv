@@ -48,7 +48,7 @@
 
 .has-cover-image .header-inner,
 .single-org.has-video .header-inner {
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,0.6);
 }
 
 .orgs-list .has-cover-image .header-inner {
@@ -111,12 +111,12 @@ header h4 > a, header h4 > a:hover {
   line-height: 1;
   text-decoration: none;
   color: #fff;
-  max-height: 0.9em;
+  max-height: 1em;
   overflow: hidden;
 }
 
 .org header .info {
-  margin-top: -0.1em;
+  margin-top: -0.18em;
   margin-bottom: 0.5em;
   white-space: nowrap;
 }
@@ -246,11 +246,7 @@ header h4 > a, header h4 > a:hover {
     padding-right: 45px;
     padding-left: 45px;
   }
-
-  .org-search-box {
-    font-size: 0.9em;
-  }
-
+  
   search-box + select {
     float: none;
     margin-top: 0.7em;

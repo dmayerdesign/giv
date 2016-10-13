@@ -51689,9 +51689,9 @@
 	            this.router.navigate(['/']);
 	            this.ui.flash("You're already logged in!", "info");
 	        }
-	        // FOR DEMO MODE
-	        // else this.router.navigate(['/']);
-	        // this.ui.flash("Sorry—user accounts aren't available in the demo");
+	        else
+	            this.router.navigate(['/']);
+	        this.ui.flash("Sorry—user accounts aren't available in the demo");
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
 	        this.ui.setTitle("GIV :: Sign up");
@@ -52406,7 +52406,7 @@
 	            /** Infinite scrolling! **/
 	            var orgs = _this.orgs;
 	            document.onscroll = function () {
-	                if (!_this.showOrgsMobileTab)
+	                if (!_this.showOrgsMobileTab || _this.orgs.length < 20)
 	                    return;
 	                var body = document.body;
 	                var html = document.documentElement;
@@ -52674,10 +52674,12 @@
 	    }
 	    Categories.prototype.list = function () {
 	        return [
+	            { name: "Civil rights", id: "civil" },
 	            { name: "Racial justice", id: "racial" },
 	            { name: "LGBTQIA justice", id: "lgbtqia" },
 	            { name: "Environmental justice", id: "environmental" },
 	            { name: "Reproductive rights", id: "reproductive" },
+	            { name: "Healthcare advocacy", id: "healthcare" },
 	            { name: "Economic justice", id: "economic" },
 	            { name: "Other", id: "other" }
 	        ];
@@ -52876,6 +52878,7 @@
 	        if (!this.isBrowsing) {
 	            this.viewingOne = true;
 	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
+	            this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 	        }
 	        else {
 	            this.router.navigate(['/organization/i', this.posts.find(function (post) { return post._id === id; }).org], { queryParams: { viewpost: id } });
@@ -52956,6 +52959,7 @@
 	            this.orgService.editPost(post).subscribe(function (post) {
 	                _this.ui.flash("Saved", "success");
 	                _this.selectedPost = post;
+	                _this.selectedPost.treatedContent = _this.treatContent(_this.selectedPost.content);
 	                _this.isEditing = false;
 	            }, function (error) {
 	                console.error(error);
@@ -52964,18 +52968,35 @@
 	            });
 	        }
 	    };
+	    OrgPostsComponent.prototype.deletePost = function (post) {
+	        var _this = this;
+	        this.http.delete('/post/' + post._id).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            if (res.errmsg) {
+	                _this.ui.flash("Delete failed", "error");
+	                return;
+	            }
+	            _this.posts.splice(_this.posts.indexOf(post), 1);
+	            _this.org.posts.splice(_this.org.posts.indexOf(post._id), 1);
+	            _this.update.emit(_this.org);
+	            _this.viewingOne = false;
+	            _this.selectedPost = null;
+	            _this.ui.flash("Deleted", "info");
+	        }, function (error) {
+	            _this.ui.flash("Delete failed", "error");
+	            return;
+	        });
+	    };
 	    OrgPostsComponent.prototype.createPost = function (newPost) {
 	        var _this = this;
 	        this.savingPost = true;
 	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            console.log("New post: ", res);
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
 	                _this.savingPost = false;
 	                return;
 	            }
-	            _this.org = res;
-	            _this.org.posts = res.posts;
+	            _this.posts.push(res);
+	            _this.org.posts.push(res._id);
 	            _this.update.emit(_this.org);
 	            _this.savingPost = false;
 	            _this.ui.flash("Saved", "success");
@@ -52984,6 +53005,18 @@
 	    };
 	    OrgPostsComponent.prototype.showOrgs = function () {
 	        this.tabChange.emit("");
+	    };
+	    OrgPostsComponent.prototype.treatContent = function (content) {
+	        var url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
+	        if (url) {
+	            url = url[0];
+	        }
+	        else {
+	            return content;
+	        }
+	        var shortenedUrl = (url.length > 40) ? url.slice(0, 40) + "..." : url;
+	        console.log("URL:", url);
+	        return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	    };
 	    __decorate([
 	        core_1.Input(), 

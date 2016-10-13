@@ -22,4 +22,8 @@ input:focus {
 	input {
 		padding-right: 0;
 	}
+
+	.search-box {
+    font-size: 0.9em;
+  }
 }

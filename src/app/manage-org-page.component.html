@@ -1,7 +1,7 @@
 <div class="manage-org-page" *ngIf="isLoaded">
-	<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
-	<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
-	<h4>Manage {{org.name}}</h4>
+	<a *ngIf="org?.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
+	<a *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
+	<h4>Manage {{org?.name}}</h4>
 	<img [src]="org.coverImage" width="200">
 
   <button (click)="deleteOrg()">Delete this org</button>

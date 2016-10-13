@@ -34,7 +34,7 @@ const orgSchema = new mongoose.Schema({
 
 orgSchema.pre('save', function(next) {
   let org = this;
-  let makeid = function makeid() {
+  function makeid() {
     let text = "";
     let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
     for( var i=0; i < 10; i++ ) text += possible.charAt(Math.floor(Math.random() * possible.length));

@@ -2,7 +2,7 @@
 <div class="clearfix posts-container"
 		*ngIf="posts?.length"
 		[attr.id]="!isBrowsing ? 'posts' : null"
-		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'col-md-12': org && !isBrowsing}">
+		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'single': org && !isBrowsing, 'col-md-12': org && !isBrowsing}">
 
 	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
 		<h4 class="posts-title" *ngIf="org">Updates</h4>
@@ -30,7 +30,10 @@
 						class="org-avatar bg-image"
 						(click)="selectPost(post._id)"></div>
 				<div class="post-inner">
-					<p class="post-meta" *ngIf="!org"><strong class="post-org">{{orgsByPost[post._id]?.name}}</strong><span class="post-date">{{orgsByPost[post._id]?.dateCreated | date: MMMEEEEd}}</span></p>
+					<p class="post-meta">
+						<strong *ngIf="!org" class="post-org">{{orgsByPost[post._id]?.name}}<span> &middot; </span></strong>
+						<span class="post-date">{{post?.dateCreated | date: MMMEEEEd}}</span>
+					</p>
 					<h5 class="post-title" (click)="selectPost(post._id)">{{post.title}}</h5>
 					<p class="post-content">{{post.content | truncate:100}}</p>
 				</div>
@@ -44,14 +47,25 @@
 		</section>
 
 		<!-- View Post -->
-		<section *ngIf="viewingOne && selectedPost" class="col-md-12">
-			<a (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">Back to posts</a>
-			<img *ngIf="selectedPost?.featuredImage?.length" [src]="selectedPost.featuredImage" width="100">
-			<div *ngIf="!isEditing">
-				<h5>{{selectedPost.title}}</h5>
-				<p>{{selectedPost.content}}</p>
+		<section *ngIf="viewingOne && selectedPost" class="single-post col-md-12">
+			<a class="back-btn" (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">
+				<i class="fa fa-long-arrow-left"></i>
+				Back to posts
+			</a>
+			<div class="bg-image featured-image" 
+					*ngIf="selectedPost?.featuredImage?.length"
+					[ngStyle]="{'background-image': 'url(' + selectedPost.featuredImage + ')'}"></div>
+			<div class="post-inner" *ngIf="!isEditing">
+				<h3 class="post-title single-post-title">{{selectedPost.title}}</h3>
+				<p class="post-meta">
+					<strong *ngIf="!org" class="post-org">{{orgsByPost[selectedPost._id]?.name}}<span> &middot; </span></strong>
+					<span class="post-date">{{selectedPost?.dateCreated | date: MMMEEEEd}}</span>
+				</p>
+				<p *ngIf="!selectedPost.treatedContent" class="post-content single-post-content">{{selectedPost.content}}</p>
+				<p *ngIf="selectedPost.treatedContent" [innerHTML]="selectedPost.treatedContent" class="post-content single-post-content"></p>
 			</div>
 			<button *ngIf="userHasPermission(org)" (click)="editPost()">Edit</button>
+			<button *ngIf="userHasPermission(org)" (click)="deletePost(selectedPost)">Delete</button>
 			<div *ngIf="isEditing">
 				<input [(ngModel)]="selectedPost.title">
 				<textarea [(ngModel)]="selectedPost.content"></textarea>
