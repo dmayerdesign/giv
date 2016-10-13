@@ -51593,6 +51593,9 @@
 	        if (localStorage['profile']) {
 	            this.router.navigate(['/']);
 	        }
+	        // FOR DEMO MODE
+	        // else this.router.navigate(['/']);
+	        // this.ui.flash("Sorry—user accounts aren't available in the demo");
 	        // this.fb.init({
 	        //     appId      : '146608639126993',
 	        //     cookie     : false,
@@ -51686,6 +51689,9 @@
 	            this.router.navigate(['/']);
 	            this.ui.flash("You're already logged in!", "info");
 	        }
+	        // FOR DEMO MODE
+	        // else this.router.navigate(['/']);
+	        // this.ui.flash("Sorry—user accounts aren't available in the demo");
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
 	        this.ui.setTitle("GIV :: Sign up");
@@ -52559,8 +52565,7 @@
 	            });
 	            if (featuredOrgToStar)
 	                orgToStar.stars++;
-	            console.log(data.org);
-	            console.log(data.user);
+	            console.log(orgToStar);
 	        });
 	    };
 	    BrowseOrgsComponent.prototype.unstarOrg = function (org) {
@@ -53123,7 +53128,7 @@
 	        this.showOptionsMenu = false;
 	    };
 	    SingleOrgComponent.prototype.claimOrg = function () {
-	        if (this.user && this.userHasPermission(this.org))
+	        if (this.user)
 	            this.router.navigate(['/organization', 'claim', this.org._id]);
 	        else
 	            this.ui.flash("Sign up for free or log in to claim this organization", "info");

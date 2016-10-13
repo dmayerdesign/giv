@@ -262,18 +262,17 @@ export class BrowseOrgsComponent implements OnInit {
 			data => {
 				this.user = data.user;
 
-				let orgToStar = this.orgs.find((thisOrg) => {
+				let orgToStar = this.orgs.find(thisOrg => {
 					return thisOrg._id === org._id;
 				});
 				if (orgToStar) orgToStar.stars++;
 				
-				let featuredOrgToStar = this.featuredOrgs.find((thisOrg) => {
+				let featuredOrgToStar = this.featuredOrgs.find(thisOrg => {
 					return thisOrg._id === org._id;
 				});
 				if (featuredOrgToStar) orgToStar.stars++;
 
-				console.log(data.org);
-				console.log(data.user);
+				console.log(orgToStar);
 			}
 		);
 	}

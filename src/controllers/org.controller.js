@@ -18,6 +18,7 @@ const categories = [
 ];
 
 const Org = require('../models/Org');
+const User = require('../models/User');
 
 exports.routes = [
   { // GET ORGS
@@ -297,6 +298,7 @@ exports.routes = [
 ** Edit Organization
 */
 let editableInOrg = [
+  "avatar",
   "coverImage",
   "donateLink",
   "donateLinkCopy",
@@ -395,4 +397,30 @@ exports.sample = function(next) {
     str = firstLetter.toUpperCase() + str;
     return str;
   }
+};
+
+exports.insert = function(orgs, next) {
+  orgs.forEach(org => {
+    let newOrg = new Org(org);
+    newOrg.verified = true;
+    newOrg.description = " ";
+    newOrg.categories = [{id: newOrg.category, name: "Environmental justice"}];
+    delete newOrg.category;
+
+    newOrg.save(function(err, obj) {
+      if(err) return console.log(err);
+      console.log(obj);
+      User.find({}, function(err, users) { // Give all users globalPermission
+        users.forEach(function(user) {
+          if (i = 0) {
+            user.permissions = [];
+          }
+          user.permissions.push(obj.globalPermission);
+          user.save();
+        });
+      });
+    });
+  });
+
+  next();
 };

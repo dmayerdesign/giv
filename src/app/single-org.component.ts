@@ -128,7 +128,7 @@ export class SingleOrgComponent implements OnInit {
 	}
 
 	claimOrg() {
-		if (this.user && this.userHasPermission(this.org))
+		if (this.user)
 			this.router.navigate(['/organization', 'claim', this.org._id]);
 		else
 			this.ui.flash("Sign up for free or log in to claim this organization", "info");

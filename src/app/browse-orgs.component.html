@@ -1,4 +1,4 @@
-<div class="featured-orgs col-md-12" *ngIf="!isLoadingFeatured">
+<div class="featured-orgs col-md-12" *ngIf="!isLoadingFeatured && featuredOrgs?.length">
 	<div class="featured-orgs-inner row">
 
 		<div class="featured-carousel-nav">
@@ -122,10 +122,10 @@
 						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
 
 						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
-						<p *ngIf="org.stars" class="stars-preview preview info inside-org">
+						<p class="stars-preview preview info inside-org">
 							<i *ngIf="user && orgIsStarred(org)" class="fa fa-star inside-org"></i>
-							<i *ngIf="!orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
-							<strong class="inside-org">{{org.stars}}</strong>
+							<i *ngIf="!org.stars || !orgIsStarred(org)" class="fa fa-star-o inside-org"></i>
+							<strong class="inside-org">{{org.stars || '0'}}</strong>
 						</p>
 
 						<h4 class="org-name" *ngIf="viewingOrg && org._id === selectedOrg._id">
@@ -136,7 +136,7 @@
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
 							<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-							&nbsp;{{org.stars}} people starred this
+							&nbsp;{{org.stars || '0'}} people starred this
 						</p>
 					</div>
 				</div>

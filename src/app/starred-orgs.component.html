@@ -20,7 +20,7 @@
 			*ngIf="user"
 			[ngClass]="{'loading-more-orgs': loadingShowMoreOrgs}">
 
-		<section class="null-search" *ngIf="orgs.length === 0">
+		<section class="null-search row" *ngIf="orgs.length === 0">
 			<p>No organizations to show. Star some, and watch them appear here!</p>
 		</section>
 
@@ -64,7 +64,7 @@
 						</h4>
 						<p class="info" *ngIf="viewingOrg && org._id === selectedOrg._id">
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-							&nbsp;{{org.stars}} people starred this
+							&nbsp;{{org.stars || '0'}} people starred this
 						</p>
 					</div>
 				</div>

@@ -33,6 +33,12 @@
           placeholder="Change the description of your page"><button (click)="editOrg('description')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
+    <input [(ngModel)]="avatarLink"
+          class="form-control"
+          name="avatarLink"
+          placeholder="Change the avatar"><button (click)="editOrg('avatar', avatarLink)"><i [hidden]="!loading_avatar" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  </div>
+  <div class="form-block">
   	<input [(ngModel)]="coverImageLink"
   				class="form-control"
   				name="coverImageLink"

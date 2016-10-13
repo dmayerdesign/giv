@@ -23,6 +23,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private progress:number = 0;
 
 	private coverImageLink:string;
+	private avatarLink:string;
 	private videoLink:string;
 	private donateLink:string;
 	private slug:string;
@@ -39,6 +40,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private categories = this.categoryService.list();
 
 	private loading_coverImage:boolean;
+	private loading_avatar:boolean;
 	private loading_donateLink:boolean;
 	private loading_slug:boolean;
 	private loading_categories:boolean;

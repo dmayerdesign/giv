@@ -30,6 +30,10 @@ export class LoginComponent implements OnInit {
 			this.router.navigate(['/']);
 		}
 
+    // FOR DEMO MODE
+    // else this.router.navigate(['/']);
+    // this.ui.flash("Sorry—user accounts aren't available in the demo");
+
 		// this.fb.init({
   //     appId      : '146608639126993',
   //     cookie     : false,
