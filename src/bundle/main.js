@@ -54015,6 +54015,17 @@
 	        });
 	    };
 	    CreatePostComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        var required = ["title", "content"];
+	        var invalid = false;
+	        required.forEach(function (field) {
+	            if (!newPost[field] || !newPost[field].length) {
+	                invalid = true;
+	                _this.ui.flash("Oops! You need to fill out the " + field + " of your post", "error");
+	            }
+	        });
+	        if (invalid)
+	            return;
 	        this.postAdd.emit(newPost);
 	        this.post = new Post();
 	    };

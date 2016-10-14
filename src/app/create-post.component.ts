@@ -98,6 +98,15 @@ export class CreatePostComponent implements OnInit {
   }
 
   createPost(newPost:post):void {
+  	let required = ["title", "content"];
+		let invalid = false;
+		required.forEach(field => {
+			if (!newPost[field] || !newPost[field].length) {
+				invalid = true;
+				this.ui.flash("Oops! You need to fill out the " + field + " of your post", "error");
+			}
+		});
+		if (invalid) return;
   	this.postAdd.emit(newPost);
   	this.post = new Post();
   }
