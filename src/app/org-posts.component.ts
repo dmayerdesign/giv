@@ -98,7 +98,10 @@ export class OrgPostsComponent {
 
 				next(data);
 			},
-			error => console.log(error)
+			error => {
+				console.log(error)
+				this.isLoading = false;
+			}
 		);
 	}
 

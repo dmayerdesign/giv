@@ -52875,7 +52875,10 @@
 	                _this.getOrgAvatarsByPost();
 	            _this.update.emit("init");
 	            next(data);
-	        }, function (error) { return console.log(error); });
+	        }, function (error) {
+	            console.log(error);
+	            _this.isLoading = false;
+	        });
 	    };
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        console.log(id);

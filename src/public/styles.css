@@ -417,7 +417,7 @@ search-box + select {
 }
 
 .null-search {
-  padding: 1.5em 1.5em 1.5em 5em;
+  padding: 1.5em 1.5em 1.5em 5em !important;
   margin-bottom: 0.5em;
   color: #aba4a9;
 

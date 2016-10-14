@@ -1,6 +1,5 @@
 <create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)" (postAdd)="createPost($event)"></create-post>
 <div class="clearfix posts-container"
-		*ngIf="posts?.length"
 		[attr.id]="!isBrowsing ? 'posts' : null"
 		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'single': org && !isBrowsing, 'col-md-12': org && !isBrowsing}">
 

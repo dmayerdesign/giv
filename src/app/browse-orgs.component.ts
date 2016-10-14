@@ -71,7 +71,7 @@ export class BrowseOrgsComponent implements OnInit {
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 			: this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
 	
-		this.orgService.loadOrgs({limit:20}).subscribe(
+		this.orgService.loadOrgs({limit: 20}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
