@@ -2,7 +2,7 @@
 		[ngClass]="{'active': showStarredMobileTab}">
 	<header class="row col-md-12">
 		<div class="row">
-			<h2>Starred <span class="desktop-tab-button" (click)="showRecommended()">Recommended</span></h2>
+			<h2>Starred <span class="desktop-tab-button" *ngIf="user" (click)="showRecommended()">Recommended</span></h2>
 			<p class="subtitle">Here you can keep track of organizations you like</p>
 		</div>
 	</header>
@@ -82,7 +82,9 @@
 	</div>
 </div>
 
-<div class="mobile-tab desktop-tab" [ngClass]="{'active': showRecommendedMobileTab}">
+<div class="mobile-tab desktop-tab"
+		*ngIf="user"
+		[ngClass]="{'active': showRecommendedMobileTab}">
 	<recommended-orgs (tabChange)="showStarred($event)" [orgs]="orgs" [inStarred]="true"></recommended-orgs>
 </div>
 

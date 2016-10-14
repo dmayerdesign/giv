@@ -217,8 +217,8 @@ h1.masthead-logo {
   line-height: 0.4em;
 }
 
-h1.masthead-logo img {
-  width: 46px;
+.masthead-logo > img {
+  width: 46px !important;
 }
 
 ul.nav {
