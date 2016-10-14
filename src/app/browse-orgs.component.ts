@@ -27,7 +27,8 @@ export class BrowseOrgsComponent implements OnInit {
 	private orgs = [];
 	private featuredOrgs = [];
 	private featuredShowing:number;
-	private orgsLoaded:number = 20;
+	private orgsLoaded:number = 14;
+	private totalOrgs:number;
 	private orgsSorting = {order: "-name"};
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -71,7 +72,7 @@ export class BrowseOrgsComponent implements OnInit {
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 			: this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
 	
-		this.orgService.loadOrgs({limit: 20}).subscribe(
+		this.orgService.loadOrgs({limit: 14}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
@@ -88,7 +89,7 @@ export class BrowseOrgsComponent implements OnInit {
 				/** Infinite scrolling! **/
 				let orgs = this.orgs;
 				document.onscroll = ():void => {
-					if (!this.showOrgsMobileTab || this.orgs.length < 20) return;
+					if (!this.showOrgsMobileTab || this.orgs.length < 14) return;
 					let body = document.body;
 		    	let html = document.documentElement;
 					let height = Math.max( body.scrollHeight, body.offsetHeight, 
@@ -102,7 +103,7 @@ export class BrowseOrgsComponent implements OnInit {
 			error => console.log(error)
 		);
 
-		this.orgService.loadOrgs({limit:6, filterField:"featured", filterValue:"true"}).subscribe(
+		this.orgService.loadOrgs({limit: 6, filterField:"featured", filterValue:"true"}).subscribe(
 			data => {
 				this.isLoadingFeatured = false;
 				this.featuredOrgs = data;
@@ -112,6 +113,15 @@ export class BrowseOrgsComponent implements OnInit {
 				}
 			},
 			error => console.log(error)
+		);
+
+		this.http.get("/orgs/count").map(res => res.json()).subscribe(
+			data => {
+				if (data.errmsg) return console.error(data.errmsg);
+				this.totalOrgs = data;
+			}, err => {
+				console.error(err);
+			}
 		);
 	}
 
@@ -150,7 +160,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		let query = {search: search, field: "name", bodyField: "description", limit: 20};
+		let query = {search: search, field: "name", bodyField: "description", limit: 14};
 
 		if (this.categoryFilter && this.categoryFilter.id) {
 			query['filterField'] = "categories.id";
@@ -348,6 +358,11 @@ export class BrowseOrgsComponent implements OnInit {
 	showUpdates() {
 		this.showOrgsMobileTab = false;
 		this.showUpdatesMobileTab = true;
+	}
+
+	showShowMore() {
+		if (this.orgs.length >= 14 && this.orgs.length < this.totalOrgs) return true;
+		else return false;
 	}
 
 }

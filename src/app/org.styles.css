@@ -42,17 +42,21 @@
   color: #fff;
 }
 
+.orgs-list .header-inner {
+  min-height: 7.5em;
+}
+
 .recommended-orgs .header-inner {
   padding: 2em 1.7em;
 }
 
 .has-cover-image .header-inner,
 .single-org.has-video .header-inner {
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(20,40,50,0.65);
 }
 
 .orgs-list .has-cover-image .header-inner {
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(20,40,50,0.8);
 }
 
 .org.selected .header-inner {
@@ -108,7 +112,7 @@ header h4 {
 
 header h4 > a, header h4 > a:hover {
   display: inline-block;
-  line-height: 1;
+  line-height: 1.1;
   text-decoration: none;
   color: #fff;
   max-height: 1em;

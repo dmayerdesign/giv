@@ -4,7 +4,7 @@
 
 			<p class="org-categories">Categories: <span *ngFor="let category of org.categories; let i = index;"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;<span *ngIf="(i+1) < org?.categories.length">|&nbsp;</span></span></p>
 			<p *ngIf="isSingle && org?.type" class="org-type">Type: {{org.type}}</p>
-			<p class="org-description">{{org.description | truncate: truncateDescription}}</p>
+			<p class="org-description" [innerHTML]="org.description | truncate: truncateDescription"></p>
 			<p class="read-more" *ngIf="isSingle && descriptionIsLong()">
 				<span *ngIf="truncateDescription !== 0" (click)="readMore()">Show more</span>
 				<span *ngIf="truncateDescription == 0" (click)="readLess()">Show less</span>

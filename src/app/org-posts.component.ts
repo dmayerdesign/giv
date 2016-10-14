@@ -248,13 +248,16 @@ export class OrgPostsComponent {
 	}
 
 	treatContent(content):string {
+		if (!content || typeof content === "undefined") return "";
+
+		content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
 		let url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
 		if (url) {
     	url = url[0];
     } else {
     	return content;
     }
-    let shortenedUrl = (url.length > 40) ? url.slice(0, 40) + "..." : url;
+    let shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
     console.log("URL:", url);
     return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	}

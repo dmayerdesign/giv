@@ -14,7 +14,8 @@ export class OrgDetailsComponent implements OnInit {
 	@Input() isSingle;
 	@Output() update = new EventEmitter();
 	private coverImageLinkBroken:boolean = false;
-	private truncateDescription:number = 300;
+	private shortDescriptionLength = 450;
+	private truncateDescription:number = this.shortDescriptionLength;
 
 	constructor(
 				private http: Http,
@@ -28,6 +29,9 @@ export class OrgDetailsComponent implements OnInit {
 
 	ngAfterContentInit() {
 		this.update.emit("init");
+		if (this.org.description) {
+			this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+		}
 	}
 
 	ngOnDestroy() {
@@ -50,7 +54,7 @@ export class OrgDetailsComponent implements OnInit {
 	}
 
 	descriptionIsLong() {
-		if (this.org.description.length > 300) return true;
+		if (this.org.description && this.org.description.length > 300) return true;
 		else return false;
 	}
 
@@ -59,7 +63,7 @@ export class OrgDetailsComponent implements OnInit {
 	}
 
 	readLess() {
-		this.truncateDescription = 300;
+		this.truncateDescription = this.shortDescriptionLength;
 	}
 
 }

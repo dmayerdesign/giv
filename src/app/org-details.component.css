@@ -3,16 +3,17 @@
 	margin-bottom: 1em;
 
 	background: #f4f9f8;
+	background: transparent;
 	border-bottom-left-radius: 2px;
 	border-bottom-right-radius: 2px;
 }
 
-.in-single .org-details-content {
-	padding-bottom: 1em;
+.in-single.org-details {
+	margin-bottom: 0;
 }
 
-.in-single .org-details {
-	padding-top: 1.4em;
+.in-single .org-details-content {
+	padding-bottom: 1em;
 }
 
 .org-details.in-list {

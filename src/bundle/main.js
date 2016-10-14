@@ -52125,7 +52125,7 @@
 	var org_service_1 = __webpack_require__(75);
 	var app_service_1 = __webpack_require__(70);
 	var search_service_1 = __webpack_require__(76);
-	function shuffle(array) {
+	function shuffleArray(array) {
 	    var currentIndex = array.length, temporaryValue, randomIndex;
 	    // While there remain elements to shuffle...
 	    while (0 !== currentIndex) {
@@ -52156,13 +52156,20 @@
 	        this.showRecommendedMobileTab = false;
 	    }
 	    RecommendedOrgsComponent.prototype.ngOnInit = function () {
+	    };
+	    RecommendedOrgsComponent.prototype.ngAfterViewInit = function () {
 	        var _this = this;
 	        this.userService.getLoggedInUser(function (err, user) {
+	            if ((!user || typeof user === "undefined") && _this.org) {
+	                _this.loadRelated();
+	            }
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
 	            console.log(_this.user.starred);
-	            _this.loadRecommendations();
+	            if (_this.user) {
+	                _this.loadRecommendations();
+	            }
 	        });
 	    };
 	    RecommendedOrgsComponent.prototype.viewOrg = function (e, id) {
@@ -52239,6 +52246,37 @@
 	        else
 	            return false;
 	    };
+	    RecommendedOrgsComponent.prototype.loadRelated = function () {
+	        var _this = this;
+	        var query = {};
+	        query['filterField'] = "categories.id";
+	        query['filterValue'] = this.org.categories[0].id;
+	        query['limit'] = 4;
+	        query['sort'] = "-stars";
+	        query['not'] = [this.org._id];
+	        this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
+	            _this.recommended = _this.recommended.concat(orgs);
+	            if (!_this.org.categories[1])
+	                return _this.recommendedOrgsAreLoaded = true;
+	            query['filterValue'] = _this.org.categories[1].id;
+	            query['limit'] = 4;
+	            _this.recommended.forEach(function (org) {
+	                if (query['not'].indexOf(org._id) < 0)
+	                    query['not'].push(org._id);
+	            });
+	            _this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
+	                _this.recommended = _this.recommended.concat(orgs);
+	                shuffleArray(_this.recommended);
+	                _this.recommendedOrgsAreLoaded = true;
+	            }, function (err) {
+	                _this.ui.flash("Something went wrong while loading related orgs", "error");
+	                return console.error(err);
+	            });
+	        }, function (err) {
+	            _this.ui.flash("Sorry, we couldn't load related orgs", "error");
+	            return console.error(err);
+	        });
+	    };
 	    RecommendedOrgsComponent.prototype.loadRecommendations = function () {
 	        var _this = this;
 	        var interests = [];
@@ -52285,10 +52323,8 @@
 	                    query['not'].push(org._id);
 	            });
 	            _this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
-	                orgs.forEach(function (org) {
-	                    _this.recommended.push(org);
-	                });
-	                shuffle(_this.recommended);
+	                _this.recommended = _this.recommended.concat(orgs);
+	                shuffleArray(_this.recommended);
 	                _this.recommendedOrgsAreLoaded = true;
 	            }, function (err) {
 	                _this.ui.flash("Something went wrong while loading your recommendation", "error");
@@ -52364,7 +52400,7 @@
 	        this.selectedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
-	        this.orgsLoaded = 20;
+	        this.orgsLoaded = 14;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
@@ -52392,7 +52428,7 @@
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 	            : this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
-	        this.orgService.loadOrgs({ limit: 20 }).subscribe(function (data) {
+	        this.orgService.loadOrgs({ limit: 14 }).subscribe(function (data) {
 	            _this.isLoading = false;
 	            _this.orgs = data;
 	            _this.paramsSub = _this.route.params.subscribe(function (params) {
@@ -52406,7 +52442,7 @@
 	            /** Infinite scrolling! **/
 	            var orgs = _this.orgs;
 	            document.onscroll = function () {
-	                if (!_this.showOrgsMobileTab || _this.orgs.length < 20)
+	                if (!_this.showOrgsMobileTab || _this.orgs.length < 14)
 	                    return;
 	                var body = document.body;
 	                var html = document.documentElement;
@@ -52425,6 +52461,13 @@
 	                _this.featuredOrgs[_this.featuredShowing]['showing'] = true;
 	            }
 	        }, function (error) { return console.log(error); });
+	        this.http.get("/orgs/count").map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data.errmsg)
+	                return console.error(data.errmsg);
+	            _this.totalOrgs = data;
+	        }, function (err) {
+	            console.error(err);
+	        });
 	    };
 	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
 	        this.paramsSub.unsubscribe();
@@ -52459,7 +52502,7 @@
 	    };
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
-	        var query = { search: search, field: "name", bodyField: "description", limit: 20 };
+	        var query = { search: search, field: "name", bodyField: "description", limit: 14 };
 	        if (this.categoryFilter && this.categoryFilter.id) {
 	            query['filterField'] = "categories.id";
 	            query['filterValue'] = this.categoryFilter.id;
@@ -52633,6 +52676,12 @@
 	        this.showOrgsMobileTab = false;
 	        this.showUpdatesMobileTab = true;
 	    };
+	    BrowseOrgsComponent.prototype.showShowMore = function () {
+	        if (this.orgs.length >= 14 && this.orgs.length < this.totalOrgs)
+	            return true;
+	        else
+	            return false;
+	    };
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -52724,12 +52773,16 @@
 	        this.utilities = utilities;
 	        this.update = new core_1.EventEmitter();
 	        this.coverImageLinkBroken = false;
-	        this.truncateDescription = 300;
+	        this.shortDescriptionLength = 450;
+	        this.truncateDescription = this.shortDescriptionLength;
 	    }
 	    OrgDetailsComponent.prototype.ngOnInit = function () {
 	    };
 	    OrgDetailsComponent.prototype.ngAfterContentInit = function () {
 	        this.update.emit("init");
+	        if (this.org.description) {
+	            this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	        }
 	    };
 	    OrgDetailsComponent.prototype.ngOnDestroy = function () {
 	        this.update.emit("destroy");
@@ -52751,7 +52804,7 @@
 	        }
 	    };
 	    OrgDetailsComponent.prototype.descriptionIsLong = function () {
-	        if (this.org.description.length > 300)
+	        if (this.org.description && this.org.description.length > 300)
 	            return true;
 	        else
 	            return false;
@@ -52760,7 +52813,7 @@
 	        this.truncateDescription = 0;
 	    };
 	    OrgDetailsComponent.prototype.readLess = function () {
-	        this.truncateDescription = 300;
+	        this.truncateDescription = this.shortDescriptionLength;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -53015,6 +53068,9 @@
 	        this.tabChange.emit("");
 	    };
 	    OrgPostsComponent.prototype.treatContent = function (content) {
+	        if (!content || typeof content === "undefined")
+	            return "";
+	        content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
 	        var url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
 	        if (url) {
 	            url = url[0];
@@ -53022,7 +53078,7 @@
 	        else {
 	            return content;
 	        }
-	        var shortenedUrl = (url.length > 40) ? url.slice(0, 40) + "..." : url;
+	        var shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
 	        console.log("URL:", url);
 	        return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	    };
@@ -53124,9 +53180,6 @@
 	                    _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "v/");
 	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
 	                    var matchId = _this.org.videoLink.match(/(embed)\/(.*)/);
-	                    if (matchId) {
-	                        _this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg';
-	                    }
 	                }
 	                _this.userService.getLoggedInUser(function (err, user) {
 	                    if (err)

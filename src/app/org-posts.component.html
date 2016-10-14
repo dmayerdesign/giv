@@ -1,7 +1,7 @@
 <create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)" (postAdd)="createPost($event)"></create-post>
 <div class="clearfix posts-container"
 		[attr.id]="!isBrowsing ? 'posts' : null"
-		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'single': org && !isBrowsing, 'col-md-12': org && !isBrowsing}">
+		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'single section': org && !isBrowsing, 'col-md-12': org && !isBrowsing}">
 
 	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
 		<h4 class="posts-title" *ngIf="org">Updates</h4>
@@ -47,7 +47,7 @@
 
 		<!-- View Post -->
 		<section *ngIf="viewingOne && selectedPost" class="single-post col-md-12">
-			<a class="back-btn" (click)="deselectPost()" [routerLink]="['/organization/i', org?._id]">
+			<a class="back-btn" (click)="deselectPost()">
 				<i class="fa fa-long-arrow-left"></i>
 				Back to posts
 			</a>
@@ -68,6 +68,7 @@
 			<div *ngIf="isEditing">
 				<input [(ngModel)]="selectedPost.title">
 				<textarea [(ngModel)]="selectedPost.content"></textarea>
+				<input [(ngModel)]="selectedPost.featuredImage">
 				<button (click)="savePost(selectedPost)">Save</button>
 			</div>
 		</section>

@@ -1,4 +1,4 @@
-<div *ngIf="user && recommendedOrgsAreLoaded"
+<div *ngIf="(user || org) && recommendedOrgsAreLoaded"
 		class="recommended-orgs col-md-8"
 		[ngClass]="{'in-single': org, 'in-starred': inStarred}">
 	<header class="row col-md-12">

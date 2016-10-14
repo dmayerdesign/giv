@@ -31,6 +31,7 @@ h4 {
 }
 
 a, a:hover, a:active, a:link, a:visited, a:link:active, a:visited:active {
+  cursor: pointer;
   color: #999194;
   color: inherit;
 }
@@ -160,8 +161,8 @@ main {
   }
 }
 
-section, .search-box {
-  background: #F2F7F6;
+section, .section, .search-box {
+  background-color: #F2F7F6;
   border: 2px solid #F0F5F4;
   border-radius: 2px;
   box-shadow: 0px 2px 2px rgba(0,0,0,0.1);
@@ -175,8 +176,12 @@ section, .search-box {
   padding-right: 0 !important;
 }
 
-section section {
-  background: #fff;
+section section,
+.section section,
+section .search-box,
+.section .search-box {
+  background-color: #fff;
+  box-shadow: 0 0 0 transparent;
 }
 
 

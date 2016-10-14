@@ -152,7 +152,7 @@
 		</section>
 		
 		<button id="show-more"
-				*ngIf="orgs?.length > 19"
+				*ngIf="showShowMore()"
 				(click)="showMore(10, orgs.length)"
 				[ngClass]="{'loading': loadingShowMoreOrgs}"
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>

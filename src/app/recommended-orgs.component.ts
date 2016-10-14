@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { UserService } from './services/user.service';
 import { OrgService } from './services/org.service';
 import { UIHelper } from './services/app.service';
 import { SearchService } from './services/search.service';
 
-function shuffle(array) {
+function shuffleArray(array) {
   var currentIndex = array.length, temporaryValue, randomIndex;
 
   // While there remain elements to shuffle...
@@ -52,11 +52,20 @@ export class RecommendedOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
+		
+	}
+
+	ngAfterViewInit() {
 		this.userService.getLoggedInUser((err, user) => {
+			if ((!user || typeof user === "undefined") && this.org) {
+				this.loadRelated();
+			}
 			if (err) return console.error(err);
 			this.user = user;
 			console.log(this.user.starred);
-			this.loadRecommendations();
+			if (this.user) {
+				this.loadRecommendations();
+			}
 		});
 	}
 
@@ -141,6 +150,39 @@ export class RecommendedOrgsComponent implements OnInit {
 		else return false;
 	}
 
+	loadRelated() {
+		let query = {};
+
+    query['filterField'] = "categories.id";
+    query['filterValue'] = this.org.categories[0].id;
+    query['limit'] = 4;
+    query['sort'] = "-stars";
+    query['not'] = [this.org._id];
+
+    this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
+    	this.recommended = this.recommended.concat(orgs);
+
+    	if (!this.org.categories[1]) return this.recommendedOrgsAreLoaded = true;
+
+    	query['filterValue'] = this.org.categories[1].id;
+    	query['limit'] = 4;
+	    this.recommended.forEach(org => {
+	    	if (query['not'].indexOf(org._id) < 0) query['not'].push(org._id);
+	    });
+    	this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
+	    	this.recommended = this.recommended.concat(orgs);
+	    	shuffleArray(this.recommended);
+	    	this.recommendedOrgsAreLoaded = true;
+	    }, err => {
+	    	this.ui.flash("Something went wrong while loading related orgs", "error");
+	    	return console.error(err);
+	    });
+    }, err => {
+    	this.ui.flash("Sorry, we couldn't load related orgs", "error");
+    	return console.error(err);
+    });
+	}
+
 	loadRecommendations() {
 		let interests = [];
 		let query = {};
@@ -190,10 +232,8 @@ export class RecommendedOrgsComponent implements OnInit {
 	    	if (query['not'].indexOf(org._id) < 0) query['not'].push(org._id);
 	    });
     	this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
-	    	orgs.forEach(org => {
-	    		this.recommended.push(org);
-	    	});
-	    	shuffle(this.recommended);
+	    	this.recommended = this.recommended.concat(orgs);
+	    	shuffleArray(this.recommended);
 	    	this.recommendedOrgsAreLoaded = true;
 	    }, err => {
 	    	this.ui.flash("Something went wrong while loading your recommendation", "error");

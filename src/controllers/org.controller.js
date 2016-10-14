@@ -157,8 +157,11 @@ exports.routes = [
     uri: '/orgs/count',
     process: function(req, res) {
       Org.count(function(err, count) {
-        if(err) return console.error(err);
-        res.json(count);
+        if(err) {
+          console.error(err);
+          return res.status(500).json({errmsg: err});
+        }        
+        res.status(200).json(count);
       });
     }
   },

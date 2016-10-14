@@ -1,45 +1,47 @@
 <div class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink, 'has-cover-image': org.coverImage }">
-	<div class="banner-container clearfix">
-		<div *ngIf="org?.videoLink"
-				[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"
-				[ngStyle]="{'background-image': 'url(' + (org?.coverImage || videoBg || 'app/images/cover-icons-overlay.png') + ')'}">
-			<iframe frameborder="0" height="100%" width="100%" 
-			  [src]="videoLink">
-			</iframe>
-		</div>
-		<div *ngIf="org?.videoLink" class="expand-video" [ngClass]="{'is-expanded': videoIsExpanded}">
-			<button *ngIf="!videoIsExpanded" (click)="expandVideo()" class="mini"><i class="fa fa-play"></i> Play the video</button>
-			<button *ngIf="videoIsExpanded" (click)="minimizeVideo()" class="mini"><i class="fa fa-angle-up"></i> Minimize the video</button>
-		</div>
-	
-		<div *ngIf="!org?.videoLink"
-			class="cover-image"
-			[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
-		</div>
-	</div>
-
-	<header class="org-header">
-		<div class="org-header-inner">
-			<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-			<h1 class="org-name">{{org.name}}</h1>
-			<p class="info stars">
-				<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
-				<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-				&nbsp;{{org.stars || '0'}} starred this
-			</p>
+	<section>
+		<div class="banner-container clearfix">
+			<div *ngIf="org?.videoLink"
+					[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"
+					[ngStyle]="{'background-image': 'url(' + (org?.coverImage || 'app/images/cover-icons-overlay.png') + ')'}">
+				<iframe frameborder="0" height="100%" width="100%" 
+				  [src]="videoLink">
+				</iframe>
+			</div>
+			<div *ngIf="org?.videoLink" class="expand-video" [ngClass]="{'is-expanded': videoIsExpanded}">
+				<button *ngIf="!videoIsExpanded" (click)="expandVideo()" class="mini"><i class="fa fa-play"></i> Play the video</button>
+				<button *ngIf="videoIsExpanded" (click)="minimizeVideo()" class="mini"><i class="fa fa-angle-up"></i> Minimize the video</button>
+			</div>
+		
+			<div *ngIf="!org?.videoLink"
+				class="cover-image"
+				[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
+			</div>
 		</div>
 
-		<div class="options-menu" (clickOutside)="closeOptionsMenu()">
-			<button class="icon-btn" (click)="toggleOptionsMenu()" [ngClass]="{'active': showOptionsMenu}">
-				<img src="app/images/options.svg" alt="options">
-			</button>
-			<ul *ngIf="showOptionsMenu" class="submenu">
-				<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
-				<li><a (click)="claimOrg()">Is this your organization?</a></li>
-			</ul>
-		</div>
-	</header>
-	<org-details [org]="org" [isSingle]="true"></org-details>
+		<header class="org-header">
+			<div class="org-header-inner">
+				<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+				<h1 class="org-name">{{org.name}}</h1>
+				<p class="info stars">
+					<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
+					<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
+					&nbsp;{{org.stars || '0'}} starred this
+				</p>
+			</div>
+
+			<div class="options-menu" (clickOutside)="closeOptionsMenu()">
+				<button class="icon-btn" (click)="toggleOptionsMenu()" [ngClass]="{'active': showOptionsMenu}">
+					<img src="app/images/options.svg" alt="options">
+				</button>
+				<ul *ngIf="showOptionsMenu" class="submenu">
+					<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
+					<li><a (click)="claimOrg()">Is this your organization?</a></li>
+				</ul>
+			</div>
+		</header>
+		<org-details [org]="org" [isSingle]="true"></org-details>
+	</section>
 	<org-posts [org]="org" [user]="user"></org-posts>
 	<recommended-orgs (tabChange)="showStarred($event)" [org]="org"></recommended-orgs>
 </div>
