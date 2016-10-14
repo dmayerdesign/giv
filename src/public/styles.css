@@ -372,6 +372,7 @@ button.nav-item:hover {
 /* SEARCH BOX CONTAINER */
 
 search-box + select {
+  position: relative;
   float: right;
   margin-top: -3.33em;
   margin-bottom: 0;
