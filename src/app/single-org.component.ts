@@ -134,20 +134,15 @@ export class SingleOrgComponent implements OnInit {
 			this.ui.flash("Sign up for free or log in to claim this organization", "info");
 	}
 
-	createPost(newPost:post):void {
-  	this.savingPost = true;
+	createPost(newPost):void {
   	this.http.post('/post', newPost).map(res => res.json()).subscribe(res => {
   		console.log("New post: ", res);
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
-  			this.savingPost = false;
   			return;
   		}
   		this.org = res;
-  		this.update.emit(this.org);
-  		this.savingPost = false;
-  		this.post = new Post();
-  			this.ui.flash("Saved", "success");
+ 			this.ui.flash("Saved", "success");
   		console.log(res);
   	});
   }

@@ -53195,18 +53195,13 @@
 	    };
 	    SingleOrgComponent.prototype.createPost = function (newPost) {
 	        var _this = this;
-	        this.savingPost = true;
 	        this.http.post('/post', newPost).map(function (res) { return res.json(); }).subscribe(function (res) {
 	            console.log("New post: ", res);
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
-	                _this.savingPost = false;
 	                return;
 	            }
 	            _this.org = res;
-	            _this.update.emit(_this.org);
-	            _this.savingPost = false;
-	            _this.post = new Post();
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
