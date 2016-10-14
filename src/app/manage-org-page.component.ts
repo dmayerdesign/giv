@@ -184,22 +184,36 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   orgHasCategory(category) {
-  	let categoryInOrg = this.org.categories.filter((orgCategory) => {
+  	let categoryInOrg = this.org.categories.find((orgCategory) => {
   		return orgCategory.id === category.id;
   	});
 
-  	if (categoryInOrg.length) return true;
+  	if (categoryInOrg) return true;
   	else return false;
   }
 
   changeSelectedCategories(category, add) {
+  	console.log(this.org.categories);
+  	let categoryIndex = -1;
+  	let foundCategory = this.org.categories.find((cat, index) => {
+  		if (cat.id == category.id) {
+  			categoryIndex = index;
+  		}
+  		return cat.id == category.id;
+  	});
+
   	if (!this.org.categories) this.org['categories'] = []; // for old orgs without categories array already
   	if (add) {
-  		this.org.categories.push(category);
+  		if (categoryIndex === -1) {
+  			this.org.categories.push(category);
+  		}
+  		console.log("Added", category);
   	} 
   	else {
-	  	this.org.categories.splice(this.org.categories.indexOf(category), 1);
+	  	this.org.categories.splice(categoryIndex, 1);
+	  	console.log("Removed", category);
 	  }
+	  console.log(this.org.categories);
   }
 
   deleteOrg(id) {

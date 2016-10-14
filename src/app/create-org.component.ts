@@ -109,9 +109,14 @@ export class CreateOrgComponent implements OnInit {
   }
 
   submitOrg(newOrg:org):void {
-    this.requiredOrgFields.forEach((field) => {
-    	if (!newOrg[field.id]) return this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+  	let ok:boolean = true;
+    this.requiredOrgFields.forEach((field, index, arr) => {
+    	if (!newOrg[field.id]) {
+    		this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+    		ok = false;
+    	}
     });
+    if (!ok) return;
     if (!this.roleDescription) return this.ui.flash("Oops! You need to describe your role in the organization", "error");
 
     let categories:string = "";

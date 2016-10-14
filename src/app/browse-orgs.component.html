@@ -32,7 +32,7 @@
 						<p class="info">
 							<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-							&nbsp;{{org.stars}} people starred this
+							&nbsp;{{org.stars || '0'}} starred this
 						</p>
 						<p class="description inside-org preview">{{org.description | truncate:280}}</p>
 					</div>
@@ -152,7 +152,7 @@
 		</section>
 		
 		<button id="show-more"
-				*ngIf="orgs?.length"
+				*ngIf="orgs?.length > 19"
 				(click)="showMore(10, orgs.length)"
 				[ngClass]="{'loading': loadingShowMoreOrgs}"
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>

@@ -129,6 +129,10 @@
   height: 16em;
 }
 
+.featured-org .header-right {
+  width: 60%;
+}
+
 .featured-org .stars-preview {
   display: none;
 }
@@ -187,7 +191,6 @@
 
 .featured-org .description {
   display: inline-block;
-  width: 60%;
   height: 4.4em;
   overflow: hidden;
 }

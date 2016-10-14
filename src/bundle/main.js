@@ -52567,7 +52567,7 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (featuredOrgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 1;
+	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars + 1 : 1;
 	            console.log(orgToStar);
 	        });
 	    };
@@ -52586,7 +52586,7 @@
 	                return thisOrg._id === org._id;
 	            });
 	            if (featuredOrgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
+	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars - 1 : 0;
 	            console.log(data.org);
 	            console.log(data.user);
 	        });
@@ -52676,10 +52676,15 @@
 	        return [
 	            { name: "Civil rights", id: "civil" },
 	            { name: "Racial justice", id: "racial" },
+	            { name: "Criminal justice", id: "criminal" },
 	            { name: "LGBTQIA justice", id: "lgbtqia" },
+	            { name: "Disability rights", id: "disability" },
+	            { name: "Neurodiversity", id: "neurodiversity" },
 	            { name: "Environmental justice", id: "environmental" },
+	            { name: "Women's issues", id: "women" },
 	            { name: "Reproductive rights", id: "reproductive" },
-	            { name: "Healthcare advocacy", id: "healthcare" },
+	            { name: "Immigration and refugee rights", id: "immigration" },
+	            { name: "Healthcare", id: "healthcare" },
 	            { name: "Economic justice", id: "economic" },
 	            { name: "Other", id: "other" }
 	        ];
@@ -53379,23 +53384,36 @@
 	        });
 	    };
 	    ManageOrgPageComponent.prototype.orgHasCategory = function (category) {
-	        var categoryInOrg = this.org.categories.filter(function (orgCategory) {
+	        var categoryInOrg = this.org.categories.find(function (orgCategory) {
 	            return orgCategory.id === category.id;
 	        });
-	        if (categoryInOrg.length)
+	        if (categoryInOrg)
 	            return true;
 	        else
 	            return false;
 	    };
 	    ManageOrgPageComponent.prototype.changeSelectedCategories = function (category, add) {
+	        console.log(this.org.categories);
+	        var categoryIndex = -1;
+	        var foundCategory = this.org.categories.find(function (cat, index) {
+	            if (cat.id == category.id) {
+	                categoryIndex = index;
+	            }
+	            return cat.id == category.id;
+	        });
 	        if (!this.org.categories)
 	            this.org['categories'] = []; // for old orgs without categories array already
 	        if (add) {
-	            this.org.categories.push(category);
+	            if (categoryIndex === -1) {
+	                this.org.categories.push(category);
+	            }
+	            console.log("Added", category);
 	        }
 	        else {
-	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
+	            this.org.categories.splice(categoryIndex, 1);
+	            console.log("Removed", category);
 	        }
+	        console.log(this.org.categories);
 	    };
 	    ManageOrgPageComponent.prototype.deleteOrg = function (id) {
 	        var _this = this;
@@ -53852,10 +53870,15 @@
 	    };
 	    CreateOrgComponent.prototype.submitOrg = function (newOrg) {
 	        var _this = this;
-	        this.requiredOrgFields.forEach(function (field) {
-	            if (!newOrg[field.id])
-	                return _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+	        var ok = true;
+	        this.requiredOrgFields.forEach(function (field, index, arr) {
+	            if (!newOrg[field.id]) {
+	                _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+	                ok = false;
+	            }
 	        });
+	        if (!ok)
+	            return;
 	        if (!this.roleDescription)
 	            return this.ui.flash("Oops! You need to describe your role in the organization", "error");
 	        var categories = "";

@@ -272,7 +272,7 @@ export class BrowseOrgsComponent implements OnInit {
 					return thisOrg._id === org._id;
 				});
 				if (featuredOrgToStar)
-					orgToStar.stars = orgToStar.stars ? orgToStar.stars+1 : 1;
+					featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars+1 : 1;
 
 				console.log(orgToStar);
 			}
@@ -295,7 +295,7 @@ export class BrowseOrgsComponent implements OnInit {
 					return thisOrg._id === org._id;
 				});
 				if (featuredOrgToStar)
-					orgToStar.stars = orgToStar.stars ? orgToStar.stars-1 : 0;
+					featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars-1 : 0;
 
 				console.log(data.org);
 				console.log(data.user);
