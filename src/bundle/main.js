@@ -54134,14 +54134,20 @@
 	        this.focusChange = new core_1.EventEmitter();
 	    }
 	    SearchBox.prototype.submitSearch = function ($event) {
-	        var search = $event.target.value;
+	        var search = this.search;
 	        var keyCode = $event.keyCode;
-	        if (search.length <= 1 && keyCode === 8)
+	        if (!search || typeof search === "undefined")
+	            return;
+	        if (search.length <= 1 && keyCode === 8) {
 	            this.update.emit("");
-	        if (keyCode === 13) {
-	            this.update.emit(search);
-	            this.el.nativeElement.querySelectorAll(".search-box-container input")[0].blur();
 	        }
+	        if (keyCode === 13 || $event.target.className.indexOf("search-button") > -1) {
+	            this.update.emit(search);
+	            this.el.nativeElement.querySelectorAll(".search-box input")[0].blur();
+	        }
+	    };
+	    SearchBox.prototype.updateSearch = function ($event) {
+	        this.search = $event.target.value;
 	    };
 	    SearchBox.prototype.checkEmpty = function ($event) {
 	        var search = $event.target.value;
@@ -54164,7 +54170,7 @@
 	    SearchBox = __decorate([
 	        core_1.Component({
 	            selector: 'search-box',
-	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t</div>",
+	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event); updateSearch($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t\t<div class=\"search-button\" (click)=\"submitSearch($event)\"></div>\n\t\t</div>",
 	            styleUrls: ['app/search-box.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [core_1.ElementRef])

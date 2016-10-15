@@ -1,3 +1,7 @@
+.search-box {
+	position: relative;
+}
+
 input {
 	display: block;
 	width: 100%;
@@ -16,6 +20,18 @@ input:focus {
 	border: 0 none;
 	background-color: transparent;
 	box-shadow: none !important;
+}
+
+.search-button {
+	display: block;
+	cursor: pointer;
+	background: transparent;
+  position: absolute;
+	  top: 0;
+	  left: 0;
+	  z-index: 100;
+  width: 3em;
+  height: 3.4em;
 }
 
 @media only screen and (max-width: 579px) {
