@@ -37,7 +37,7 @@
 					<p class="post-content">{{post.content | truncate:100}}</p>
 				</div>
 			</div>
-			<button *ngIf="posts.length > 19"
+			<button *ngIf="tooFewPosts()"
 					id="show-more"
 					(click)="showMore(10, posts.length)">Show more</button>
 		</section>

@@ -27,7 +27,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private orgs = [];
 	private featuredOrgs = [];
 	private featuredShowing:number;
-	private orgsLoaded:number = 14;
+	private initialLimit:number = 14;
 	private totalOrgs:number;
 	private orgsSorting = {order: "-name"};
 	private searchText:string;
@@ -72,7 +72,7 @@ export class BrowseOrgsComponent implements OnInit {
 			? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 			: this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
 	
-		this.orgService.loadOrgs({limit: 14}).subscribe(
+		this.orgService.loadOrgs({limit: this.initialLimit}).subscribe(
 			data => {
 				this.isLoading = false;
 				this.orgs = data;
@@ -160,7 +160,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	searchOrgs(search:string) {
-		let query = {search: search, field: "name", bodyField: "description", limit: 14};
+		let query = {search: search, field: "name", bodyField: "description", limit: this.initialLimit};
 
 		if (this.categoryFilter && this.categoryFilter.id) {
 			query['filterField'] = "categories.id";
@@ -361,7 +361,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	showShowMore() {
-		if (this.orgs.length >= 14 && this.orgs.length < this.totalOrgs) return true;
+		if (this.orgs.length >= this.initialLimit && this.orgs.length < this.totalOrgs) return true;
 		else return false;
 	}
 

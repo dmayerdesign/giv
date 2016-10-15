@@ -24,6 +24,7 @@ export class OrgPostsComponent {
 
 	private posts:Array<any> = [];
 	private postsShowing:number;
+	private initialPostLimit:number = 30;
 	private savingPost:boolean = false;
 	private selectedPost:any = null;
 	private viewingOne:boolean = false;
@@ -73,8 +74,8 @@ export class OrgPostsComponent {
 		if (increase) query['limit'] = increase;
 		if (offset) query['offset'] = offset;
 
-		if (!this.org) query = {limit: 30, sort: "-dateCreated"}
-		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated"};
+		if (!this.org) query = {limit: this.initialPostLimit, sort: "-dateCreated"}
+		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-dateCreated"};
 		if (this.org && this.isBrowsing) query['limit'] = 4;
 
 		if (search) {
@@ -264,6 +265,11 @@ export class OrgPostsComponent {
     let shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
     console.log("URL:", url);
     return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
+	}
+
+	tooFewPosts() {
+		if (this.posts) return this.posts.length >= this.initialPostLimit;
+		else return true;
 	}
 
 }
