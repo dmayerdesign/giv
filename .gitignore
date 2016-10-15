@@ -13,9 +13,6 @@ logs
 results
 tmp
 
-#Build
-public/css/main.css
-
 # API keys and secrets
 .env
 
@@ -30,3 +27,6 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Design files
+*.sketch
