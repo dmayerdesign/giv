@@ -29,4 +29,5 @@ bower_components
 Thumbs.db
 
 # Design files
-*.sketch
+_design
+_usability
