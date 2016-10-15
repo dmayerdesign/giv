@@ -4,5 +4,6 @@ export class FormField {
 	title:string; // Cover image
 	name:string; // coverImage
 	model:string; // coverImageLink
+	placeholder:string; // Paste a link to an image
 	uploadModel:any = null; // org.coverImage
 }
