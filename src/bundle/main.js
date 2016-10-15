@@ -52400,7 +52400,7 @@
 	        this.selectedOrg = null;
 	        this.orgs = [];
 	        this.featuredOrgs = [];
-	        this.orgsLoaded = 14;
+	        this.initialLimit = 14;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
 	        this.viewingOrg = false;
@@ -52428,7 +52428,7 @@
 	        !this.utilities.existsLocally('OrgsSorting')
 	            ? localStorage.setItem('OrgsSorting', JSON.stringify(this.orgsSorting))
 	            : this.orgsSorting = JSON.parse(localStorage['OrgsSorting']);
-	        this.orgService.loadOrgs({ limit: 14 }).subscribe(function (data) {
+	        this.orgService.loadOrgs({ limit: this.initialLimit }).subscribe(function (data) {
 	            _this.isLoading = false;
 	            _this.orgs = data;
 	            _this.paramsSub = _this.route.params.subscribe(function (params) {
@@ -52502,7 +52502,7 @@
 	    };
 	    BrowseOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
-	        var query = { search: search, field: "name", bodyField: "description", limit: 14 };
+	        var query = { search: search, field: "name", bodyField: "description", limit: this.initialLimit };
 	        if (this.categoryFilter && this.categoryFilter.id) {
 	            query['filterField'] = "categories.id";
 	            query['filterValue'] = this.categoryFilter.id;
@@ -52677,7 +52677,7 @@
 	        this.showUpdatesMobileTab = true;
 	    };
 	    BrowseOrgsComponent.prototype.showShowMore = function () {
-	        if (this.orgs.length >= 14 && this.orgs.length < this.totalOrgs)
+	        if (this.orgs.length >= this.initialLimit && this.orgs.length < this.totalOrgs)
 	            return true;
 	        else
 	            return false;
@@ -52872,6 +52872,7 @@
 	        this.tabChange = new core_1.EventEmitter();
 	        this.$posts = [];
 	        this.posts = [];
+	        this.initialPostLimit = 30;
 	        this.savingPost = false;
 	        this.selectedPost = null;
 	        this.viewingOne = false;
@@ -52908,9 +52909,9 @@
 	        if (offset)
 	            query['offset'] = offset;
 	        if (!this.org)
-	            query = { limit: 30, sort: "-dateCreated" };
+	            query = { limit: this.initialPostLimit, sort: "-dateCreated" };
 	        if (this.org)
-	            query = { filterField: "org", filterValue: this.org._id, limit: 20, sort: "-dateCreated" };
+	            query = { filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-dateCreated" };
 	        if (this.org && this.isBrowsing)
 	            query['limit'] = 4;
 	        if (search) {
@@ -53085,6 +53086,12 @@
 	        var shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
 	        console.log("URL:", url);
 	        return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
+	    };
+	    OrgPostsComponent.prototype.tooFewPosts = function () {
+	        if (this.posts)
+	            return this.posts.length >= this.initialPostLimit;
+	        else
+	            return true;
 	    };
 	    __decorate([
 	        core_1.Input(), 
