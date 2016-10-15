@@ -53306,12 +53306,13 @@
 	var core_1 = __webpack_require__(3);
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
+	var forms_1 = __webpack_require__(56);
 	var org_service_1 = __webpack_require__(75);
 	var user_service_1 = __webpack_require__(68);
 	var categories_service_1 = __webpack_require__(79);
 	var app_service_1 = __webpack_require__(70);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService, formBuilder) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -53321,9 +53322,17 @@
 	        this.zone = zone;
 	        this.http = http;
 	        this.categoryService = categoryService;
+	        this.formBuilder = formBuilder;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        this.newOrg = {};
+	        this.uploads = {
+	            coverImage: {
+	                options: {},
+	                upload: this.coverImageUpload
+	            }
+	        };
 	        this.callsToAction = [
 	            "Donate",
 	            "Support",
@@ -53355,9 +53364,78 @@
 	                        }
 	                        _this.org = data;
 	                        _this.isLoaded = true;
+	                        // for editing
+	                        _this.newOrg['categories'] = _this.org.categories;
+	                        _this.newOrg['otherLinks'] = _this.org.otherLinks;
 	                        _this.restoreOtherLinks();
+	                        console.log("New org", _this.newOrg);
+	                        // this.form = [
+	                        // 	{
+	                        // 		className: "visuals",
+	                        // 		save: this.editOrg,
+	                        // 		fields: [
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "url",
+	                        // 				title: "Cover image",
+	                        // 				model: "coverImage",
+	                        // 				placeholder: "'Paste a link to an image'",
+	                        // 				upload: true
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "url",
+	                        // 				title: "Cover video",
+	                        // 				model: "coverImage",
+	                        // 				placeholder: "Paste a link to an image",
+	                        // 			}
+	                        // 		]
+	                        // 	},
+	                        // 	{
+	                        // 		className: "other-links",
+	                        // 		save: this.editOrg,
+	                        // 		fields: [
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "text",
+	                        // 				model: "otherLinks[0].copy",
+	                        // 				title: "Text for your link",
+	                        // 				placeholder: "'e.g. Sign up to volunteer'"
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "url",
+	                        // 				model: "otherLinks[0].href"
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "text",
+	                        // 				model: "otherLinks[1].copy",
+	                        // 				title: "Text for your link",
+	                        // 				placeholder: "'e.g. Sign up to volunteer'"
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "url",
+	                        // 				model: "otherLinks[1].href"
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "text",
+	                        // 				model: "otherLinks[2].copy",
+	                        // 				title: "Text for your link",
+	                        // 				placeholder: "'e.g. Sign up to volunteer'"
+	                        // 			},
+	                        // 			{
+	                        // 				element: "input",
+	                        // 				type: "url",
+	                        // 				model: "otherLinks[2].href"
+	                        // 			}
+	                        // 		]
+	                        // 	}
+	                        // ];
 	                        // for ng-upload
-	                        _this.uploadOptions = {
+	                        _this.uploads.coverImage.options = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
 	                            filterExtensions: true,
 	                            calculateSpeed: true,
@@ -53379,7 +53457,7 @@
 	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
 	    };
-	    ManageOrgPageComponent.prototype.handleUpload = function (data) {
+	    ManageOrgPageComponent.prototype.coverImageUpload = function (data) {
 	        var _this = this;
 	        this.zone.run(function () {
 	            console.log(data);
@@ -53405,12 +53483,7 @@
 	    };
 	    ManageOrgPageComponent.prototype.editOrg = function (key, value) {
 	        var _this = this;
-	        if (key === "categories") {
-	            value = this.org.categories;
-	        }
-	        if (typeof value === "undefined") {
-	            value = this[key] || this.org[key];
-	        }
+	        value = value || this.newOrg[key];
 	        if (key === "slug") {
 	            var slugMatch = value.match(/[^a-zA-Z0-9\-]/);
 	            if (slugMatch) {
@@ -53422,7 +53495,7 @@
 	        }
 	        if (key === "otherLinks") {
 	            value = [];
-	            this.org.otherLinks.forEach(function (otherLink) {
+	            this.newOrg.otherLinks.forEach(function (otherLink) {
 	                if (otherLink.href) {
 	                    value.push(otherLink);
 	                }
@@ -53449,6 +53522,8 @@
 	        });
 	    };
 	    ManageOrgPageComponent.prototype.orgHasCategory = function (category) {
+	        if (!this.org)
+	            return false;
 	        var categoryInOrg = this.org.categories.find(function (orgCategory) {
 	            return orgCategory.id === category.id;
 	        });
@@ -53458,27 +53533,25 @@
 	            return false;
 	    };
 	    ManageOrgPageComponent.prototype.changeSelectedCategories = function (category, add) {
-	        console.log(this.org.categories);
 	        var categoryIndex = -1;
-	        var foundCategory = this.org.categories.find(function (cat, index) {
+	        if (!this.newOrg.categories)
+	            this.newOrg['categories'] = []; // for old orgs without categories array already
+	        this.newOrg.categories.forEach(function (cat, index) {
 	            if (cat.id == category.id) {
 	                categoryIndex = index;
 	            }
-	            return cat.id == category.id;
 	        });
-	        if (!this.org.categories)
-	            this.org['categories'] = []; // for old orgs without categories array already
 	        if (add) {
 	            if (categoryIndex === -1) {
-	                this.org.categories.push(category);
+	                this.newOrg.categories.push(category);
 	            }
 	            console.log("Added", category);
 	        }
 	        else {
-	            this.org.categories.splice(categoryIndex, 1);
+	            this.newOrg.categories.splice(categoryIndex, 1);
 	            console.log("Removed", category);
 	        }
-	        console.log(this.org.categories);
+	        console.log(this.newOrg.categories);
 	    };
 	    ManageOrgPageComponent.prototype.deleteOrg = function (id) {
 	        var _this = this;
@@ -53494,11 +53567,11 @@
 	    };
 	    ManageOrgPageComponent.prototype.restoreOtherLinks = function () {
 	        // for editing
-	        var addNullOtherLinks = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
+	        var addNullOtherLinks = this.newOrg.otherLinks && this.newOrg.otherLinks.length ? 3 - this.newOrg.otherLinks.length : 3;
 	        if (addNullOtherLinks === 3)
-	            this.org.otherLinks = [];
+	            this.newOrg.otherLinks = [];
 	        while (addNullOtherLinks > 0) {
-	            this.org.otherLinks.push({ copy: null, href: null });
+	            this.newOrg.otherLinks.push({ copy: null, href: null });
 	            addNullOtherLinks--;
 	        }
 	    };
@@ -53511,7 +53584,7 @@
 	            selector: 'manage-org-page',
 	            templateUrl: 'app/manage-org-page.component.html'
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories, forms_1.FormBuilder])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());

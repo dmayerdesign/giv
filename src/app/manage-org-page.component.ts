@@ -2,10 +2,12 @@ import { Component, OnInit, OnDestroy, NgZone, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
+import { Validators, FormGroup, FormArray, FormBuilder } from '@angular/forms';
 
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { Categories } from './services/categories.service';
+import { FormBlock } from './services/form.service';
 import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
@@ -22,6 +24,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 
+	private newOrg:any = {};
 	private coverImageLink:string;
 	private avatarLink:string;
 	private videoLink:string;
@@ -30,7 +33,17 @@ export class ManageOrgPageComponent implements OnInit {
 	private name:string;
 	private description:string;
 
-	private callsToAction:Array<string> = [
+	//private form:FormBlock[];
+	public form:FormGroup; // our form model
+
+	private uploads = {
+		coverImage: {
+			options: {},
+			upload: this.coverImageUpload
+		}
+	};
+
+	private callsToAction:string[] = [
 		"Donate",
 		"Support",
 		"Help out",
@@ -46,9 +59,6 @@ export class ManageOrgPageComponent implements OnInit {
 	private loading_categories:boolean;
 	private slugIsValid:boolean = true;
 
-	uploadFile:any;
-  uploadOptions:Object;
-
 	constructor(
 				private router:Router,
 				private route:ActivatedRoute,
@@ -58,7 +68,8 @@ export class ManageOrgPageComponent implements OnInit {
 				private utilities:Utilities,
 				private zone:NgZone,
 				private http:Http,
-				private categoryService:Categories) { }
+				private categoryService:Categories,
+				private formBuilder:FormBuilder) { }
 
 	ngOnInit() {
 		this.ui.setTitle("GIV :: Manage");
@@ -82,10 +93,82 @@ export class ManageOrgPageComponent implements OnInit {
 							}
 							this.org = data;
 							this.isLoaded = true;
+
+							// for editing
+							this.newOrg['categories'] = this.org.categories;
+							this.newOrg['otherLinks'] = this.org.otherLinks;
 							this.restoreOtherLinks();
+
+							console.log("New org", this.newOrg);
+
+							// this.form = [
+							// 	{
+							// 		className: "visuals",
+							// 		save: this.editOrg,
+							// 		fields: [
+							// 			{
+							// 				element: "input",
+							// 				type: "url",
+							// 				title: "Cover image",
+							// 				model: "coverImage",
+							// 				placeholder: "'Paste a link to an image'",
+							// 				upload: true
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "url",
+							// 				title: "Cover video",
+							// 				model: "coverImage",
+							// 				placeholder: "Paste a link to an image",
+							// 			}
+							// 		]
+							// 	},
+							// 	{
+							// 		className: "other-links",
+							// 		save: this.editOrg,
+							// 		fields: [
+							// 			{
+							// 				element: "input",
+							// 				type: "text",
+							// 				model: "otherLinks[0].copy",
+							// 				title: "Text for your link",
+							// 				placeholder: "'e.g. Sign up to volunteer'"
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "url",
+							// 				model: "otherLinks[0].href"
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "text",
+							// 				model: "otherLinks[1].copy",
+							// 				title: "Text for your link",
+							// 				placeholder: "'e.g. Sign up to volunteer'"
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "url",
+							// 				model: "otherLinks[1].href"
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "text",
+							// 				model: "otherLinks[2].copy",
+							// 				title: "Text for your link",
+							// 				placeholder: "'e.g. Sign up to volunteer'"
+							// 			},
+							// 			{
+							// 				element: "input",
+							// 				type: "url",
+							// 				model: "otherLinks[2].href"
+							// 			}
+							// 		]
+							// 	}
+							// ];
 							
 							// for ng-upload
-							this.uploadOptions = {
+							this.uploads.coverImage.options = {
 							  url: '/edit-org/upload/cover-image/' + this.org._id,
 							  filterExtensions: true,
 							  calculateSpeed: true,
@@ -111,7 +194,7 @@ export class ManageOrgPageComponent implements OnInit {
 		this.sub.unsubscribe();
 	}
 
-  handleUpload(data:any):void {
+  coverImageUpload(data:any):void {
   	this.zone.run(() => {
   		console.log(data);
   		this.progress = data.progress.percent;
@@ -135,14 +218,8 @@ export class ManageOrgPageComponent implements OnInit {
   	});
   } 
 
-  editOrg(key:string, value?:any):void {
-  	if (key === "categories") {
-  		value = this.org.categories;
-  	}
-
-  	if (typeof value === "undefined") {
-  		value = this[key] || this.org[key];
-  	}
+  editOrg(key, value?):void {
+  	value = value || this.newOrg[key];
 
   	if (key === "slug") {
   		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
@@ -155,7 +232,7 @@ export class ManageOrgPageComponent implements OnInit {
 
   	if (key === "otherLinks") {
   		value = [];
-  		this.org.otherLinks.forEach(otherLink => {
+  		this.newOrg.otherLinks.forEach(otherLink => {
   			if (otherLink.href) {
   				value.push(otherLink);
   			}
@@ -184,6 +261,8 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   orgHasCategory(category) {
+  	if (!this.org) return false;
+
   	let categoryInOrg = this.org.categories.find((orgCategory) => {
   		return orgCategory.id === category.id;
   	});
@@ -193,27 +272,25 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   changeSelectedCategories(category, add) {
-  	console.log(this.org.categories);
   	let categoryIndex = -1;
-  	let foundCategory = this.org.categories.find((cat, index) => {
+  	if (!this.newOrg.categories) this.newOrg['categories'] = []; // for old orgs without categories array already
+  	this.newOrg.categories.forEach((cat, index) => {
   		if (cat.id == category.id) {
   			categoryIndex = index;
   		}
-  		return cat.id == category.id;
   	});
 
-  	if (!this.org.categories) this.org['categories'] = []; // for old orgs without categories array already
   	if (add) {
   		if (categoryIndex === -1) {
-  			this.org.categories.push(category);
+  			this.newOrg.categories.push(category);
   		}
   		console.log("Added", category);
   	} 
   	else {
-	  	this.org.categories.splice(categoryIndex, 1);
+	  	this.newOrg.categories.splice(categoryIndex, 1);
 	  	console.log("Removed", category);
 	  }
-	  console.log(this.org.categories);
+	  console.log(this.newOrg.categories);
   }
 
   deleteOrg(id) {
@@ -230,10 +307,10 @@ export class ManageOrgPageComponent implements OnInit {
 
   restoreOtherLinks() {
   	// for editing
-		let addNullOtherLinks:number = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
-		if (addNullOtherLinks === 3) this.org.otherLinks = [];
+		let addNullOtherLinks:number = this.newOrg.otherLinks && this.newOrg.otherLinks.length ? 3 - this.newOrg.otherLinks.length : 3;
+		if (addNullOtherLinks === 3) this.newOrg.otherLinks = [];
 		while (addNullOtherLinks > 0) {
-			this.org.otherLinks.push({copy: null, href: null});
+			this.newOrg.otherLinks.push({copy: null, href: null});
 			addNullOtherLinks--;
 		}
   }

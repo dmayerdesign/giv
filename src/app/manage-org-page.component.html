@@ -6,12 +6,50 @@
 
   <button (click)="deleteOrg()">Delete this org</button>
 
+
+<!--   <div class="giv-form" *ngIf="form?.length">
+    
+    <div class="giv-form-section"
+        *ngFor="let section of form">
+      <div class="giv-form-field"
+          *ngFor="let field of section.fields">
+        
+        <label [attr.for]="field.model">{{field.title}}</label>
+        <button (click)="section.save(field)"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+        <input
+            *ngIf="field.element === 'input'"
+            [attr.name]="field.model"
+            [(ngModel)]="newOrg[field.model]"
+            [placeholder]="field.placeholder || org[field.model]">
+        <input
+          *ngIf="field.upload"
+          type="file"
+          class="form-control"
+          ngFileSelect
+          [options]="uploads[field.model].options"
+          (onUpload)="uploads[field.model].upload($event)">
+
+
+      </div>
+    </div>
+
+  </div> -->
+
+
+  <form [formGroup]="form" novalidate>
+    
+  </form>
+
+
+
+
+
 	<div class="form-block">
 		<input type="file"
 			class="form-control"
   		ngFileSelect
-      [options]="uploadOptions"
-      (onUpload)="handleUpload($event)">
+      [options]="uploads.coverImage.options"
+      (onUpload)="coverImageUpload($event)">
 
     <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
     <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
@@ -94,9 +132,10 @@
     <div *ngFor="let category of categories">
       <input
         type="checkbox"
+        name="{{category.id}}"
         [checked]="orgHasCategory(category)"
         (change)="changeSelectedCategories(category, $event.target.checked)">
-      <label>{{category.name}}</label>
+      <label [attr.for]="category.id">{{category.name}}</label>
     </div>
     <button (click)="editOrg('categories', org.categories)"><i [hidden]="!loading_categories" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
