@@ -23,7 +23,7 @@ export class SingleOrgComponent implements OnInit {
 	private isLoaded:boolean = false;
   private videoLink:any;
   private videoIsExpanded:boolean;
-  // private videoBg:string;
+  private videoBg:string;
   private showOptionsMenu:boolean;
 
 	constructor(
@@ -53,10 +53,10 @@ export class SingleOrgComponent implements OnInit {
 					this.ui.setTitle("GIV :: " + this.org.name);
 
 					if (this.org.videoLink) {
-						this.org.videoLink = this.org.videoLink.replace("watch?v=", "v/");
+						this.org.videoLink = this.org.videoLink.replace("watch?v=", "embed/");
 						this.videoLink = this.sanitizer.bypassSecurityTrustResourceUrl(this.org.videoLink);
 						let matchId = this.org.videoLink.match(/(embed)\/(.*)/);
-						// if (matchId) { this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg'; }
+						if (matchId) { this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg'; }
 					}
 
 					this.userService.getLoggedInUser((err, user) => {

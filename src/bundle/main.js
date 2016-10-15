@@ -53177,9 +53177,12 @@
 	                _this.isLoaded = true;
 	                _this.ui.setTitle("GIV :: " + _this.org.name);
 	                if (_this.org.videoLink) {
-	                    _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "v/");
+	                    _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "embed/");
 	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
 	                    var matchId = _this.org.videoLink.match(/(embed)\/(.*)/);
+	                    if (matchId) {
+	                        _this.videoBg = 'http://i3.ytimg.com/vi/' + matchId[2] + '/mqdefault.jpg';
+	                    }
 	                }
 	                _this.userService.getLoggedInUser(function (err, user) {
 	                    if (err)

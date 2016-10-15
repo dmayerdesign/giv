@@ -1,3 +1,5 @@
 cd /data/db
 mongodump --db giv --out /data/db/backup
 mongorestore -h ds035846.mlab.com:35846 -d giv -u dannymayer -p Kounice372 /data/db/backup/giv
+
+mongorestore --db giv /data/db/backup/giv

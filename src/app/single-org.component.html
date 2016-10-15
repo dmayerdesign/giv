@@ -1,8 +1,8 @@
 <div class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink, 'has-cover-image': org.coverImage }">
 	<section>
 		<div class="banner-container clearfix">
-			<div *ngIf="org?.videoLink"
-					[ngClass]="{'expanded': videoIsExpanded, 'featured-video': org.videoLink, 'cover-image': org.coverImage}"
+			<div class="featured-video" *ngIf="org?.videoLink"
+					[ngClass]="{'expanded': videoIsExpanded, 'cover-image': org.coverImage}"
 					[ngStyle]="{'background-image': 'url(' + (org?.coverImage || 'app/images/cover-icons-overlay.png') + ')'}">
 				<iframe frameborder="0" height="100%" width="100%" 
 				  [src]="videoLink">
