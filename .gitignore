@@ -29,4 +29,5 @@ bower_components
 Thumbs.db
 
 # Large design files
-*.psd
+_design
+_usability
