@@ -114,7 +114,9 @@ export class OrgPostsComponent {
 			this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 		}
 		else {
-			this.router.navigate(['/organization/i', this.posts.find(post => post._id === id).org], {queryParams: { viewpost: id } });
+			this.router.navigate(['/organization/i', this.posts.find(post => {
+				return post._id === id;
+			}).org], {queryParams: { viewpost: id } });
 		}
 	}
 
@@ -128,6 +130,8 @@ export class OrgPostsComponent {
 	}
 
 	searchPosts(search:string) {
+		this.viewingOne = false;
+		this.selectedPost = null;
 		this.loadPosts(search, 0, 0, data => {
 			this.searchText = search;
 		});

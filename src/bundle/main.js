@@ -52942,7 +52942,9 @@
 	            this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 	        }
 	        else {
-	            this.router.navigate(['/organization/i', this.posts.find(function (post) { return post._id === id; }).org], { queryParams: { viewpost: id } });
+	            this.router.navigate(['/organization/i', this.posts.find(function (post) {
+	                    return post._id === id;
+	                }).org], { queryParams: { viewpost: id } });
 	        }
 	    };
 	    OrgPostsComponent.prototype.deselectPost = function () {
@@ -52954,6 +52956,8 @@
 	    };
 	    OrgPostsComponent.prototype.searchPosts = function (search) {
 	        var _this = this;
+	        this.viewingOne = false;
+	        this.selectedPost = null;
 	        this.loadPosts(search, 0, 0, function (data) {
 	            _this.searchText = search;
 	        });
