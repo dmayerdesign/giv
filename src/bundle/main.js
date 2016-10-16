@@ -53366,6 +53366,12 @@
 	                            calculateSpeed: true,
 	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
 	                        };
+	                        _this.avatarUploadOptions = {
+	                            url: '/edit-org/upload/avatar/' + _this.org._id,
+	                            filterExtensions: true,
+	                            calculateSpeed: true,
+	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                        };
 	                    }, function (err) {
 	                        _this.router.navigate([''], { queryParams: { "404": true } });
 	                        console.log("Error: ");
@@ -53383,16 +53389,9 @@
 	        this.sub.unsubscribe();
 	    };
 	    ManageOrgPageComponent.prototype.handleUpload = function (org) {
-	        // this.zone.run(() => {
-	        // 	console.log(data);
-	        // 	this.progress = data.progress.percent;
-	        // 	this.stillWorking = true;
-	        //   if (data.response && data.status !== 404) {
 	        this.org = org;
 	        this.stillWorking = false;
 	        console.log(org);
-	        //  }
-	        // });
 	    };
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
@@ -54305,25 +54304,33 @@
 	        this.onChange = new core_1.EventEmitter();
 	        this.onSave = new core_1.EventEmitter();
 	        this.changed = false;
-	        this.stillWorking = false;
+	        this.uploading = false;
 	        this.progress = 0;
-	        this.categories = this.categoryService.list();
 	    }
 	    FormFieldComponent.prototype.ngOnInit = function () {
+	    };
+	    FormFieldComponent.prototype.ngAfterViewInit = function () {
+	        if (this.initial) {
+	            this.value = this.initial;
+	        }
 	    };
 	    FormFieldComponent.prototype.handleUpload = function (data) {
 	        var _this = this;
 	        this.zone.run(function () {
 	            console.log(data);
 	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
+	            _this.saving = true;
+	            _this.uploading = true;
 	            if (data.response && data.status !== 404) {
 	                _this.onUpload.emit(JSON.parse(data.response));
+	                _this.saving = false;
+	                _this.uploading = false;
 	            }
 	        });
 	    };
-	    FormFieldComponent.prototype.save = function () {
-	        this.onSave.emit(this.value);
+	    FormFieldComponent.prototype.save = function (value) {
+	        this.onSave.emit(value || this.value);
+	        this.value = null;
 	    };
 	    FormFieldComponent.prototype.changeHandler = function () {
 	        if (this.value && this.value.length)
@@ -54331,6 +54338,15 @@
 	        else
 	            this.changed = false;
 	    };
+	    FormFieldComponent.prototype.isSelected = function (option) {
+	        if (option === this.initial)
+	            return "selected";
+	        return null;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "initial", void 0);
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)

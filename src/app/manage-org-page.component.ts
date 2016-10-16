@@ -24,7 +24,7 @@ export class ManageOrgPageComponent implements OnInit {
 
 	/** Fields to edit **/
 	private coverImage:string;
-	private avatarLink:string;
+	private avatar:string;
 	private videoLink:string;
 	private donateLink:string;
 	private slug:string;
@@ -50,6 +50,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private changed = {};
 
   coverImageUploadOptions:Object;
+  avatarUploadOptions:Object;
 
 	constructor(
 				private router:Router,
@@ -93,6 +94,12 @@ export class ManageOrgPageComponent implements OnInit {
 							  calculateSpeed: true,
 							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
 							};
+							this.avatarUploadOptions = {
+							  url: '/edit-org/upload/avatar/' + this.org._id,
+							  filterExtensions: true,
+							  calculateSpeed: true,
+							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+							};
 						},
 						err => {
 							this.router.navigate([''], { queryParams: {"404": true}});
@@ -114,17 +121,9 @@ export class ManageOrgPageComponent implements OnInit {
 	}
 
   handleUpload(org):void {
-  	// this.zone.run(() => {
-  	// 	console.log(data);
-  	// 	this.progress = data.progress.percent;
-  	// 	this.stillWorking = true;
-
-	  //   if (data.response && data.status !== 404) {
-	    	this.org = org;
-	    	this.stillWorking = false;
-	    	console.log(org);
-	   //  }
-    // });
+  	this.org = org;
+  	this.stillWorking = false;
+  	console.log(org);
   }
 
   checkForUniqueSlug($event) {

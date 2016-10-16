@@ -1,51 +1,54 @@
-<label [attr.for]="name">{{title}}</label>
+<div class="form-field clearfix">
+  <label [attr.for]="name">{{title}}</label>
 
-<button
-  class="save"
-  (click)="save()"
-  [disabled]="!changed"
-  [ngClass]="{'changed': changed}">
+  <button
+    class="save"
+    (click)="save()"
+    [disabled]="!changed"
+    [ngClass]="{'changed': changed}"
+    *ngIf="type !== 'select'">
 
-  <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
-  <i [hidden]="saving" class="fa fa-check"></i>
-  save<span *ngIf="!changed">d</span>
-</button>
+    <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
+    <i [hidden]="saving" class="fa fa-check"></i>
+    save<span *ngIf="!changed">d</span>
+  </button>
 
-<input
-  *ngIf="type === 'text' || type === 'url' || type === 'email'"
-  [attr.type]="type"
-  [attr.name]="name"
-  [attr.placeholder]="placeholder"
-  (keyup)="changeHandler()"
-  [(ngModel)]="value">
-
-<textarea
-  *ngIf="type === 'textarea'"
-  [attr.name]="name"
-  [attr.placeholder]="placeholder" 
-  (keyup)="changeHandler()"
-  [(ngModel)]="value"></textarea>
-
-<select
-  *ngIf="type === 'select'"
-  [attr.name]="name"
-  [attr.placeholder]="placeholder" 
-  (keyup)="changeHandler()"
-  [(ngModel)]="value">
-
-  <option
-    *ngFor="let option of selectOptions"
-    [value]="option.value">{{option.text}}</option>
-
-</select>  
-
-<div class="upload" *ngIf="upload">
   <input
-    *ngIf="upload?.url"
-    type="file"
-		class="form-control"
-		ngFileSelect
-    [options]="upload"
-    (onUpload)="handleUpload($event)">
-  <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
+    *ngIf="type === 'text' || type === 'url' || type === 'email'"
+    [attr.type]="type"
+    [attr.name]="name"
+    [attr.placeholder]="placeholder"
+    (keyup)="changeHandler()"
+    [(ngModel)]="value">
+
+  <textarea
+    *ngIf="type === 'textarea'"
+    [attr.name]="name"
+    [attr.placeholder]="placeholder" 
+    (keyup)="changeHandler()"
+    [(ngModel)]="value"></textarea>
+
+  <select
+    *ngIf="type === 'select'"
+    [attr.name]="name"
+    [attr.placeholder]="placeholder" 
+    (change)="save($event.target.value)"
+    [(ngModel)]="value">
+
+    <option
+      *ngFor="let option of selectOptions; let index = i"
+      [value]="option"
+      [attr.selected]="isSelected(option)">{{option}}</option>
+
+  </select>  
+
+  <div class="upload" *ngIf="upload">
+    <input
+      *ngIf="upload?.url"
+      type="file"
+  		ngFileSelect
+      [options]="upload"
+      (onUpload)="handleUpload($event)">
+    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
+  </div>
 </div>

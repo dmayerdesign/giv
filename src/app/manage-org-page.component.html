@@ -3,7 +3,7 @@
 	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
 	<h2>Manage <span>{{org?.name}}</span></h2>
 
-  <div class="giv-form col-md-6">
+  <div class="giv-form col-md-6" *ngIf="org">
   	<div class="form-section">
 
       <form-field
@@ -16,6 +16,62 @@
         (onUpload)="handleUpload($event)"
         (onChange)="changeHandler('coverImage', $event)"
         (onSave)="save('coverImage', $event)"></form-field>
+
+      <form-field
+        [title]="'Cover video (YouTube)'"
+        [name]="'videoLink'"
+        [placeholder]="org.videoLink || 'Paste a regular link to a YouTube video'"
+        [type]="'url'"
+        [saving]="saving_videoLink"
+        (onChange)="changeHandler('videoLink', $event)"
+        (onSave)="save('videoLink', $event)"></form-field>
+
+      <form-field
+        [title]="'Avatar'"
+        [name]="'avatar'"
+        [placeholder]="'Paste a link to an image'"
+        [type]="'url'"
+        [saving]="saving_avatar"
+        [upload]="avatarUploadOptions"
+        (onUpload)="handleUpload($event)"
+        (onChange)="changeHandler('avatar', $event)"
+        (onSave)="save('avatar', $event)"></form-field>
+
+      <form-field
+        [title]="'Name'"
+        [name]="'name'"
+        [placeholder]="org.name"
+        [type]="'text'"
+        [saving]="saving_name"
+        (onChange)="changeHandler('name', $event)"
+        (onSave)="save('name', $event)"></form-field>
+
+      <form-field
+        [title]="'Identifier'"
+        [name]="'slug'"
+        [placeholder]="org.slug || 'e.g. my-awesome-org'"
+        [type]="'text'"
+        [saving]="saving_slug"
+        (onChange)="changeHandler('slug', $event)"
+        (onSave)="save('slug', $event)"></form-field>
+
+      <form-field
+        [title]="'Description'"
+        [name]="'description'"
+        [placeholder]="org.description || 'Describe your organization in a few sentences'"
+        [type]="'textarea'"
+        [saving]="saving_description"
+        (onChange)="changeHandler('description', $event)"
+        (onSave)="save('description', $event)"></form-field>
+
+      <form-field
+        [title]="'Call to action text'"
+        [name]="'donateLinkCopy'"
+        [type]="'select'"
+        [saving]="saving_donateLinkCopy"
+        [selectOptions]="callsToAction"
+        [initial]="org.donateLinkCopy"
+        (onSave)="save('donateLinkCopy', $event)"></form-field>
 
 <!--       <label for="coverImage">Cover image</label>
       <button
@@ -55,7 +111,7 @@
 
 
 
-
+<div class="pull-left">
 <!--   <div class="form-block">
     <input type="file"
       class="form-control"
@@ -68,40 +124,40 @@
     <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
     <span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
   </div> -->
-  <div class="form-block">
+  <!-- <div class="form-block">
     <input [(ngModel)]="name"
           class="form-control"
           ngControl="name"
           name="name"
           placeholder="Change the name of your page"><button (click)="save('name')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
+  </div> -->
+  <!-- <div class="form-block">
     <textarea [(ngModel)]="description"
           class="form-control"
           ngControl="description"
           name="description"
           placeholder="Change the description of your page"></textarea>
       <button (click)="save('description')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
+  </div> -->
+  <!-- <div class="form-block">
     <input [(ngModel)]="avatarLink"
           class="form-control"
           name="avatarLink"
           placeholder="Change the avatar"><button (click)="save('avatar', avatarLink)"><i [hidden]="!saving_avatar" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
+  </div> -->
+  <!-- <div class="form-block">
     <input [(ngModel)]="videoLink"
           class="form-control"
           name="videoLink"
           placeholder="Add a link to a youtube video"><button (click)="save('videoLink')"><i [hidden]="!saving_videoLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
+  </div> -->
+  <!-- <div class="form-block">
   	<input [(ngModel)]="donateLink"
   				class="form-control"
   				name="donateLink"
   				placeholder="Change the main Donate link"><button (click)="save('donateLink')"><i [hidden]="!saving_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
+  </div> -->
+<!--   <div class="form-block">
     <select
         (change)="save('donateLinkCopy', $event.target.value)"
         [(ngModel)]="org.donateLinkCopy"
@@ -150,4 +206,6 @@
 	</div>
 
   <button (click)="deleteOrg()">Delete this org</button>
+-->
+</div>
 </div>
