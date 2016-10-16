@@ -37901,6 +37901,7 @@
 	var create_post_component_1 = __webpack_require__(89);
 	var search_box_component_1 = __webpack_require__(90);
 	var contact_component_1 = __webpack_require__(91);
+	var form_field_component_1 = __webpack_require__(355);
 	var user_service_1 = __webpack_require__(68);
 	var search_service_1 = __webpack_require__(76);
 	var ng2_click_outside_1 = __webpack_require__(92);
@@ -37962,7 +37963,8 @@
 	                ng2_uploader_1.UPLOAD_DIRECTIVES,
 	                create_org_component_1.CreateOrgComponent,
 	                create_post_component_1.CreatePostComponent,
-	                truncate_pipe_1.TruncatePipe
+	                truncate_pipe_1.TruncatePipe,
+	                form_field_component_1.FormFieldComponent
 	            ],
 	            providers: [
 	                platform_browser_1.Title,
@@ -53332,6 +53334,7 @@
 	        ];
 	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
+	        this.changed = {};
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53357,7 +53360,7 @@
 	                        _this.isLoaded = true;
 	                        _this.restoreOtherLinks();
 	                        // for ng-upload
-	                        _this.uploadOptions = {
+	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
 	                            filterExtensions: true,
 	                            calculateSpeed: true,
@@ -53379,18 +53382,17 @@
 	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
 	    };
-	    ManageOrgPageComponent.prototype.handleUpload = function (data) {
-	        var _this = this;
-	        this.zone.run(function () {
-	            console.log(data);
-	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
-	            if (data.response && data.status !== 404) {
-	                _this.org = JSON.parse(data.response);
-	                _this.stillWorking = false;
-	                console.log(data.response);
-	            }
-	        });
+	    ManageOrgPageComponent.prototype.handleUpload = function (org) {
+	        // this.zone.run(() => {
+	        // 	console.log(data);
+	        // 	this.progress = data.progress.percent;
+	        // 	this.stillWorking = true;
+	        //   if (data.response && data.status !== 404) {
+	        this.org = org;
+	        this.stillWorking = false;
+	        console.log(org);
+	        //  }
+	        // });
 	    };
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
@@ -53403,7 +53405,7 @@
 	                _this.slugIsValid = true;
 	        });
 	    };
-	    ManageOrgPageComponent.prototype.editOrg = function (key, value) {
+	    ManageOrgPageComponent.prototype.save = function (key, value) {
 	        var _this = this;
 	        if (key === "categories") {
 	            value = this.org.categories;
@@ -53428,7 +53430,7 @@
 	                }
 	            });
 	        }
-	        this['loading_' + key] = true;
+	        this['saving_' + key] = true;
 	        this.orgService.editOrg({
 	            id: this.org._id,
 	            key: key,
@@ -53437,12 +53439,14 @@
 	            console.log(res);
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
-	                _this['loading_' + key] = false;
+	                _this['saving_' + key] = false;
 	                _this.restoreOtherLinks();
 	                return;
 	            }
 	            _this.org = res;
-	            _this['loading_' + key] = false;
+	            _this[key] = null;
+	            _this['saving_' + key] = false;
+	            _this.changed[key] = false;
 	            _this.ui.flash("Saved", "success");
 	            _this.restoreOtherLinks();
 	            console.log(res);
@@ -53501,6 +53505,12 @@
 	            this.org.otherLinks.push({ copy: null, href: null });
 	            addNullOtherLinks--;
 	        }
+	    };
+	    ManageOrgPageComponent.prototype.changeHandler = function (key, event) {
+	        if (event.target.value)
+	            this.changed[key] = true;
+	        else
+	            this.changed[key] = false;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -54417,6 +54427,371 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
+
+
+/***/ },
+/* 95 */,
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var categories_service_1 = __webpack_require__(79);
+	var app_service_1 = __webpack_require__(70);
+	var FormFieldComponent = (function () {
+	    function FormFieldComponent(ui, utilities, categoryService, zone) {
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.categoryService = categoryService;
+	        this.zone = zone;
+	        this.onUpload = new core_1.EventEmitter();
+	        this.onChange = new core_1.EventEmitter();
+	        this.onSave = new core_1.EventEmitter();
+	        this.changed = false;
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        this.categories = this.categoryService.list();
+	    }
+	    FormFieldComponent.prototype.ngOnInit = function () {
+	    };
+	    FormFieldComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response && data.status !== 404) {
+	                _this.onUpload.emit(JSON.parse(data.response));
+	            }
+	        });
+	    };
+	    FormFieldComponent.prototype.save = function () {
+	        this.onSave.emit(this.value);
+	    };
+	    FormFieldComponent.prototype.changeHandler = function () {
+	        if (this.value && this.value.length)
+	            this.changed = true;
+	        else
+	            this.changed = false;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "title", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "name", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "placeholder", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "type", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "saving", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "upload", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "selectOptions", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onUpload", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onChange", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onSave", void 0);
+	    FormFieldComponent = __decorate([
+	        core_1.Component({
+	            selector: 'form-field',
+	            templateUrl: 'app/form-field.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [app_service_1.UIHelper, app_service_1.Utilities, categories_service_1.Categories, core_1.NgZone])
+	    ], FormFieldComponent);
+	    return FormFieldComponent;
+	}());
+	exports.FormFieldComponent = FormFieldComponent;
 
 
 /***/ }

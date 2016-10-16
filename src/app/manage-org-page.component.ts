@@ -16,13 +16,14 @@ import { UIHelper, Utilities } from './services/app.service';
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 
 export class ManageOrgPageComponent implements OnInit {
-	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org"></...>
+	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org">...
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 
-	private coverImageLink:string;
+	/** Fields to edit **/
+	private coverImage:string;
 	private avatarLink:string;
 	private videoLink:string;
 	private donateLink:string;
@@ -36,18 +37,19 @@ export class ManageOrgPageComponent implements OnInit {
 		"Help out",
 		"Volunteer"
 	];
-
 	private categories = this.categoryService.list();
 
-	private loading_coverImage:boolean;
-	private loading_avatar:boolean;
-	private loading_donateLink:boolean;
-	private loading_slug:boolean;
-	private loading_categories:boolean;
-	private slugIsValid:boolean = true;
+	/** Loading **/
+	private saving_coverImage:boolean;
+	private saving_avatar:boolean;
+	private saving_donateLink:boolean;
+	private saving_slug:boolean;
+	private saving_categories:boolean;
 
-	uploadFile:any;
-  uploadOptions:Object;
+	private slugIsValid:boolean = true;
+	private changed = {};
+
+  coverImageUploadOptions:Object;
 
 	constructor(
 				private router:Router,
@@ -85,7 +87,7 @@ export class ManageOrgPageComponent implements OnInit {
 							this.restoreOtherLinks();
 							
 							// for ng-upload
-							this.uploadOptions = {
+							this.coverImageUploadOptions = {
 							  url: '/edit-org/upload/cover-image/' + this.org._id,
 							  filterExtensions: true,
 							  calculateSpeed: true,
@@ -111,18 +113,18 @@ export class ManageOrgPageComponent implements OnInit {
 		this.sub.unsubscribe();
 	}
 
-  handleUpload(data:any):void {
-  	this.zone.run(() => {
-  		console.log(data);
-  		this.progress = data.progress.percent;
-  		this.stillWorking = true;
+  handleUpload(org):void {
+  	// this.zone.run(() => {
+  	// 	console.log(data);
+  	// 	this.progress = data.progress.percent;
+  	// 	this.stillWorking = true;
 
-	    if (data.response && data.status !== 404) {
-	    	this.org = JSON.parse(data.response);
+	  //   if (data.response && data.status !== 404) {
+	    	this.org = org;
 	    	this.stillWorking = false;
-	    	console.log(data.response);
-	    }
-    });
+	    	console.log(org);
+	   //  }
+    // });
   }
 
   checkForUniqueSlug($event) {
@@ -135,7 +137,7 @@ export class ManageOrgPageComponent implements OnInit {
   	});
   } 
 
-  editOrg(key:string, value?:any):void {
+  save(key:string, value?:any):void {
   	if (key === "categories") {
   		value = this.org.categories;
   	}
@@ -162,7 +164,7 @@ export class ManageOrgPageComponent implements OnInit {
   		});
   	}
 
-  	this['loading_' + key] = true;
+  	this['saving_' + key] = true;
   	this.orgService.editOrg({
   		id: this.org._id,
   		key: key,
@@ -171,12 +173,14 @@ export class ManageOrgPageComponent implements OnInit {
   		console.log(res);
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
-  			this['loading_' + key] = false;
+  			this['saving_' + key] = false;
   			this.restoreOtherLinks();
   			return;
   		}
   		this.org = res;
-  		this['loading_' + key] = false;
+  		this[key] = null;
+  		this['saving_' + key] = false;
+  		this.changed[key] = false;
   		this.ui.flash("Saved", "success");
   		this.restoreOtherLinks();
   		console.log(res);
@@ -236,6 +240,13 @@ export class ManageOrgPageComponent implements OnInit {
 			this.org.otherLinks.push({copy: null, href: null});
 			addNullOtherLinks--;
 		}
+  }
+
+  changeHandler(key:string, event) {
+  	if (event.target.value)
+  		this.changed[key] = true;
+  	else
+  		this.changed[key] = false;
   }
 
 }
