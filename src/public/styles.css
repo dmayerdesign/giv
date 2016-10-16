@@ -231,6 +231,8 @@ ul.nav {
 }
 
 .nav-item {
+  font-family: "Hind", Helvetica, Roboto, sans-serif;
+  font-weight: 500;
   position: relative;
   box-sizing: content-box;
   display: inline-block;
@@ -298,18 +300,19 @@ button.nav-item:hover {
     top: 0.08em;
   background: #fff;
   color: #4fead1;
-  font-weight: normal;
+  font-weight: 500;
   text-shadow: none;
   font-size: 0.8em;
-  padding: 0.8em 1em;
+  padding: 0.8em 1.6em;
 }
 
 button.nav-item {
-  box-shadow: 0px 1px 2px (0,0,0,0.2) !important;
+  box-shadow: 0px 1px 2px rgba(0,0,0,0.1);
 }
 
 button.nav-item:hover {
   color: #49cab3;
+  box-shadow: none;
 }
 
 .nav-link > * {
@@ -325,7 +328,8 @@ button.nav-item:hover {
 }
 
 .nav-link > span {
-  padding-top: 0.11em;
+  position: relative;
+    top: 0.15em;
 }
 
 /* subnav */
