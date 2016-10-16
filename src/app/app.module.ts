@@ -23,6 +23,7 @@ import { CreateOrgComponent } from './create-org.component';
 import { CreatePostComponent } from './create-post.component';
 import { SearchBox } from './search-box.component';
 import { ContactComponent } from './contact.component';
+import { FormFieldComponent } from './form-field.component';
 
 import { UserService } from './services/user.service';
 import { SearchService } from './services/search.service';
@@ -84,6 +85,7 @@ const routing = RouterModule.forRoot([
       , CreateOrgComponent
       , CreatePostComponent
       , TruncatePipe
+      , FormFieldComponent
     ],
     providers: [
         Title

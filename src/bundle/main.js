@@ -37901,13 +37901,14 @@
 	var create_post_component_1 = __webpack_require__(89);
 	var search_box_component_1 = __webpack_require__(90);
 	var contact_component_1 = __webpack_require__(91);
+	var form_field_component_1 = __webpack_require__(92);
 	var user_service_1 = __webpack_require__(68);
 	var search_service_1 = __webpack_require__(76);
-	var ng2_click_outside_1 = __webpack_require__(92);
+	var ng2_click_outside_1 = __webpack_require__(93);
 	var categories_service_1 = __webpack_require__(79);
 	var org_service_1 = __webpack_require__(75);
 	var app_service_1 = __webpack_require__(70);
-	var truncate_pipe_1 = __webpack_require__(94);
+	var truncate_pipe_1 = __webpack_require__(95);
 	var core_2 = __webpack_require__(3);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -37962,7 +37963,8 @@
 	                ng2_uploader_1.UPLOAD_DIRECTIVES,
 	                create_org_component_1.CreateOrgComponent,
 	                create_post_component_1.CreatePostComponent,
-	                truncate_pipe_1.TruncatePipe
+	                truncate_pipe_1.TruncatePipe,
+	                form_field_component_1.FormFieldComponent
 	            ],
 	            providers: [
 	                platform_browser_1.Title,
@@ -53332,6 +53334,7 @@
 	        ];
 	        this.categories = this.categoryService.list();
 	        this.slugIsValid = true;
+	        this.changed = {};
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53357,7 +53360,7 @@
 	                        _this.isLoaded = true;
 	                        _this.restoreOtherLinks();
 	                        // for ng-upload
-	                        _this.uploadOptions = {
+	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
 	                            filterExtensions: true,
 	                            calculateSpeed: true,
@@ -53379,18 +53382,17 @@
 	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
 	        this.sub.unsubscribe();
 	    };
-	    ManageOrgPageComponent.prototype.handleUpload = function (data) {
-	        var _this = this;
-	        this.zone.run(function () {
-	            console.log(data);
-	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
-	            if (data.response && data.status !== 404) {
-	                _this.org = JSON.parse(data.response);
-	                _this.stillWorking = false;
-	                console.log(data.response);
-	            }
-	        });
+	    ManageOrgPageComponent.prototype.handleUpload = function (org) {
+	        // this.zone.run(() => {
+	        // 	console.log(data);
+	        // 	this.progress = data.progress.percent;
+	        // 	this.stillWorking = true;
+	        //   if (data.response && data.status !== 404) {
+	        this.org = org;
+	        this.stillWorking = false;
+	        console.log(org);
+	        //  }
+	        // });
 	    };
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
@@ -53403,7 +53405,7 @@
 	                _this.slugIsValid = true;
 	        });
 	    };
-	    ManageOrgPageComponent.prototype.editOrg = function (key, value) {
+	    ManageOrgPageComponent.prototype.save = function (key, value) {
 	        var _this = this;
 	        if (key === "categories") {
 	            value = this.org.categories;
@@ -53428,7 +53430,7 @@
 	                }
 	            });
 	        }
-	        this['loading_' + key] = true;
+	        this['saving_' + key] = true;
 	        this.orgService.editOrg({
 	            id: this.org._id,
 	            key: key,
@@ -53437,12 +53439,14 @@
 	            console.log(res);
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
-	                _this['loading_' + key] = false;
+	                _this['saving_' + key] = false;
 	                _this.restoreOtherLinks();
 	                return;
 	            }
 	            _this.org = res;
-	            _this['loading_' + key] = false;
+	            _this[key] = null;
+	            _this['saving_' + key] = false;
+	            _this.changed[key] = false;
 	            _this.ui.flash("Saved", "success");
 	            _this.restoreOtherLinks();
 	            console.log(res);
@@ -53501,6 +53505,12 @@
 	            this.org.otherLinks.push({ copy: null, href: null });
 	            addNullOtherLinks--;
 	        }
+	    };
+	    ManageOrgPageComponent.prototype.changeHandler = function (key, event) {
+	        if (event.target.value)
+	            this.changed[key] = true;
+	        else
+	            this.changed[key] = false;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -54283,7 +54293,112 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var click_outside_directive_1 = __webpack_require__(93);
+	var categories_service_1 = __webpack_require__(79);
+	var app_service_1 = __webpack_require__(70);
+	var FormFieldComponent = (function () {
+	    function FormFieldComponent(ui, utilities, categoryService, zone) {
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.categoryService = categoryService;
+	        this.zone = zone;
+	        this.onUpload = new core_1.EventEmitter();
+	        this.onChange = new core_1.EventEmitter();
+	        this.onSave = new core_1.EventEmitter();
+	        this.changed = false;
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        this.categories = this.categoryService.list();
+	    }
+	    FormFieldComponent.prototype.ngOnInit = function () {
+	    };
+	    FormFieldComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response && data.status !== 404) {
+	                _this.onUpload.emit(JSON.parse(data.response));
+	            }
+	        });
+	    };
+	    FormFieldComponent.prototype.save = function () {
+	        this.onSave.emit(this.value);
+	    };
+	    FormFieldComponent.prototype.changeHandler = function () {
+	        if (this.value && this.value.length)
+	            this.changed = true;
+	        else
+	            this.changed = false;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "title", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "name", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "placeholder", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "type", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "saving", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "upload", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "selectOptions", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onUpload", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onChange", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onSave", void 0);
+	    FormFieldComponent = __decorate([
+	        core_1.Component({
+	            selector: 'form-field',
+	            templateUrl: 'app/form-field.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [app_service_1.UIHelper, app_service_1.Utilities, categories_service_1.Categories, core_1.NgZone])
+	    ], FormFieldComponent);
+	    return FormFieldComponent;
+	}());
+	exports.FormFieldComponent = FormFieldComponent;
+
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var click_outside_directive_1 = __webpack_require__(94);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -54301,7 +54416,7 @@
 
 
 /***/ },
-/* 93 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54382,7 +54497,7 @@
 
 
 /***/ },
-/* 94 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

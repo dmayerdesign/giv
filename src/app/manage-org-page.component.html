@@ -1,29 +1,79 @@
 <div class="manage-org-page" *ngIf="isLoaded">
-	<a *ngIf="org?.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
-	<a *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
-	<h4>Manage {{org?.name}}</h4>
-	<img [src]="org.coverImage" width="200">
+	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
+	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
+	<h2>Manage <span>{{org?.name}}</span></h2>
 
-  <button (click)="deleteOrg()">Delete this org</button>
+  <div class="giv-form col-md-6">
+  	<div class="form-section">
 
-	<div class="form-block">
-		<input type="file"
-			class="form-control"
-  		ngFileSelect
-      [options]="uploadOptions"
+      <form-field
+        [title]="'Cover image'"
+        [name]="'coverImage'"
+        [placeholder]="'Paste a link to an image'"
+        [type]="'url'"
+        [saving]="saving_coverImage"
+        [upload]="coverImageUploadOptions"
+        (onUpload)="handleUpload($event)"
+        (onChange)="changeHandler('coverImage', $event)"
+        (onSave)="save('coverImage', $event)"></form-field>
+
+<!--       <label for="coverImage">Cover image</label>
+      <button
+          class="save"
+          (click)="save('coverImage')"
+          [disabled]="!changed?.coverImage"
+          [ngClass]="{'changed': changed?.coverImage}">
+        <i [hidden]="!saving_coverImage" class="fa fa-circle-o-notch fa-spin"></i>
+        <i [hidden]="saving_coverImage" class="fa fa-check"></i>
+        save<span *ngIf="!changed?.coverImage">d</span>
+      </button>
+      <input 
+          type="url"
+          name="coverImage"
+          placeholder="Paste a link to an image" 
+          (keyup)="changeHandler('coverImage', $event)">
+  		<input
+          *ngIf="coverImageUploadOptions?.url"
+          type="file"
+    			class="form-control"
+      		ngFileSelect
+          [options]="coverImageUploadOptions"
+          (onUpload)="handleUpload($event)">
+      <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span> -->
+    
+    </div>
+  </div>
+
+  <div class="preview-pane col-md-6 pull-right">
+    
+  </div>
+
+
+
+
+
+
+
+
+
+<!--   <div class="form-block">
+    <input type="file"
+      class="form-control"
+      ngFileSelect
+      [options]="coverImageUploadOptions"
       (onUpload)="handleUpload($event)">
 
     <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
     <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
     <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
-  	<span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
-  </div>
+    <span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
+  </div> -->
   <div class="form-block">
     <input [(ngModel)]="name"
           class="form-control"
           ngControl="name"
           name="name"
-          placeholder="Change the name of your page"><button (click)="editOrg('name')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Change the name of your page"><button (click)="save('name')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <textarea [(ngModel)]="description"
@@ -31,35 +81,29 @@
           ngControl="description"
           name="description"
           placeholder="Change the description of your page"></textarea>
-      <button (click)="editOrg('description')"><i [hidden]="!loading_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+      <button (click)="save('description')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <input [(ngModel)]="avatarLink"
           class="form-control"
           name="avatarLink"
-          placeholder="Change the avatar"><button (click)="editOrg('avatar', avatarLink)"><i [hidden]="!loading_avatar" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
-  	<input [(ngModel)]="coverImageLink"
-  				class="form-control"
-  				name="coverImageLink"
-  				placeholder="Change the cover image"><button (click)="editOrg('coverImage', coverImageLink)"><i [hidden]="!loading_coverImage" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Change the avatar"><button (click)="save('avatar', avatarLink)"><i [hidden]="!saving_avatar" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <input [(ngModel)]="videoLink"
           class="form-control"
           name="videoLink"
-          placeholder="Add a link to a youtube video"><button (click)="editOrg('videoLink')"><i [hidden]="!loading_videoLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+          placeholder="Add a link to a youtube video"><button (click)="save('videoLink')"><i [hidden]="!saving_videoLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
   	<input [(ngModel)]="donateLink"
   				class="form-control"
   				name="donateLink"
-  				placeholder="Change the main Donate link"><button (click)="editOrg('donateLink')"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  				placeholder="Change the main Donate link"><button (click)="save('donateLink')"><i [hidden]="!saving_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <select
-        (change)="editOrg('donateLinkCopy', $event.target.value)"
+        (change)="save('donateLinkCopy', $event.target.value)"
         [(ngModel)]="org.donateLinkCopy"
         name="donateLinkCopy"
         class="form-control">
@@ -80,7 +124,7 @@
             name="otherLink{{i}}Href"
             placeholder="Enter the URL where you want to lead people">
     </div>
-    <button (click)="editOrg('otherLinks')"><i [hidden]="!loading_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+    <button (click)="save('otherLinks')"><i [hidden]="!saving_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
   	<input [(ngModel)]="slug"
@@ -88,7 +132,7 @@
   				(keyup)="checkForUniqueSlug($event)"
   				ngControl="slug"
   				name="slug"
-  				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="editOrg('slug', slug)"><i [hidden]="!loading_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+  				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="save('slug', slug)"><i [hidden]="!saving_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
   <div class="form-block">
     <div *ngFor="let category of categories">
@@ -98,10 +142,12 @@
         (change)="changeSelectedCategories(category, $event.target.checked)">
       <label>{{category.name}}</label>
     </div>
-    <button (click)="editOrg('categories', org.categories)"><i [hidden]="!loading_categories" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
+    <button (click)="save('categories', org.categories)"><i [hidden]="!saving_categories" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
   </div>
 	<div class="form-block">
-  	<button *ngIf="!org.featured" (click)="editOrg('featured', true)">Set featured org</button>
-  	<button *ngIf="org.featured" (click)="editOrg('featured', false)">Unset featured org</button>
+  	<button *ngIf="!org.featured" (click)="save('featured', true)">Set featured org</button>
+  	<button *ngIf="org.featured" (click)="save('featured', false)">Unset featured org</button>
 	</div>
+
+  <button (click)="deleteOrg()">Delete this org</button>
 </div>
