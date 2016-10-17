@@ -118,17 +118,6 @@
 	margin-top: 0.8em !important;
 }
 
-.back-btn {
-	display: block;
-	font-size: 0.75em;
-	font-weight: bold;
-	padding: 1.5em 0;
-}
-
-.back-btn i {
-	padding-right: 0.2em;
-}
-
 .featured-image {
 	width: 100%;
 	height: 18em;

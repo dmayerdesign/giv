@@ -13,7 +13,9 @@
 			<p class="read-more" *ngIf="!isSingle && !org?.slug"><a [routerLink]="['/organization', 'i', org._id]">Read more</a></p>
 		</div>
 		<div class="org-details-ctas" [ngClass]="{'col-md-6': isSingle}">
-			<a class="donate-link" [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
+			<a class="donate-link" [href]="org.donateLink" target="_blank">
+				<button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
+			</a>
 			<div class="other-links" *ngIf="isSingle && org?.otherLinks?.length">
 				<h4>Other ways to help</h4>
 				<ul>

@@ -126,6 +126,18 @@ button i {
   padding-right: 0.6em;
 }
 
+.back-btn {
+  display: block;
+  max-width: 12em;
+  font-size: 0.75em;
+  font-weight: bold;
+  padding: 1.5em 0;
+}
+
+.back-btn i {
+  padding-right: 0.2em;
+}
+
 .icon-btn, .icon-btn:hover, .icon-btn:focus, .icon-btn:active {
   outline: 0 none;
   border: 0 none;
@@ -165,6 +177,10 @@ main {
   line-height: 1;
 }
 
+.centered, .center {
+  text-align: center;
+}
+
 @media only screen and (min-width: 1200px) {
 
 }
@@ -176,12 +192,17 @@ main {
   }
 }
 
-section, .section, .search-box {
+section, .section, .search-box, .grey-bg, .gray-bg {
   background-color: #F2F7F6;
   border: 2px solid #F0F5F4;
   border-radius: 2px;
   overflow: hidden;
   box-shadow: 0px 2px 2px rgba(0,0,0,0.1);
+}
+
+.grey-bg.no-shadow,
+.gray-bg.no-shadow {
+  box-shadow: 0 0 0 transparent;
 }
 
 .posts-by-org .search-box {
@@ -315,7 +336,7 @@ button.nav-item:hover {
   position: relative;
     top: 0.08em;
   background: #fff;
-  color: #4fead1;
+  color: #49cab3;
   font-weight: 500;
   text-shadow: none;
   font-size: 0.8em;
@@ -327,7 +348,6 @@ button.nav-item {
 }
 
 button.nav-item:hover {
-  color: #49cab3;
   box-shadow: none;
 }
 

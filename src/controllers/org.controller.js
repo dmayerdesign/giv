@@ -72,13 +72,13 @@ exports.routes = [
         .skip(+req.query.offset)
         .limit(+req.query.limit)
         .exec((err, docs) => {
-          if(err) return console.error(err);
+          if(err) return console.log(err);
           res.json(docs);
         })
       }
       else {
         Org.find(dbQuery, (err, docs) => {
-          if(err) return console.error(err);
+          if(err) return console.log(err);
           res.json(docs);
         })
         .sort("-stars")
@@ -118,13 +118,13 @@ exports.routes = [
         .skip(+req.query.offset)
         .limit(+req.query.limit)
         .exec((err, docs) => {
-          if(err) return console.error(err);
+          if(err) return console.log(err);
           res.json(docs);
         })
       }
       else {
         Org.find(dbQuery, (err, docs) => {
-          if(err) return console.error(err);
+          if(err) return console.log(err);
           res.json(docs);
         })
         .sort("-dateCreated")
@@ -146,7 +146,7 @@ exports.routes = [
 
       console.log("Query starred: ", dbQuery);
       Org.find(dbQuery, (err, docs) => {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.json(docs);
       });
     }
@@ -158,7 +158,7 @@ exports.routes = [
     process: function(req, res) {
       Org.count(function(err, count) {
         if(err) {
-          console.error(err);
+          console.log(err);
           return res.status(500).json({errmsg: err});
         }        
         res.status(200).json(count);
@@ -175,7 +175,7 @@ exports.routes = [
       obj.save(function(err, obj) {
         if(err) {
           res.json({errmsg: "Couldn't create your organization. It's possible that one already exists with the same name."});
-          return console.error(err);
+          return console.log(err);
         }
         console.log(obj);
         res.status(200).json(obj);
@@ -189,7 +189,7 @@ exports.routes = [
     uri: "/org/:id",
     process: function(req, res) {
       Org.findOne({_id: req.params.id, verified: true}, function (err, obj) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.json(obj);
       });
     }
@@ -201,7 +201,7 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.sendStatus(200);
       });
     }
@@ -213,7 +213,7 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.status(200).json({success: true});
       });
     }
@@ -224,7 +224,7 @@ exports.routes = [
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOne({slug: req.params.slug, verified: true}, function (err, obj) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.json(obj);
       });
     }
@@ -236,7 +236,7 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.sendStatus(200);
       });
     }
@@ -247,7 +247,7 @@ exports.routes = [
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOneAndRemove({slug: req.params.slug}, function(err) {
-        if(err) return console.error(err);
+        if(err) return console.log(err);
         res.sendStatus(200);
       });
     }
@@ -264,7 +264,7 @@ exports.routes = [
       //updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {
-          console.error(err);
+          console.log(err);
           res.send(400).json(err);
         }
         else {
@@ -285,7 +285,7 @@ exports.routes = [
       //updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {
-          console.error(err);
+          console.log(err);
           res.send(400).json(err);
         }
         else {

@@ -1,3 +1,7 @@
+.manage-org-page {
+	margin-top: -0.6em;
+}
+
 .header-preview {
 	width: 100%;
 	height: 14em;
@@ -6,4 +10,70 @@
 label.checked {
 	background: #000;
 	color: #fff;
+}
+
+h2 {
+	margin-bottom: 0.5em;
+}
+
+h2 span {
+	font-weight: 500;
+}
+
+/* FORM */
+
+.giv-form {
+	padding-right: 30px;
+}
+
+.form-section {
+	margin-bottom: 2em;
+}
+
+
+/* PREVIEW PANE */
+
+/* Visuals */
+.preview-section.visuals {
+	margin-bottom: 5.3em;
+}
+
+.org-avatar {
+	font-size: 1.4em;
+	position: absolute;
+		top: auto;
+		bottom: 1em;
+		left: 1em;
+		z-index: 101;
+}
+
+/* Basics */
+.preview-section.basics {
+	margin-bottom: 13em;
+}
+
+.slug-preview a {
+	font-family: 'Hind', 'Roboto', Helvetica, sans-serif;
+	font-weight: 500;
+}
+
+.slug-preview a span {
+	opacity: 0.5;
+	font-weight: normal;
+}
+
+/* Calls to action */
+.preview-section.calls-to-action {
+
+}
+
+.preview-section.calls-to-action p {
+	float: left;
+	width: 100%;
+	margin-top: 0.6em;
+}
+
+.other-links {
+	float: left;
+	margin-top: 1.6em;
 }

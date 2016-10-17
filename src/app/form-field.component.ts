@@ -4,7 +4,8 @@ import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
 	selector: 'form-field',
-	templateUrl: 'app/form-field.component.html'
+	templateUrl: 'app/form-field.component.html',
+	styleUrls: ['app/form-field.component.css']
 })
 
 export class FormFieldComponent implements OnInit {
@@ -52,6 +53,7 @@ export class FormFieldComponent implements OnInit {
 	    	this.onUpload.emit(JSON.parse(data.response));
 	    	this.saving = false;
 	    	this.uploading = false;
+	    	console.log(data.response);
 	    }
     });
   }
@@ -59,6 +61,9 @@ export class FormFieldComponent implements OnInit {
   save(value?):void {
   	this.onSave.emit(value || this.value);
   	this.value = null;
+  	this.zone.run(() => {
+  		if (!this.saving) this.changed = false;
+  	});
   }
 
   changeHandler() {

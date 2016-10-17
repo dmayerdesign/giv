@@ -1,0 +1,100 @@
+.form-field {
+	margin-bottom: 1em;
+}
+
+label.title {
+	float: left;
+	font-family: 'Hind', 'Roboto', Helvetica, sans-serif;
+	margin-bottom: 0.3rem;
+}
+
+input, textarea, select, button {
+	display: block;
+	float: left;
+	clear: both;
+}
+
+input, textarea {
+	width: 100%;
+}
+
+input, textarea, select {
+	font-size: 0.85em;
+	padding: 0.5em 1em;
+	border: 2px solid #DFE8E6;
+}
+
+.save {
+	margin-left: 1em;
+	font-size: 0.6em;
+	clear: none;
+	font-weight: bold
+}
+
+.save[disabled] {
+	color: #999194;
+	background: transparent;
+	padding: 0.45em;
+}
+
+.save i {
+	padding-right: 0.2em;
+}
+
+.save span:not(span span) {
+	font-size: 1.1em;
+}
+
+select,
+input[type='url'] {
+	width: 73%;
+}
+
+.upload-container {
+	float: right;
+	clear: none;
+	width: 26%;
+}
+
+.upload-container span {
+	position: relative;
+		top: 0.7em;
+	display: block;
+	box-sizing: border-box;
+	padding-right: 0.9em;
+	width: 25%;
+	text-align: right;
+	letter-spacing: 1px;
+	float: left;
+	font-family: 'Hind', 'Roboto', Helvetica, sans-serif;
+	font-size: 0.7em;
+	font-weight: 500;
+	opacity: 0.7;
+}
+
+label.upload {
+	float: right;
+	cursor: pointer;
+	width: 75%;
+	height: 1.8em;
+	background: #6895A5 url('app/images/upload.png') no-repeat 50% 50%;
+	background-size: 3.6em auto;
+	border-radius: 2px;
+	opacity: 0.8;
+}
+
+label.upload:hover {
+	opacity: 1;
+}
+
+.upload input {
+	visibility: hidden;
+}
+
+.upload + .info {
+	float: right;
+	clear: both;
+	width: 10em;
+	font-size: 0.7em;
+	line-height: 1.1;
+}

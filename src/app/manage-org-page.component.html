@@ -1,11 +1,17 @@
 <div class="manage-org-page" *ngIf="org && isLoaded">
-	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
-	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
+	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]">
+    <i class="fa fa-long-arrow-left"></i>
+    Back to page
+  </a>
+	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">
+    <i class="fa fa-long-arrow-left"></i>
+    Back to page
+  </a>
 	<h2>Manage <span>{{org?.name}}</span></h2>
 
   <div class="row">
     <div class="giv-form col-md-6" *ngIf="org">
-    	<div class="form-section visuals">
+    	<div class="form-section visuals clearfix">
         <form-field
           [title]="'Cover image'"
           [name]="'coverImage'"
@@ -34,7 +40,7 @@
           (onUpload)="handleUpload($event)"
           (onSave)="save('avatar', $event)"></form-field>
       </div>
-      <div class="form-section basics">
+      <div class="form-section basics clearfix">
         <form-field
           [title]="'Name'"
           [name]="'name'"
@@ -59,7 +65,7 @@
           [saving]="saving_description"
           (onSave)="save('description', $event)"></form-field>
       </div>
-      <div class="form-section calls-to-action">
+      <div class="form-section calls-to-action clearfix">
         <form-field
           [title]="'Call to action text'"
           [name]="'donateLinkCopy'"
@@ -78,7 +84,7 @@
           (onSave)="save('donateLink', $event)"></form-field>
         
         <div class="form-field clearfix">
-          <label>Other ways to help</label>
+          <label class="title">Other ways to help</label>
           <button
             class="save"
             (click)="save('otherLinks')"
@@ -90,6 +96,10 @@
             save<span *ngIf="!changed_otherLinks">d</span>
           </button>
           <div class="other-link" *ngFor="let otherLink of org?.otherLinks; let i = index">
+            <button
+              class="remove-link"
+              *ngIf="org?.otherLinks.length < 3 && org?.otherLinks.length"
+              (click)="removeOtherLink(otherLink)">- remove</button>
             <input
               [attr.name]="'otherLink' + i + 'Copy'"
               [attr.placeholder]="'Description'"
@@ -108,9 +118,9 @@
             (click)="addAnotherLink()">+ Add another</button>
         </div>
       </div>
-      <div class="form-section categories">
+      <div class="form-section categories clearfix">
         <div class="form-field categories clearfix">
-          <label>Categories</label>
+          <label class="title">Categories</label>
           <button
             class="save"
             (click)="save('categories')"
@@ -137,7 +147,7 @@
           </div>
         </div>
       </div>
-      <div class="form-section admin">
+      <div class="form-section admin clearfix">
         <div class="form-field clearfix" *ngIf="userIsAdmin()">
           <button *ngIf="!org.featured" (click)="save('featured', true)">Set featured org</button>
           <button *ngIf="org.featured" (click)="save('featured', false)">Unset featured org</button>
@@ -152,18 +162,33 @@
         <div class="header-preview"
             [ngClass]="{'has-cover-image': org.coverImage}"
             [ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
-          <div class="header-inner">
-            <div *ngIf="!viewingOrg" class="inside-org header-left">
-              <div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-            </div>
-          </div>
+          
+          <div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
         </div>
       </div>
 
       <div class="preview-section basics">
         <h4 class="name-preview">{{org.name}}</h4>
-        <p class="slug-preview"><span>giv.community/</span>{{org.slug}}</p>
+        <p class="slug-preview" *ngIf="org.slug">
+          <a href="http://giv.community/organization/{{org.slug}}" target="_blank"><span>giv.community/organization/</span>{{org.slug}}</a>
+        </p>
         <p class="description-preview" [innerHTML]="org.description"></p>
+      </div>
+
+      <div class="preview-section calls-to-action">
+        <a class="donate-link donate-link-preview" [href]="org.donateLink" target="_blank">
+          <button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
+        </a>
+        <p class="centered">Try it out!</p>
+
+        <div class="other-links" *ngIf="org?.otherLinks?.length">
+          <h4>Other ways to help</h4>
+          <ul>
+            <li *ngFor="let otherLink of org.otherLinks">
+              <a target="_blank" [href]="otherLink.href">{{otherLink.copy}}</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

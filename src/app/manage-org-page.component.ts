@@ -11,7 +11,7 @@ import { UIHelper, Utilities } from './services/app.service';
 @Component({
 	selector: 'manage-org-page',
 	templateUrl: 'app/manage-org-page.component.html',
-	styleUrls: ['app/manage-org-page.component.css']
+	styleUrls: ['app/org.styles.css', 'app/org-details.component.css', 'app/form-field.component.css', 'app/manage-org-page.component.css']
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
@@ -253,6 +253,11 @@ export class ManageOrgPageComponent implements OnInit {
   	let showing:number = this.org.otherLinks && this.org.otherLinks.length;
 		if (showing === 3) return;
 		this.org.otherLinks.push({copy: null, href: null});
+  }
+
+  removeOtherLink(link):void {
+  	this.org.otherLinks.splice(this.org.otherLinks.indexOf(link), 1);
+  	this['changed_otherLinks'] = true;
   }
 
   changeHandler(key:string, event) {
