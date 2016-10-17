@@ -60,10 +60,8 @@ export class RecommendedOrgsComponent implements OnInit {
 	ngDoCheck() {
 		if (this.orgWas !== this.org) {
 			this.orgWas = this.org;
-			if ((!this.user || typeof this.user === "undefined")) {
-				this.loadRelated();
-			}
-			else this.loadRecommendations();
+			if (this.user) this.loadRecommendations();
+			else this.loadRelated();
 		}
 	}
 
@@ -162,6 +160,9 @@ export class RecommendedOrgsComponent implements OnInit {
 	loadRecommendations() {
 		let interests = [];
 		let query = {};
+		
+		if (!this.user || typeof this.user === "undefined") return;
+
 		for (let interest in this.user.interests) {
       interests.push([interest, this.user.interests[interest]]);
 		}
