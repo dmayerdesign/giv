@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
 	  //this.checkLoginStatus();
-    this.ui.setTitle("GIV :: Login");
+    this.ui.setTitle("Login");
     this.getQueryParams((data) => console.log(data));
   }
 

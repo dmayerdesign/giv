@@ -22,7 +22,10 @@
 		<header class="org-header">
 			<div class="org-header-inner">
 				<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-				<h1 class="org-name">{{org.name}}</h1>
+				<h1 class="org-name">
+					{{org.name}}
+					<span *ngIf="org.official" class="official-badge"></span>
+				</h1>
 				<p class="info stars">
 					<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
 					<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>

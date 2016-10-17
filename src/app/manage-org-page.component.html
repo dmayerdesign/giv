@@ -1,6 +1,6 @@
 <div class="manage-org-page" *ngIf="isLoaded">
-	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]">Back to page</a>
-	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]">Back to page</a>
+	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
+	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
 	<h2>Manage <span>{{org?.name}}</span></h2>
 
   <div class="giv-form col-md-6" *ngIf="org">
@@ -14,7 +14,6 @@
         [saving]="saving_coverImage"
         [upload]="coverImageUploadOptions"
         (onUpload)="handleUpload($event)"
-        (onChange)="changeHandler('coverImage', $event)"
         (onSave)="save('coverImage', $event)"></form-field>
 
       <form-field
@@ -23,7 +22,6 @@
         [placeholder]="org.videoLink || 'Paste a regular link to a YouTube video'"
         [type]="'url'"
         [saving]="saving_videoLink"
-        (onChange)="changeHandler('videoLink', $event)"
         (onSave)="save('videoLink', $event)"></form-field>
 
       <form-field
@@ -34,7 +32,6 @@
         [saving]="saving_avatar"
         [upload]="avatarUploadOptions"
         (onUpload)="handleUpload($event)"
-        (onChange)="changeHandler('avatar', $event)"
         (onSave)="save('avatar', $event)"></form-field>
 
       <form-field
@@ -43,7 +40,6 @@
         [placeholder]="org.name"
         [type]="'text'"
         [saving]="saving_name"
-        (onChange)="changeHandler('name', $event)"
         (onSave)="save('name', $event)"></form-field>
 
       <form-field
@@ -52,7 +48,6 @@
         [placeholder]="org.slug || 'e.g. my-awesome-org'"
         [type]="'text'"
         [saving]="saving_slug"
-        (onChange)="changeHandler('slug', $event)"
         (onSave)="save('slug', $event)"></form-field>
 
       <form-field
@@ -61,7 +56,6 @@
         [placeholder]="org.description || 'Describe your organization in a few sentences'"
         [type]="'textarea'"
         [saving]="saving_description"
-        (onChange)="changeHandler('description', $event)"
         (onSave)="save('description', $event)"></form-field>
 
       <form-field
@@ -72,6 +66,40 @@
         [selectOptions]="callsToAction"
         [initial]="org.donateLinkCopy"
         (onSave)="save('donateLinkCopy', $event)"></form-field>
+
+      
+      <div class="form-field clearfix">
+        <label *ngIf="title">Other ways to help</label>
+        <button
+          class="save"
+          (click)="save('otherLinks')"
+          [disabled]="!changed_otherLinks"
+          [ngClass]="{'changed': changed_otherLinks}">
+
+          <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
+          <i [hidden]="saving" class="fa fa-check"></i>
+          save<span *ngIf="!changed_otherLinks">d</span>
+        </button>
+        <div class="other-link" *ngFor="let otherLink of org?.otherLinks; let i = index">
+          <input
+            [attr.name]="'otherLink' + i + 'Copy'"
+            [attr.placeholder]="'Description'"
+            (keyup)="changeHandler('otherLinks', $event)"
+            [(ngModel)]="org.otherLinks[i].copy">
+          <input
+            [attr.name]="'otherLink' + i + 'Href'"
+            [attr.type]="'url'"
+            [attr.placeholder]="'Link to a resource or contact'"
+            (keyup)="changeHandler('otherLinks', $event)"
+            [(ngModel)]="org.otherLinks[i].href">
+        </div>
+        <button
+          class="add-link"
+          *ngIf="org?.otherLinks.length < 3"
+          (click)="addAnotherLink()">+ Add another</button>
+      </div>
+
+
 
 <!--       <label for="coverImage">Cover image</label>
       <button

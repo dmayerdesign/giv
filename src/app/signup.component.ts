@@ -29,7 +29,7 @@ export class SignupComponent implements OnInit {
 	}
 
   ngOnInit() {
-    this.ui.setTitle("GIV :: Sign up");
+    this.ui.setTitle("Sign up");
   }
 
   signup() {

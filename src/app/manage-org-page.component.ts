@@ -31,6 +31,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private name:string;
 	private description:string;
 
+	/** Fields requiring lists **/
 	private callsToAction:Array<string> = [
 		"Donate",
 		"Support",
@@ -39,16 +40,21 @@ export class ManageOrgPageComponent implements OnInit {
 	];
 	private categories = this.categoryService.list();
 
-	/** Loading **/
+	/** Saving (most are unused in template but must exist or else save() will break) **/
 	private saving_coverImage:boolean;
 	private saving_avatar:boolean;
 	private saving_donateLink:boolean;
 	private saving_slug:boolean;
 	private saving_categories:boolean;
+	private saving_otherLinks:boolean;
 
+	/** Changed **/
+	private changed_otherLinks:boolean;
+
+	/** Slug validation **/
 	private slugIsValid:boolean = true;
-	private changed = {};
 
+	/** Upload options **/
   coverImageUploadOptions:Object;
   avatarUploadOptions:Object;
 
@@ -64,7 +70,7 @@ export class ManageOrgPageComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Manage");
+		this.ui.setTitle("Manage");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			if (this.route.params) {
@@ -85,7 +91,6 @@ export class ManageOrgPageComponent implements OnInit {
 							}
 							this.org = data;
 							this.isLoaded = true;
-							this.restoreOtherLinks();
 							
 							// for ng-upload
 							this.coverImageUploadOptions = {
@@ -173,15 +178,13 @@ export class ManageOrgPageComponent implements OnInit {
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
   			this['saving_' + key] = false;
-  			this.restoreOtherLinks();
   			return;
   		}
   		this.org = res;
   		this[key] = null;
   		this['saving_' + key] = false;
-  		this.changed[key] = false;
+  		this['changed_' + key] = false;
   		this.ui.flash("Saved", "success");
-  		this.restoreOtherLinks();
   		console.log(res);
   	});
   }
@@ -231,21 +234,17 @@ export class ManageOrgPageComponent implements OnInit {
 	  }
   }
 
-  restoreOtherLinks() {
-  	// for editing
-		let addNullOtherLinks:number = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
-		if (addNullOtherLinks === 3) this.org.otherLinks = [];
-		while (addNullOtherLinks > 0) {
-			this.org.otherLinks.push({copy: null, href: null});
-			addNullOtherLinks--;
-		}
+  addAnotherLink():void {
+  	let showing:number = this.org.otherLinks && this.org.otherLinks.length;
+		if (showing === 3) return;
+		this.org.otherLinks.push({copy: null, href: null});
   }
 
   changeHandler(key:string, event) {
   	if (event.target.value)
-  		this.changed[key] = true;
+  		this['changed_' + key] = true;
   	else
-  		this.changed[key] = false;
+  		this['changed_' + key] = false;
   }
 
 }

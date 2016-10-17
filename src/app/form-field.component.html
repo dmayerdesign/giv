@@ -1,5 +1,5 @@
-<div class="form-field clearfix">
-  <label [attr.for]="name">{{title}}</label>
+<div class="form-field clearfix" [ngClass]="name">
+  <label *ngIf="title" [attr.for]="name">{{title}}</label>
 
   <button
     class="save"

@@ -31,6 +31,8 @@
   margin-bottom: 0.7em;
 }
 
+
+/** ORG **/
 .orgs-list .org {
   margin-bottom: 0.55em;
   cursor: default;
@@ -192,7 +194,7 @@
 
 .featured-org .description {
   display: inline-block;
-  height: 4.4em;
+  height: 6.1em;
   overflow: hidden;
 }
 

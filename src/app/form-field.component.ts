@@ -18,7 +18,6 @@ export class FormFieldComponent implements OnInit {
 	@Input() selectOptions;
 
 	@Output() onUpload = new EventEmitter();
-	@Output() onChange = new EventEmitter();
 	@Output() onSave = new EventEmitter();
 
 	private value:any;

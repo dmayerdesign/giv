@@ -37888,6 +37888,7 @@
 	var login_component_1 = __webpack_require__(71);
 	var signup_component_1 = __webpack_require__(72);
 	var about_component_1 = __webpack_require__(73);
+	var org_component_1 = __webpack_require__(356);
 	var starred_orgs_component_1 = __webpack_require__(74);
 	var recommended_orgs_component_1 = __webpack_require__(77);
 	var browse_orgs_component_1 = __webpack_require__(78);
@@ -37948,6 +37949,7 @@
 	                app_component_1.AppComponent,
 	                login_component_1.LoginComponent,
 	                signup_component_1.SignupComponent,
+	                org_component_1.OrgComponent,
 	                browse_orgs_component_1.BrowseOrgsComponent,
 	                search_box_component_1.SearchBox,
 	                org_details_component_1.OrgDetailsComponent,
@@ -51498,7 +51500,7 @@
 	        this.toastyConfig = toastyConfig;
 	    }
 	    UIHelper.prototype.setTitle = function (newTitle) {
-	        this.title.setTitle(newTitle);
+	        this.title.setTitle("GIV ♦ " + newTitle);
 	    };
 	    UIHelper.prototype.takeCount = function (children) {
 	        var counter = function () {
@@ -51607,7 +51609,7 @@
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
-	        this.ui.setTitle("GIV :: Login");
+	        this.ui.setTitle("Login");
 	        this.getQueryParams(function (data) { return console.log(data); });
 	    };
 	    LoginComponent.prototype.ngOnDestroy = function () {
@@ -51696,7 +51698,7 @@
 	        this.ui.flash("Sorry—user accounts aren't available in the demo");
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
-	        this.ui.setTitle("GIV :: Sign up");
+	        this.ui.setTitle("Sign up");
 	    };
 	    SignupComponent.prototype.signup = function () {
 	        var _this = this;
@@ -51811,7 +51813,7 @@
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Your starred");
+	        this.ui.setTitle("Your starred");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -52405,7 +52407,6 @@
 	        this.initialLimit = 14;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
-	        this.viewingOrg = false;
 	        this.categoryFilter = { id: null };
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
@@ -52418,7 +52419,7 @@
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Browse organizations");
+	        this.ui.setTitle("Browse organizations");
 	        this.categoriesList = this.categories.list();
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
@@ -52474,12 +52475,6 @@
 	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
 	        this.paramsSub.unsubscribe();
 	    };
-	    // ngDoCheck() {
-	    // 	this.takeCount(this.$orgs);
-	    // }
-	    // takeCount(children:any) {
-	    // 	this.orgsShowing = this.ui.takeCount(children);
-	    // }
 	    BrowseOrgsComponent.prototype.toggleOrder = function (attr) {
 	        if (this.orgsSorting.order.indexOf(attr) === -1) {
 	            this.orgsSorting.order = '-' + attr;
@@ -52571,25 +52566,13 @@
 	            this.searchBoxIsFocused = false;
 	        }
 	    };
-	    BrowseOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
+	    BrowseOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
-	        };
-	        this.selectedOrg = this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
+	        });
 	    };
-	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	            this.singlePostsAreLoaded = false;
-	        }
+	    BrowseOrgsComponent.prototype.deselectOrg = function (id) {
+	        this.selectedOrg = null;
 	    };
 	    BrowseOrgsComponent.prototype.orgIsStarred = function (org) {
 	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
@@ -52597,55 +52580,39 @@
 	        else
 	            return true;
 	    };
-	    BrowseOrgsComponent.prototype.starOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 1;
-	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (featuredOrgToStar)
-	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars + 1 : 1;
-	            console.log(orgToStar);
+	    BrowseOrgsComponent.prototype.starOrg = function (id) {
+	        var featuredOrgToStar = this.featuredOrgs.find(function (thisOrg) {
+	            return thisOrg._id === id;
 	        });
+	        if (featuredOrgToStar)
+	            featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars + 1 : 1;
 	    };
-	    BrowseOrgsComponent.prototype.unstarOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
-	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (featuredOrgToStar)
-	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars - 1 : 0;
-	            console.log(data.org);
-	            console.log(data.user);
+	    BrowseOrgsComponent.prototype.unstarOrg = function (id) {
+	        var featuredOrgToUnStar = this.featuredOrgs.find(function (thisOrg) {
+	            return thisOrg._id === id;
 	        });
+	        if (featuredOrgToUnStar)
+	            featuredOrgToUnStar.stars = featuredOrgToUnStar.stars ? featuredOrgToUnStar.stars - 1 : 0;
 	    };
-	    BrowseOrgsComponent.prototype.revealOrgDetails = function (event) {
-	        if (event == "init") {
-	            this.singleDetailsAreLoaded = true;
-	        }
-	    };
-	    BrowseOrgsComponent.prototype.revealOrgPosts = function (event) {
-	        if (event == "init") {
-	            this.singlePostsAreLoaded = true;
-	        }
-	    };
+	    // starFeaturedOrg(org):void {
+	    // 	let featuredOrg = this.featuredOrgs.find(featured => {
+	    // 		return featured._id === org._id;
+	    // 	});
+	    // 	if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	    // 	this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+	    // 		data => {
+	    // 			if (data.errmsg) return console.error(data.errmsg);
+	    // 			this.user = data.user;
+	    // 			this.orgs.find(org => {
+	    // 				return org._id === data.org._id;
+	    // 			}).stars++;
+	    // 			featuredOrg.stars = featuredOrg.stars ? featuredOrg.stars+1 : 1;
+	    // 		},
+	    // 		err => {
+	    // 			console.error(err);
+	    // 		}
+	    // 	);
+	    // }
 	    BrowseOrgsComponent.prototype.cycleFeatured = function (inc) {
 	        this.featuredOrgs[this.featuredShowing]['showing'] = false;
 	        this.featuredShowing += inc;
@@ -53188,7 +53155,7 @@
 	                }
 	                _this.org = data;
 	                _this.isLoaded = true;
-	                _this.ui.setTitle("GIV :: " + _this.org.name);
+	                _this.ui.setTitle(_this.org.name);
 	                if (_this.org.videoLink) {
 	                    _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "embed/");
 	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
@@ -53326,6 +53293,7 @@
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        /** Fields requiring lists **/
 	        this.callsToAction = [
 	            "Donate",
 	            "Support",
@@ -53333,12 +53301,12 @@
 	            "Volunteer"
 	        ];
 	        this.categories = this.categoryService.list();
+	        /** Slug validation **/
 	        this.slugIsValid = true;
-	        this.changed = {};
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Manage");
+	        this.ui.setTitle("Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53358,7 +53326,6 @@
 	                        }
 	                        _this.org = data;
 	                        _this.isLoaded = true;
-	                        _this.restoreOtherLinks();
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
@@ -53439,15 +53406,13 @@
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
 	                _this['saving_' + key] = false;
-	                _this.restoreOtherLinks();
 	                return;
 	            }
 	            _this.org = res;
 	            _this[key] = null;
 	            _this['saving_' + key] = false;
-	            _this.changed[key] = false;
+	            _this['changed_' + key] = false;
 	            _this.ui.flash("Saved", "success");
-	            _this.restoreOtherLinks();
 	            console.log(res);
 	        });
 	    };
@@ -53495,21 +53460,17 @@
 	            });
 	        }
 	    };
-	    ManageOrgPageComponent.prototype.restoreOtherLinks = function () {
-	        // for editing
-	        var addNullOtherLinks = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
-	        if (addNullOtherLinks === 3)
-	            this.org.otherLinks = [];
-	        while (addNullOtherLinks > 0) {
-	            this.org.otherLinks.push({ copy: null, href: null });
-	            addNullOtherLinks--;
-	        }
+	    ManageOrgPageComponent.prototype.addAnotherLink = function () {
+	        var showing = this.org.otherLinks && this.org.otherLinks.length;
+	        if (showing === 3)
+	            return;
+	        this.org.otherLinks.push({ copy: null, href: null });
 	    };
 	    ManageOrgPageComponent.prototype.changeHandler = function (key, event) {
 	        if (event.target.value)
-	            this.changed[key] = true;
+	            this['changed_' + key] = true;
 	        else
-	            this.changed[key] = false;
+	            this['changed_' + key] = false;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -53561,7 +53522,7 @@
 	    }
 	    ClaimOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Claim an organization");
+	        this.ui.setTitle("Claim an organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                console.error(err);
@@ -53700,7 +53661,7 @@
 	    }
 	    VerifyOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Verify organizations");
+	        this.ui.setTitle("Verify organizations");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53893,7 +53854,7 @@
 	    }
 	    CreateOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Add your organization");
+	        this.ui.setTitle("Add your organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err) {
 	                console.error(err);
@@ -54301,7 +54262,6 @@
 	        this.categoryService = categoryService;
 	        this.zone = zone;
 	        this.onUpload = new core_1.EventEmitter();
-	        this.onChange = new core_1.EventEmitter();
 	        this.onSave = new core_1.EventEmitter();
 	        this.changed = false;
 	        this.uploading = false;
@@ -54379,10 +54339,6 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "onUpload", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "onChange", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -54548,6 +54504,394 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
+
+
+/***/ },
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var router_1 = __webpack_require__(25);
+	var app_service_1 = __webpack_require__(70);
+	var OrgComponent = (function () {
+	    function OrgComponent(http, route, ui) {
+	        this.http = http;
+	        this.route = route;
+	        this.ui = ui;
+	        this.onSelect = new core_1.EventEmitter();
+	        this.onDeselect = new core_1.EventEmitter();
+	        this.onStar = new core_1.EventEmitter();
+	        this.onUnstar = new core_1.EventEmitter();
+	        this.viewingOrg = false;
+	        this.singleDetailsAreLoaded = false;
+	        this.singlePostsAreLoaded = false;
+	    }
+	    OrgComponent.prototype.ngOnInit = function () {
+	    };
+	    OrgComponent.prototype.viewOrg = function () {
+	        this.onSelect.emit(this.org._id);
+	        this.viewingOrg = true;
+	    };
+	    OrgComponent.prototype.deselectOrg = function (e) {
+	        if (e.target.className.indexOf("inside-org") > -1)
+	            return;
+	        if (this.viewingOrg) {
+	            this.onDeselect.emit(this.org._id);
+	            this.viewingOrg = false;
+	            this.singleDetailsAreLoaded = false;
+	            this.singlePostsAreLoaded = false;
+	        }
+	    };
+	    OrgComponent.prototype.orgIsStarred = function () {
+	        if (!this.user || this.user.starred.indexOf(this.org._id) === -1)
+	            return false;
+	        else
+	            return true;
+	    };
+	    OrgComponent.prototype.starOrg = function (org) {
+	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.org.stars = _this.org.stars ? _this.org.stars + 1 : 1;
+	            _this.onStar.emit(org._id);
+	        });
+	    };
+	    OrgComponent.prototype.unstarOrg = function (org) {
+	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.org.stars = _this.org.stars ? _this.org.stars - 1 : 0;
+	            _this.onUnstar.emit(org._id);
+	        });
+	    };
+	    OrgComponent.prototype.revealOrgDetails = function (event) {
+	        if (event == "init") {
+	            this.singleDetailsAreLoaded = true;
+	        }
+	    };
+	    OrgComponent.prototype.revealOrgPosts = function (event) {
+	        if (event == "init") {
+	            this.singlePostsAreLoaded = true;
+	        }
+	    };
+	    OrgComponent.prototype.userHasPermission = function (org) {
+	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	            return true;
+	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
+	            return true;
+	        else
+	            return false;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onSelect", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onDeselect", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onStar", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onUnstar", void 0);
+	    OrgComponent = __decorate([
+	        core_1.Component({
+	            selector: 'org',
+	            templateUrl: 'app/org.component.html',
+	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.ActivatedRoute, app_service_1.UIHelper])
+	    ], OrgComponent);
+	    return OrgComponent;
+	}());
+	exports.OrgComponent = OrgComponent;
 
 
 /***/ }

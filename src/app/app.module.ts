@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
 import { AboutComponent } from './about.component';
+import { OrgComponent } from './org.component';
 import { StarredOrgsComponent } from './starred-orgs.component';
 import { RecommendedOrgsComponent } from './recommended-orgs.component';
 import { BrowseOrgsComponent } from './browse-orgs.component';
@@ -69,6 +70,7 @@ const routing = RouterModule.forRoot([
         AppComponent
       , LoginComponent
       , SignupComponent
+      , OrgComponent
       , BrowseOrgsComponent
       , SearchBox
       , OrgDetailsComponent
