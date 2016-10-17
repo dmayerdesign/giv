@@ -52268,7 +52268,10 @@
 	    RecommendedOrgsComponent.prototype.ngDoCheck = function () {
 	        if (this.orgWas !== this.org) {
 	            this.orgWas = this.org;
-	            this.loadRecommendations();
+	            if (this.user)
+	                this.loadRecommendations();
+	            else
+	                this.loadRelated();
 	        }
 	    };
 	    RecommendedOrgsComponent.prototype.ngAfterViewInit = function () {
@@ -52361,6 +52364,8 @@
 	        var _this = this;
 	        var interests = [];
 	        var query = {};
+	        if (!this.user || typeof this.user === "undefined")
+	            return;
 	        for (var interest in this.user.interests) {
 	            interests.push([interest, this.user.interests[interest]]);
 	        }
