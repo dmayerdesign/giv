@@ -60,7 +60,10 @@ export class RecommendedOrgsComponent implements OnInit {
 	ngDoCheck() {
 		if (this.orgWas !== this.org) {
 			this.orgWas = this.org;
-			this.loadRecommendations();
+			if ((!this.user || typeof this.user === "undefined")) {
+				this.loadRelated();
+			}
+			else this.loadRecommendations();
 		}
 	}
 
