@@ -138,6 +138,7 @@ app.post('/account/password', passportConfig.isAuthenticated, userController.pos
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.post('/interests', passportConfig.isAuthenticated, userController.showInterest);
+app.get('/adminToken', passportConfig.isAuthenticated, userController.adminToken);
 
 /**
  * Error Handler.

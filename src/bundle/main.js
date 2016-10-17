@@ -37888,27 +37888,28 @@
 	var login_component_1 = __webpack_require__(71);
 	var signup_component_1 = __webpack_require__(72);
 	var about_component_1 = __webpack_require__(73);
-	var starred_orgs_component_1 = __webpack_require__(74);
-	var recommended_orgs_component_1 = __webpack_require__(77);
-	var browse_orgs_component_1 = __webpack_require__(78);
-	var org_details_component_1 = __webpack_require__(80);
-	var org_posts_component_1 = __webpack_require__(81);
-	var single_org_component_1 = __webpack_require__(83);
-	var manage_org_page_component_1 = __webpack_require__(84);
-	var claim_org_component_1 = __webpack_require__(85);
-	var verify_orgs_component_1 = __webpack_require__(87);
-	var create_org_component_1 = __webpack_require__(88);
-	var create_post_component_1 = __webpack_require__(89);
-	var search_box_component_1 = __webpack_require__(90);
-	var contact_component_1 = __webpack_require__(91);
-	var form_field_component_1 = __webpack_require__(92);
+	var org_component_1 = __webpack_require__(74);
+	var starred_orgs_component_1 = __webpack_require__(75);
+	var recommended_orgs_component_1 = __webpack_require__(78);
+	var browse_orgs_component_1 = __webpack_require__(79);
+	var org_details_component_1 = __webpack_require__(81);
+	var org_posts_component_1 = __webpack_require__(82);
+	var single_org_component_1 = __webpack_require__(84);
+	var manage_org_page_component_1 = __webpack_require__(85);
+	var claim_org_component_1 = __webpack_require__(86);
+	var verify_orgs_component_1 = __webpack_require__(88);
+	var create_org_component_1 = __webpack_require__(89);
+	var create_post_component_1 = __webpack_require__(90);
+	var search_box_component_1 = __webpack_require__(91);
+	var contact_component_1 = __webpack_require__(92);
+	var form_field_component_1 = __webpack_require__(93);
 	var user_service_1 = __webpack_require__(68);
-	var search_service_1 = __webpack_require__(76);
-	var ng2_click_outside_1 = __webpack_require__(93);
-	var categories_service_1 = __webpack_require__(79);
-	var org_service_1 = __webpack_require__(75);
+	var search_service_1 = __webpack_require__(77);
+	var ng2_click_outside_1 = __webpack_require__(94);
+	var categories_service_1 = __webpack_require__(80);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	var truncate_pipe_1 = __webpack_require__(95);
+	var truncate_pipe_1 = __webpack_require__(96);
 	var core_2 = __webpack_require__(3);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -37948,6 +37949,7 @@
 	                app_component_1.AppComponent,
 	                login_component_1.LoginComponent,
 	                signup_component_1.SignupComponent,
+	                org_component_1.OrgComponent,
 	                browse_orgs_component_1.BrowseOrgsComponent,
 	                search_box_component_1.SearchBox,
 	                org_details_component_1.OrgDetailsComponent,
@@ -51498,7 +51500,7 @@
 	        this.toastyConfig = toastyConfig;
 	    }
 	    UIHelper.prototype.setTitle = function (newTitle) {
-	        this.title.setTitle(newTitle);
+	        this.title.setTitle("GIV ♦ " + newTitle);
 	    };
 	    UIHelper.prototype.takeCount = function (children) {
 	        var counter = function () {
@@ -51607,7 +51609,7 @@
 	    }
 	    LoginComponent.prototype.ngOnInit = function () {
 	        //this.checkLoginStatus();
-	        this.ui.setTitle("GIV :: Login");
+	        this.ui.setTitle("Login");
 	        this.getQueryParams(function (data) { return console.log(data); });
 	    };
 	    LoginComponent.prototype.ngOnDestroy = function () {
@@ -51696,7 +51698,7 @@
 	        this.ui.flash("Sorry—user accounts aren't available in the demo");
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
-	        this.ui.setTitle("GIV :: Sign up");
+	        this.ui.setTitle("Sign up");
 	    };
 	    SignupComponent.prototype.signup = function () {
 	        var _this = this;
@@ -51789,10 +51791,150 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
-	var user_service_1 = __webpack_require__(68);
-	var org_service_1 = __webpack_require__(75);
+	var router_1 = __webpack_require__(25);
 	var app_service_1 = __webpack_require__(70);
-	var search_service_1 = __webpack_require__(76);
+	var OrgComponent = (function () {
+	    function OrgComponent(http, route, ui) {
+	        this.http = http;
+	        this.route = route;
+	        this.ui = ui;
+	        this.onSelect = new core_1.EventEmitter();
+	        this.onDeselect = new core_1.EventEmitter();
+	        this.onStar = new core_1.EventEmitter();
+	        this.onUnstar = new core_1.EventEmitter();
+	        this.viewingOrg = false;
+	        this.singleDetailsAreLoaded = false;
+	        this.singlePostsAreLoaded = false;
+	    }
+	    OrgComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.adminToken = data;
+	        }, function (err) {
+	            console.error(err);
+	        });
+	    };
+	    OrgComponent.prototype.ngAfterViewInit = function () {
+	        this.shortDescription = this.org.description.replace("<br />", " ");
+	    };
+	    OrgComponent.prototype.viewOrg = function () {
+	        this.onSelect.emit(this.org._id);
+	        this.viewingOrg = true;
+	    };
+	    OrgComponent.prototype.deselectOrg = function (e) {
+	        if (e.target.className.indexOf("inside-org") > -1)
+	            return;
+	        if (this.viewingOrg) {
+	            this.onDeselect.emit(this.org._id);
+	            this.viewingOrg = false;
+	            this.singleDetailsAreLoaded = false;
+	            this.singlePostsAreLoaded = false;
+	        }
+	    };
+	    OrgComponent.prototype.orgIsStarred = function () {
+	        if (!this.user || this.user.starred.indexOf(this.org._id) === -1)
+	            return false;
+	        else
+	            return true;
+	    };
+	    OrgComponent.prototype.starOrg = function (org) {
+	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.org.stars = _this.org.stars ? _this.org.stars + 1 : 1;
+	            _this.onStar.emit(org._id);
+	        });
+	    };
+	    OrgComponent.prototype.unstarOrg = function (org) {
+	        var _this = this;
+	        if (!this.user)
+	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.user = data.user;
+	            _this.org.stars = _this.org.stars ? _this.org.stars - 1 : 0;
+	            _this.onUnstar.emit(org._id);
+	        });
+	    };
+	    OrgComponent.prototype.revealOrgDetails = function (event) {
+	        if (event == "init") {
+	            this.singleDetailsAreLoaded = true;
+	        }
+	    };
+	    OrgComponent.prototype.revealOrgPosts = function (event) {
+	        if (event == "init") {
+	            this.singlePostsAreLoaded = true;
+	        }
+	    };
+	    OrgComponent.prototype.userHasPermission = function (org) {
+	        if (this.user && this.userIsAdmin())
+	            return true;
+	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
+	            return true;
+	        else
+	            return false;
+	    };
+	    OrgComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onSelect", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onDeselect", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onStar", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onUnstar", void 0);
+	    OrgComponent = __decorate([
+	        core_1.Component({
+	            selector: 'org',
+	            templateUrl: 'app/org.component.html',
+	            styleUrls: ['app/org.styles.css', 'app/org.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.ActivatedRoute, app_service_1.UIHelper])
+	    ], OrgComponent);
+	    return OrgComponent;
+	}());
+	exports.OrgComponent = OrgComponent;
+
+
+/***/ },
+/* 75 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var user_service_1 = __webpack_require__(68);
+	var org_service_1 = __webpack_require__(76);
+	var app_service_1 = __webpack_require__(70);
+	var search_service_1 = __webpack_require__(77);
 	var StarredOrgsComponent = (function () {
 	    function StarredOrgsComponent(userService, orgService, search, ui, http) {
 	        this.userService = userService;
@@ -51811,11 +51953,16 @@
 	    }
 	    StarredOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Your starred");
+	        this.ui.setTitle("Your starred");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	            }, function (err) {
+	                console.error(err);
+	            });
 	            console.log(_this.user.starred);
 	            _this.loadOrgs(_this.user.starred);
 	        });
@@ -51829,64 +51976,19 @@
 	            _this.loadRecommendations();
 	        }, function (error) { return console.error(error); });
 	    };
-	    StarredOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
+	    StarredOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
-	        };
-	        this.selectedOrg = this.recommended.find(findOrg) || this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
+	        });
 	    };
-	    StarredOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	            this.singlePostsAreLoaded = false;
-	        }
+	    StarredOrgsComponent.prototype.deselectOrg = function (id) {
+	        this.selectedOrg = null;
 	    };
 	    StarredOrgsComponent.prototype.orgIsStarred = function (org) {
 	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
 	            return false;
 	        else
 	            return true;
-	    };
-	    StarredOrgsComponent.prototype.starOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars++;
-	            console.log(data.org);
-	            console.log(data.user);
-	        });
-	    };
-	    StarredOrgsComponent.prototype.unstarOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            var orgIndex = _this.orgs.indexOf(orgToStar);
-	            if (orgToStar)
-	                orgToStar.stars--;
-	            // Special for this component
-	            _this.orgs.splice(orgIndex, 1);
-	            console.log(data.org);
-	            console.log(data.user);
-	        });
 	    };
 	    StarredOrgsComponent.prototype.revealOrgDetails = function (event) {
 	        if (event == "init") {
@@ -51899,12 +52001,15 @@
 	        }
 	    };
 	    StarredOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
 	        else
 	            return false;
+	    };
+	    StarredOrgsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    StarredOrgsComponent.prototype.loadRecommendations = function () {
 	        var _this = this;
@@ -51981,7 +52086,7 @@
 
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -51996,7 +52101,7 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
-	var search_service_1 = __webpack_require__(76);
+	var search_service_1 = __webpack_require__(77);
 	var OrgService = (function () {
 	    function OrgService(http, search) {
 	        this.http = http;
@@ -52043,7 +52148,7 @@
 
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52108,7 +52213,7 @@
 
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52124,9 +52229,9 @@
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var user_service_1 = __webpack_require__(68);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	var search_service_1 = __webpack_require__(76);
+	var search_service_1 = __webpack_require__(77);
 	function shuffleArray(array) {
 	    var currentIndex = array.length, temporaryValue, randomIndex;
 	    // While there remain elements to shuffle...
@@ -52158,6 +52263,13 @@
 	        this.showRecommendedMobileTab = false;
 	    }
 	    RecommendedOrgsComponent.prototype.ngOnInit = function () {
+	        this.orgWas = this.org;
+	    };
+	    RecommendedOrgsComponent.prototype.ngDoCheck = function () {
+	        if (this.orgWas !== this.org) {
+	            this.orgWas = this.org;
+	            this.loadRecommendations();
+	        }
 	    };
 	    RecommendedOrgsComponent.prototype.ngAfterViewInit = function () {
 	        var _this = this;
@@ -52168,67 +52280,30 @@
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	            }, function (err) {
+	                console.error(err);
+	            });
 	            console.log(_this.user.starred);
 	            if (_this.user) {
 	                _this.loadRecommendations();
 	            }
 	        });
 	    };
-	    RecommendedOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
+	    RecommendedOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = this.recommended.find(function (org) {
 	            return org._id === id;
-	        };
-	        this.selectedOrg = this.recommended.find(findOrg) || this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
+	        });
 	    };
-	    RecommendedOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	            this.singlePostsAreLoaded = false;
-	        }
+	    RecommendedOrgsComponent.prototype.deselectOrg = function (id) {
+	        this.selectedOrg = null;
 	    };
 	    RecommendedOrgsComponent.prototype.orgIsStarred = function (org) {
 	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
 	            return false;
 	        else
 	            return true;
-	    };
-	    RecommendedOrgsComponent.prototype.starOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 0;
-	            console.log(data.org);
-	            console.log(data.user);
-	        });
-	    };
-	    RecommendedOrgsComponent.prototype.unstarOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
-	            console.log(data.org);
-	            console.log(data.user);
-	        });
 	    };
 	    RecommendedOrgsComponent.prototype.revealOrgDetails = function (event) {
 	        if (event == "init") {
@@ -52241,12 +52316,15 @@
 	        }
 	    };
 	    RecommendedOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
 	        else
 	            return false;
+	    };
+	    RecommendedOrgsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    RecommendedOrgsComponent.prototype.loadRelated = function () {
 	        var _this = this;
@@ -52293,6 +52371,7 @@
 	        if (!interests || !interests.length) {
 	            return this.recommendedOrgsAreLoaded = true;
 	        }
+	        this.recommended = [];
 	        query['filterField'] = "categories.id";
 	        query['filterValue'] = interests[0] && interests[0][0];
 	        query['limit'] = 4;
@@ -52370,7 +52449,7 @@
 
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52387,9 +52466,9 @@
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
 	var user_service_1 = __webpack_require__(68);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	var categories_service_1 = __webpack_require__(79);
+	var categories_service_1 = __webpack_require__(80);
 	var BrowseOrgsComponent = (function () {
 	    function BrowseOrgsComponent(http, orgService, ui, utilities, route, userService, categories) {
 	        this.http = http;
@@ -52405,7 +52484,6 @@
 	        this.initialLimit = 14;
 	        this.orgsSorting = { order: "-name" };
 	        this.searchBoxIsFocused = false;
-	        this.viewingOrg = false;
 	        this.categoryFilter = { id: null };
 	        this.isLoading = true;
 	        this.isLoadingFeatured = true;
@@ -52418,12 +52496,17 @@
 	    }
 	    BrowseOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Browse organizations");
+	        this.ui.setTitle("Browse organizations");
 	        this.categoriesList = this.categories.list();
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
 	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	            }, function (err) {
+	                console.error(err);
+	            });
 	            console.log("User: ", user);
 	        });
 	        /** Check for the current order of orgs (i.e. the current value of localStorage.OrgsSorting) **/
@@ -52474,12 +52557,6 @@
 	    BrowseOrgsComponent.prototype.ngOnDestroy = function () {
 	        this.paramsSub.unsubscribe();
 	    };
-	    // ngDoCheck() {
-	    // 	this.takeCount(this.$orgs);
-	    // }
-	    // takeCount(children:any) {
-	    // 	this.orgsShowing = this.ui.takeCount(children);
-	    // }
 	    BrowseOrgsComponent.prototype.toggleOrder = function (attr) {
 	        if (this.orgsSorting.order.indexOf(attr) === -1) {
 	            this.orgsSorting.order = '-' + attr;
@@ -52571,25 +52648,13 @@
 	            this.searchBoxIsFocused = false;
 	        }
 	    };
-	    BrowseOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
+	    BrowseOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
-	        };
-	        this.selectedOrg = this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
+	        });
 	    };
-	    BrowseOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	            this.singlePostsAreLoaded = false;
-	        }
+	    BrowseOrgsComponent.prototype.deselectOrg = function (id) {
+	        this.selectedOrg = null;
 	    };
 	    BrowseOrgsComponent.prototype.orgIsStarred = function (org) {
 	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
@@ -52597,55 +52662,39 @@
 	        else
 	            return true;
 	    };
-	    BrowseOrgsComponent.prototype.starOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/add", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars + 1 : 1;
-	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (featuredOrgToStar)
-	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars + 1 : 1;
-	            console.log(orgToStar);
+	    BrowseOrgsComponent.prototype.starOrg = function (id) {
+	        var featuredOrgToStar = this.featuredOrgs.find(function (thisOrg) {
+	            return thisOrg._id === id;
 	        });
+	        if (featuredOrgToStar)
+	            featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars + 1 : 1;
 	    };
-	    BrowseOrgsComponent.prototype.unstarOrg = function (org) {
-	        var _this = this;
-	        if (!this.user)
-	            return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-	        this.http.put("/user/star/subtract", { orgId: org._id, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            _this.user = data.user;
-	            var orgToStar = _this.orgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (orgToStar)
-	                orgToStar.stars = orgToStar.stars ? orgToStar.stars - 1 : 0;
-	            var featuredOrgToStar = _this.featuredOrgs.find(function (thisOrg) {
-	                return thisOrg._id === org._id;
-	            });
-	            if (featuredOrgToStar)
-	                featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars - 1 : 0;
-	            console.log(data.org);
-	            console.log(data.user);
+	    BrowseOrgsComponent.prototype.unstarOrg = function (id) {
+	        var featuredOrgToUnStar = this.featuredOrgs.find(function (thisOrg) {
+	            return thisOrg._id === id;
 	        });
+	        if (featuredOrgToUnStar)
+	            featuredOrgToUnStar.stars = featuredOrgToUnStar.stars ? featuredOrgToUnStar.stars - 1 : 0;
 	    };
-	    BrowseOrgsComponent.prototype.revealOrgDetails = function (event) {
-	        if (event == "init") {
-	            this.singleDetailsAreLoaded = true;
-	        }
-	    };
-	    BrowseOrgsComponent.prototype.revealOrgPosts = function (event) {
-	        if (event == "init") {
-	            this.singlePostsAreLoaded = true;
-	        }
-	    };
+	    // starFeaturedOrg(org):void {
+	    // 	let featuredOrg = this.featuredOrgs.find(featured => {
+	    // 		return featured._id === org._id;
+	    // 	});
+	    // 	if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	    // 	this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+	    // 		data => {
+	    // 			if (data.errmsg) return console.error(data.errmsg);
+	    // 			this.user = data.user;
+	    // 			this.orgs.find(org => {
+	    // 				return org._id === data.org._id;
+	    // 			}).stars++;
+	    // 			featuredOrg.stars = featuredOrg.stars ? featuredOrg.stars+1 : 1;
+	    // 		},
+	    // 		err => {
+	    // 			console.error(err);
+	    // 		}
+	    // 	);
+	    // }
 	    BrowseOrgsComponent.prototype.cycleFeatured = function (inc) {
 	        this.featuredOrgs[this.featuredShowing]['showing'] = false;
 	        this.featuredShowing += inc;
@@ -52663,12 +52712,15 @@
 	        this.featuredOrgs[this.featuredShowing]['showing'] = true;
 	    };
 	    BrowseOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
 	        else
 	            return false;
+	    };
+	    BrowseOrgsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    BrowseOrgsComponent.prototype.showOrgs = function (e) {
 	        this.showOrgsMobileTab = true;
@@ -52706,7 +52758,7 @@
 
 
 /***/ },
-/* 79 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52750,7 +52802,7 @@
 
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52765,7 +52817,7 @@
 	};
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
 	var OrgDetailsComponent = (function () {
 	    function OrgDetailsComponent(http, orgService, helper, utilities) {
@@ -52843,7 +52895,7 @@
 
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52859,9 +52911,9 @@
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	__webpack_require__(82);
+	__webpack_require__(83);
 	var OrgPostsComponent = (function () {
 	    function OrgPostsComponent(router, route, http, orgService, ui, utilities) {
 	        this.router = router;
@@ -52885,6 +52937,14 @@
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	        this.isEditing = false;
 	    }
+	    OrgPostsComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	            _this.adminToken = data;
+	        }, function (err) {
+	            console.error(err);
+	        });
+	    };
 	    OrgPostsComponent.prototype.ngAfterViewInit = function () {
 	        var _this = this;
 	        this.searchPlaceholder = (this.org && this.org._id) ? 'posts by ' + this.org.name : 'posts';
@@ -52981,7 +53041,7 @@
 	        }
 	    };
 	    OrgPostsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
@@ -53095,6 +53155,9 @@
 	        else
 	            return true;
 	    };
+	    OrgPostsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -53133,7 +53196,7 @@
 
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53143,7 +53206,7 @@
 
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53160,7 +53223,7 @@
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
 	var platform_browser_1 = __webpack_require__(22);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var app_service_1 = __webpack_require__(70);
 	var SingleOrgComponent = (function () {
@@ -53186,9 +53249,10 @@
 	                    _this.ui.flash("This page doesn't exist", "error");
 	                    return _this.router.navigate([''], { queryParams: { "404": true } });
 	                }
+	                window.scrollTo(0, 0);
 	                _this.org = data;
 	                _this.isLoaded = true;
-	                _this.ui.setTitle("GIV :: " + _this.org.name);
+	                _this.ui.setTitle(_this.org.name);
 	                if (_this.org.videoLink) {
 	                    _this.org.videoLink = _this.org.videoLink.replace("watch?v=", "embed/");
 	                    _this.videoLink = _this.sanitizer.bypassSecurityTrustResourceUrl(_this.org.videoLink);
@@ -53201,6 +53265,11 @@
 	                    if (err)
 	                        return console.error(err);
 	                    _this.user = user;
+	                    _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                        _this.adminToken = data;
+	                    }, function (err) {
+	                        console.error(err);
+	                    });
 	                    _this.http.post("/interests", { userId: user._id, categories: _this.org.categories, increment: 1 })
 	                        .map(function (res) { return res.json(); })
 	                        .subscribe(function (data) { return console.log(data); }, function (err) { return console.error(err); });
@@ -53246,12 +53315,15 @@
 	        });
 	    };
 	    SingleOrgComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
 	        else
 	            return false;
+	    };
+	    SingleOrgComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    SingleOrgComponent.prototype.toggleOptionsMenu = function () {
 	        this.showOptionsMenu = this.showOptionsMenu ? false : true;
@@ -53292,7 +53364,7 @@
 
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53308,9 +53380,9 @@
 	var core_1 = __webpack_require__(3);
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
-	var categories_service_1 = __webpack_require__(79);
+	var categories_service_1 = __webpack_require__(80);
 	var app_service_1 = __webpack_require__(70);
 	var ManageOrgPageComponent = (function () {
 	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService) {
@@ -53326,6 +53398,7 @@
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
+	        /** Fields requiring lists **/
 	        this.callsToAction = [
 	            "Donate",
 	            "Support",
@@ -53333,15 +53406,22 @@
 	            "Volunteer"
 	        ];
 	        this.categories = this.categoryService.list();
+	        this.checked = {};
+	        /** Slug validation **/
 	        this.slugIsValid = true;
-	        this.changed = {};
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Manage");
+	        this.ui.setTitle("Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
+	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	            }, function (err) {
+	                console.error(err);
+	            });
 	            if (_this.route.params) {
 	                _this.sub = _this.route.params.subscribe(function (params) {
 	                    var id = params['id'];
@@ -53350,7 +53430,7 @@
 	                        return _this.router.navigate([''], { queryParams: { "404": true } });
 	                    }
 	                    _this.orgService.loadOrg(id).subscribe(function (data) {
-	                        if (user.adminToken !== 'h2u81eg7wr3h9uijk8') {
+	                        if (!_this.userIsAdmin()) {
 	                            if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
 	                                _this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
 	                                return _this.router.navigate([''], { queryParams: { "404": true } });
@@ -53358,10 +53438,17 @@
 	                        }
 	                        _this.org = data;
 	                        _this.isLoaded = true;
-	                        _this.restoreOtherLinks();
+	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
+	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
+	                            filterExtensions: true,
+	                            calculateSpeed: true,
+	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                        };
+	                        _this.avatarUploadOptions = {
+	                            url: '/edit-org/upload/avatar/' + _this.org._id,
 	                            filterExtensions: true,
 	                            calculateSpeed: true,
 	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
@@ -53383,16 +53470,9 @@
 	        this.sub.unsubscribe();
 	    };
 	    ManageOrgPageComponent.prototype.handleUpload = function (org) {
-	        // this.zone.run(() => {
-	        // 	console.log(data);
-	        // 	this.progress = data.progress.percent;
-	        // 	this.stillWorking = true;
-	        //   if (data.response && data.status !== 404) {
 	        this.org = org;
 	        this.stillWorking = false;
 	        console.log(org);
-	        //  }
-	        // });
 	    };
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
@@ -53407,11 +53487,11 @@
 	    };
 	    ManageOrgPageComponent.prototype.save = function (key, value) {
 	        var _this = this;
-	        if (key === "categories") {
-	            value = this.org.categories;
-	        }
 	        if (typeof value === "undefined") {
 	            value = this[key] || this.org[key];
+	        }
+	        if (key === "categories") {
+	            value = this.org.categories;
 	        }
 	        if (key === "slug") {
 	            var slugMatch = value.match(/[^a-zA-Z0-9\-]/);
@@ -53440,15 +53520,12 @@
 	            if (res.errmsg) {
 	                _this.ui.flash("Save failed", "error");
 	                _this['saving_' + key] = false;
-	                _this.restoreOtherLinks();
 	                return;
 	            }
 	            _this.org = res;
-	            _this[key] = null;
 	            _this['saving_' + key] = false;
-	            _this.changed[key] = false;
+	            _this['changed_' + key] = false;
 	            _this.ui.flash("Saved", "success");
-	            _this.restoreOtherLinks();
 	            console.log(res);
 	        });
 	    };
@@ -53462,7 +53539,6 @@
 	            return false;
 	    };
 	    ManageOrgPageComponent.prototype.changeSelectedCategories = function (category, add) {
-	        console.log(this.org.categories);
 	        var categoryIndex = -1;
 	        var foundCategory = this.org.categories.find(function (cat, index) {
 	            if (cat.id == category.id) {
@@ -53475,51 +53551,57 @@
 	        if (add) {
 	            if (categoryIndex === -1) {
 	                this.org.categories.push(category);
+	                this.checked[category.id] = true;
 	            }
-	            console.log("Added", category);
 	        }
 	        else {
 	            this.org.categories.splice(categoryIndex, 1);
-	            console.log("Removed", category);
+	            this.checked[category.id] = false;
 	        }
-	        console.log(this.org.categories);
 	    };
 	    ManageOrgPageComponent.prototype.deleteOrg = function (id) {
 	        var _this = this;
 	        if (window.confirm("Are you sure you want to delete this organization? This can't be undone.")) {
-	            var orgId = id || this.org._id;
-	            this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
-	                if (data && data.success) {
-	                    _this.router.navigate(['']);
-	                    return _this.ui.flash("Org was deleted", "error");
-	                }
-	            });
+	            if (window.confirm("Sure you're sure?")) {
+	                var orgId = id || this.org._id;
+	                this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                    if (data && data.success) {
+	                        _this.router.navigate(['']);
+	                        return _this.ui.flash("Org was deleted", "error");
+	                    }
+	                });
+	            }
 	        }
 	    };
-	    ManageOrgPageComponent.prototype.restoreOtherLinks = function () {
-	        // for editing
-	        var addNullOtherLinks = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
-	        if (addNullOtherLinks === 3)
-	            this.org.otherLinks = [];
-	        while (addNullOtherLinks > 0) {
-	            this.org.otherLinks.push({ copy: null, href: null });
-	            addNullOtherLinks--;
-	        }
+	    ManageOrgPageComponent.prototype.addAnotherLink = function () {
+	        var showing = this.org.otherLinks && this.org.otherLinks.length;
+	        if (showing === 3)
+	            return;
+	        this.org.otherLinks.push({ copy: null, href: null });
 	    };
 	    ManageOrgPageComponent.prototype.changeHandler = function (key, event) {
 	        if (event.target.value)
-	            this.changed[key] = true;
+	            this['changed_' + key] = true;
 	        else
-	            this.changed[key] = false;
+	            this['changed_' + key] = false;
+	    };
+	    ManageOrgPageComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], ManageOrgPageComponent.prototype, "org", void 0);
+	    __decorate([
+	        // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org">...
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], ManageOrgPageComponent.prototype, "user", void 0);
 	    ManageOrgPageComponent = __decorate([
 	        core_1.Component({
 	            selector: 'manage-org-page',
-	            templateUrl: 'app/manage-org-page.component.html'
+	            templateUrl: 'app/manage-org-page.component.html',
+	            styleUrls: ['app/manage-org-page.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
 	    ], ManageOrgPageComponent);
@@ -53529,7 +53611,7 @@
 
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53546,8 +53628,8 @@
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
 	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(86);
-	var org_service_1 = __webpack_require__(75);
+	var email_service_1 = __webpack_require__(87);
+	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var ClaimOrgComponent = (function () {
 	    function ClaimOrgComponent(http, router, route, ui, orgService, userService) {
@@ -53562,7 +53644,7 @@
 	    }
 	    ClaimOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Claim an organization");
+	        this.ui.setTitle("Claim an organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                console.error(err);
@@ -53644,7 +53726,7 @@
 
 
 /***/ },
-/* 86 */
+/* 87 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -53663,7 +53745,7 @@
 
 
 /***/ },
-/* 87 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53680,7 +53762,7 @@
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
 	var user_service_1 = __webpack_require__(68);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
 	var VerifyOrgsComponent = (function () {
 	    function VerifyOrgsComponent(http, orgService, ui, utilities, route, router, userService) {
@@ -53701,15 +53783,20 @@
 	    }
 	    VerifyOrgsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV :: Verify organizations");
+	        this.ui.setTitle("Verify organizations");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
-	            if (!_this.isAdmin(user)) {
-	                _this.router.navigate(['/']);
-	                return _this.ui.flash("You don't have permission to do that!", "error");
-	            }
 	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	                if (!_this.userIsAdmin()) {
+	                    _this.router.navigate(['/']);
+	                    _this.ui.flash("You don't have permission to do that!", "error");
+	                }
+	            }, function (err) {
+	                console.error(err);
+	            });
 	            console.log("User: ", user);
 	        });
 	        this.orgService.loadUnverifiedOrgs({ limit: 100 }).subscribe(function (data) {
@@ -53790,18 +53877,15 @@
 	        }
 	    };
 	    VerifyOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8')
+	        if (this.user && this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
 	        else
 	            return false;
 	    };
-	    VerifyOrgsComponent.prototype.isAdmin = function (user) {
-	        if (user.adminToken === 'h2u81eg7wr3h9uijk8')
-	            return true;
-	        else
-	            return false;
+	    VerifyOrgsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
 	    };
 	    VerifyOrgsComponent.prototype.verifyOrg = function (org) {
 	        var _this = this;
@@ -53835,7 +53919,7 @@
 
 
 /***/ },
-/* 88 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -53851,11 +53935,11 @@
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
-	var categories_service_1 = __webpack_require__(79);
+	var categories_service_1 = __webpack_require__(80);
 	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(86);
+	var email_service_1 = __webpack_require__(87);
 	function Org() {
 	    this.name = null;
 	    this.description = null;
@@ -53894,7 +53978,7 @@
 	    }
 	    CreateOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("GIV | Add your organization");
+	        this.ui.setTitle("Add your organization");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err) {
 	                console.error(err);
@@ -54004,7 +54088,7 @@
 
 
 /***/ },
-/* 89 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54020,7 +54104,7 @@
 	var core_1 = __webpack_require__(3);
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
-	var org_service_1 = __webpack_require__(75);
+	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var app_service_1 = __webpack_require__(70);
 	function Post() {
@@ -54134,7 +54218,7 @@
 
 
 /***/ },
-/* 90 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54202,7 +54286,7 @@
 
 
 /***/ },
-/* 91 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54218,7 +54302,7 @@
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
-	var email_service_1 = __webpack_require__(86);
+	var email_service_1 = __webpack_require__(87);
 	var app_service_1 = __webpack_require__(70);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router, ui) {
@@ -54279,7 +54363,7 @@
 
 
 /***/ },
-/* 92 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54293,7 +54377,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var categories_service_1 = __webpack_require__(79);
+	var categories_service_1 = __webpack_require__(80);
 	var app_service_1 = __webpack_require__(70);
 	var FormFieldComponent = (function () {
 	    function FormFieldComponent(ui, utilities, categoryService, zone) {
@@ -54302,28 +54386,35 @@
 	        this.categoryService = categoryService;
 	        this.zone = zone;
 	        this.onUpload = new core_1.EventEmitter();
-	        this.onChange = new core_1.EventEmitter();
 	        this.onSave = new core_1.EventEmitter();
 	        this.changed = false;
-	        this.stillWorking = false;
+	        this.uploading = false;
 	        this.progress = 0;
-	        this.categories = this.categoryService.list();
 	    }
 	    FormFieldComponent.prototype.ngOnInit = function () {
+	    };
+	    FormFieldComponent.prototype.ngAfterViewInit = function () {
+	        if (this.initial) {
+	            this.value = this.initial;
+	        }
 	    };
 	    FormFieldComponent.prototype.handleUpload = function (data) {
 	        var _this = this;
 	        this.zone.run(function () {
 	            console.log(data);
 	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
+	            _this.saving = true;
+	            _this.uploading = true;
 	            if (data.response && data.status !== 404) {
 	                _this.onUpload.emit(JSON.parse(data.response));
+	                _this.saving = false;
+	                _this.uploading = false;
 	            }
 	        });
 	    };
-	    FormFieldComponent.prototype.save = function () {
-	        this.onSave.emit(this.value);
+	    FormFieldComponent.prototype.save = function (value) {
+	        this.onSave.emit(value || this.value);
+	        this.value = null;
 	    };
 	    FormFieldComponent.prototype.changeHandler = function () {
 	        if (this.value && this.value.length)
@@ -54331,6 +54422,15 @@
 	        else
 	            this.changed = false;
 	    };
+	    FormFieldComponent.prototype.isSelected = function (option) {
+	        if (option === this.initial)
+	            return "selected";
+	        return null;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "initial", void 0);
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -54366,10 +54466,6 @@
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "onChange", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "onSave", void 0);
 	    FormFieldComponent = __decorate([
 	        core_1.Component({
@@ -54384,7 +54480,7 @@
 
 
 /***/ },
-/* 93 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54398,7 +54494,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var click_outside_directive_1 = __webpack_require__(94);
+	var click_outside_directive_1 = __webpack_require__(95);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -54416,7 +54512,7 @@
 
 
 /***/ },
-/* 94 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54497,7 +54593,7 @@
 
 
 /***/ },
-/* 95 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";

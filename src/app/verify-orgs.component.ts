@@ -25,6 +25,7 @@ export class VerifyOrgsComponent implements OnInit {
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
 	private viewingOrg:boolean = false;
+	private adminToken:string;
 
 	private isLoading = true;
 	private loadingOrgSearch = false;
@@ -42,15 +43,23 @@ export class VerifyOrgsComponent implements OnInit {
 				private userService:UserService) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Verify organizations");
+		this.ui.setTitle("Verify organizations");
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
-			if (!this.isAdmin(user)) {
-				this.router.navigate(['/']);
-				return this.ui.flash("You don't have permission to do that!", "error");
-			}
 			this.user = user;
+			this.http.get("/adminToken").map(res => res.json()).subscribe(
+				data => {
+					this.adminToken = data;
+					if (!this.userIsAdmin()) {
+						this.router.navigate(['/']);
+						this.ui.flash("You don't have permission to do that!", "error");
+					}
+				},
+				err => {
+					console.error(err);
+				}
+			);
 			console.log("User: ", user);
 		});
 	
@@ -150,15 +159,14 @@ export class VerifyOrgsComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
 
-	isAdmin(user) {
-		if (user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
-		else return false;
-	}
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 	verifyOrg(org) {
 		let orgIndex = this.orgs.indexOf(org);

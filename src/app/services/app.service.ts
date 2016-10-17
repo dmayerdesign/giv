@@ -10,7 +10,7 @@ export class UIHelper {
         private toastyConfig:ToastyConfig) { }
 
   setTitle(newTitle: string) {
-    this.title.setTitle( newTitle );
+    this.title.setTitle( "GIV ♦ " + newTitle );
   }
 
   takeCount(children):number {

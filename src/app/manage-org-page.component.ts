@@ -10,46 +10,58 @@ import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
 	selector: 'manage-org-page',
-	templateUrl: 'app/manage-org-page.component.html'
+	templateUrl: 'app/manage-org-page.component.html',
+	styleUrls: ['app/manage-org-page.component.css']
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 
 export class ManageOrgPageComponent implements OnInit {
 	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org">...
+	@Input() user;
 	private sub:Subscription;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
 	private progress:number = 0;
+	private adminToken:string;
 
 	/** Fields to edit **/
 	private coverImage:string;
-	private avatarLink:string;
+	private avatar:string;
 	private videoLink:string;
 	private donateLink:string;
 	private slug:string;
 	private name:string;
 	private description:string;
 
+	/** Fields requiring lists **/
 	private callsToAction:Array<string> = [
 		"Donate",
 		"Support",
 		"Help out",
 		"Volunteer"
 	];
-	private categories = this.categoryService.list();
+	private categories = this.categoryService.list(); 
 
-	/** Loading **/
+	/** Saving (most are unused in template but must exist or else save() will break) **/
 	private saving_coverImage:boolean;
 	private saving_avatar:boolean;
 	private saving_donateLink:boolean;
 	private saving_slug:boolean;
 	private saving_categories:boolean;
+	private saving_otherLinks:boolean;
 
+	/** Changed **/
+	private changed_otherLinks:boolean;
+	private changed_categories:boolean;
+	private checked = {};
+
+	/** Slug validation **/
 	private slugIsValid:boolean = true;
-	private changed = {};
 
+	/** Upload options **/
   coverImageUploadOptions:Object;
+  avatarUploadOptions:Object;
 
 	constructor(
 				private router:Router,
@@ -63,9 +75,18 @@ export class ManageOrgPageComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Manage");
+		this.ui.setTitle("Manage");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
+			this.user = user;
+			this.http.get("/adminToken").map(res => res.json()).subscribe(
+				data => {
+					this.adminToken = data;
+				},
+				err => {
+					console.error(err);
+				}
+			);
 			if (this.route.params) {
 				this.sub = this.route.params.subscribe(params => {
 					let id = params['id'];
@@ -76,7 +97,7 @@ export class ManageOrgPageComponent implements OnInit {
 
 					this.orgService.loadOrg(id).subscribe(
 						data => {
-							if (user.adminToken !== 'h2u81eg7wr3h9uijk8') {
+							if (!this.userIsAdmin()) {
 								if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
 									this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
 									return this.router.navigate([''], { queryParams: {"404": true}});
@@ -84,11 +105,18 @@ export class ManageOrgPageComponent implements OnInit {
 							}
 							this.org = data;
 							this.isLoaded = true;
-							this.restoreOtherLinks();
+							this.org.categories.forEach(category => this.checked[category.id] = true);
+							this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
 							
 							// for ng-upload
 							this.coverImageUploadOptions = {
 							  url: '/edit-org/upload/cover-image/' + this.org._id,
+							  filterExtensions: true,
+							  calculateSpeed: true,
+							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+							};
+							this.avatarUploadOptions = {
+							  url: '/edit-org/upload/avatar/' + this.org._id,
 							  filterExtensions: true,
 							  calculateSpeed: true,
 							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
@@ -114,17 +142,9 @@ export class ManageOrgPageComponent implements OnInit {
 	}
 
   handleUpload(org):void {
-  	// this.zone.run(() => {
-  	// 	console.log(data);
-  	// 	this.progress = data.progress.percent;
-  	// 	this.stillWorking = true;
-
-	  //   if (data.response && data.status !== 404) {
-	    	this.org = org;
-	    	this.stillWorking = false;
-	    	console.log(org);
-	   //  }
-    // });
+  	this.org = org;
+  	this.stillWorking = false;
+  	console.log(org);
   }
 
   checkForUniqueSlug($event) {
@@ -138,12 +158,12 @@ export class ManageOrgPageComponent implements OnInit {
   } 
 
   save(key:string, value?:any):void {
-  	if (key === "categories") {
-  		value = this.org.categories;
-  	}
-
   	if (typeof value === "undefined") {
   		value = this[key] || this.org[key];
+  	}
+
+  	if (key === "categories") {
+  		value = this.org.categories;
   	}
 
   	if (key === "slug") {
@@ -174,15 +194,12 @@ export class ManageOrgPageComponent implements OnInit {
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
   			this['saving_' + key] = false;
-  			this.restoreOtherLinks();
   			return;
   		}
   		this.org = res;
-  		this[key] = null;
   		this['saving_' + key] = false;
-  		this.changed[key] = false;
+  		this['changed_' + key] = false;
   		this.ui.flash("Saved", "success");
-  		this.restoreOtherLinks();
   		console.log(res);
   	});
   }
@@ -197,7 +214,6 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   changeSelectedCategories(category, add) {
-  	console.log(this.org.categories);
   	let categoryIndex = -1;
   	let foundCategory = this.org.categories.find((cat, index) => {
   		if (cat.id == category.id) {
@@ -210,43 +226,44 @@ export class ManageOrgPageComponent implements OnInit {
   	if (add) {
   		if (categoryIndex === -1) {
   			this.org.categories.push(category);
+  			this.checked[category.id] = true;
   		}
-  		console.log("Added", category);
   	} 
   	else {
 	  	this.org.categories.splice(categoryIndex, 1);
-	  	console.log("Removed", category);
+	  	this.checked[category.id] = false;
 	  }
-	  console.log(this.org.categories);
   }
 
   deleteOrg(id) {
   	if (window.confirm("Are you sure you want to delete this organization? This can't be undone.")) {
-	  	let orgId = id || this.org._id;
-	  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
-	  		if (data && data.success) {
-	  			this.router.navigate(['']);
-	  			return this.ui.flash("Org was deleted", "error");
-	  		}
-	  	});
+  		if (window.confirm("Sure you're sure?")) {
+		  	let orgId = id || this.org._id;
+		  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
+		  		if (data && data.success) {
+		  			this.router.navigate(['']);
+		  			return this.ui.flash("Org was deleted", "error");
+		  		}
+		  	});
+		  }
 	  }
   }
 
-  restoreOtherLinks() {
-  	// for editing
-		let addNullOtherLinks:number = this.org.otherLinks && this.org.otherLinks.length ? 3 - this.org.otherLinks.length : 3;
-		if (addNullOtherLinks === 3) this.org.otherLinks = [];
-		while (addNullOtherLinks > 0) {
-			this.org.otherLinks.push({copy: null, href: null});
-			addNullOtherLinks--;
-		}
+  addAnotherLink():void {
+  	let showing:number = this.org.otherLinks && this.org.otherLinks.length;
+		if (showing === 3) return;
+		this.org.otherLinks.push({copy: null, href: null});
   }
 
   changeHandler(key:string, event) {
   	if (event.target.value)
-  		this.changed[key] = true;
+  		this['changed_' + key] = true;
   	else
-  		this.changed[key] = false;
+  		this['changed_' + key] = false;
+  }
+
+  userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
   }
 
 }

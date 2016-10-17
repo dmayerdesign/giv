@@ -23,6 +23,7 @@ export class StarredOrgsComponent implements OnInit {
 	private singlePostsAreLoaded:boolean;
 	private showStarredMobileTab:boolean = true;
 	private showRecommendedMobileTab:boolean = false;
+	private adminToken:string;
 
 	constructor(private userService:UserService,
 							private orgService:OrgService,
@@ -31,10 +32,18 @@ export class StarredOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Your starred");
+		this.ui.setTitle("Your starred");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
+			this.http.get("/adminToken").map(res => res.json()).subscribe(
+				data => {
+					this.adminToken = data;
+				},
+				err => {
+					console.error(err);
+				}
+			);
 			console.log(this.user.starred);
 			this.loadOrgs(this.user.starred);
 		});
@@ -52,69 +61,19 @@ export class StarredOrgsComponent implements OnInit {
 		);
 	}
 
-	viewOrg(e:any, id:string):void {
-		let findOrg = function(org) {
+	viewOrg(id:string):void {
+		this.selectedOrg = this.orgs.find(function(org) {
 			return org._id === id;
-		}
-		this.selectedOrg = this.recommended.find(findOrg) || this.orgs.find(findOrg);
-		this.viewingOrg = true;
-		console.log(this.selectedOrg);
+		});
 	}
 
-	deselectOrg(e:any, id:string):void {
-		console.log(e.target.className);
-		if (e.target.className.indexOf("inside-org") > -1) return;
-
-		if (this.viewingOrg && this.selectedOrg._id === id) {
-			console.log(this.selectedOrg);
-			this.selectedOrg = null;
-			this.viewingOrg = false;
-			this.singleDetailsAreLoaded = false;
-			this.singlePostsAreLoaded = false;
-		}
+	deselectOrg(id:string):void {
+		this.selectedOrg = null;
 	}
 
 	orgIsStarred(org) {
 		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
 		else return true;
-	}
-
-	starOrg(org):void {
-		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
-			data => {
-				this.user = data.user;
-
-				let orgToStar = this.orgs.find((thisOrg) => {
-					return thisOrg._id === org._id;
-				});
-				if (orgToStar) orgToStar.stars++;
-
-				console.log(data.org);
-				console.log(data.user);
-			}
-		);
-	}
-
-	unstarOrg(org):void {
-		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
-			data => {
-				this.user = data.user;
-
-				let orgToStar = this.orgs.find((thisOrg) => {
-					return thisOrg._id === org._id;
-				});
-				let orgIndex = this.orgs.indexOf(orgToStar);
-				if (orgToStar) orgToStar.stars--;
-				
-				// Special for this component
-				this.orgs.splice(orgIndex, 1);
-
-				console.log(data.org);
-				console.log(data.user);
-			}
-		);
 	}
 
 	revealOrgDetails(event) {
@@ -130,10 +89,14 @@ export class StarredOrgsComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 	loadRecommendations() {
 		let interests = [];

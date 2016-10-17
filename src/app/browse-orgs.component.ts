@@ -32,9 +32,9 @@ export class BrowseOrgsComponent implements OnInit {
 	private orgsSorting = {order: "-name"};
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
-	private viewingOrg:boolean = false;
 	private categoriesList:any;
 	private categoryFilter:any = {id: null};
+	private adminToken:string;
 
 	private isLoading = true;
 	private isLoadingFeatured = true;
@@ -58,12 +58,20 @@ export class BrowseOrgsComponent implements OnInit {
 				private categories:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("GIV :: Browse organizations");
+		this.ui.setTitle("Browse organizations");
 		this.categoriesList = this.categories.list();
 
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
 			this.user = user;
+			this.http.get("/adminToken").map(res => res.json()).subscribe(
+				data => {
+					this.adminToken = data;
+				},
+				err => {
+					console.error(err);
+				}
+			);
 			console.log("User: ", user);
 		});
 
@@ -128,14 +136,6 @@ export class BrowseOrgsComponent implements OnInit {
 	ngOnDestroy() {
 		this.paramsSub.unsubscribe();
 	}
-
-	// ngDoCheck() {
-	// 	this.takeCount(this.$orgs);
-	// }
-
-	// takeCount(children:any) {
-	// 	this.orgsShowing = this.ui.takeCount(children);
-	// }
 
 	toggleOrder(attr) {
 		if (this.orgsSorting.order.indexOf(attr) === -1) {
@@ -239,26 +239,14 @@ export class BrowseOrgsComponent implements OnInit {
 		}
 	}
 
-	viewOrg(e:any, id:string):void {
-		let findOrg = function(org) {
+	viewOrg(id:string):void {
+		this.selectedOrg = this.orgs.find(function(org) {
 			return org._id === id;
-		}
-		this.selectedOrg = this.orgs.find(findOrg);
-		this.viewingOrg = true;
-		console.log(this.selectedOrg);
+		});
 	}
 
-	deselectOrg(e:any, id:string):void {
-		console.log(e.target.className);
-		if (e.target.className.indexOf("inside-org") > -1) return;
-
-		if (this.viewingOrg && this.selectedOrg._id === id) {
-			console.log(this.selectedOrg);
-			this.selectedOrg = null;
-			this.viewingOrg = false;
-			this.singleDetailsAreLoaded = false;
-			this.singlePostsAreLoaded = false;
-		}
+	deselectOrg(id:string):void {
+		this.selectedOrg = null;
 	}
 
 	orgIsStarred(org) {
@@ -266,64 +254,41 @@ export class BrowseOrgsComponent implements OnInit {
 		else return true;
 	}
 
-	starOrg(org):void {
-		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
-			data => {
-				this.user = data.user;
-
-				let orgToStar = this.orgs.find(thisOrg => {
-					return thisOrg._id === org._id;
-				});
-				if (orgToStar)
-					orgToStar.stars = orgToStar.stars ? orgToStar.stars+1 : 1;
-				
-				let featuredOrgToStar = this.featuredOrgs.find(thisOrg => {
-					return thisOrg._id === org._id;
-				});
-				if (featuredOrgToStar)
-					featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars+1 : 1;
-
-				console.log(orgToStar);
-			}
-		);
+	starOrg(id):void {				
+		let featuredOrgToStar = this.featuredOrgs.find(thisOrg => {
+			return thisOrg._id === id;
+		});
+		if (featuredOrgToStar)
+			featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars+1 : 1;
 	}
 
-	unstarOrg(org):void {
-		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
-			data => {
-				this.user = data.user;
-
-				let orgToStar = this.orgs.find((thisOrg) => {
-					return thisOrg._id === org._id;
-				});
-				if (orgToStar)
-					orgToStar.stars = orgToStar.stars ? orgToStar.stars-1 : 0;
-
-				let featuredOrgToStar = this.featuredOrgs.find((thisOrg) => {
-					return thisOrg._id === org._id;
-				});
-				if (featuredOrgToStar)
-					featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars-1 : 0;
-
-				console.log(data.org);
-				console.log(data.user);
-			}
-		);
+	unstarOrg(id):void {				
+		let featuredOrgToUnStar = this.featuredOrgs.find(thisOrg => {
+			return thisOrg._id === id;
+		});
+		if (featuredOrgToUnStar)
+			featuredOrgToUnStar.stars = featuredOrgToUnStar.stars ? featuredOrgToUnStar.stars-1 : 0;
 	}
 
-	revealOrgDetails(event) {
-		if (event == "init") {
-			this.singleDetailsAreLoaded = true;
-		}
-	}
-
-	revealOrgPosts(event) {
-		if (event == "init") {
-			this.singlePostsAreLoaded = true;
-		}
-	}
+	// starFeaturedOrg(org):void {
+	// 	let featuredOrg = this.featuredOrgs.find(featured => {
+	// 		return featured._id === org._id;
+	// 	});
+	// 	if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
+	// 	this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+	// 		data => {
+	// 			if (data.errmsg) return console.error(data.errmsg);
+	// 			this.user = data.user;
+	// 			this.orgs.find(org => {
+	// 				return org._id === data.org._id;
+	// 			}).stars++;
+	// 			featuredOrg.stars = featuredOrg.stars ? featuredOrg.stars+1 : 1;
+	// 		},
+	// 		err => {
+	// 			console.error(err);
+	// 		}
+	// 	);
+	// }
 
 	cycleFeatured(inc:number) {
 		this.featuredOrgs[this.featuredShowing]['showing'] = false;
@@ -345,10 +310,14 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 	showOrgs(e) {
 		this.showOrgsMobileTab = true;

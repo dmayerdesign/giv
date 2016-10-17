@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, NgZone } from '@angular/core';
 import { Categories } from './services/categories.service';
 import { UIHelper, Utilities } from './services/app.service';
 
@@ -8,6 +8,7 @@ import { UIHelper, Utilities } from './services/app.service';
 })
 
 export class FormFieldComponent implements OnInit {
+	@Input() initial;
 	@Input() title;
 	@Input() name;
 	@Input() placeholder;
@@ -17,15 +18,12 @@ export class FormFieldComponent implements OnInit {
 	@Input() selectOptions;
 
 	@Output() onUpload = new EventEmitter();
-	@Output() onChange = new EventEmitter();
 	@Output() onSave = new EventEmitter();
 
 	private value:any;
 	private changed:boolean = false;
-
-	private stillWorking:boolean = false;
+	private uploading:boolean = false;
 	private progress:number = 0;
-	private categories = this.categoryService.list();
 
 	constructor(
 				private ui:UIHelper,
@@ -37,20 +35,30 @@ export class FormFieldComponent implements OnInit {
 
 	}
 
+	ngAfterViewInit() {
+		if (this.initial) {
+			this.value = this.initial;
+		}
+	}
+
   handleUpload(data:any):void {
   	this.zone.run(() => {
   		console.log(data);
   		this.progress = data.progress.percent;
-  		this.stillWorking = true;
+  		this.saving = true;
+  		this.uploading = true;
 
 	    if (data.response && data.status !== 404) {
 	    	this.onUpload.emit(JSON.parse(data.response));
+	    	this.saving = false;
+	    	this.uploading = false;
 	    }
     });
   }
 
-  save():void {
-  	this.onSave.emit(this.value);
+  save(value?):void {
+  	this.onSave.emit(value || this.value);
+  	this.value = null;
   }
 
   changeHandler() {
@@ -58,4 +66,8 @@ export class FormFieldComponent implements OnInit {
   	else this.changed = false;
   }
 
+  isSelected(option):any {
+  	if (option === this.initial) return "selected";
+  	return null;
+  }
 }

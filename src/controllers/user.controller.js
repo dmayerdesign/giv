@@ -407,4 +407,11 @@ exports.star = (req, res) => {
       });
     });
   });
-}
+};
+
+exports.adminToken = (req, res) => {
+  if (process.env.ADMIN_TOKEN)
+    res.status(200).json(process.env.ADMIN_TOKEN);
+  else
+    res.sendStatus(500);
+};

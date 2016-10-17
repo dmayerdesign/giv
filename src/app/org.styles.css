@@ -16,7 +16,8 @@
   font-size: 0.9em;
 }
 
-.org header {
+.org header,
+.header-preview {
   position: relative;
   background-color: #5D8BD5;
   background-size: 12em auto;
@@ -29,7 +30,8 @@
 }
 
 .has-cover-image header,
-.has-video header {
+.has-video header,
+.header-preview.has-cover-image {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50%;
@@ -207,6 +209,22 @@ header h4 > a, header h4 > a:hover {
 }
 .desktop-tab-button:hover {
   opacity: 0.7;
+}
+
+.official-badge {
+  position: relative;
+    top: -0.2rem;
+  display: inline-block;
+  padding-left: 0.8rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  background: url("app/images/official.png") no-repeat left top;
+  background-size: 0.8rem auto;
+  background-size: cover;
+}
+
+.featured-org .official-badge {
+  top: -0.3em;
 }
 
 @media only screen and (max-width: 767px) {
