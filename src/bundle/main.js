@@ -52337,8 +52337,9 @@
 	        query['limit'] = 4;
 	        query['sort'] = "-stars";
 	        query['not'] = [this.org._id];
+	        this.recommended = [];
 	        this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
-	            _this.recommended = _this.recommended.concat(orgs);
+	            _this.recommended = orgs;
 	            if (!_this.org.categories[1])
 	                return _this.recommendedOrgsAreLoaded = true;
 	            query['filterValue'] = _this.org.categories[1].id;
@@ -52376,7 +52377,6 @@
 	        if (!interests || !interests.length) {
 	            return this.recommendedOrgsAreLoaded = true;
 	        }
-	        this.recommended = [];
 	        query['filterField'] = "categories.id";
 	        query['filterValue'] = interests[0] && interests[0][0];
 	        query['limit'] = 4;
@@ -52392,10 +52392,9 @@
 	            query['not'].push(this.org._id);
 	        }
 	        console.log("Query: ", query);
+	        this.recommended = [];
 	        this.search.loadSearchableData("/orgs/get", query).subscribe(function (orgs) {
-	            orgs.forEach(function (org) {
-	                _this.recommended.push(org);
-	            });
+	            _this.recommended = orgs;
 	            if (!interests[1] || !interests[1][0])
 	                return _this.recommendedOrgsAreLoaded = true;
 	            query['filterValue'] = interests[1][0];

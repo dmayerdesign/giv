@@ -135,7 +135,7 @@ export class RecommendedOrgsComponent implements OnInit {
 
     this.recommended = [];
     this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
-    	this.recommended = this.recommended.concat(orgs);
+    	this.recommended = orgs;
 
     	if (!this.org.categories[1]) return this.recommendedOrgsAreLoaded = true;
 
@@ -195,9 +195,7 @@ export class RecommendedOrgsComponent implements OnInit {
 
     this.recommended = [];
     this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
-    	orgs.forEach(org => {
-    		this.recommended.push(org);
-    	});
+    	this.recommended = orgs;
 
     	if (!interests[1] || !interests[1][0]) return this.recommendedOrgsAreLoaded = true;
 
