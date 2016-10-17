@@ -133,6 +133,7 @@ export class RecommendedOrgsComponent implements OnInit {
     query['sort'] = "-stars";
     query['not'] = [this.org._id];
 
+    this.recommended = [];
     this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
     	this.recommended = this.recommended.concat(orgs);
 
@@ -160,7 +161,6 @@ export class RecommendedOrgsComponent implements OnInit {
 	loadRecommendations() {
 		let interests = [];
 		let query = {};
-		
 		if (!this.user || typeof this.user === "undefined") return;
 
 		for (let interest in this.user.interests) {
@@ -176,7 +176,6 @@ export class RecommendedOrgsComponent implements OnInit {
 			return this.recommendedOrgsAreLoaded = true;
 		}
 
-		this.recommended = [];
     query['filterField'] = "categories.id";
     query['filterValue'] = interests[0] && interests[0][0];
     query['limit'] = 4;
@@ -194,6 +193,7 @@ export class RecommendedOrgsComponent implements OnInit {
 
     console.log("Query: ", query);
 
+    this.recommended = [];
     this.search.loadSearchableData("/orgs/get", query).subscribe(orgs => {
     	orgs.forEach(org => {
     		this.recommended.push(org);
