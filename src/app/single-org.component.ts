@@ -25,6 +25,7 @@ export class SingleOrgComponent implements OnInit {
   private videoIsExpanded:boolean;
   private videoBg:string;
   private showOptionsMenu:boolean;
+  private adminToken:string;
 
 	constructor(
 				private router: Router,
@@ -48,6 +49,7 @@ export class SingleOrgComponent implements OnInit {
 						this.ui.flash("This page doesn't exist", "error");
 						return this.router.navigate([''], { queryParams: {"404": true}});
 					}
+					window.scrollTo(0,0);
 					this.org = data;
 					this.isLoaded = true;
 					this.ui.setTitle(this.org.name);
@@ -62,6 +64,14 @@ export class SingleOrgComponent implements OnInit {
 					this.userService.getLoggedInUser((err, user) => {
 						if(err) return console.error(err);
 						this.user = user;
+						this.http.get("/adminToken").map(res => res.json()).subscribe(
+							data => {
+								this.adminToken = data;
+							},
+							err => {
+								console.error(err);
+							}
+						);
 						this.http.post("/interests", {userId: user._id, categories: this.org.categories, increment: 1})
 							.map(res => res.json())
 							.subscribe(data => console.log(data), err => console.error(err));
@@ -114,10 +124,14 @@ export class SingleOrgComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 	toggleOptionsMenu() {
 		this.showOptionsMenu = this.showOptionsMenu ? false : true;

@@ -17,6 +17,7 @@
     *ngIf="type === 'text' || type === 'url' || type === 'email'"
     [attr.type]="type"
     [attr.name]="name"
+    [attr.id]="name"
     [attr.placeholder]="placeholder"
     (keyup)="changeHandler()"
     [(ngModel)]="value">
@@ -24,6 +25,7 @@
   <textarea
     *ngIf="type === 'textarea'"
     [attr.name]="name"
+    [attr.id]="name"
     [attr.placeholder]="placeholder" 
     (keyup)="changeHandler()"
     [(ngModel)]="value"></textarea>
@@ -31,6 +33,7 @@
   <select
     *ngIf="type === 'select'"
     [attr.name]="name"
+    [attr.id]="name"
     [attr.placeholder]="placeholder" 
     (change)="save($event.target.value)"
     [(ngModel)]="value">

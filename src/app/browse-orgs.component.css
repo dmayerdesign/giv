@@ -31,50 +31,6 @@
   margin-bottom: 0.7em;
 }
 
-
-/** ORG **/
-.orgs-list .org {
-  margin-bottom: 0.55em;
-  cursor: default;
-  position: relative;
-}
-
-.has-cover-image header,
-.has-video header {
-  background-size: 100%;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.org-expanded {
-  opacity: 0;
-  padding: 0 1.5em 1em;
-
-  -webkit-transition: opacity 1s ease-out;
-  transition: opacity 1s ease-out;
-}
-
-.org-expanded.expanded {
-  opacity: 1;
-}
-
-.org-name span {
-  position: relative;
-    top: -0.5em;
-  font-family: Helvetica, 'Roboto', sans-serif;
-  font-size: 0.5em;
-  text-decoration: underline;
-  font-weight: bold;
-}
-
-.description {
-  margin-bottom: 0;
-}
-
-.more-posts {
-  padding: 0.7em 0;
-}
-
 /* Featured orgs in browse */
 
 .featured-orgs {

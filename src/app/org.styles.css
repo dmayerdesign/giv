@@ -16,7 +16,8 @@
   font-size: 0.9em;
 }
 
-.org header {
+.org header,
+.header-preview {
   position: relative;
   background-color: #5D8BD5;
   background-size: 12em auto;
@@ -29,7 +30,8 @@
 }
 
 .has-cover-image header,
-.has-video header {
+.has-video header,
+.header-preview.has-cover-image {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50%;

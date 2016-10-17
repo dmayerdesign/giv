@@ -34,6 +34,7 @@ export class BrowseOrgsComponent implements OnInit {
 	private searchBoxIsFocused:boolean = false;
 	private categoriesList:any;
 	private categoryFilter:any = {id: null};
+	private adminToken:string;
 
 	private isLoading = true;
 	private isLoadingFeatured = true;
@@ -63,6 +64,14 @@ export class BrowseOrgsComponent implements OnInit {
 		this.userService.getLoggedInUser((err, user) => {
 			if(err) return console.error(err);
 			this.user = user;
+			this.http.get("/adminToken").map(res => res.json()).subscribe(
+				data => {
+					this.adminToken = data;
+				},
+				err => {
+					console.error(err);
+				}
+			);
 			console.log("User: ", user);
 		});
 
@@ -301,10 +310,14 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 	showOrgs(e) {
 		this.showOrgsMobileTab = true;

@@ -1,239 +1,172 @@
-<div class="manage-org-page" *ngIf="isLoaded">
+<div class="manage-org-page" *ngIf="org && isLoaded">
 	<a class="back-btn" *ngIf="org?.slug" [routerLink]="['/organization', org.slug]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
 	<a class="back-btn" *ngIf="!org?.slug" [routerLink]="['/organization', 'i', org._id]"><span class="flip-horizontal html-arrow">&#10132;</span> Back to page</a>
 	<h2>Manage <span>{{org?.name}}</span></h2>
 
-  <div class="giv-form col-md-6" *ngIf="org">
-  	<div class="form-section">
+  <div class="row">
+    <div class="giv-form col-md-6" *ngIf="org">
+    	<div class="form-section visuals">
+        <form-field
+          [title]="'Cover image'"
+          [name]="'coverImage'"
+          [placeholder]="'Paste a link to an image'"
+          [type]="'url'"
+          [saving]="saving_coverImage"
+          [upload]="coverImageUploadOptions"
+          (onUpload)="handleUpload($event)"
+          (onSave)="save('coverImage', $event)"></form-field>
 
-      <form-field
-        [title]="'Cover image'"
-        [name]="'coverImage'"
-        [placeholder]="'Paste a link to an image'"
-        [type]="'url'"
-        [saving]="saving_coverImage"
-        [upload]="coverImageUploadOptions"
-        (onUpload)="handleUpload($event)"
-        (onSave)="save('coverImage', $event)"></form-field>
+        <form-field
+          [title]="'Cover video (YouTube)'"
+          [name]="'videoLink'"
+          [placeholder]="org.videoLink || 'Paste a regular link to a YouTube video'"
+          [type]="'url'"
+          [saving]="saving_videoLink"
+          (onSave)="save('videoLink', $event)"></form-field>
 
-      <form-field
-        [title]="'Cover video (YouTube)'"
-        [name]="'videoLink'"
-        [placeholder]="org.videoLink || 'Paste a regular link to a YouTube video'"
-        [type]="'url'"
-        [saving]="saving_videoLink"
-        (onSave)="save('videoLink', $event)"></form-field>
+        <form-field
+          [title]="'Avatar'"
+          [name]="'avatar'"
+          [placeholder]="'Paste a link to an image'"
+          [type]="'url'"
+          [saving]="saving_avatar"
+          [upload]="avatarUploadOptions"
+          (onUpload)="handleUpload($event)"
+          (onSave)="save('avatar', $event)"></form-field>
+      </div>
+      <div class="form-section basics">
+        <form-field
+          [title]="'Name'"
+          [name]="'name'"
+          [placeholder]="org.name"
+          [type]="'text'"
+          [saving]="saving_name"
+          (onSave)="save('name', $event)"></form-field>
 
-      <form-field
-        [title]="'Avatar'"
-        [name]="'avatar'"
-        [placeholder]="'Paste a link to an image'"
-        [type]="'url'"
-        [saving]="saving_avatar"
-        [upload]="avatarUploadOptions"
-        (onUpload)="handleUpload($event)"
-        (onSave)="save('avatar', $event)"></form-field>
+        <form-field
+          [title]="'Identifier'"
+          [name]="'slug'"
+          [placeholder]="org.slug || 'e.g. my-awesome-org'"
+          [type]="'text'"
+          [saving]="saving_slug"
+          (onSave)="save('slug', $event)"></form-field>
 
-      <form-field
-        [title]="'Name'"
-        [name]="'name'"
-        [placeholder]="org.name"
-        [type]="'text'"
-        [saving]="saving_name"
-        (onSave)="save('name', $event)"></form-field>
+        <form-field
+          [title]="'Description'"
+          [name]="'description'"
+          [placeholder]="org.description || 'Describe your organization in a few sentences'"
+          [type]="'textarea'"
+          [saving]="saving_description"
+          (onSave)="save('description', $event)"></form-field>
+      </div>
+      <div class="form-section calls-to-action">
+        <form-field
+          [title]="'Call to action text'"
+          [name]="'donateLinkCopy'"
+          [type]="'select'"
+          [saving]="saving_donateLinkCopy"
+          [selectOptions]="callsToAction"
+          [initial]="org.donateLinkCopy"
+          (onSave)="save('donateLinkCopy', $event)"></form-field>
 
-      <form-field
-        [title]="'Identifier'"
-        [name]="'slug'"
-        [placeholder]="org.slug || 'e.g. my-awesome-org'"
-        [type]="'text'"
-        [saving]="saving_slug"
-        (onSave)="save('slug', $event)"></form-field>
+        <form-field
+          [title]="'Call to action link'"
+          [name]="'donateLink'"
+          [placeholder]="'e.g. https://my.org.com/donate'"
+          [type]="'url'"
+          [saving]="saving_donateLink"
+          (onSave)="save('donateLink', $event)"></form-field>
+        
+        <div class="form-field clearfix">
+          <label>Other ways to help</label>
+          <button
+            class="save"
+            (click)="save('otherLinks')"
+            [disabled]="!changed_otherLinks"
+            [ngClass]="{'changed': changed_otherLinks}">
 
-      <form-field
-        [title]="'Description'"
-        [name]="'description'"
-        [placeholder]="org.description || 'Describe your organization in a few sentences'"
-        [type]="'textarea'"
-        [saving]="saving_description"
-        (onSave)="save('description', $event)"></form-field>
-
-      <form-field
-        [title]="'Call to action text'"
-        [name]="'donateLinkCopy'"
-        [type]="'select'"
-        [saving]="saving_donateLinkCopy"
-        [selectOptions]="callsToAction"
-        [initial]="org.donateLinkCopy"
-        (onSave)="save('donateLinkCopy', $event)"></form-field>
-
-      
-      <div class="form-field clearfix">
-        <label *ngIf="title">Other ways to help</label>
-        <button
-          class="save"
-          (click)="save('otherLinks')"
-          [disabled]="!changed_otherLinks"
-          [ngClass]="{'changed': changed_otherLinks}">
-
-          <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
-          <i [hidden]="saving" class="fa fa-check"></i>
-          save<span *ngIf="!changed_otherLinks">d</span>
-        </button>
-        <div class="other-link" *ngFor="let otherLink of org?.otherLinks; let i = index">
-          <input
-            [attr.name]="'otherLink' + i + 'Copy'"
-            [attr.placeholder]="'Description'"
-            (keyup)="changeHandler('otherLinks', $event)"
-            [(ngModel)]="org.otherLinks[i].copy">
-          <input
-            [attr.name]="'otherLink' + i + 'Href'"
-            [attr.type]="'url'"
-            [attr.placeholder]="'Link to a resource or contact'"
-            (keyup)="changeHandler('otherLinks', $event)"
-            [(ngModel)]="org.otherLinks[i].href">
+            <i [hidden]="!saving_otherLinks" class="fa fa-circle-o-notch fa-spin"></i>
+            <i [hidden]="saving_otherLinks" class="fa fa-check"></i>
+            save<span *ngIf="!changed_otherLinks">d</span>
+          </button>
+          <div class="other-link" *ngFor="let otherLink of org?.otherLinks; let i = index">
+            <input
+              [attr.name]="'otherLink' + i + 'Copy'"
+              [attr.placeholder]="'Description'"
+              (keyup)="changeHandler('otherLinks', $event)"
+              [(ngModel)]="org.otherLinks[i].copy">
+            <input
+              [attr.name]="'otherLink' + i + 'Href'"
+              [attr.type]="'url'"
+              [attr.placeholder]="'Link to a resource or contact'"
+              (keyup)="changeHandler('otherLinks', $event)"
+              [(ngModel)]="org.otherLinks[i].href">
+          </div>
+          <button
+            class="add-link"
+            *ngIf="org?.otherLinks.length < 3"
+            (click)="addAnotherLink()">+ Add another</button>
         </div>
-        <button
-          class="add-link"
-          *ngIf="org?.otherLinks.length < 3"
-          (click)="addAnotherLink()">+ Add another</button>
+      </div>
+      <div class="form-section categories">
+        <div class="form-field categories clearfix">
+          <label>Categories</label>
+          <button
+            class="save"
+            (click)="save('categories')"
+            [disabled]="!changed_categories"
+            [ngClass]="{'changed': changed_categories}">
+
+            <i [hidden]="!saving_categories" class="fa fa-circle-o-notch fa-spin"></i>
+            <i [hidden]="saving_categories" class="fa fa-check"></i>
+            save<span *ngIf="!changed_categories">d</span>
+          </button>
+          <div class="category" *ngFor="let category of categories">
+            <label [attr.for]="category.id"
+                class="checkbox-label"
+                [ngClass]="{'checked': checked[category.id]}">
+              <input
+                type="checkbox"
+                [attr.id]="category.id"
+                [attr.name]="category.id"
+                [checked]="orgHasCategory(category)"
+                (change)="changeHandler('categories', $event); changeSelectedCategories(category, $event.target.checked)">
+
+              {{category.name}}
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-section admin">
+        <div class="form-field clearfix" *ngIf="userIsAdmin()">
+          <button *ngIf="!org.featured" (click)="save('featured', true)">Set featured org</button>
+          <button *ngIf="org.featured" (click)="save('featured', false)">Unset featured org</button>
+        </div>
+      
+        <button (click)="deleteOrg()">Delete this org</button>
+      </div>
+    </div>
+
+    <div class="preview-pane col-md-6 pull-right">
+      <div class="preview-section visuals">
+        <div class="header-preview"
+            [ngClass]="{'has-cover-image': org.coverImage}"
+            [ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
+          <div class="header-inner">
+            <div *ngIf="!viewingOrg" class="inside-org header-left">
+              <div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-
-
-<!--       <label for="coverImage">Cover image</label>
-      <button
-          class="save"
-          (click)="save('coverImage')"
-          [disabled]="!changed?.coverImage"
-          [ngClass]="{'changed': changed?.coverImage}">
-        <i [hidden]="!saving_coverImage" class="fa fa-circle-o-notch fa-spin"></i>
-        <i [hidden]="saving_coverImage" class="fa fa-check"></i>
-        save<span *ngIf="!changed?.coverImage">d</span>
-      </button>
-      <input 
-          type="url"
-          name="coverImage"
-          placeholder="Paste a link to an image" 
-          (keyup)="changeHandler('coverImage', $event)">
-  		<input
-          *ngIf="coverImageUploadOptions?.url"
-          type="file"
-    			class="form-control"
-      		ngFileSelect
-          [options]="coverImageUploadOptions"
-          (onUpload)="handleUpload($event)">
-      <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span> -->
-    
+      <div class="preview-section basics">
+        <h4 class="name-preview">{{org.name}}</h4>
+        <p class="slug-preview"><span>giv.community/</span>{{org.slug}}</p>
+        <p class="description-preview" [innerHTML]="org.description"></p>
+      </div>
     </div>
   </div>
 
-  <div class="preview-pane col-md-6 pull-right">
-    
-  </div>
 
-
-
-
-
-
-
-
-<div class="pull-left">
-<!--   <div class="form-block">
-    <input type="file"
-      class="form-control"
-      ngFileSelect
-      [options]="coverImageUploadOptions"
-      (onUpload)="handleUpload($event)">
-
-    <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
-    <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
-    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
-    <span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
-  </div> -->
-  <!-- <div class="form-block">
-    <input [(ngModel)]="name"
-          class="form-control"
-          ngControl="name"
-          name="name"
-          placeholder="Change the name of your page"><button (click)="save('name')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div> -->
-  <!-- <div class="form-block">
-    <textarea [(ngModel)]="description"
-          class="form-control"
-          ngControl="description"
-          name="description"
-          placeholder="Change the description of your page"></textarea>
-      <button (click)="save('description')"><i [hidden]="!saving_name" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div> -->
-  <!-- <div class="form-block">
-    <input [(ngModel)]="avatarLink"
-          class="form-control"
-          name="avatarLink"
-          placeholder="Change the avatar"><button (click)="save('avatar', avatarLink)"><i [hidden]="!saving_avatar" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div> -->
-  <!-- <div class="form-block">
-    <input [(ngModel)]="videoLink"
-          class="form-control"
-          name="videoLink"
-          placeholder="Add a link to a youtube video"><button (click)="save('videoLink')"><i [hidden]="!saving_videoLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div> -->
-  <!-- <div class="form-block">
-  	<input [(ngModel)]="donateLink"
-  				class="form-control"
-  				name="donateLink"
-  				placeholder="Change the main Donate link"><button (click)="save('donateLink')"><i [hidden]="!saving_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div> -->
-<!--   <div class="form-block">
-    <select
-        (change)="save('donateLinkCopy', $event.target.value)"
-        [(ngModel)]="org.donateLinkCopy"
-        name="donateLinkCopy"
-        class="form-control">
-      <option
-        *ngFor="let callToAction of callsToAction"
-        [value]="callToAction">{{callToAction}}</option>
-    </select>
-  </div>
-  <div class="form-block">
-    <h5>Enter up to 3 additional ways for people to help</h5>
-    <div *ngFor="let otherLink of org.otherLinks; let i = index">
-      <input [(ngModel)]="org.otherLinks[i].copy"
-            class="form-control"
-            name="otherLink{{i}}Copy"
-            placeholder="Briefly describe the link">
-      <input [(ngModel)]="org.otherLinks[i].href"
-            class="form-control"
-            name="otherLink{{i}}Href"
-            placeholder="Enter the URL where you want to lead people">
-    </div>
-    <button (click)="save('otherLinks')"><i [hidden]="!saving_donateLink" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
-  	<input [(ngModel)]="slug"
-  				class="form-control"
-  				(keyup)="checkForUniqueSlug($event)"
-  				ngControl="slug"
-  				name="slug"
-  				placeholder="Change your page's identifier (currently {{org.slug}})"><button [disabled]="!slugIsValid" (click)="save('slug', slug)"><i [hidden]="!saving_slug" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-  <div class="form-block">
-    <div *ngFor="let category of categories">
-      <input
-        type="checkbox"
-        [checked]="orgHasCategory(category)"
-        (change)="changeSelectedCategories(category, $event.target.checked)">
-      <label>{{category.name}}</label>
-    </div>
-    <button (click)="save('categories', org.categories)"><i [hidden]="!saving_categories" class="fa fa-circle-o-notch fa-spin"></i>Apply</button>
-  </div>
-	<div class="form-block">
-  	<button *ngIf="!org.featured" (click)="save('featured', true)">Set featured org</button>
-  	<button *ngIf="org.featured" (click)="save('featured', false)">Unset featured org</button>
-	</div>
-
-  <button (click)="deleteOrg()">Delete this org</button>
--->
-</div>
 </div>

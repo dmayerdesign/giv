@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
 
@@ -10,7 +10,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
 @Component({
 	selector: 'org',
 	templateUrl: 'app/org.component.html',
-	styleUrls: [ 'app/org.styles.css', 'app/browse-orgs.component.css' ]
+	styleUrls: [ 'app/org.styles.css', 'app/org.component.css' ]
 })
 
 export class OrgComponent implements OnInit {
@@ -24,6 +24,8 @@ export class OrgComponent implements OnInit {
 	private viewingOrg:boolean = false;
 	private singleDetailsAreLoaded:boolean = false;
 	private singlePostsAreLoaded:boolean = false;
+	private adminToken:string;
+	private shortDescription:string;
 
 	constructor(
 				private http:Http,
@@ -31,7 +33,18 @@ export class OrgComponent implements OnInit {
 				private ui:UIHelper) { }
 
 	ngOnInit() {
+		this.http.get("/adminToken").map(res => res.json()).subscribe(
+			data => {
+				this.adminToken = data;
+			},
+			err => {
+				console.error(err);
+			}
+		);
+	}
 
+	ngAfterViewInit() {
+		this.shortDescription = this.org.description.replace("<br />", " ");
 	}
 
 	viewOrg():void {
@@ -89,9 +102,13 @@ export class OrgComponent implements OnInit {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 }

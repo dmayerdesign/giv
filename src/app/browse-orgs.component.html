@@ -35,7 +35,7 @@
 							<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarFeaturedOrg(org)"><i class="fa fa-star"></i></span>
 							&nbsp;{{org.stars || '0'}} starred this
 						</p> -->
-						<p class="description inside-org preview">{{org.description | truncate:300}}</p>
+						<p class="description inside-org preview">{{org.description | truncate:360}}</p>
 					</div>
 					<a [href]="org.donateLink" target="_blank"><button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button></a>
 				</div>

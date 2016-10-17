@@ -24,7 +24,7 @@
 					{{org.name}}
 				</h4>
 
-				<p class="description preview inside-org" *ngIf="!viewingOrg">{{org.description | truncate:170}}</p>
+				<p class="description preview inside-org" *ngIf="!viewingOrg">{{shortDescription | truncate:170}}</p>
 				<p class="stars-preview preview info inside-org">
 					<i *ngIf="user && orgIsStarred()" class="fa fa-star inside-org"></i>
 					<i *ngIf="!org.stars || !orgIsStarred()" class="fa fa-star-o inside-org"></i>

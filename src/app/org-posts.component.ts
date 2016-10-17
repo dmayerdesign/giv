@@ -14,7 +14,7 @@ import 'rxjs/add/operator/map';
 	styleUrls: ['app/org-posts.component.css', 'app/org.styles.css']
 })
 
-export class OrgPostsComponent {
+export class OrgPostsComponent implements OnInit {
 	@Input() org;
 	@Input() user;
 	@Input() isBrowsing:boolean;
@@ -31,6 +31,7 @@ export class OrgPostsComponent {
 	public postId:Observable<string>;
 	private querySub:Subscription;
 	private orgsByPost = {};
+	private adminToken:string;
 
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
@@ -49,6 +50,17 @@ export class OrgPostsComponent {
 				private orgService: OrgService,
 				private ui: UIHelper,
 				private utilities: Utilities) {
+	}
+
+	ngOnInit() {
+		this.http.get("/adminToken").map(res => res.json()).subscribe(
+			data => {
+				this.adminToken = data;
+			},
+			err => {
+				console.error(err);
+			}
+		);
 	}
 
 	ngAfterViewInit() {
@@ -155,7 +167,7 @@ export class OrgPostsComponent {
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.user.adminToken === 'h2u81eg7wr3h9uijk8') return true;
+		if (this.user && this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
@@ -271,5 +283,9 @@ export class OrgPostsComponent {
 		if (this.posts) return this.posts.length >= this.initialPostLimit;
 		else return true;
 	}
+
+	userIsAdmin() {
+  	return this.user.adminToken === this.adminToken;
+  }
 
 }
