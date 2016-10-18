@@ -72,10 +72,5 @@
 				<button (click)="savePost(selectedPost)">Save</button>
 			</div>
 		</section>
-
-		<p *ngIf="org && isBrowsing" class="read-more more-posts pull-left">
-			<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">More posts by {{org.name}}</a>
-			<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">More posts by {{org.name}}</a>
-		</p>
 	</div>
 </div>

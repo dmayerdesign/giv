@@ -60,7 +60,7 @@
         <form-field
           [title]="'Description'"
           [name]="'description'"
-          [placeholder]="org.description || 'Describe your organization in a few sentences'"
+          [placeholder]="'Describe your organization in a few sentences'"
           [type]="'textarea'"
           [saving]="saving_description"
           (onSave)="save('description', $event)"></form-field>
@@ -95,17 +95,22 @@
             <i [hidden]="saving_otherLinks" class="fa fa-check"></i>
             save<span *ngIf="!changed_otherLinks">d</span>
           </button>
-          <div class="other-link" *ngFor="let otherLink of org?.otherLinks; let i = index">
+          <div class="other-link clearfix" *ngFor="let otherLink of org?.otherLinks; let i = index">
             <button
-              class="remove-link"
+              class="remove icon-btn"
               *ngIf="org?.otherLinks.length < 3 && org?.otherLinks.length"
-              (click)="removeOtherLink(otherLink)">- remove</button>
+              (click)="removeOtherLink(otherLink)">
+
+              <img src="app/images/trash-btn.svg" alt="remove">
+            </button>
             <input
+              class="grey-bg no-shadow"
               [attr.name]="'otherLink' + i + 'Copy'"
               [attr.placeholder]="'Description'"
               (keyup)="changeHandler('otherLinks', $event)"
               [(ngModel)]="org.otherLinks[i].copy">
             <input
+              class="grey-bg no-shadow"
               [attr.name]="'otherLink' + i + 'Href'"
               [attr.type]="'url'"
               [attr.placeholder]="'Link to a resource or contact'"
@@ -113,9 +118,9 @@
               [(ngModel)]="org.otherLinks[i].href">
           </div>
           <button
-            class="add-link"
+            class="add mini"
             *ngIf="org?.otherLinks.length < 3"
-            (click)="addAnotherLink()">+ Add another</button>
+            (click)="addAnotherLink()">+ add</button>
         </div>
       </div>
       <div class="form-section categories clearfix">
@@ -131,9 +136,11 @@
             <i [hidden]="saving_categories" class="fa fa-check"></i>
             save<span *ngIf="!changed_categories">d</span>
           </button>
-          <div class="category" *ngFor="let category of categories">
-            <label [attr.for]="category.id"
-                class="checkbox-label"
+          <div class="categories-list clearfix">
+            <label
+                *ngFor="let category of categories"
+                [attr.for]="category.id"
+                class="category checkbox-label"
                 [ngClass]="{'checked': checked[category.id]}">
               <input
                 type="checkbox"
@@ -142,7 +149,7 @@
                 [checked]="orgHasCategory(category)"
                 (change)="changeHandler('categories', $event); changeSelectedCategories(category, $event.target.checked)">
 
-              {{category.name}}
+              <span>{{category.name}}</span>
             </label>
           </div>
         </div>

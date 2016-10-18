@@ -7,11 +7,6 @@
 	height: 14em;
 }
 
-label.checked {
-	background: #000;
-	color: #fff;
-}
-
 h2 {
 	margin-bottom: 0.5em;
 }
@@ -29,6 +24,36 @@ h2 span {
 .form-section {
 	margin-bottom: 2em;
 }
+
+.other-links {
+	float: left;
+	margin-top: 1.6em;
+}
+
+.other-link {
+	position: relative;
+	float: left;
+	clear: both;
+	width: 73%;
+	margin-bottom: 0.5em;
+}
+
+.other-link input {
+	width: 100%;
+}
+
+.other-link .remove {
+	position: absolute;
+    right: -2.5em;
+    top: 1.65em;
+}
+
+.categories-list {
+	float: left;
+}
+
+
+
 
 
 /* PREVIEW PANE */
@@ -71,9 +96,4 @@ h2 span {
 	float: left;
 	width: 100%;
 	margin-top: 0.6em;
-}
-
-.other-links {
-	float: left;
-	margin-top: 1.6em;
 }
