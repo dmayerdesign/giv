@@ -1,0 +1,170 @@
+.form-field {
+	margin-bottom: 1em;
+}
+
+label.title {
+	float: left;
+	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+	margin-bottom: 0.3rem;
+}
+
+input, textarea, select, button {
+	display: block;
+	float: left;
+	clear: both;
+	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+}
+
+input, textarea {
+	width: 100%;
+}
+
+input, textarea, select {
+	font-size: 0.85em;
+	padding: 0.5em 1em;
+	border: 2px solid #DFE8E6;
+	margin-bottom: 0;
+}
+
+input + input,
+input + button {
+	margin-top: 0.6em;
+}
+
+input[type='checkbox'] {
+	width: auto;
+}
+
+.save {
+	margin-left: 1em;
+	font-size: 0.6em;
+	clear: none;
+	font-weight: bold
+}
+
+.save[disabled] {
+	color: #999194;
+	background: transparent;
+	padding: 0.45em;
+}
+
+.save i {
+	padding-right: 0.2em;
+}
+
+.save span:not(span span) {
+	font-size: 1.1em;
+}
+
+select,
+input[type='url'] {
+	width: 73%;
+}
+
+.upload-container {
+	float: right;
+	clear: none;
+	width: 26%;
+}
+
+.upload-container span {
+	position: relative;
+		top: 0.7em;
+	display: block;
+	box-sizing: border-box;
+	padding-right: 0.9em;
+	width: 25%;
+	text-align: right;
+	letter-spacing: 1px;
+	float: left;
+	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+	font-size: 0.7em;
+	font-weight: 500;
+	opacity: 0.7;
+}
+
+label.upload {
+	float: right;
+	cursor: pointer;
+	width: 75%;
+	height: 2em;
+	background: url('app/images/upload.png') no-repeat 50% 49%;
+	background-size: 3.6em auto;
+	border-radius: 2px;
+	opacity: 0.8;
+}
+
+label.upload:hover {
+	opacity: 1;
+}
+
+.upload input {
+	visibility: hidden;
+}
+
+.upload + .info {
+	float: right;
+	clear: both;
+	width: 10em;
+	font-size: 0.7em;
+	line-height: 1.1;
+}
+
+
+button.add,
+label.upload {
+	background-color: #6895A5;
+}
+
+button.add {
+	font-size: 0.7em;
+	background-image: none;
+	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+	font-weight: bold;
+	padding: 0.5em 1em;
+	opacity: 0.8;
+}
+
+button.add:hover {
+	opacity: 1;
+}
+
+button.remove {
+	width: 1.6em;
+	height: 1.6em;
+  opacity: 0.8;
+}
+
+button.remove img {
+	height: 1.6em;
+}
+
+button.remove:hover {
+	opacity: 1;
+}
+
+.checkbox-label {
+	float: left;
+	display: block;
+	width: 49%;
+	padding: 1.2em;
+	margin-right: 1%;
+	margin-bottom: 0.3em;
+	border: 1px solid #DFE8E6;
+
+	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: 0.85em;
+  line-height: 1.05;
+}
+
+.checkbox-label.checked {
+	background: #6895A5;
+	color: #fff;
+}
+
+.checkbox-label span {
+	display: inline-block;
+	padding-left: 0.7em;
+	line-height: 1;
+}

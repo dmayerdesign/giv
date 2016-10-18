@@ -1,5 +1,5 @@
 <div class="form-field clearfix" [ngClass]="name">
-  <label *ngIf="title" [attr.for]="name">{{title}}</label>
+  <label class="title" *ngIf="title" [attr.for]="name">{{title}}</label>
 
   <button
     class="save"
@@ -10,10 +10,11 @@
 
     <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
     <i [hidden]="saving" class="fa fa-check"></i>
-    save<span *ngIf="!changed">d</span>
+    <span>save<span *ngIf="!changed">d</span></span>
   </button>
 
   <input
+    class="grey-bg no-shadow"
     *ngIf="type === 'text' || type === 'url' || type === 'email'"
     [attr.type]="type"
     [attr.name]="name"
@@ -23,6 +24,7 @@
     [(ngModel)]="value">
 
   <textarea
+    class="grey-bg no-shadow"
     *ngIf="type === 'textarea'"
     [attr.name]="name"
     [attr.id]="name"
@@ -31,6 +33,7 @@
     [(ngModel)]="value"></textarea>
 
   <select
+    class="grey-bg no-shadow"
     *ngIf="type === 'select'"
     [attr.name]="name"
     [attr.id]="name"
@@ -45,13 +48,17 @@
 
   </select>  
 
-  <div class="upload" *ngIf="upload">
-    <input
-      *ngIf="upload?.url"
-      type="file"
-  		ngFileSelect
-      [options]="upload"
-      (onUpload)="handleUpload($event)">
-    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
+  <div class="upload-container" *ngIf="upload">
+    <span>OR</span>
+    <label class="upload" [attr.for]="name + '-upload'">
+      <input
+        *ngIf="upload?.url"
+        [attr.id]="name + '-upload'"
+        type="file"
+    		ngFileSelect
+        [options]="upload"
+        (onUpload)="handleUpload($event)">
+    </label>
+    <!-- <p class="info upload-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></p> -->
   </div>
 </div>

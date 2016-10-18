@@ -53583,6 +53583,10 @@
 	            return;
 	        this.org.otherLinks.push({ copy: null, href: null });
 	    };
+	    ManageOrgPageComponent.prototype.removeOtherLink = function (link) {
+	        this.org.otherLinks.splice(this.org.otherLinks.indexOf(link), 1);
+	        this['changed_otherLinks'] = true;
+	    };
 	    ManageOrgPageComponent.prototype.changeHandler = function (key, event) {
 	        if (event.target.value)
 	            this['changed_' + key] = true;
@@ -53605,7 +53609,7 @@
 	        core_1.Component({
 	            selector: 'manage-org-page',
 	            templateUrl: 'app/manage-org-page.component.html',
-	            styleUrls: ['app/manage-org-page.component.css']
+	            styleUrls: ['app/org.styles.css', 'app/org-details.component.css', 'app/form-field.component.css', 'app/manage-org-page.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
 	    ], ManageOrgPageComponent);
@@ -54413,12 +54417,18 @@
 	                _this.onUpload.emit(JSON.parse(data.response));
 	                _this.saving = false;
 	                _this.uploading = false;
+	                console.log(data.response);
 	            }
 	        });
 	    };
 	    FormFieldComponent.prototype.save = function (value) {
+	        var _this = this;
 	        this.onSave.emit(value || this.value);
 	        this.value = null;
+	        this.zone.run(function () {
+	            if (!_this.saving)
+	                _this.changed = false;
+	        });
 	    };
 	    FormFieldComponent.prototype.changeHandler = function () {
 	        if (this.value && this.value.length)
@@ -54474,7 +54484,8 @@
 	    FormFieldComponent = __decorate([
 	        core_1.Component({
 	            selector: 'form-field',
-	            templateUrl: 'app/form-field.component.html'
+	            templateUrl: 'app/form-field.component.html',
+	            styleUrls: ['app/form-field.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [app_service_1.UIHelper, app_service_1.Utilities, categories_service_1.Categories, core_1.NgZone])
 	    ], FormFieldComponent);
