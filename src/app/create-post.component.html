@@ -1,33 +1,43 @@
-  <h3>Add a post</h3>
-	<div class="form-block">
-		<input type="file"
-			class="form-control"
-  		ngFileSelect
-      [options]="uploadOptions"
-      (onUpload)="handleUpload($event)">
+<div class="create-post col-md-7">
 
-    <span class="upload-status" *ngIf="progress && stillWorking"><i class="fa fa-circle-o-notch fa-spin"></i></span>
-    <span class="upload-status" *ngIf="progress && !stillWorking"><i class="fa fa-check"></i></span>
-    <span class="editing-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></span>
-  	<span class="editing-tip">If your file is publicly accessible on the Internet, simply paste the link below.</span>
-  </div>
-  <div class="form-block">
-  	<input [(ngModel)]="post.featuredImage"
-  				class="form-control"
-  				name="featuredImageLink"
-  				placeholder="Add a featured image">
-  </div>
-  <div class="form-block">
+  <h4 *ngIf="!editing">Add a post</h4>
+  <h4 *ngIf="editing">Edit {{editing.title}}</h4>
+
+  <div class="form-field reversed clearfix">
     <input [(ngModel)]="post.title"
-          class="form-control"
+          class="grey-bg no-shadow"
           name="title"
           placeholder="Title">
   </div>
-  <div class="form-block">
+  <div class="form-field reversed clearfix">
     <textarea [(ngModel)]="post.content"
-          class="form-control"
+          class="grey-bg no-shadow"
           name="content"
           placeholder="Type something"></textarea>
   </div>
+  <div class="form-field reversed clearfix">
+    <input [(ngModel)]="post.featuredImage"
+      [attr.type]="'url'"
+      class="grey-bg no-shadow"
+      name="featuredImageLink"
+      placeholder="Paste a link to an image">
+    <div class="upload-container">
+      <span>OR</span>
+      <label class="upload" [attr.for]="'post-featured-image'">
+        <input
+          [attr.id]="'post-featured-image'"
+          type="file"
+          ngFileSelect
+          [options]="uploadOptions"
+          (onUpload)="handleUpload($event)">
+      </label>
+      <!-- <p class="info upload-tip">If you want to upload a file larger than 3 MB, go <a href="http://compressjpeg.com">here for JPEGs</a> and <a href="http://tinypng.com">here for PNGs.</a></p> -->
+    </div>
+  </div>
 
-  <button (click)="createPost(post)">Add post</button>
+  <button class="submit" (click)="createPost(post)">
+    <span *ngIf="!editing">Add</span><span *ngIf="editing">Save</span> post
+  </button>
+  <button class="cancel" (click)="cancelPost()">Cancel</button>
+
+</div>

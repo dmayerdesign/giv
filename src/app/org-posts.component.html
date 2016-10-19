@@ -1,10 +1,17 @@
-<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing" [org]="org" [user]="user" (update)="updatePosts($event)" (postAdd)="createPost($event)"></create-post>
 <div class="clearfix posts-container"
 		[attr.id]="!isBrowsing ? 'posts' : null"
 		[ngClass]="{'posts-by-org': org, 'browsing': isBrowsing, 'single section': org && !isBrowsing, 'col-md-12': org && !isBrowsing}">
 
+	<create-post *ngIf="org && user && userHasPermission(org) && !isBrowsing && creatingPost" [org]="org" [user]="user" (postAdd)="createPost($event)" (cancel)="toggleCreatingPost($event)"></create-post>
+
 	<header [ngClass]="{'col-md-12': org && !isBrowsing}">
-		<h4 class="posts-title" *ngIf="org">Updates</h4>
+		<h4 class="posts-title" *ngIf="org">Updates
+			<button
+					(click)="toggleCreatingPost()"
+					[ngClass]="{'cancel': creatingPost, 'add': !creatingPost}"
+					*ngIf="!creatingPost && !isBrowsing">+ add a post
+			</button>
+		</h4>
 		<h2 class="posts-title" *ngIf="!org && isBrowsing">Updates <span class="mobile-tab-button" (click)="showOrgs()">Organizations</span></h2>
 
 		<p *ngIf="!org" class="subtitle">See where your money's going</p>
@@ -22,7 +29,7 @@
 		<section *ngIf="!viewingOne && posts?.length" class="posts col-md-12" [ngClass]="{'is-loading': loadingPosts}">
 			<div #singlePost
 					class="post clearfix"
-					[ngClass]="{'has-featured-image': post?.featuredImage?.length}"
+					[ngClass]="{'has-featured-image': post?.featuredImage?.length, 'col-md-6': org && !isBrowsing}"
 					*ngFor="let post of posts">
 				<div *ngIf="!org"
 						[ngStyle]="{'background-image': 'url(' + orgsByPost[post._id]?.avatar + ')'}"
@@ -63,14 +70,30 @@
 				<p *ngIf="!selectedPost.treatedContent" class="post-content single-post-content">{{selectedPost.content}}</p>
 				<p *ngIf="selectedPost.treatedContent" [innerHTML]="selectedPost.treatedContent" class="post-content single-post-content"></p>
 			</div>
-			<button *ngIf="userHasPermission(org)" (click)="editPost()">Edit</button>
-			<button *ngIf="userHasPermission(org)" (click)="deletePost(selectedPost)">Delete</button>
+
+			<button class="submit" *ngIf="!isEditing && userHasPermission(org)" (click)="editPost()">Edit</button>
+			<button class="cancel" *ngIf="!isEditing && userHasPermission(org)" (click)="deletePost(selectedPost)">Delete</button>
+			
+
+			<create-post
+				*ngIf="org && user && userHasPermission(org) && !isBrowsing && isEditing"
+				[org]="org"
+				[user]="user"
+				[editing]="selectedPost"
+				(postAdd)="savePost($event)"
+				(cancel)="cancelPost()"></create-post>
+
+<!-- 
+
 			<div *ngIf="isEditing">
 				<input [(ngModel)]="selectedPost.title">
 				<textarea [(ngModel)]="selectedPost.content"></textarea>
 				<input [(ngModel)]="selectedPost.featuredImage">
 				<button (click)="savePost(selectedPost)">Save</button>
-			</div>
+			</div> -->
+
+
+
 		</section>
 	</div>
 </div>

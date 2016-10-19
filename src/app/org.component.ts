@@ -16,12 +16,12 @@ import { TruncatePipe } from './pipes/truncate.pipe';
 export class OrgComponent implements OnInit {
 	@Input() user;
 	@Input() org;
+	@Input() selected;
 	@Output() onSelect = new EventEmitter();
 	@Output() onDeselect = new EventEmitter();
 	@Output() onStar = new EventEmitter();
 	@Output() onUnstar = new EventEmitter();
 
-	private viewingOrg:boolean = false;
 	private singleDetailsAreLoaded:boolean = false;
 	private singlePostsAreLoaded:boolean = false;
 	private adminToken:string;
@@ -49,14 +49,15 @@ export class OrgComponent implements OnInit {
 
 	viewOrg():void {
 		this.onSelect.emit(this.org._id);
-		this.viewingOrg = true;
+		this.selected = this.selected;
 	}
 
-	deselectOrg(e:any):void {
+	deselectOrg(e:any, orgId):void {
+		if (!this.selected || orgId !== this.selected._id) return;
 		if (e.target.className.indexOf("inside-org") > -1) return;
-		if (this.viewingOrg) {
+		if (this.selected && this.selected._id === orgId) {
 			this.onDeselect.emit(this.org._id);
-			this.viewingOrg = false;
+			this.selected = null;
 			this.singleDetailsAreLoaded = false;
 			this.singlePostsAreLoaded = false;
 		}
@@ -109,6 +110,12 @@ export class OrgComponent implements OnInit {
 
 	userIsAdmin() {
   	return this.user.adminToken === this.adminToken;
+  }
+
+  isSelected(orgId) {
+  	if (!this.selected) return false;
+  	if (this.selected._id === orgId) return true;
+  	else return false;
   }
 
 }

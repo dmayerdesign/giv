@@ -102,6 +102,7 @@
 			*ngFor="let org of orgs"
 			[org]="org"
 			[user]="user"
+			[selected]="selectedOrg"
 			(onSelect)="viewOrg($event)"
 			(onDeselect)="deselectOrg($event)"
 			(onStar)="starOrg($event)"
@@ -135,6 +136,11 @@
   <p class="loader__label"><img src="images/logo-color-2x.png" width="30" alt="loading organizations"></p>
 </div> -->
 <div class="loader app-loader" *ngIf="isLoading">
-  <p class="loader__label"><img src="images/logo-color-2x.gif" width="50"></p>
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="50"></p>
+  <p class="loader_dots">
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+  </p>
 </div>
 

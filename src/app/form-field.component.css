@@ -19,11 +19,21 @@ input, textarea {
 	width: 100%;
 }
 
+textarea {
+	min-height: 8em;
+}
+
 input, textarea, select {
 	font-size: 0.85em;
 	padding: 0.5em 1em;
 	border: 2px solid #DFE8E6;
 	margin-bottom: 0;
+}
+
+.reversed input,
+.reversed textarea,
+.reversed select {
+	background-color: #fff;
 }
 
 input + input,
@@ -108,25 +118,6 @@ label.upload:hover {
 	width: 10em;
 	font-size: 0.7em;
 	line-height: 1.1;
-}
-
-
-button.add,
-label.upload {
-	background-color: #6895A5;
-}
-
-button.add {
-	font-size: 0.7em;
-	background-image: none;
-	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
-	font-weight: bold;
-	padding: 0.5em 1em;
-	opacity: 0.8;
-}
-
-button.add:hover {
-	opacity: 1;
 }
 
 button.remove {

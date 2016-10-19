@@ -6,8 +6,8 @@
 			<p *ngIf="isSingle && org?.type" class="org-type">Type: {{org.type}}</p>
 			<p class="org-description" [innerHTML]="org.description | truncate: truncateDescription"></p>
 			<p class="read-more" *ngIf="isSingle && descriptionIsLong()">
-				<span *ngIf="truncateDescription !== 0" (click)="readMore()">Show more</span>
-				<span *ngIf="truncateDescription == 0" (click)="readLess()">Show less</span>
+				<span *ngIf="truncateDescription !== 0 && org.description > truncateDescription" (click)="readMore()">Show more</span>
+				<span *ngIf="truncateDescription == 0 && org.description > truncateDescription" (click)="readLess()">Show less</span>
 			</p>
 		</div>
 		<div class="org-details-ctas" [ngClass]="{'col-md-6': isSingle}">

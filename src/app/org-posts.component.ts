@@ -42,6 +42,7 @@ export class OrgPostsComponent implements OnInit {
 	private options = new RequestOptions({ headers: new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 
 	private isEditing:boolean = false;
+	private creatingPost:boolean = false;
 
 	constructor(
 				private router: Router,
@@ -224,22 +225,28 @@ export class OrgPostsComponent implements OnInit {
 		}
 	}
 
+	cancelPost() {
+		this.isEditing = false;
+	}
+
 	deletePost(post):void {
-		this.http.delete('/post/' + post._id).map(res => res.json()).subscribe(res => {
-			if (res.errmsg) {
-  			this.ui.flash("Delete failed", "error");
-  			return;
-  		}
-  		this.posts.splice(this.posts.indexOf(post), 1);
-  		this.org.posts.splice(this.org.posts.indexOf(post._id), 1);
-  		this.update.emit(this.org);
-  		this.viewingOne = false;
-  		this.selectedPost = null;
-  		this.ui.flash("Deleted", "info");
-		}, error => {
-			this.ui.flash("Delete failed", "error");
-  		return;
-		});
+		if (window.confirm("Are you sure you want to delete this post? This can't be undone.")) {
+			this.http.delete('/post/' + post._id).map(res => res.json()).subscribe(res => {
+				if (res.errmsg) {
+	  			this.ui.flash("Delete failed", "error");
+	  			return;
+	  		}
+	  		this.posts.splice(this.posts.indexOf(post), 1);
+	  		this.org.posts.splice(this.org.posts.indexOf(post._id), 1);
+	  		this.update.emit(this.org);
+	  		this.viewingOne = false;
+	  		this.selectedPost = null;
+	  		this.ui.flash("Deleted", "info");
+			}, error => {
+				this.ui.flash("Delete failed", "error");
+	  		return;
+			});
+		}
 	}
 
 	createPost(newPost):void {
@@ -254,6 +261,7 @@ export class OrgPostsComponent implements OnInit {
   		this.org.posts.push(res._id);
   		this.update.emit(this.org);
   		this.savingPost = false;
+  		this.creatingPost = false;
   		
   		this.ui.flash("Saved", "success");
   		console.log(res);
@@ -286,6 +294,11 @@ export class OrgPostsComponent implements OnInit {
 
 	userIsAdmin() {
   	return this.user.adminToken === this.adminToken;
+  }
+
+  toggleCreatingPost(b:boolean) {
+  	if (b) this.creatingPost = b;
+  	else this.creatingPost = this.creatingPost ? false : true;
   }
 
 }

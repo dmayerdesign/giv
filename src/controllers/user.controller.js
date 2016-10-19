@@ -28,6 +28,7 @@ exports.postLogin = (req, res, next) => {
     req.logIn(user, (err) => {
       if (err) { return next(err); }
       console.log(user);
+      user.password = null;
       res.json(user);
     });
   })(req, res, next);
@@ -62,6 +63,7 @@ exports.postSignup = (req, res, next) => {
     }
     user.save((err) => {
       if (err) { return next(err); }
+      user.password = null;
       res.json(user);
     });
   });
@@ -97,6 +99,7 @@ exports.postUpdateProfile = (req, res, next) => {
         res.json({errmsg: err});
         return next(err);
       }
+      user.password = null;
       res.json(user);
     });
   });
@@ -125,6 +128,7 @@ exports.postUpdatePassword = (req, res, next) => {
     req.logIn(user, (err) => {
       if (err) { return next(err); }
       console.log(user);
+      user.password = null;
       res.json(user);
     });
   })(req, res, next);
@@ -289,6 +293,7 @@ exports.postReset = (req, res, next) => {
       res.json({errmsg: err});
       return next(err);
     }
+    user.password = null;
     res.json(user);
   });
 };
@@ -297,6 +302,7 @@ exports.getUser = (req, res) => {
   User.findOne({ _id: req.params.id }, (err, user) => {
     if (err) return console.log(err);
     if (user) {
+      user.password = null;
       res.json(user);
     }
   });
@@ -337,6 +343,7 @@ exports.showInterest = (req, res) => {
         return console.log(err);
       }
       console.log(user);
+      user.password = null;
       res.status(200).json(user);
     });
   });

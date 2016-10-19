@@ -51802,7 +51802,6 @@
 	        this.onDeselect = new core_1.EventEmitter();
 	        this.onStar = new core_1.EventEmitter();
 	        this.onUnstar = new core_1.EventEmitter();
-	        this.viewingOrg = false;
 	        this.singleDetailsAreLoaded = false;
 	        this.singlePostsAreLoaded = false;
 	    }
@@ -51819,14 +51818,16 @@
 	    };
 	    OrgComponent.prototype.viewOrg = function () {
 	        this.onSelect.emit(this.org._id);
-	        this.viewingOrg = true;
+	        this.selected = this.selected;
 	    };
-	    OrgComponent.prototype.deselectOrg = function (e) {
+	    OrgComponent.prototype.deselectOrg = function (e, orgId) {
+	        if (!this.selected || orgId !== this.selected._id)
+	            return;
 	        if (e.target.className.indexOf("inside-org") > -1)
 	            return;
-	        if (this.viewingOrg) {
+	        if (this.selected && this.selected._id === orgId) {
 	            this.onDeselect.emit(this.org._id);
-	            this.viewingOrg = false;
+	            this.selected = null;
 	            this.singleDetailsAreLoaded = false;
 	            this.singlePostsAreLoaded = false;
 	        }
@@ -51878,6 +51879,14 @@
 	    OrgComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
 	    };
+	    OrgComponent.prototype.isSelected = function (orgId) {
+	        if (!this.selected)
+	            return false;
+	        if (this.selected._id === orgId)
+	            return true;
+	        else
+	            return false;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -51886,6 +51895,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "selected", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -51977,6 +51990,7 @@
 	        }, function (error) { return console.error(error); });
 	    };
 	    StarredOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52257,7 +52271,6 @@
 	        this.tabChange = new core_1.EventEmitter();
 	        this.recommended = [];
 	        this.recommendedOrgsAreLoaded = false;
-	        this.viewingOrg = false;
 	        this.selectedOrg = null;
 	        this.showStarredMobileTab = true;
 	        this.showRecommendedMobileTab = false;
@@ -52295,6 +52308,7 @@
 	        });
 	    };
 	    RecommendedOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.recommended.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52653,6 +52667,7 @@
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52940,6 +52955,7 @@
 	        this.loadingPosts = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	        this.isEditing = false;
+	        this.creatingPost = false;
 	    }
 	    OrgPostsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53100,23 +53116,28 @@
 	            });
 	        }
 	    };
+	    OrgPostsComponent.prototype.cancelPost = function () {
+	        this.isEditing = false;
+	    };
 	    OrgPostsComponent.prototype.deletePost = function (post) {
 	        var _this = this;
-	        this.http.delete('/post/' + post._id).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            if (res.errmsg) {
+	        if (window.confirm("Are you sure you want to delete this post? This can't be undone.")) {
+	            this.http.delete('/post/' + post._id).map(function (res) { return res.json(); }).subscribe(function (res) {
+	                if (res.errmsg) {
+	                    _this.ui.flash("Delete failed", "error");
+	                    return;
+	                }
+	                _this.posts.splice(_this.posts.indexOf(post), 1);
+	                _this.org.posts.splice(_this.org.posts.indexOf(post._id), 1);
+	                _this.update.emit(_this.org);
+	                _this.viewingOne = false;
+	                _this.selectedPost = null;
+	                _this.ui.flash("Deleted", "info");
+	            }, function (error) {
 	                _this.ui.flash("Delete failed", "error");
 	                return;
-	            }
-	            _this.posts.splice(_this.posts.indexOf(post), 1);
-	            _this.org.posts.splice(_this.org.posts.indexOf(post._id), 1);
-	            _this.update.emit(_this.org);
-	            _this.viewingOne = false;
-	            _this.selectedPost = null;
-	            _this.ui.flash("Deleted", "info");
-	        }, function (error) {
-	            _this.ui.flash("Delete failed", "error");
-	            return;
-	        });
+	            });
+	        }
 	    };
 	    OrgPostsComponent.prototype.createPost = function (newPost) {
 	        var _this = this;
@@ -53131,6 +53152,7 @@
 	            _this.org.posts.push(res._id);
 	            _this.update.emit(_this.org);
 	            _this.savingPost = false;
+	            _this.creatingPost = false;
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
@@ -53161,6 +53183,12 @@
 	    };
 	    OrgPostsComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
+	    };
+	    OrgPostsComponent.prototype.toggleCreatingPost = function (b) {
+	        if (b)
+	            this.creatingPost = b;
+	        else
+	            this.creatingPost = this.creatingPost ? false : true;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -54135,8 +54163,8 @@
 	        this.utilities = utilities;
 	        this.zone = zone;
 	        this.http = http;
-	        this.update = new core_1.EventEmitter();
 	        this.postAdd = new core_1.EventEmitter();
+	        this.cancel = new core_1.EventEmitter();
 	        this.stillWorking = false;
 	        this.progress = 0;
 	        this.savingPost = false;
@@ -54194,7 +54222,11 @@
 	        if (invalid)
 	            return;
 	        this.postAdd.emit(newPost);
-	        this.post = new Post();
+	        if (!this.editing)
+	            this.post = new Post();
+	    };
+	    CreatePostComponent.prototype.cancelPost = function () {
+	        this.cancel.emit(false);
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -54205,18 +54237,22 @@
 	        __metadata('design:type', Object)
 	    ], CreatePostComponent.prototype, "user", void 0);
 	    __decorate([
-	        core_1.Output(), 
+	        core_1.Input(), 
 	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "update", void 0);
+	    ], CreatePostComponent.prototype, "editing", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], CreatePostComponent.prototype, "postAdd", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "cancel", void 0);
 	    CreatePostComponent = __decorate([
 	        core_1.Component({
 	            selector: 'create-post',
 	            templateUrl: 'app/create-post.component.html',
-	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
+	            styleUrls: ['app/form-field.component.css', 'app/create-post.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http])
 	    ], CreatePostComponent);

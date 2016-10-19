@@ -240,6 +240,7 @@ export class BrowseOrgsComponent implements OnInit {
 	}
 
 	viewOrg(id:string):void {
+		this.selectedOrg = null;
 		this.selectedOrg = this.orgs.find(function(org) {
 			return org._id === id;
 		});
