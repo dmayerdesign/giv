@@ -38,7 +38,6 @@ export class RecommendedOrgsComponent implements OnInit {
 	private user:any;
 	private recommended = [];
 	private recommendedOrgsAreLoaded:boolean = false;
-	private viewingOrg:boolean = false;
 	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
 	private singlePostsAreLoaded:boolean;
@@ -88,6 +87,7 @@ export class RecommendedOrgsComponent implements OnInit {
 	}
 
 	viewOrg(id:string):void {
+		this.selectedOrg = null;
 		this.selectedOrg = this.recommended.find(function(org) {
 			return org._id === id;
 		});

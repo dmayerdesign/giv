@@ -9,6 +9,7 @@ import { UIHelper } from './services/app.service';
 @Component({
 	selector: 'login'
 , templateUrl: 'app/login.component.html'
+, styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login.component.css']
 //, providers: [FacebookService]
 })
 
@@ -17,6 +18,8 @@ export class LoginComponent implements OnInit {
 	private user:any;
   private isLoggedIn:boolean;
   private querySub:Subscription;
+  private forgot:boolean;
+  private email:string;
 
 	constructor(//private fb:FacebookService,
 							private http:Http,
@@ -69,8 +72,7 @@ export class LoginComponent implements OnInit {
         this.userService.confirmLogin(data);
       	console.log(data);
         this.getQueryParams(params => {
-          if (params['redirect']) {
-            console.log(decodeURI(params['redirect']));
+          if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1) {
             window.location.href = decodeURI(params['redirect']);
           } else {
             this.router.navigate(['/']);
@@ -82,6 +84,26 @@ export class LoginComponent implements OnInit {
       });
     } else {
     	console.error("The form model was undefined.");
+    }
+  }
+
+  forgotPassword() {
+    this.forgot = true;
+  }
+
+  postForgot() {
+    let email = (this.formModel && this.formModel.email) ? this.formModel.email : this.email;
+    if (email) {
+      this.http.post("forgot", {email: email}).map(res => res.json()).subscribe(
+        data => {
+          if (data.errmsg) return this.ui.flash("Something went wrong. Try again", "error");
+          this.ui.flash("A reset link was just sent to your email", "success");
+        },
+        err => {
+          this.ui.flash("Something went wrong. Try again", "error");
+          console.error(err);
+        }
+      );
     }
   }
 

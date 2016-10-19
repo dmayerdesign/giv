@@ -37896,6 +37896,8 @@
 	var org_posts_component_1 = __webpack_require__(82);
 	var single_org_component_1 = __webpack_require__(84);
 	var manage_org_page_component_1 = __webpack_require__(85);
+	var account_settings_component_1 = __webpack_require__(357);
+	var reset_password_component_1 = __webpack_require__(358);
 	var claim_org_component_1 = __webpack_require__(86);
 	var verify_orgs_component_1 = __webpack_require__(88);
 	var create_org_component_1 = __webpack_require__(89);
@@ -37921,6 +37923,8 @@
 	    { path: 'about', component: about_component_1.AboutComponent },
 	    { path: 'starred', component: starred_orgs_component_1.StarredOrgsComponent },
 	    { path: 'contact', component: contact_component_1.ContactComponent },
+	    { path: 'account', component: account_settings_component_1.AccountSettingsComponent },
+	    { path: 'reset/:token', component: reset_password_component_1.ResetPasswordComponent },
 	    { path: 'organization/create', component: create_org_component_1.CreateOrgComponent },
 	    { path: 'organization/i/:id', component: single_org_component_1.SingleOrgComponent },
 	    { path: 'organization/:slug', component: single_org_component_1.SingleOrgComponent },
@@ -37956,6 +37960,8 @@
 	                org_posts_component_1.OrgPostsComponent,
 	                single_org_component_1.SingleOrgComponent,
 	                manage_org_page_component_1.ManageOrgPageComponent,
+	                account_settings_component_1.AccountSettingsComponent,
+	                reset_password_component_1.ResetPasswordComponent,
 	                claim_org_component_1.ClaimOrgComponent,
 	                verify_orgs_component_1.VerifyOrgsComponent,
 	                about_component_1.AboutComponent,
@@ -51182,6 +51188,7 @@
 	        this.route = route;
 	        this.isLoggedIn = false;
 	        this.showAccountMenu = false;
+	        this.viewingAccount = false;
 	        // Updates the component upon redirect from login
 	        userService.loginConfirmed$.subscribe(function (user) {
 	            console.log("Login confirmed in app component");
@@ -51200,9 +51207,13 @@
 	                _this.isLoggedIn = true;
 	            }
 	        });
+	        console.log(this.route);
 	    };
 	    AppComponent.prototype.ngDoCheck = function () {
 	        this.location = encodeURI(window.location.href);
+	        if (this.route.component === "AccountSettingsComponent") {
+	            this.viewingAccount = true;
+	        }
 	    };
 	    AppComponent.prototype.logIn = function () {
 	        this.router.navigate(['/login'], { queryParams: { redirect: this.location } });
@@ -51634,8 +51645,7 @@
 	                _this.userService.confirmLogin(data);
 	                console.log(data);
 	                _this.getQueryParams(function (params) {
-	                    if (params['redirect']) {
-	                        console.log(decodeURI(params['redirect']));
+	                    if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1) {
 	                        window.location.href = decodeURI(params['redirect']);
 	                    }
 	                    else {
@@ -51651,10 +51661,28 @@
 	            console.error("The form model was undefined.");
 	        }
 	    };
+	    LoginComponent.prototype.forgotPassword = function () {
+	        this.forgot = true;
+	    };
+	    LoginComponent.prototype.postForgot = function () {
+	        var _this = this;
+	        var email = (this.formModel && this.formModel.email) ? this.formModel.email : this.email;
+	        if (email) {
+	            this.http.post("forgot", { email: email }).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                if (data.errmsg)
+	                    return _this.ui.flash("Something went wrong. Try again", "error");
+	                _this.ui.flash("A reset link was just sent to your email", "success");
+	            }, function (err) {
+	                _this.ui.flash("Something went wrong. Try again", "error");
+	                console.error(err);
+	            });
+	        }
+	    };
 	    LoginComponent = __decorate([
 	        core_1.Component({
 	            selector: 'login',
-	            templateUrl: 'app/login.component.html'
+	            templateUrl: 'app/login.component.html',
+	            styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper])
 	    ], LoginComponent);
@@ -51802,7 +51830,6 @@
 	        this.onDeselect = new core_1.EventEmitter();
 	        this.onStar = new core_1.EventEmitter();
 	        this.onUnstar = new core_1.EventEmitter();
-	        this.viewingOrg = false;
 	        this.singleDetailsAreLoaded = false;
 	        this.singlePostsAreLoaded = false;
 	    }
@@ -51819,14 +51846,16 @@
 	    };
 	    OrgComponent.prototype.viewOrg = function () {
 	        this.onSelect.emit(this.org._id);
-	        this.viewingOrg = true;
+	        this.selected = this.selected;
 	    };
-	    OrgComponent.prototype.deselectOrg = function (e) {
+	    OrgComponent.prototype.deselectOrg = function (e, orgId) {
+	        if (!this.selected || orgId !== this.selected._id)
+	            return;
 	        if (e.target.className.indexOf("inside-org") > -1)
 	            return;
-	        if (this.viewingOrg) {
+	        if (this.selected && this.selected._id === orgId) {
 	            this.onDeselect.emit(this.org._id);
-	            this.viewingOrg = false;
+	            this.selected = null;
 	            this.singleDetailsAreLoaded = false;
 	            this.singlePostsAreLoaded = false;
 	        }
@@ -51878,6 +51907,14 @@
 	    OrgComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
 	    };
+	    OrgComponent.prototype.isSelected = function (orgId) {
+	        if (!this.selected)
+	            return false;
+	        if (this.selected._id === orgId)
+	            return true;
+	        else
+	            return false;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -51886,6 +51923,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "selected", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -51977,6 +52018,7 @@
 	        }, function (error) { return console.error(error); });
 	    };
 	    StarredOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52257,7 +52299,6 @@
 	        this.tabChange = new core_1.EventEmitter();
 	        this.recommended = [];
 	        this.recommendedOrgsAreLoaded = false;
-	        this.viewingOrg = false;
 	        this.selectedOrg = null;
 	        this.showStarredMobileTab = true;
 	        this.showRecommendedMobileTab = false;
@@ -52295,6 +52336,7 @@
 	        });
 	    };
 	    RecommendedOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.recommended.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52653,6 +52695,7 @@
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
 	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
 	        });
@@ -52940,6 +52983,7 @@
 	        this.loadingPosts = false;
 	        this.options = new http_1.RequestOptions({ headers: new http_1.Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' }) });
 	        this.isEditing = false;
+	        this.creatingPost = false;
 	    }
 	    OrgPostsComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53100,23 +53144,28 @@
 	            });
 	        }
 	    };
+	    OrgPostsComponent.prototype.cancelPost = function () {
+	        this.isEditing = false;
+	    };
 	    OrgPostsComponent.prototype.deletePost = function (post) {
 	        var _this = this;
-	        this.http.delete('/post/' + post._id).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            if (res.errmsg) {
+	        if (window.confirm("Are you sure you want to delete this post? This can't be undone.")) {
+	            this.http.delete('/post/' + post._id).map(function (res) { return res.json(); }).subscribe(function (res) {
+	                if (res.errmsg) {
+	                    _this.ui.flash("Delete failed", "error");
+	                    return;
+	                }
+	                _this.posts.splice(_this.posts.indexOf(post), 1);
+	                _this.org.posts.splice(_this.org.posts.indexOf(post._id), 1);
+	                _this.update.emit(_this.org);
+	                _this.viewingOne = false;
+	                _this.selectedPost = null;
+	                _this.ui.flash("Deleted", "info");
+	            }, function (error) {
 	                _this.ui.flash("Delete failed", "error");
 	                return;
-	            }
-	            _this.posts.splice(_this.posts.indexOf(post), 1);
-	            _this.org.posts.splice(_this.org.posts.indexOf(post._id), 1);
-	            _this.update.emit(_this.org);
-	            _this.viewingOne = false;
-	            _this.selectedPost = null;
-	            _this.ui.flash("Deleted", "info");
-	        }, function (error) {
-	            _this.ui.flash("Delete failed", "error");
-	            return;
-	        });
+	            });
+	        }
 	    };
 	    OrgPostsComponent.prototype.createPost = function (newPost) {
 	        var _this = this;
@@ -53131,6 +53180,7 @@
 	            _this.org.posts.push(res._id);
 	            _this.update.emit(_this.org);
 	            _this.savingPost = false;
+	            _this.creatingPost = false;
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
@@ -53161,6 +53211,12 @@
 	    };
 	    OrgPostsComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
+	    };
+	    OrgPostsComponent.prototype.toggleCreatingPost = function (b) {
+	        if (b)
+	            this.creatingPost = b;
+	        else
+	            this.creatingPost = this.creatingPost ? false : true;
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -53416,7 +53472,6 @@
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53444,6 +53499,7 @@
 	                        _this.isLoaded = true;
 	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
 	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	                        _this.ui.setTitle("Manage " + _this.org.name);
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
@@ -53571,7 +53627,7 @@
 	                this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
 	                    if (data && data.success) {
 	                        _this.router.navigate(['']);
-	                        return _this.ui.flash("Org was deleted", "error");
+	                        return _this.ui.flash("The organization was deleted successfully", "error");
 	                    }
 	                });
 	            }
@@ -54135,8 +54191,8 @@
 	        this.utilities = utilities;
 	        this.zone = zone;
 	        this.http = http;
-	        this.update = new core_1.EventEmitter();
 	        this.postAdd = new core_1.EventEmitter();
+	        this.cancel = new core_1.EventEmitter();
 	        this.stillWorking = false;
 	        this.progress = 0;
 	        this.savingPost = false;
@@ -54194,7 +54250,11 @@
 	        if (invalid)
 	            return;
 	        this.postAdd.emit(newPost);
-	        this.post = new Post();
+	        if (!this.editing)
+	            this.post = new Post();
+	    };
+	    CreatePostComponent.prototype.cancelPost = function () {
+	        this.cancel.emit(false);
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -54205,18 +54265,22 @@
 	        __metadata('design:type', Object)
 	    ], CreatePostComponent.prototype, "user", void 0);
 	    __decorate([
-	        core_1.Output(), 
+	        core_1.Input(), 
 	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "update", void 0);
+	    ], CreatePostComponent.prototype, "editing", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], CreatePostComponent.prototype, "postAdd", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "cancel", void 0);
 	    CreatePostComponent = __decorate([
 	        core_1.Component({
 	            selector: 'create-post',
 	            templateUrl: 'app/create-post.component.html',
-	            providers: [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities]
+	            styleUrls: ['app/form-field.component.css', 'app/create-post.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http])
 	    ], CreatePostComponent);
@@ -54395,6 +54459,7 @@
 	        this.zone = zone;
 	        this.onUpload = new core_1.EventEmitter();
 	        this.onSave = new core_1.EventEmitter();
+	        this.onChange = new core_1.EventEmitter();
 	        this.changed = false;
 	        this.uploading = false;
 	        this.progress = 0;
@@ -54402,6 +54467,8 @@
 	    FormFieldComponent.prototype.ngOnInit = function () {
 	    };
 	    FormFieldComponent.prototype.ngAfterViewInit = function () {
+	        if (!this.type)
+	            this.type = "text";
 	        if (this.initial) {
 	            this.value = this.initial;
 	        }
@@ -54431,6 +54498,7 @@
 	        });
 	    };
 	    FormFieldComponent.prototype.changeHandler = function () {
+	        this.onChange.emit(this.value);
 	        if (this.value && this.value.length)
 	            this.changed = true;
 	        else
@@ -54474,6 +54542,10 @@
 	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "selectOptions", void 0);
 	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "noSave", void 0);
+	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "onUpload", void 0);
@@ -54481,6 +54553,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "onSave", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onChange", void 0);
 	    FormFieldComponent = __decorate([
 	        core_1.Component({
 	            selector: 'form-field',
@@ -54643,6 +54719,540 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
+
+
+/***/ },
+/* 97 */,
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */,
+/* 357 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var router_1 = __webpack_require__(25);
+	var http_1 = __webpack_require__(55);
+	var user_service_1 = __webpack_require__(68);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var AccountSettingsComponent = (function () {
+	    function AccountSettingsComponent(router, route, userService, ui, utilities, zone, http, categoryService) {
+	        this.router = router;
+	        this.route = route;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.http = http;
+	        this.categoryService = categoryService;
+	        this.isLoaded = false;
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        /** Fields to edit **/
+	        this.model = {
+	            _id: null,
+	            email: null,
+	            name: null,
+	            username: null,
+	            gender: null,
+	            avatar: null
+	        };
+	        this.passwords = {
+	            current: null,
+	            password: null,
+	            confirm: null
+	        };
+	        /** Changed **/
+	        this.changed = false;
+	        this.saving = false;
+	        this.checked = {};
+	        /** Slug validation **/
+	        this.usernameIsValid = true;
+	    }
+	    AccountSettingsComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.ui.setTitle("Your account");
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	            }, function (err) {
+	                console.error(err);
+	            });
+	            _this.isLoaded = true;
+	            _this.model._id = _this.user._id;
+	            _this.model.email = _this.user.email;
+	            _this.model.name = _this.user.name;
+	            _this.model.username = _this.user.username;
+	            _this.model.gender = _this.user.gender;
+	            _this.model.avatar = _this.user.avatar;
+	            _this.avatarUploadOptions = {
+	                url: '/account/upload/avatar/' + _this.user._id,
+	                filterExtensions: true,
+	                calculateSpeed: true,
+	                allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	            };
+	        });
+	    };
+	    AccountSettingsComponent.prototype.handleUpload = function (user) {
+	        this.user = user;
+	        this.stillWorking = false;
+	        console.log("User", user);
+	    };
+	    AccountSettingsComponent.prototype.checkForUniqueUsername = function ($event) {
+	        var _this = this;
+	        if (!this.model.username || typeof this.model.username === "undefined")
+	            return;
+	        this.http.get("/user/u/" + this.model.username).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data) {
+	                _this.usernameIsValid = false;
+	                _this.ui.flash("Sorry, that username is taken", "error");
+	            }
+	            else
+	                _this.usernameIsValid = true;
+	        });
+	    };
+	    AccountSettingsComponent.prototype.savePassword = function () {
+	        var _this = this;
+	        if (!this.passwords.current || !this.passwords.password || !this.passwords.confirm) {
+	            return this.ui.flash("Enter your current password, then type your new password twice", "info");
+	        }
+	        if (this.passwords.password !== this.passwords.confirm) {
+	            return this.ui.flash("New passwords don't match", "error");
+	        }
+	        this.http.post("/account/password", {
+	            _id: this.user._id,
+	            currentPassword: this.passwords.current,
+	            password: this.passwords.password,
+	            confirmPassword: this.passwords.confirm
+	        }).map(function (res) { return res.json(); }).subscribe(function (user) {
+	            if (user.errmsg)
+	                return _this.ui.flash(user.errmsg, "error");
+	            _this.ui.flash("Your password was changed successfully", "success");
+	            _this.user = user;
+	            console.log(user);
+	        }, function (err) {
+	            _this.ui.flash("Something went wrong. Try again", "error");
+	            console.error(err);
+	        });
+	    };
+	    AccountSettingsComponent.prototype.updatePasswords = function (key, value) {
+	        this.passwords[key] = value;
+	    };
+	    AccountSettingsComponent.prototype.updateModel = function (key, value) {
+	        this.model[key] = value;
+	    };
+	    AccountSettingsComponent.prototype.save = function () {
+	        var _this = this;
+	        if (this.model.username && this.model.username.length) {
+	            var usernameMatch = this.model.username.match(/[^a-zA-Z0-9\-_]/);
+	            if (usernameMatch) {
+	                return this.ui.flash("Your username can't contain spaces or special characters", "error");
+	            }
+	            else {
+	                this.model.username = this.model.username.toLowerCase();
+	            }
+	        }
+	        this.model._id = this.user._id;
+	        this.saving = true;
+	        this.http.post("/account/profile", this.model).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log(res);
+	            if (res.errmsg) {
+	                _this.ui.flash("Save failed", "error");
+	                _this.saving = false;
+	                return;
+	            }
+	            _this.user = res;
+	            _this.saving = false;
+	            _this.changed = false;
+	            _this.ui.flash("Saved", "success");
+	            console.log(res);
+	        });
+	    };
+	    AccountSettingsComponent.prototype.deleteAccount = function (id) {
+	        var _this = this;
+	        if (window.confirm("Are you sure you want to delete your account? This can't be undone.")) {
+	            if (window.confirm("Sure you're sure?")) {
+	                var userId = id || this.user._id;
+	                this.http.delete('/user/' + userId).map(function (res) { return res.json(); }).subscribe(function (data) {
+	                    if (data && data.success) {
+	                        _this.router.navigate(['']);
+	                        return _this.ui.flash("User was deleted successfully", "error");
+	                    }
+	                });
+	            }
+	        }
+	    };
+	    AccountSettingsComponent.prototype.changeHandler = function (key, event) {
+	        if (event.target.value)
+	            this.changed = true;
+	        else
+	            this.changed = false;
+	    };
+	    AccountSettingsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
+	    };
+	    AccountSettingsComponent = __decorate([
+	        core_1.Component({
+	            selector: 'account-settings',
+	            templateUrl: 'app/account-settings.component.html',
+	            styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	    ], AccountSettingsComponent);
+	    return AccountSettingsComponent;
+	}());
+	exports.AccountSettingsComponent = AccountSettingsComponent;
+
+
+/***/ },
+/* 358 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var router_1 = __webpack_require__(25);
+	var http_1 = __webpack_require__(55);
+	var user_service_1 = __webpack_require__(68);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var ResetPasswordComponent = (function () {
+	    function ResetPasswordComponent(router, route, userService, ui, utilities, zone, http, categoryService) {
+	        this.router = router;
+	        this.route = route;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.http = http;
+	        this.categoryService = categoryService;
+	        this.isLoaded = false;
+	        this.passwords = {
+	            password: null,
+	            confirm: null
+	        };
+	    }
+	    ResetPasswordComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        if (this.route.params) {
+	            this.sub = this.route.params.subscribe(function (params) {
+	                _this.token = params['token'];
+	                _this.isLoaded = true;
+	            });
+	        }
+	    };
+	    ResetPasswordComponent.prototype.savePassword = function () {
+	        var _this = this;
+	        if (!this.passwords.password || !this.passwords.confirm) {
+	            return this.ui.flash("Type your new password twice", "info");
+	        }
+	        if (this.passwords.password !== this.passwords.confirm) {
+	            return this.ui.flash("Passwords don't match", "error");
+	        }
+	        this.http.post("/reset/" + this.token, {
+	            password: this.passwords.password,
+	            confirmPassword: this.passwords.confirm
+	        }).map(function (res) { return res.json(); }).subscribe(function (user) {
+	            if (user.errmsg)
+	                return _this.ui.flash(user.errmsg, "error");
+	            _this.ui.flash("Your password was updated successfully", "success");
+	            console.log(user);
+	        }, function (err) {
+	            _this.ui.flash("Something went wrong. Try again", "error");
+	            console.error(err);
+	        });
+	    };
+	    ResetPasswordComponent.prototype.updatePasswords = function (key, value) {
+	        this.passwords[key] = value;
+	    };
+	    ResetPasswordComponent = __decorate([
+	        core_1.Component({
+	            selector: 'reset-password',
+	            templateUrl: 'app/reset-password.component.html',
+	            styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	    ], ResetPasswordComponent);
+	    return ResetPasswordComponent;
+	}());
+	exports.ResetPasswordComponent = ResetPasswordComponent;
 
 
 /***/ }

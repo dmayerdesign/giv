@@ -11,12 +11,14 @@
         </li>
       </ul>
       <ul class="nav nav-right pull-right">
-        <li *ngIf="isLoggedIn" class="nav-item" (clickOutside)="exitAccountMenu()">
+        <li *ngIf="isLoggedIn" class="nav-item" [ngClass]="{'has-avatar': user?.avatar?.length}" (clickOutside)="exitAccountMenu()">
       		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
-            <img *ngIf="!user?.profile?.picture" height="18" [src]="user?.profile?.picture || 'app/images/profile-icon.svg'" style="position:relative; left:4px;">
-            <span>Your account</span>
+            <span>{{user?.name || 'Your account'}}</span>
+            <div class="user-avatar" *ngIf="user?.avatar?.length" [ngStyle]="{'background-image': 'url(' + user.avatar + ')'}"></div>
+            <img class="user-default-avatar" *ngIf="!user?.avatar?.length" height="18" [src]="'app/images/profile-icon.svg'">
           </a>
           <ul *ngIf="showAccountMenu" class="subnav">
+            <li class="subnav-item"><a [routerLink]="['/account']"><i class="fa fa-cog"></i><span>Settings</span></a></li>
             <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
           </ul>
         </li>

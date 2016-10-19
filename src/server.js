@@ -31,6 +31,12 @@ const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const s3 = new AWS.S3({params: {Bucket: 'giv-uploads', Key: 'default'}});
+const appendFileExt = function(file) {
+  if (file && file.mimetype) {
+    if (file.mimetype.indexOf("jpeg") > -1) return ".jpg";
+    else return "." + file.mimetype.match(/image\/(.*)/)[1];
+  }
+};
 
 /**
 * Security middleware
@@ -44,6 +50,20 @@ const userController = require('./controllers/user.controller');
 const contactController = require('./controllers/contact.controller');
 const orgController = require('./controllers/org.controller');
 const postController = require('./controllers/post.controller');
+
+const userAvatarUpload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'giv-uploads',
+    acl: 'public-read',
+    key: function (req, file, callback) {
+      req.newPath = "avatars/users/" + req.params.userId + "_" + Date.now().toString() + appendFileExt(file);
+      console.log("Uploading "); console.log(file);
+      callback(null, req.newPath);
+    }
+  }),
+  limits: { fileSize: 3000000 }
+});
 
 /**
   * DANNY'S Services
@@ -125,6 +145,8 @@ app.use('/bundle', express.static(path.join(__dirname, 'bundle')));
 app.use('/app', express.static(path.join(__dirname, 'app')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
+
 /**
  * Primary app routes.
  */
@@ -134,11 +156,15 @@ app.post('/forgot', userController.postForgot);
 app.post('/reset/:token', userController.postReset);
 app.post('/contact-form', contactController.postContact);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
+app.post('/account/upload/avatar/:userId', passportConfig.isAuthenticated, userAvatarUpload.any(), userController.uploadUserAvatar);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.post('/interests', passportConfig.isAuthenticated, userController.showInterest);
 app.get('/adminToken', passportConfig.isAuthenticated, userController.adminToken);
+app.get('/user/:id', userController.getUser);
+app.get('/user/u/:username', userController.getUserByUsername);
+app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
 
 /**
  * Error Handler.
@@ -170,14 +196,6 @@ mongoose.connection.on('connected', () => {
   ** Posts
   **/
   appService.addRoutes(app, postController.routes);
-
-  /**
-  ** Users
-  **/
-
-  app.get('/user/:id', userController.getUser);
-  app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
-
 
   // all other routes are handled by Angular
   app.get('/*', function(req, res) {

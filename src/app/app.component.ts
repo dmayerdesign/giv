@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
 	private user:any;
 	private location:string;
 	private showAccountMenu:boolean = false;
+	private viewingAccount:boolean = false;
 
 	constructor(private http:Http,
 							private userService:UserService,
@@ -41,10 +42,15 @@ export class AppComponent implements OnInit {
 				this.isLoggedIn = true;
 			}
 		});
+
+		console.log(this.route);
 	}
 
 	ngDoCheck() {
 		this.location = encodeURI(window.location.href);
+		if (this.route.component === "AccountSettingsComponent") {
+			this.viewingAccount = true;
+		}
 	}
 
 	logIn() {

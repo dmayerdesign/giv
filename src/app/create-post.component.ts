@@ -29,14 +29,16 @@ function Post():void {
 @Component({
 	selector: 'create-post',
 	templateUrl: 'app/create-post.component.html',
-	providers: [OrgService, UserService, UIHelper, Utilities]
+	styleUrls: ['app/form-field.component.css', 'app/create-post.component.css']
 })
 
 export class CreatePostComponent implements OnInit {
 	@Input() org;
 	@Input() user;
-	@Output() update = new EventEmitter();
+	@Input() editing;
 	@Output() postAdd = new EventEmitter();
+	@Output() cancel = new EventEmitter();
+
 	private stillWorking:boolean = false;
 	private progress:number = 0;
 	private savingPost:boolean = false;
@@ -108,7 +110,11 @@ export class CreatePostComponent implements OnInit {
 		});
 		if (invalid) return;
   	this.postAdd.emit(newPost);
-  	this.post = new Post();
+  	if (!this.editing) this.post = new Post();
+  }
+
+  cancelPost() {
+  	this.cancel.emit(false);
   }
 
 }

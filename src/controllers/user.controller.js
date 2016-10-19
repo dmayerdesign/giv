@@ -28,6 +28,7 @@ exports.postLogin = (req, res, next) => {
     req.logIn(user, (err) => {
       if (err) { return next(err); }
       console.log(user);
+      user.password = null;
       res.json(user);
     });
   })(req, res, next);
@@ -62,6 +63,7 @@ exports.postSignup = (req, res, next) => {
     }
     user.save((err) => {
       if (err) { return next(err); }
+      user.password = null;
       res.json(user);
     });
   });
@@ -78,14 +80,15 @@ exports.postUpdateProfile = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/account');
+    return res.json({errmsg: "There were problems with your input"});
   }
 
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
     user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
+    user.name = req.body.name || '';
+    user.avatar = req.body.avatar || '';
+    user.username = req.body.username || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
@@ -97,8 +100,25 @@ exports.postUpdateProfile = (req, res, next) => {
         res.json({errmsg: err});
         return next(err);
       }
+      user.password = null;
       res.json(user);
     });
+  });
+};
+
+exports.uploadUserAvatar = (req, res, next) => {
+  let updateQuery = {$set:{}};
+  updateQuery.$set.avatar = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
+  //updateQuery.$set.avatar = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
+  User.findOneAndUpdate({_id: req.params.userId}, updateQuery, {new: true}, function(err, obj) {
+    if(err) {
+      console.log(err);
+      res.send(400).json({errmsg: err});
+    }
+    else {
+      console.log(obj.avatar);
+      res.json(obj);
+    } 
   });
 };
 
@@ -107,6 +127,7 @@ exports.postUpdateProfile = (req, res, next) => {
  * Update current password.
  */
 exports.postUpdatePassword = (req, res, next) => {
+  req.assert('currentPassword', 'Password must be at least 4 characters long').len(4);
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
 
@@ -117,25 +138,24 @@ exports.postUpdatePassword = (req, res, next) => {
     return res.redirect('/account');
   }
 
-  passport.authenticate('local', (err, user, info) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
-    if (!user) {
-      res.status(401).json({"errmsg": "Login was not valid"});
-    }
-    req.logIn(user, (err) => {
-      if (err) { return next(err); }
-      console.log(user);
-      res.json(user);
-    });
-  })(req, res, next);
-
-  User.findById(req.user.id, (err, user) => {
-    if (err) { return next(err); }
-    user.password = req.body.password;
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
+    user.comparePassword(req.body.currentPassword, (err, isMatch) => {
+      if (err) { res.json({ errmsg: "Password isn't valid" }); }
+      if (isMatch) {
+        user.password = req.body.password;
+        user.save((err) => {
+          if (err) { return next(err); }
+          console.log(user);
+          user.password = null;
+          res.json(user);
+          next();
+        });
+      }
+      else {
+        res.json({ errmsg: "Invalid email or password." });
+        next();
+      }
     });
   });
 };
@@ -145,7 +165,7 @@ exports.postUpdatePassword = (req, res, next) => {
  * Delete user account.
  */
 exports.postDeleteAccount = (req, res, next) => {
-  User.remove({ _id: req.user.id }, (err) => {
+  User.remove({ _id: req.body._id }, (err) => {
     if (err) { return next(err); }
     res.json({ success: 'Your account has been deleted.' });
   });
@@ -157,7 +177,7 @@ exports.postDeleteAccount = (req, res, next) => {
  */
 exports.getOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);
@@ -197,7 +217,7 @@ exports.postForgot = (req, res, next) => {
           return res.json({ errmsg: 'Account with that email address does not exist.' });
         }
         user.passwordResetToken = token;
-        user.passwordResetExpires = Date.now() + 3600000; // 1 hour
+        user.passwordResetExpires = Date.now() + 36000000; // 1 hour
         user.save((err) => {
           done(err, token, user);
         });
@@ -236,7 +256,7 @@ exports.postForgot = (req, res, next) => {
  */
 exports.postReset = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
-  req.assert('confirm', 'Passwords must match.').equals(req.body.password);
+  req.assert('confirmPassword', 'Passwords must match.').equals(req.body.password);
 
   const errors = req.validationErrors();
 
@@ -283,13 +303,15 @@ exports.postReset = (req, res, next) => {
         done(err, user);
       });
     }
-  ], (err) => {
+  ], (err, user) => {
     if (err) {
       console.log(err);
       res.json({errmsg: err});
       return next(err);
     }
+    user.password = null;
     res.json(user);
+    next(err, user);
   });
 };
 
@@ -297,6 +319,17 @@ exports.getUser = (req, res) => {
   User.findOne({ _id: req.params.id }, (err, user) => {
     if (err) return console.log(err);
     if (user) {
+      user.password = null;
+      res.json(user);
+    }
+  });
+};
+
+exports.getUserByUsername = (req, res) => {
+  User.findOne({ username: req.params.username }, (err, user) => {
+    if (err) return console.log(err);
+    if (user) {
+      user.password = null;
       res.json(user);
     }
   });
@@ -337,6 +370,7 @@ exports.showInterest = (req, res) => {
         return console.log(err);
       }
       console.log(user);
+      user.password = null;
       res.status(200).json(user);
     });
   });

@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, input, th {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+h1, h2 {
   font-weight: 300;
 }
 
@@ -23,6 +23,10 @@ h2 {
   letter-spacing: -0.5px;
   color: rgba(120,110,116,0.65) !important;
   text-shadow: 0 -1px 0px rgba(255,255,255,1), 0 0.5px 0px rgba(20,13,16,0.2);
+}
+
+h3 {
+  font-weight: normal;
 }
 
 h4 {
@@ -126,6 +130,51 @@ button i {
   padding-right: 0.6em;
 }
 
+.add, .add:hover, .add:active, .add:focus,
+.cancel, .cancel:hover, .cancel:active, .cancel:focus,
+.submit, .submit:hover, .submit:active, .submit:focus {
+  font-size: 0.7rem;
+  background-image: none;
+  background-color: #6895A5;
+  font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  opacity: 0.8;
+}
+
+.add:hover,
+.cancel:hover,
+.submit:hover {
+  opacity: 1;
+}
+
+.add, .add:hover, .add:active, .add:focus {
+  font-weight: 600;
+}
+
+.submit {
+  float: left;
+}
+.cancel, .cancel:hover, .cancel:active, .cancel:focus {
+  float: left;
+  clear: none !important;
+  margin-top: 0.2em;
+  margin-left: 1em;
+  background-color: #f59393;
+}
+
+.submit,
+.add,
+label.upload {
+  background-color: #6895A5 !important;
+}
+
+.submit, .submit:hover, .submit:active, .submit:focus {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+
 .back-btn {
   display: block;
   max-width: 12em;
@@ -179,6 +228,10 @@ main {
 
 .centered, .center {
   text-align: center;
+}
+
+.full-width, .fullwidth {
+  width: 100%;
 }
 
 @media only screen and (min-width: 1200px) {
@@ -273,6 +326,7 @@ ul.nav {
   position: relative;
   box-sizing: content-box;
   display: inline-block;
+  max-height: 1em;
   line-height: 1em;
   padding: 1.75em 0.6em 1.85em;
 }
@@ -293,12 +347,12 @@ ul.nav {
   content: " ";
   display: block;
   width: 100%;
-  height: 5px;
+  height: 6px;
   background: url("app/images/triangle.svg") 50% bottom no-repeat;
-  background-size: 18px 5px;
+  background-size: 20px 6px;
   position: absolute;
     left: 0;
-    bottom: 0;
+    bottom: -1px;
 }
 
 .no-backgroundsize .nav-item.active::after {
@@ -312,6 +366,7 @@ ul.nav {
   color: #fff;
   font-size: 0.8em;
   font-weight: 300;
+  vertical-align: middle;
 /*  text-shadow: 0px 1px 4px rgba(0,0,0,0.1);
 */  
   text-shadow: 0 0.5px 0px rgba(20,13,16,0.5);
@@ -368,6 +423,17 @@ button.nav-item:hover {
     top: 0.15em;
 }
 
+.has-avatar .nav-link > span {
+  top: -0.2em;
+  right: -0.2em;
+  padding-right: 1em;
+}
+
+.has-avatar .nav-link > div {
+  display: inline-block;
+  top: -0.35em;
+}
+
 /* subnav */
 
 .subnav,
@@ -375,7 +441,7 @@ button.nav-item:hover {
   position: absolute;
     bottom: -2.2em;
     right: 0;
-    z-index: 101;
+    z-index: 103;
   padding: 0.2em 0;
   width: 9em;
   margin-left: -1.5em;
@@ -385,12 +451,18 @@ button.nav-item:hover {
   box-shadow: 0px 2px 4px rgba(20,20,20,0.1);
 }
 
+.subnav {
+  bottom: auto;
+  top: 4.9em;
+}
+
 .subnav a,
 .submenu a {
   display: block;
   padding: 0.8em 0.8em 0.8em 1.2em;
   cursor: pointer;
   font-size: 0.8em;
+  font-weight: normal;
   color: #fff !important;
   text-shadow: 0px 1px 1px rgba(0,0,0,0.2);
 }
@@ -413,6 +485,26 @@ button.nav-item:hover {
   .nav-link img, .nav-link i {
     padding-right: 0;
   }
+}
+
+/* USER */
+
+.user-avatar {
+  position: relative;
+    top: 0.1em;
+  background-color: #fff;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-size: cover;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 2px;
+  border: 1px solid #F1F6F5;
+}
+
+.user-default-avatar {
+  position:relative; left:4px;
 }
 
 /* SEARCH BOX CONTAINER */
@@ -614,10 +706,49 @@ search-box + select {
   animation: loader-label 2s infinite ease-out;
 }
 
+.app-loader {
+  padding-top: 0;
+  height: auto;
+  width: 100%;
+}
+
 .app-loader .loader__label {
-  -webkit-animation: app-loader-label 2s infinite ease-out;
-  -moz-animation: app-loader-label 2s infinite ease-out;
-  animation: app-loader-label 2s infinite ease-out;
+  -webkit-animation: app-loader-label 1.5s infinite ease-in-out;
+  -moz-animation: app-loader-label 1.5s infinite ease-in-out;
+  animation: app-loader-label 1.5s infinite ease-in-out;
+}
+
+.loader_dots {
+  float: left;
+  clear: both;
+  width: 100%;
+  text-align: center;
+  font-size: 1em;
+  margin-top: 5px;
+
+/*  -webkit-animation: app-loader-label 1.5s infinite ease-out;
+  -moz-animation: app-loader-label 1.5s infinite ease-out;
+  animation: app-loader-label 1.5s infinite ease-out;*/
+}
+
+.loader_dots i {
+  font-size: 6px;
+  padding: 0 3px;
+  color: #43D4DD;
+  opacity: 0.4;
+  -webkit-animation: dots 1.5s infinite ease-in-out 0s;
+  -moz-animation: dots 1.5s infinite ease-in-out 0s;
+  animation: dots 1.5s infinite ease-in-out 0s;
+}
+.loader_dots i:nth-child(2) {
+  -webkit-animation-delay: 0.5s;
+  -moz-animation-delay: 0.5s;
+  animation-delay: 0.5s;
+}
+.loader_dots i:nth-child(3) {
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  animation-delay: 1s;
 }
 
 @-webkit-keyframes loader-figure {
@@ -730,5 +861,57 @@ search-box + select {
   }
   100% {
     opacity: 0.35;
+  }
+}
+
+@-webkit-keyframes dots {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+@-moz-keyframes dots {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+@keyframes dots {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.4;
   }
 }

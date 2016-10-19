@@ -31,6 +31,7 @@
 			*ngFor="let org of orgs"
 			[org]="org"
 			[user]="user"
+			[selected]="selectedOrg"
 			(onSelect)="viewOrg($event)"
 			(onDeselect)="deselectOrg($event)"
 			#singleItem></org>

@@ -42,6 +42,12 @@
 	margin-bottom: 0.4em;
 }
 
+.posts-title button {
+	position: relative;
+	  top: -0.4em;
+	margin-left: 1em;
+}
+
 .post {
 	padding: 1em 0 0.7em;
 }
@@ -50,6 +56,7 @@
 }
 .single .post {
 	padding: 1.3em 0;
+	border-bottom: 0;
 }
 .post:not(:last-child) {
 	border-bottom: 2px solid #edF2F1;
@@ -61,6 +68,7 @@
 
 .post-inner {
 	padding-left: 3.6em;
+	margin-bottom: 1em;
 }
 
 .post-meta {

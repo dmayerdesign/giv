@@ -75,7 +75,6 @@ export class ManageOrgPageComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
-		this.ui.setTitle("Manage");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
@@ -103,10 +102,12 @@ export class ManageOrgPageComponent implements OnInit {
 									return this.router.navigate([''], { queryParams: {"404": true}});
 								}
 							}
+
 							this.org = data;
 							this.isLoaded = true;
 							this.org.categories.forEach(category => this.checked[category.id] = true);
 							this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+							this.ui.setTitle("Manage " + this.org.name);
 							
 							// for ng-upload
 							this.coverImageUploadOptions = {
@@ -242,7 +243,7 @@ export class ManageOrgPageComponent implements OnInit {
 		  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
 		  		if (data && data.success) {
 		  			this.router.navigate(['']);
-		  			return this.ui.flash("Org was deleted", "error");
+		  			return this.ui.flash("The organization was deleted successfully", "error");
 		  		}
 		  	});
 		  }

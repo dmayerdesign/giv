@@ -1,8 +1,26 @@
-<form (submit)="login()">
-	<input [(ngModel)]="formModel.email" name="email" type="email" placeholder="Your email" required>
-	<input [(ngModel)]="formModel.password" name="password" type="password" placeholder="Your password" required>
-	<button type="submit">Log in</button>
-</form>
+<div class="login col-md-7">
+	<h2>Log in</h2>
+	<form class="giv-form login-form col-md-12 row" (submit)="login()">
+		<div class="form-field clearfix">
+			<label class="title">Email</label>
+			<input [(ngModel)]="formModel.email" name="email" type="email" placeholder="Your email" required>
+		</div>
+		<div class="form-field clearfix">
+			<label class="title">Password</label>
+			<input [(ngModel)]="formModel.password" name="password" type="password" placeholder="Your password" required>
+		</div>
+		<button type="submit" class="login-btn full-width">Log in</button>
+		<a class="forgot-password" (click)="forgotPassword()">Forgot your password?</a>
+	</form>
+
+	<div *ngIf="forgot" class="forgot-form giv-form col-md-12 row">
+		<div class="form-field clearfix">
+			<label class="title">Enter your email to reset your password</label>
+			<input type="email" placeholder="example@gmail.com" [(ngModel)]="email">
+		</div>
+		<button class="submit" (click)="postForgot()">Submit</button>
+	</div>
+</div>
 
 <!-- <button class="btn btn-primary" (click)="loginWithFacebook()">Login with Facebook</button>
 <button class="btn btn-default" (click)="logoutOfFacebook()">Logout</button> -->

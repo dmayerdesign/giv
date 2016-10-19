@@ -8,14 +8,16 @@ const userSchema = new mongoose.Schema({
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  name: String,
   facebook: String,
   tokens: Array,
-
   adminToken: String,
   permissions: [String],
   uniqueClicks: [String],
   starred: [String],
+
+  name: String,
+  username: String,
+  avatar: String,
 
   profile: {
     gender: String,

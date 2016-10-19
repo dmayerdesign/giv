@@ -8,7 +8,7 @@
   margin-top: 0.4em;
 }
 
-.orgs-list section.org {
+section.org {
   border: 0 none;
 }
 
@@ -19,7 +19,7 @@
 .org header,
 .header-preview {
   position: relative;
-  background-color: #5D8BD5;
+  background-color: #7Dadd7;
   background-size: 12em auto;
   background-repeat: repeat;
   background-position: 50% 50%;
@@ -86,7 +86,7 @@
   height: 2.5em;
   margin-right: 0.8em;
   border-radius: 0.1em;
-  border: 1px solid #F1F6F5;
+  border: 2px solid #F1F6F5;
 }
 
 .org .exit {
