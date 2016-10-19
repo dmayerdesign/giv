@@ -16,10 +16,8 @@ import { UIHelper, Utilities } from './services/app.service';
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
 
-export class ManageOrgPageComponent implements OnInit {
-	@Input() org:any; // Declared as an input in case you're including it inside another component like <manage-org-page [org]="org">...
-	@Input() user;
-	private sub:Subscription;
+export class accountSettingsComponent implements OnInit {
+	private user:any;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
 	private progress:number = 0;
@@ -75,6 +73,7 @@ export class ManageOrgPageComponent implements OnInit {
 				private categoryService:Categories) { }
 
 	ngOnInit() {
+		this.ui.setTitle("Your account");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
@@ -86,60 +85,17 @@ export class ManageOrgPageComponent implements OnInit {
 					console.error(err);
 				}
 			);
-			if (this.route.params) {
-				this.sub = this.route.params.subscribe(params => {
-					let id = params['id'];
-					if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-						this.ui.flash("This page doesn't exist", "error");
-						return this.router.navigate([''], { queryParams: {"404": true}});
-					}
 
-					this.orgService.loadOrg(id).subscribe(
-						data => {
-							if (!this.userIsAdmin()) {
-								if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-									this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
-									return this.router.navigate([''], { queryParams: {"404": true}});
-								}
-							}
+			this.isLoaded = true;
 
-							this.org = data;
-							this.isLoaded = true;
-							this.org.categories.forEach(category => this.checked[category.id] = true);
-							this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-							this.ui.setTitle("Manage " + this.org.name);
-							
-							// for ng-upload
-							this.coverImageUploadOptions = {
-							  url: '/edit-org/upload/cover-image/' + this.org._id,
-							  filterExtensions: true,
-							  calculateSpeed: true,
-							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-							};
-							this.avatarUploadOptions = {
-							  url: '/edit-org/upload/avatar/' + this.org._id,
-							  filterExtensions: true,
-							  calculateSpeed: true,
-							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-							};
-						},
-						err => {
-							this.router.navigate([''], { queryParams: {"404": true}});
-							console.log("Error: ");
-							console.log(err);
-							return console.error(err);
-						}
-					);					
-				});
-			}
-			else {
-				this.router.navigate(['../']);
-			}
+			this.avatarUploadOptions = {
+			  url: '/account/upload/avatar/' + this.user._id,
+			  filterExtensions: true,
+			  calculateSpeed: true,
+			  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+			};
+
 		});
-	}
-
-	ngOnDestroy() {
-		this.sub.unsubscribe();
 	}
 
   handleUpload(org):void {
@@ -164,7 +120,7 @@ export class ManageOrgPageComponent implements OnInit {
   	}
 
   	if (key === "categories") {
-  		value = this.org.categories;
+  		value = this.user.categories;
   	}
 
   	if (key === "slug") {
@@ -178,7 +134,7 @@ export class ManageOrgPageComponent implements OnInit {
 
   	if (key === "otherLinks") {
   		value = [];
-  		this.org.otherLinks.forEach(otherLink => {
+  		this.user.otherLinks.forEach(otherLink => {
   			if (otherLink.href) {
   				value.push(otherLink);
   			}
@@ -187,7 +143,7 @@ export class ManageOrgPageComponent implements OnInit {
 
   	this['saving_' + key] = true;
   	this.orgService.editOrg({
-  		id: this.org._id,
+  		id: this.user._id,
   		key: key,
   		value: value
   	}).subscribe(res => {
@@ -206,7 +162,7 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   orgHasCategory(category) {
-  	let categoryInOrg = this.org.categories.find((orgCategory) => {
+  	let categoryInOrg = this.user.categories.find((orgCategory) => {
   		return orgCategory.id === category.id;
   	});
 
@@ -216,49 +172,38 @@ export class ManageOrgPageComponent implements OnInit {
 
   changeSelectedCategories(category, add) {
   	let categoryIndex = -1;
-  	let foundCategory = this.org.categories.find((cat, index) => {
+  	let foundCategory = this.user.categories.find((cat, index) => {
   		if (cat.id == category.id) {
   			categoryIndex = index;
   		}
   		return cat.id == category.id;
   	});
 
-  	if (!this.org.categories) this.org['categories'] = []; // for old orgs without categories array already
+  	if (!this.user.categories) this.org['categories'] = []; // for old orgs without categories array already
   	if (add) {
   		if (categoryIndex === -1) {
-  			this.org.categories.push(category);
+  			this.user.categories.push(category);
   			this.checked[category.id] = true;
   		}
   	} 
   	else {
-	  	this.org.categories.splice(categoryIndex, 1);
+	  	this.user.categories.splice(categoryIndex, 1);
 	  	this.checked[category.id] = false;
 	  }
   }
 
-  deleteOrg(id) {
-  	if (window.confirm("Are you sure you want to delete this organization? This can't be undone.")) {
+  deleteAccount(id) {
+  	if (window.confirm("Are you sure you want to delete your account? This can't be undone.")) {
   		if (window.confirm("Sure you're sure?")) {
-		  	let orgId = id || this.org._id;
-		  	this.http.delete('/org/' + orgId).map(res => res.json()).subscribe(data => {
+		  	let userId = id || this.user._id;
+		  	this.http.delete('/user/' + userId).map(res => res.json()).subscribe(data => {
 		  		if (data && data.success) {
 		  			this.router.navigate(['']);
-		  			return this.ui.flash("The organization was deleted successfully", "error");
+		  			return this.ui.flash("User was deleted successfully", "error");
 		  		}
 		  	});
 		  }
 	  }
-  }
-
-  addAnotherLink():void {
-  	let showing:number = this.org.otherLinks && this.org.otherLinks.length;
-		if (showing === 3) return;
-		this.org.otherLinks.push({copy: null, href: null});
-  }
-
-  removeOtherLink(link):void {
-  	this.org.otherLinks.splice(this.org.otherLinks.indexOf(link), 1);
-  	this['changed_otherLinks'] = true;
   }
 
   changeHandler(key:string, event) {

@@ -53444,7 +53444,6 @@
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
-	        this.ui.setTitle("Manage");
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53472,6 +53471,7 @@
 	                        _this.isLoaded = true;
 	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
 	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	                        _this.ui.setTitle("Manage " + _this.org.name);
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
 	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
@@ -53599,7 +53599,7 @@
 	                this.http.delete('/org/' + orgId).map(function (res) { return res.json(); }).subscribe(function (data) {
 	                    if (data && data.success) {
 	                        _this.router.navigate(['']);
-	                        return _this.ui.flash("Org was deleted", "error");
+	                        return _this.ui.flash("The organization was deleted successfully", "error");
 	                    }
 	                });
 	            }

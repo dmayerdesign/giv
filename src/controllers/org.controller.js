@@ -282,14 +282,14 @@ exports.routes = [
     process: function(req, res, next) {
       let updateQuery = {$set:{}};
       updateQuery.$set.avatar = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
-      //updateQuery.$set.coverImage = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
+      //updateQuery.$set.avatar = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {
           console.log(err);
-          res.send(400).json(err);
+          res.send(400).json({errmsg: err});
         }
         else {
-          console.log(obj.coverImage);
+          console.log(obj.avatar);
           res.json(obj);
         } 
       });

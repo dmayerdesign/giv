@@ -142,14 +142,17 @@
                 [attr.for]="category.id"
                 class="category checkbox-label"
                 [ngClass]="{'checked': checked[category.id]}">
-              <input
-                type="checkbox"
-                [attr.id]="category.id"
-                [attr.name]="category.id"
-                [checked]="orgHasCategory(category)"
-                (change)="changeHandler('categories', $event); changeSelectedCategories(category, $event.target.checked)">
 
-              <span>{{category.name}}</span>
+              <div>
+                <input
+                  type="checkbox"
+                  [attr.id]="category.id"
+                  [attr.name]="category.id"
+                  [checked]="orgHasCategory(category)"
+                  (change)="changeHandler('categories', $event); changeSelectedCategories(category, $event.target.checked)">
+
+                <span>{{category.name}}</span>
+              </div>
             </label>
           </div>
         </div>

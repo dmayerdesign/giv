@@ -56,7 +56,7 @@ const attach = multer({
   limits: { fileSize: 3000000 }
 });
 
-const uploadProfilePic = multer({
+const userAvatarUpload = multer({
   storage: multerS3({
     s3: s3,
     bucket: 'giv-uploads',
@@ -77,6 +77,7 @@ module.exports = {
       if (request.middleware) {
         if (request.middleware === "uploadCover") app[request.method](request.uri, passportConfig.isAuthenticated, uploadCoverImage.any(), request.process);
         if (request.middleware === "uploadOrgAvatar") app[request.method](request.uri, passportConfig.isAuthenticated, uploadOrgAvatar.any(), request.process);
+        if (request.middleware === "userAvatarUpload") app[request.method](request.uri, passportConfig.isAuthenticated, userAvatarUpload.any(), request.process);
         if (request.middleware === "attach") app[request.method](request.uri, passportConfig.isAuthenticated, attach.any(), request.process);
         if (request.middleware === "passport") app[request.method](request.uri, passportConfig.isAuthenticated, request.process);
       }

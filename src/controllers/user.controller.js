@@ -84,10 +84,10 @@ exports.postUpdateProfile = (req, res, next) => {
     return res.redirect('/account');
   }
 
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
     user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
+    user.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
@@ -102,6 +102,22 @@ exports.postUpdateProfile = (req, res, next) => {
       user.password = null;
       res.json(user);
     });
+  });
+};
+
+exports.uploadUserAvatar = (req, res, next) => {
+  let updateQuery = {$set:{}};
+  updateQuery.$set.avatar = "https://d1poe49zt5yre3.cloudfront.net/" + req.newPath;
+  //updateQuery.$set.avatar = "https://s3.amazonaws.com/fuse-uploads/" + req.newPath;
+  User.findOneAndUpdate({_id: req.params.userId}, updateQuery, {new: true}, function(err, obj) {
+    if(err) {
+      console.log(err);
+      res.send(400).json({errmsg: err});
+    }
+    else {
+      console.log(obj.avatar);
+      res.json(obj);
+    } 
   });
 };
 
@@ -133,7 +149,7 @@ exports.postUpdatePassword = (req, res, next) => {
     });
   })(req, res, next);
 
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
     user.password = req.body.password;
     user.save((err) => {
@@ -149,7 +165,7 @@ exports.postUpdatePassword = (req, res, next) => {
  * Delete user account.
  */
 exports.postDeleteAccount = (req, res, next) => {
-  User.remove({ _id: req.user.id }, (err) => {
+  User.remove({ _id: req.body._id }, (err) => {
     if (err) { return next(err); }
     res.json({ success: 'Your account has been deleted.' });
   });
@@ -161,7 +177,7 @@ exports.postDeleteAccount = (req, res, next) => {
  */
 exports.getOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
-  User.findById(req.user.id, (err, user) => {
+  User.findById(req.body._id, (err, user) => {
     if (err) { return next(err); }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);

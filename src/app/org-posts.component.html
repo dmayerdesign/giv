@@ -9,12 +9,12 @@
 			<button
 					(click)="toggleCreatingPost()"
 					[ngClass]="{'cancel': creatingPost, 'add': !creatingPost}"
-					*ngIf="!creatingPost && !isBrowsing">+ add a post
+					*ngIf="userHasPermission(org) && !creatingPost && !isBrowsing">+ add a post
 			</button>
 		</h4>
 		<h2 class="posts-title" *ngIf="!org && isBrowsing">Updates <span class="mobile-tab-button" (click)="showOrgs()">Organizations</span></h2>
 
-		<p *ngIf="!org" class="subtitle">See where your money's going</p>
+		<p *ngIf="!org" class="subtitle">See where your giving goes</p>
 		<search-box
 			class="search-box-container clearfix"
 			*ngIf="(!org?._id || !isBrowsing) && !isLoading"
