@@ -1,22 +1,19 @@
-import { Component, OnInit, OnDestroy, NgZone, Input } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
 
-import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { Categories } from './services/categories.service';
 import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
-	selector: 'manage-org-page',
-	templateUrl: 'app/manage-org-page.component.html',
-	styleUrls: ['app/org.styles.css', 'app/org-details.component.css', 'app/form-field.component.css', 'app/manage-org-page.component.css']
+	selector: 'account-settings',
+	templateUrl: 'app/account-settings.component.html',
+	styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css']
 })
 
-// Tell users to go to compressjpeg.com if their images exceed 2 MB
-
-export class accountSettingsComponent implements OnInit {
+export class AccountSettingsComponent implements OnInit {
 	private user:any;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
@@ -24,47 +21,35 @@ export class accountSettingsComponent implements OnInit {
 	private adminToken:string;
 
 	/** Fields to edit **/
-	private coverImage:string;
-	private avatar:string;
-	private videoLink:string;
-	private donateLink:string;
-	private slug:string;
-	private name:string;
-	private description:string;
+	private model = {
+    _id: null,
+    email: null,
+    name: null,
+    username: null,
+    gender: null,
+    avatar: null
+  };
 
-	/** Fields requiring lists **/
-	private callsToAction:Array<string> = [
-		"Donate",
-		"Support",
-		"Help out",
-		"Volunteer"
-	];
-	private categories = this.categoryService.list(); 
-
-	/** Saving (most are unused in template but must exist or else save() will break) **/
-	private saving_coverImage:boolean;
-	private saving_avatar:boolean;
-	private saving_donateLink:boolean;
-	private saving_slug:boolean;
-	private saving_categories:boolean;
-	private saving_otherLinks:boolean;
+	private passwords = {
+    current: null,
+    password: null,
+    confirm: null
+  };
 
 	/** Changed **/
-	private changed_otherLinks:boolean;
-	private changed_categories:boolean;
+	private changed:boolean = false;
+	private saving:boolean = false;
 	private checked = {};
 
 	/** Slug validation **/
-	private slugIsValid:boolean = true;
+	private usernameIsValid:boolean = true;
 
 	/** Upload options **/
-  coverImageUploadOptions:Object;
-  avatarUploadOptions:Object;
+  private avatarUploadOptions:Object;
 
 	constructor(
 				private router:Router,
 				private route:ActivatedRoute,
-				private orgService:OrgService,
 				private userService:UserService,
 				private ui:UIHelper,
 				private utilities:Utilities,
@@ -88,6 +73,13 @@ export class accountSettingsComponent implements OnInit {
 
 			this.isLoaded = true;
 
+      this.model._id = this.user._id;
+      this.model.email = this.user.email;
+			this.model.name = this.user.name;
+			this.model.username = this.user.username;
+			this.model.gender = this.user.gender;
+			this.model.avatar = this.user.avatar;
+
 			this.avatarUploadOptions = {
 			  url: '/account/upload/avatar/' + this.user._id,
 			  filterExtensions: true,
@@ -98,98 +90,81 @@ export class accountSettingsComponent implements OnInit {
 		});
 	}
 
-  handleUpload(org):void {
-  	this.org = org;
+  handleUpload(user):void {
+  	this.user = user;
   	this.stillWorking = false;
-  	console.log(org);
+  	console.log("User", user);
   }
 
-  checkForUniqueSlug($event) {
-  	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
+  checkForUniqueUsername($event) {
+    if (!this.model.username || typeof this.model.username === "undefined") return;
+
+  	this.http.get("/user/u/" + this.model.username).map(res => res.json()).subscribe(data => {
   		if (data) {
-  			this.slugIsValid = false;
-  			this.ui.flash("Sorry, that identifier is taken", "error");
+  			this.usernameIsValid = false;
+  			this.ui.flash("Sorry, that username is taken", "error");
   		}
-  		else this.slugIsValid = true;
+  		else this.usernameIsValid = true;
   	});
-  } 
+  }
 
-  save(key:string, value?:any):void {
-  	if (typeof value === "undefined") {
-  		value = this[key] || this.org[key];
+  savePassword() {
+  	if (!this.passwords.current || !this.passwords.password || !this.passwords.confirm) {
+  		return this.ui.flash("Enter your current password, then type your new password twice", "info");
   	}
-
-  	if (key === "categories") {
-  		value = this.user.categories;
+  	if (this.passwords.password !== this.passwords.confirm) {
+  		return this.ui.flash("New passwords don't match", "error");
   	}
+  	this.http.post("/account/password", {
+  		_id: this.user._id,
+  		currentPassword: this.passwords.current,
+  		password: this.passwords.password,
+  		confirmPassword: this.passwords.confirm
+  	}).map(res => res.json()).subscribe(user => {
+  		if (user.errmsg) return this.ui.flash(user.errmsg, "error");
+      this.ui.flash("Your password was changed successfully", "success");
+  		this.user = user;
+  		console.log(user);
+  	}, err => {
+  		this.ui.flash("Something went wrong. Try again", "error");
+  		console.error(err);
+  	});
+  }
 
-  	if (key === "slug") {
-  		let slugMatch = value.match(/[^a-zA-Z0-9\-]/);
-  		if (slugMatch) {
-  			return this.ui.flash("Your slug can only have lowercase letters, numbers, and hyphens", "error");
+  updatePasswords(key:string, value:any) {
+    this.passwords[key] = value;
+  }
+
+  updateModel(key:string, value:any) {
+  	this.model[key] = value;
+  }
+
+  save():void {
+  	if (this.model.username && this.model.username.length) {
+  		let usernameMatch = this.model.username.match(/[^a-zA-Z0-9\-_]/);
+  		if (usernameMatch) {
+  			return this.ui.flash("Your username can't contain spaces or special characters", "error");
   		} else {
-  			value = value.toLowerCase();
+  			this.model.username = this.model.username.toLowerCase();
   		}
   	}
 
-  	if (key === "otherLinks") {
-  		value = [];
-  		this.user.otherLinks.forEach(otherLink => {
-  			if (otherLink.href) {
-  				value.push(otherLink);
-  			}
-  		});
-  	}
+    this.model._id = this.user._id;
 
-  	this['saving_' + key] = true;
-  	this.orgService.editOrg({
-  		id: this.user._id,
-  		key: key,
-  		value: value
-  	}).subscribe(res => {
+  	this.saving = true;
+  	this.http.post("/account/profile", this.model).map(res => res.json()).subscribe(res => {
   		console.log(res);
   		if (res.errmsg) {
   			this.ui.flash("Save failed", "error");
-  			this['saving_' + key] = false;
+  			this.saving = false;
   			return;
   		}
-  		this.org = res;
-  		this['saving_' + key] = false;
-  		this['changed_' + key] = false;
+  		this.user = res;
+  		this.saving = false;
+  		this.changed = false;
   		this.ui.flash("Saved", "success");
   		console.log(res);
   	});
-  }
-
-  orgHasCategory(category) {
-  	let categoryInOrg = this.user.categories.find((orgCategory) => {
-  		return orgCategory.id === category.id;
-  	});
-
-  	if (categoryInOrg) return true;
-  	else return false;
-  }
-
-  changeSelectedCategories(category, add) {
-  	let categoryIndex = -1;
-  	let foundCategory = this.user.categories.find((cat, index) => {
-  		if (cat.id == category.id) {
-  			categoryIndex = index;
-  		}
-  		return cat.id == category.id;
-  	});
-
-  	if (!this.user.categories) this.org['categories'] = []; // for old orgs without categories array already
-  	if (add) {
-  		if (categoryIndex === -1) {
-  			this.user.categories.push(category);
-  			this.checked[category.id] = true;
-  		}
-  	} 
-  	else {
-	  	this.user.categories.splice(categoryIndex, 1);
-	  	this.checked[category.id] = false;
-	  }
   }
 
   deleteAccount(id) {
@@ -208,9 +183,9 @@ export class accountSettingsComponent implements OnInit {
 
   changeHandler(key:string, event) {
   	if (event.target.value)
-  		this['changed_' + key] = true;
+  		this.changed = true;
   	else
-  		this['changed_' + key] = false;
+  		this.changed = false;
   }
 
   userIsAdmin() {

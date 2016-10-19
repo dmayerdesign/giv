@@ -18,6 +18,8 @@ import { OrgDetailsComponent } from './org-details.component';
 import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
+import { AccountSettingsComponent } from './account-settings.component';
+import { ResetPasswordComponent } from './reset-password.component';
 import { ClaimOrgComponent } from './claim-org.component';
 import { VerifyOrgsComponent } from './verify-orgs.component';
 import { CreateOrgComponent } from './create-org.component';
@@ -46,6 +48,8 @@ const routing = RouterModule.forRoot([
   , { path: 'about', component: AboutComponent }
   , { path: 'starred', component: StarredOrgsComponent }
   , { path: 'contact', component: ContactComponent }
+  , { path: 'account', component: AccountSettingsComponent }
+  , { path: 'reset/:token', component: ResetPasswordComponent }
   , { path: 'organization/create', component: CreateOrgComponent }
   , { path: 'organization/i/:id', component: SingleOrgComponent }
   , { path: 'organization/:slug', component: SingleOrgComponent }
@@ -77,6 +81,8 @@ const routing = RouterModule.forRoot([
       , OrgPostsComponent
       , SingleOrgComponent
       , ManageOrgPageComponent
+      , AccountSettingsComponent
+      , ResetPasswordComponent
       , ClaimOrgComponent
       , VerifyOrgsComponent
     	, AboutComponent

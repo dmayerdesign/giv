@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   starred: [String],
 
   name: String,
+  username: String,
   avatar: String,
 
   profile: {

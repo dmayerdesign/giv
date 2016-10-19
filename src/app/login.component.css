@@ -1,0 +1,30 @@
+.login {
+	margin-top: 1.8em;
+}
+
+.login-form {
+	margin-top: 1em;
+}
+
+.form-field {
+	margin-bottom: 0.4em;
+}
+
+.submit {
+	margin-top: 0.4em;
+}
+
+.login-btn {
+	margin-top: 1em;
+}
+
+.forgot-password {
+	display: block;
+	float: left;
+	margin: 1em 0;
+	font-size: 0.8em;
+}
+
+.forgot-password:hover {
+	text-decoration: underline !important;
+}

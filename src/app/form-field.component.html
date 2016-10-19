@@ -6,6 +6,7 @@
     (click)="save()"
     [disabled]="!changed"
     [ngClass]="{'changed': changed}"
+    [hidden]="noSave"
     *ngIf="type !== 'select'">
 
     <i [hidden]="!saving" class="fa fa-circle-o-notch fa-spin"></i>
@@ -15,7 +16,7 @@
 
   <input
     class="grey-bg no-shadow"
-    *ngIf="type === 'text' || type === 'url' || type === 'email'"
+    *ngIf="type === 'text' || type === 'url' || type === 'email' || type === 'password'"
     [attr.type]="type"
     [attr.name]="name"
     [attr.id]="name"

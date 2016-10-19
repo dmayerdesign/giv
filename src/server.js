@@ -31,6 +31,12 @@ const AWS = require('aws-sdk'); AWS.config.region = 'us-west-2';
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const s3 = new AWS.S3({params: {Bucket: 'giv-uploads', Key: 'default'}});
+const appendFileExt = function(file) {
+  if (file && file.mimetype) {
+    if (file.mimetype.indexOf("jpeg") > -1) return ".jpg";
+    else return "." + file.mimetype.match(/image\/(.*)/)[1];
+  }
+};
 
 /**
 * Security middleware
@@ -156,7 +162,9 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.post('/interests', passportConfig.isAuthenticated, userController.showInterest);
 app.get('/adminToken', passportConfig.isAuthenticated, userController.adminToken);
-
+app.get('/user/:id', userController.getUser);
+app.get('/user/u/:username', userController.getUserByUsername);
+app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
 
 /**
  * Error Handler.
@@ -188,14 +196,6 @@ mongoose.connection.on('connected', () => {
   ** Posts
   **/
   appService.addRoutes(app, postController.routes);
-
-  /**
-  ** Users
-  **/
-
-  app.get('/user/:id', userController.getUser);
-  app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
-
 
   // all other routes are handled by Angular
   app.get('/*', function(req, res) {

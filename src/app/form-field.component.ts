@@ -17,9 +17,11 @@ export class FormFieldComponent implements OnInit {
 	@Input() saving;
 	@Input() upload;
 	@Input() selectOptions;
+	@Input() noSave;
 
 	@Output() onUpload = new EventEmitter();
 	@Output() onSave = new EventEmitter();
+	@Output() onChange = new EventEmitter();
 
 	private value:any;
 	private changed:boolean = false;
@@ -37,6 +39,7 @@ export class FormFieldComponent implements OnInit {
 	}
 
 	ngAfterViewInit() {
+		if (!this.type) this.type = "text";
 		if (this.initial) {
 			this.value = this.initial;
 		}
@@ -67,6 +70,8 @@ export class FormFieldComponent implements OnInit {
   }
 
   changeHandler() {
+  	this.onChange.emit(this.value);
+
   	if (this.value && this.value.length) this.changed = true;
   	else this.changed = false;
   }

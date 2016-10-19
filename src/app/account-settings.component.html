@@ -1,0 +1,71 @@
+<div class="account-settings" *ngIf="user && isLoaded">
+
+	<h2>Your account</h2>
+
+  <div class="row">
+    <div class="giv-form col-md-7" *ngIf="user">
+    	<div class="form-section clearfix">
+        <h3>Edit your info</h3>
+
+        <form-field
+          [title]="'Avatar'"
+          [name]="'avatar'"
+          [placeholder]="'Paste a link to an image'"
+          [type]="'url'"
+          [noSave]="true"
+          [upload]="avatarUploadOptions"
+          (onUpload)="handleUpload($event)"
+          (onChange)="updateModel('avatar', $event)"></form-field>
+
+        <form-field
+          [title]="'Your name'"
+          [name]="'name'"
+          [placeholder]="user.name"
+          [noSave]="true"
+          (onChange)="updateModel('name', $event)"></form-field>
+
+        <form-field
+          [title]="'Your username'"
+          [name]="'username'"
+          [placeholder]="user.username"
+          [noSave]="true"
+          (onChange)="updateModel('username', $event)"></form-field>
+
+      <button class="submit" (click)="save()">Save changes</button>
+      
+      </div>
+
+      <div class="form-section clearfix">
+        <h3>Update your password</h3>
+
+        <form-field
+          [title]="'Current password'"
+          [name]="'currentPassword'"
+          [type]="'password'"
+          [noSave]="true"
+          (onChange)="updatePasswords('current', $event)"></form-field>
+
+        <form-field
+          [title]="'New password'"
+          [name]="'newPassword'"
+          [type]="'password'"
+          [noSave]="true"
+          (onChange)="updatePasswords('password', $event)"></form-field>
+
+        <form-field
+          [title]="'New password again'"
+          [name]="'confirmPassword'"
+          [type]="'password'"
+          [noSave]="true"
+          (onChange)="updatePasswords('confirm', $event)"></form-field>
+
+        <button class="submit" (click)="savePassword()">Update password</button>
+      </div>
+      <div class="form-section admin clearfix">
+        <button (click)="deleteAccount(user._id)">Delete account</button>
+      </div>
+    </div>
+  </div>
+
+
+</div>
