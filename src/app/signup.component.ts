@@ -5,8 +5,9 @@ import { UIHelper } from './services/app.service';
 import { UserService } from './services/user.service';
 
 @Component({
-	selector: 'signup',
-  templateUrl: 'app/signup.component.html'
+	selector: 'signup'
+, templateUrl: 'app/signup.component.html'
+, styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login-signup.styles.css']
 })
 
 export class SignupComponent implements OnInit {
@@ -24,8 +25,10 @@ export class SignupComponent implements OnInit {
 			this.ui.flash("You're already logged in!", "info");
 		}
     // FOR DEMO MODE
-    else this.router.navigate(['/']);
-    this.ui.flash("Sorry—user accounts aren't available in the demo");
+    else {
+      this.router.navigate(['/']);
+      this.ui.flash("Sorry—user accounts aren't available in the demo");
+    }
 	}
 
   ngOnInit() {

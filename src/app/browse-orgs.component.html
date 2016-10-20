@@ -76,10 +76,10 @@
 				<option *ngFor="let category of categoriesList" [value]="category?.id">{{category?.name}}</option>
 			</select>
 
-			<p class="info" *ngIf="searchText">
+			<p class="info filter-info" *ngIf="searchText">
 				<button class="mini" (click)="clearOrgSearch()"><i class="fa fa-undo"></i>Clear search</button>
 			</p>
-			<p class="info" *ngIf="categoryFilter.id">
+			<p class="info filter-info" *ngIf="categoryFilter.id">
 				Category: {{categoryFilter.name}}&nbsp;&nbsp;
 				<button class="mini" (click)="clearCategoryFilter()"><i class="fa fa-undo"></i>Clear filter</button>
 			</p>

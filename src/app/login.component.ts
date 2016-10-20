@@ -9,7 +9,7 @@ import { UIHelper } from './services/app.service';
 @Component({
 	selector: 'login'
 , templateUrl: 'app/login.component.html'
-, styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login.component.css']
+, styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login-signup.styles.css']
 //, providers: [FacebookService]
 })
 

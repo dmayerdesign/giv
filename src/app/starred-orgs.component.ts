@@ -166,4 +166,14 @@ export class StarredOrgsComponent implements OnInit {
 		this.showStarredMobileTab = false;
 	}
 
+	unstar(orgToUnstar) {
+		let i;
+		this.orgs.forEach((org, index, arr) => {
+			if (org._id === orgToUnstar._id) {
+				i = index;
+			}
+		});
+		this.orgs.splice(i, 1);
+	}
+
 }

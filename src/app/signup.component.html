@@ -1,6 +1,21 @@
-<form (submit)="signup()">
-	<input [(ngModel)]="formModel.email" name="email" type="email" placeholder="Your email" required>
-	<input [(ngModel)]="formModel.password" name="password" type="password" placeholder="Your password" required>
-	<input [(ngModel)]="formModel.confirmPassword" name="confirmPassword" type="password" placeholder="Your password again" required>
-	<button type="submit">Sign up</button>
-</form>
+<div class="signup col-md-7">
+	<h2>Signup</h2>
+
+	<form class="giv-form signup-form col-md-12 row" (submit)="signup()">
+		<div class="form-field clearfix">
+			<label class="title">Email</label>
+			<input [(ngModel)]="formModel.email" name="email" type="email" placeholder="Your email" required>
+		</div>
+		<div class="form-field clearfix">
+			<label class="title">Password</label>
+			<input [(ngModel)]="formModel.password" name="password" type="password" placeholder="Your password" required>
+		</div>
+		<div class="form-field clearfix">
+			<label class="title">Password again</label>
+			<input [(ngModel)]="formModel.confirmPassword" name="confirmPassword" type="password" placeholder="Your password again" required>
+		</div>
+			
+		<button class="signup-btn full-width" type="submit">Sign up</button>
+	</form>
+</div>
+
