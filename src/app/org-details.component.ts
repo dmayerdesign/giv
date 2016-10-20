@@ -16,6 +16,7 @@ export class OrgDetailsComponent implements OnInit {
 	private coverImageLinkBroken:boolean = false;
 	private shortDescriptionLength = 450;
 	private truncateDescription:number = this.shortDescriptionLength;
+	private originalDescriptionLength:number;
 
 	constructor(
 				private http: Http,
@@ -30,6 +31,7 @@ export class OrgDetailsComponent implements OnInit {
 	ngAfterContentInit() {
 		this.update.emit("init");
 		if (this.org.description) {
+			this.originalDescriptionLength = this.org.description.length;
 			this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
 		}
 	}
@@ -54,7 +56,7 @@ export class OrgDetailsComponent implements OnInit {
 	}
 
 	descriptionIsLong() {
-		if (this.org.description && this.org.description.length > 300) return true;
+		if (this.org.description && (this.originalDescriptionLength > this.truncateDescription)) return true;
 		else return false;
 	}
 
@@ -64,6 +66,14 @@ export class OrgDetailsComponent implements OnInit {
 
 	readLess() {
 		this.truncateDescription = this.shortDescriptionLength;
+	}
+
+	showReadMore() {
+		return this.truncateDescription !== 0 && this.originalDescriptionLength > this.truncateDescription;
+	}
+
+	showReadLess() {
+		return this.truncateDescription == 0 && this.originalDescriptionLength > this.truncateDescription;
 	}
 
 }

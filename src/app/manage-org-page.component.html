@@ -124,6 +124,15 @@
         </div>
       </div>
       <div class="form-section categories clearfix">
+        <form-field
+          [title]="'Facebook page'"
+          [name]="'facebook'"
+          [type]="'url'"
+          [saving]="saving_facebook"
+          [placeholder]="org.facebook || 'e.g. https://facebook.com/myorganization'"
+          (onSave)="save('facebook', $event)"></form-field>
+      </div>
+      <div class="form-section categories clearfix">
         <div class="form-field categories clearfix">
           <label class="title">Categories</label>
           <button

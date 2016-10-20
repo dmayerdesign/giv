@@ -33,6 +33,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private slug:string;
 	private name:string;
 	private description:string;
+	private facebook:string;
 
 	/** Fields requiring lists **/
 	private callsToAction:Array<string> = [
@@ -50,6 +51,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private saving_slug:boolean;
 	private saving_categories:boolean;
 	private saving_otherLinks:boolean;
+	private saving_facebook:boolean;
 
 	/** Changed **/
 	private changed_otherLinks:boolean;

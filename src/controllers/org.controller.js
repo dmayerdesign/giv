@@ -313,7 +313,8 @@ let editableInOrg = [
   "verified",
   "featured",
   "categories",
-  "videoLink"
+  "videoLink",
+  "facebook"
 ];
 for (let i = 0; i < editableInOrg.length; i++) {
   exports.routes.push(editOrg(editableInOrg[i]));
