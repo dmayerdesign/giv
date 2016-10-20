@@ -5,7 +5,7 @@
 
 .starred-orgs h2,
 .recommended-orgs h2 {
-  margin-top: 0.4em;
+  margin-top: 0.6em;
 }
 
 section.org {
@@ -265,10 +265,10 @@ header h4 > a, header h4 > a:hover {
   }
   .starred-orgs > header,
   .recommended-orgs > header {
-    padding-right: 45px;
-    padding-left: 45px;
+    padding-right: 15px;
+    padding-left: 15px;
   }
-  
+
   search-box + select {
     float: none;
     margin-top: 0.7em;

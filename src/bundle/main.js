@@ -37896,22 +37896,22 @@
 	var org_posts_component_1 = __webpack_require__(82);
 	var single_org_component_1 = __webpack_require__(84);
 	var manage_org_page_component_1 = __webpack_require__(85);
-	var account_settings_component_1 = __webpack_require__(357);
-	var reset_password_component_1 = __webpack_require__(358);
-	var claim_org_component_1 = __webpack_require__(86);
-	var verify_orgs_component_1 = __webpack_require__(88);
-	var create_org_component_1 = __webpack_require__(89);
-	var create_post_component_1 = __webpack_require__(90);
-	var search_box_component_1 = __webpack_require__(91);
-	var contact_component_1 = __webpack_require__(92);
-	var form_field_component_1 = __webpack_require__(93);
+	var account_settings_component_1 = __webpack_require__(86);
+	var reset_password_component_1 = __webpack_require__(87);
+	var claim_org_component_1 = __webpack_require__(88);
+	var verify_orgs_component_1 = __webpack_require__(90);
+	var create_org_component_1 = __webpack_require__(91);
+	var create_post_component_1 = __webpack_require__(92);
+	var search_box_component_1 = __webpack_require__(93);
+	var contact_component_1 = __webpack_require__(94);
+	var form_field_component_1 = __webpack_require__(95);
 	var user_service_1 = __webpack_require__(68);
 	var search_service_1 = __webpack_require__(77);
-	var ng2_click_outside_1 = __webpack_require__(94);
+	var ng2_click_outside_1 = __webpack_require__(96);
 	var categories_service_1 = __webpack_require__(80);
 	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	var truncate_pipe_1 = __webpack_require__(96);
+	var truncate_pipe_1 = __webpack_require__(98);
 	var core_2 = __webpack_require__(3);
 	core_2.enableProdMode();
 	var routing = router_1.RouterModule.forRoot([
@@ -51682,7 +51682,7 @@
 	        core_1.Component({
 	            selector: 'login',
 	            templateUrl: 'app/login.component.html',
-	            styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login.component.css']
+	            styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login-signup.styles.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper])
 	    ], LoginComponent);
@@ -51721,9 +51721,10 @@
 	            this.router.navigate(['/']);
 	            this.ui.flash("You're already logged in!", "info");
 	        }
-	        else
+	        else {
 	            this.router.navigate(['/']);
-	        this.ui.flash("Sorry—user accounts aren't available in the demo");
+	            this.ui.flash("Sorry—user accounts aren't available in the demo");
+	        }
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
 	        this.ui.setTitle("Sign up");
@@ -51764,7 +51765,8 @@
 	    SignupComponent = __decorate([
 	        core_1.Component({
 	            selector: 'signup',
-	            templateUrl: 'app/signup.component.html'
+	            templateUrl: 'app/signup.component.html',
+	            styleUrls: ['app/form-field.component.css', 'app/manage-org.component.css', 'app/login-signup.styles.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, user_service_1.UserService, app_service_1.UIHelper])
 	    ], SignupComponent);
@@ -52113,6 +52115,15 @@
 	    StarredOrgsComponent.prototype.showRecommended = function () {
 	        this.showRecommendedMobileTab = true;
 	        this.showStarredMobileTab = false;
+	    };
+	    StarredOrgsComponent.prototype.unstar = function (orgToUnstar) {
+	        var i;
+	        this.orgs.forEach(function (org, index, arr) {
+	            if (org._id === orgToUnstar._id) {
+	                i = index;
+	            }
+	        });
+	        this.orgs.splice(i, 1);
 	    };
 	    StarredOrgsComponent = __decorate([
 	        core_1.Component({
@@ -53689,1313 +53700,6 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var http_1 = __webpack_require__(55);
-	var router_1 = __webpack_require__(25);
-	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(87);
-	var org_service_1 = __webpack_require__(76);
-	var user_service_1 = __webpack_require__(68);
-	var ClaimOrgComponent = (function () {
-	    function ClaimOrgComponent(http, router, route, ui, orgService, userService) {
-	        this.http = http;
-	        this.router = router;
-	        this.route = route;
-	        this.ui = ui;
-	        this.orgService = orgService;
-	        this.userService = userService;
-	        this.isLoaded = false;
-	        this.inputs = new email_service_1.HtmlEmailModel();
-	    }
-	    ClaimOrgComponent.prototype.ngOnInit = function () {
-	        var _this = this;
-	        this.ui.setTitle("Claim an organization");
-	        this.userService.getLoggedInUser(function (err, user) {
-	            if (err)
-	                console.error(err);
-	            if (!user || err) {
-	                _this.ui.flash("You have to be logged in to do that!", "error");
-	                return _this.router.navigate(['/']);
-	            }
-	            _this.user = user;
-	            if (_this.route.params) {
-	                _this.sub = _this.route.params.subscribe(function (params) {
-	                    var id = params['id'];
-	                    if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-	                        _this.ui.flash("This page doesn't exist", "error");
-	                        return _this.router.navigate([''], { queryParams: { "404": true } });
-	                    }
-	                    _this.orgService.loadOrg(id).subscribe(function (data) {
-	                        _this.org = data;
-	                        _this.isLoaded = true;
-	                    }, function (err) {
-	                        _this.router.navigate([''], { queryParams: { "404": true } });
-	                        console.log("Error: ");
-	                        console.log(err);
-	                        return console.error(err);
-	                    });
-	                });
-	            }
-	            else {
-	                _this.router.navigate(['../']);
-	            }
-	        });
-	    };
-	    ClaimOrgComponent.prototype.ngOnDestroy = function () {
-	        this.sub.unsubscribe();
-	    };
-	    ClaimOrgComponent.prototype.submitForm = function () {
-	        var _this = this;
-	        if (!this.org) {
-	            this.router.navigate(['/']);
-	            return this.ui.flash("There was an error finding the organization", "error");
-	        }
-	        this.inputs.subject = this.org.name + ' has been claimed by ' + this.inputs.fromName;
-	        this.inputs.redirectTo = '/';
-	        this.inputs.toName = 'Support';
-	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
-	        this.inputs.html = "\n\t\t<doctype html>\n\t\t<html>\n\t\t<body>\n\t\t\t<p><strong>User:</strong><br><pre>" + this.user._id + "</pre></p>\n\t\t\t<p><strong>Org:</strong><br><pre>" + JSON.stringify(this.org) + "</pre></p>\n\t\t\t<p><strong>Message:</strong><br>" + this.message + "</p>\n\t\t</body>\n\t\t</html>";
-	        console.log(this.inputs);
-	        this.http.post('/contact-form', this.inputs)
-	            .map(function (res) { return res.json(); })
-	            .subscribe(function (data) {
-	            if (data.errmsg) {
-	                console.error(data.errmsg);
-	                return _this.ui.flash("Sorry, your message couldn't be sent.", "error");
-	            }
-	            _this.ui.flash("Sent!", "success");
-	            console.log(data);
-	            if (_this.org.slug)
-	                _this.router.navigate(['/organization', _this.org.slug]);
-	            else
-	                _this.router.navigate(['/organization', 'i', _this.org._id]);
-	        }, function (err) {
-	            console.log(err);
-	            _this.ui.flash("Sorry, your message couldn't be sent.", "error");
-	        });
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], ClaimOrgComponent.prototype, "org", void 0);
-	    ClaimOrgComponent = __decorate([
-	        core_1.Component({
-	            selector: 'claim-org',
-	            templateUrl: 'app/claim-org.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, app_service_1.UIHelper, org_service_1.OrgService, user_service_1.UserService])
-	    ], ClaimOrgComponent);
-	    return ClaimOrgComponent;
-	}());
-	exports.ClaimOrgComponent = ClaimOrgComponent;
-
-
-/***/ },
-/* 87 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var EmailModel = (function () {
-	    function EmailModel() {
-	    }
-	    return EmailModel;
-	}());
-	exports.EmailModel = EmailModel;
-	var HtmlEmailModel = (function () {
-	    function HtmlEmailModel() {
-	    }
-	    return HtmlEmailModel;
-	}());
-	exports.HtmlEmailModel = HtmlEmailModel;
-
-
-/***/ },
-/* 88 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var http_1 = __webpack_require__(55);
-	var router_1 = __webpack_require__(25);
-	var user_service_1 = __webpack_require__(68);
-	var org_service_1 = __webpack_require__(76);
-	var app_service_1 = __webpack_require__(70);
-	var VerifyOrgsComponent = (function () {
-	    function VerifyOrgsComponent(http, orgService, ui, utilities, route, router, userService) {
-	        this.http = http;
-	        this.orgService = orgService;
-	        this.ui = ui;
-	        this.utilities = utilities;
-	        this.route = route;
-	        this.router = router;
-	        this.userService = userService;
-	        this.orgs = [];
-	        this.searchBoxIsFocused = false;
-	        this.viewingOrg = false;
-	        this.isLoading = true;
-	        this.loadingOrgSearch = false;
-	        this.loadingShowMoreOrgs = false;
-	        this.singleDetailsAreLoaded = false;
-	    }
-	    VerifyOrgsComponent.prototype.ngOnInit = function () {
-	        var _this = this;
-	        this.ui.setTitle("Verify organizations");
-	        this.userService.getLoggedInUser(function (err, user) {
-	            if (err)
-	                return console.error(err);
-	            _this.user = user;
-	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
-	                _this.adminToken = data;
-	                if (!_this.userIsAdmin()) {
-	                    _this.router.navigate(['/']);
-	                    _this.ui.flash("You don't have permission to do that!", "error");
-	                }
-	            }, function (err) {
-	                console.error(err);
-	            });
-	            console.log("User: ", user);
-	        });
-	        this.orgService.loadUnverifiedOrgs({ limit: 100 }).subscribe(function (data) {
-	            _this.isLoading = false;
-	            _this.orgs = data;
-	        }, function (error) { return console.log(error); });
-	    };
-	    VerifyOrgsComponent.prototype.isAscending = function (order) {
-	        if (order.indexOf("+") > -1) {
-	            return true;
-	        }
-	        else {
-	            return false;
-	        }
-	    };
-	    VerifyOrgsComponent.prototype.searchOrgs = function (search) {
-	        var _this = this;
-	        var query = { search: search, field: "name", bodyField: "description", limit: 100 };
-	        this.loadingOrgSearch = true;
-	        this.orgService.loadUnverifiedOrgs(query)
-	            .subscribe(function (results) {
-	            _this.orgs = results;
-	            _this.loadingOrgSearch = false;
-	            _this.searchText = search;
-	        }, function (error) { return console.error(error); });
-	    };
-	    VerifyOrgsComponent.prototype.clearOrgSearch = function () {
-	        this.searchOrgs('');
-	        var searchInput = document.querySelector(".org-search-box input");
-	        searchInput.value = "";
-	    };
-	    VerifyOrgsComponent.prototype.showMore = function (increase, offset) {
-	        var _this = this;
-	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
-	        var query = { limit: increase, offset: offset };
-	        if (search && search.length) {
-	            query['search'] = search;
-	            query['field'] = "name";
-	            query['bodyField'] = "description";
-	        }
-	        this.loadingShowMoreOrgs = true;
-	        this.orgService.loadUnverifiedOrgs(query).subscribe(function (res) {
-	            _this.loadingShowMoreOrgs = false;
-	            console.log(res);
-	            _this.orgs = _this.orgs.concat(res);
-	        }, function (error) { return console.log(error); });
-	    };
-	    VerifyOrgsComponent.prototype.toggleSearchBoxFocus = function (event) {
-	        if (event == 'focus') {
-	            this.searchBoxIsFocused = true;
-	        }
-	        if (event == 'blur') {
-	            this.searchBoxIsFocused = false;
-	        }
-	    };
-	    VerifyOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
-	            return org._id === id;
-	        };
-	        this.selectedOrg = this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
-	    };
-	    VerifyOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	        }
-	    };
-	    VerifyOrgsComponent.prototype.revealOrgDetails = function (event) {
-	        if (event == "init") {
-	            this.singleDetailsAreLoaded = true;
-	        }
-	    };
-	    VerifyOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.userIsAdmin())
-	            return true;
-	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
-	            return true;
-	        else
-	            return false;
-	    };
-	    VerifyOrgsComponent.prototype.userIsAdmin = function () {
-	        return this.user.adminToken === this.adminToken;
-	    };
-	    VerifyOrgsComponent.prototype.verifyOrg = function (org) {
-	        var _this = this;
-	        var orgIndex = this.orgs.indexOf(org);
-	        this.orgService.editOrg({
-	            id: org._id,
-	            key: "verified",
-	            value: true
-	        }).subscribe(function (res) {
-	            console.log(res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Verification failed", "error");
-	                return;
-	            }
-	            _this.orgs.splice(orgIndex, 1);
-	            _this.ui.flash("Verified", "success");
-	            console.log(res);
-	        });
-	    };
-	    VerifyOrgsComponent = __decorate([
-	        core_1.Component({
-	            selector: 'verify-orgs',
-	            templateUrl: 'app/verify-orgs.component.html',
-	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css']
-	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, router_1.Router, user_service_1.UserService])
-	    ], VerifyOrgsComponent);
-	    return VerifyOrgsComponent;
-	}());
-	exports.VerifyOrgsComponent = VerifyOrgsComponent;
-
-
-/***/ },
-/* 89 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var http_1 = __webpack_require__(55);
-	var router_1 = __webpack_require__(25);
-	var org_service_1 = __webpack_require__(76);
-	var user_service_1 = __webpack_require__(68);
-	var categories_service_1 = __webpack_require__(80);
-	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(87);
-	function Org() {
-	    this.name = null;
-	    this.description = null;
-	    return this;
-	}
-	;
-	var CreateOrgComponent = (function () {
-	    function CreateOrgComponent(orgService, userService, ui, http, router, categoryService) {
-	        this.orgService = orgService;
-	        this.userService = userService;
-	        this.ui = ui;
-	        this.http = http;
-	        this.router = router;
-	        this.categoryService = categoryService;
-	        this.org = new Org();
-	        this.email = new email_service_1.HtmlEmailModel();
-	        this.categories = this.categoryService.list();
-	        this.requiredOrgFields = [
-	            {
-	                id: "name",
-	                name: "name"
-	            },
-	            {
-	                id: "description",
-	                name: "description"
-	            },
-	            {
-	                id: "donateLink",
-	                name: "donate link"
-	            },
-	            {
-	                id: "website",
-	                name: "website"
-	            }
-	        ];
-	    }
-	    CreateOrgComponent.prototype.ngOnInit = function () {
-	        var _this = this;
-	        this.ui.setTitle("Add your organization");
-	        this.userService.getLoggedInUser(function (err, user) {
-	            if (err) {
-	                console.error(err);
-	                _this.router.navigate(['/']);
-	                return _this.ui.flash("Sorry--an error occurred", "error");
-	            }
-	            if (user) {
-	                _this.user = user;
-	                _this.email = {
-	                    subject: "A new organization was submitted!",
-	                    html: null,
-	                    toAddr: "d.a.mayer92@gmail.com",
-	                    toName: "Danny at GIV",
-	                    fromAddr: _this.user.email,
-	                    fromName: _this.user.name || _this.user.email,
-	                    redirectTo: null
-	                };
-	            }
-	            else {
-	                _this.router.navigate(['/']);
-	                _this.ui.flash("Sorry! You need to be logged in to create an organization", "error");
-	            }
-	        });
-	        this.org.verified = false;
-	    };
-	    CreateOrgComponent.prototype.orgHasCategory = function (category) {
-	        if (this.org.categories) {
-	            var categoryInOrg = this.org.categories.filter(function (orgCategory) {
-	                return orgCategory.id === category.id;
-	            });
-	            if (categoryInOrg.length)
-	                return true;
-	            else
-	                return false;
-	        }
-	        else
-	            return false;
-	    };
-	    CreateOrgComponent.prototype.changeSelectedCategories = function (category, add) {
-	        if (!this.org.categories)
-	            this.org['categories'] = []; // for old orgs without categories array already
-	        if (add) {
-	            this.org.categories.push(category);
-	        }
-	        else {
-	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
-	        }
-	    };
-	    CreateOrgComponent.prototype.submitOrg = function (newOrg) {
-	        var _this = this;
-	        var ok = true;
-	        this.requiredOrgFields.forEach(function (field, index, arr) {
-	            if (!newOrg[field.id]) {
-	                _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
-	                ok = false;
-	            }
-	        });
-	        if (!ok)
-	            return;
-	        if (!this.roleDescription)
-	            return this.ui.flash("Oops! You need to describe your role in the organization", "error");
-	        var categories = "";
-	        newOrg.categories.forEach(function (category, index, arr) {
-	            if (category.name !== "undefined")
-	                categories += category.name;
-	            if (index !== (arr.length - 1))
-	                categories += ", ";
-	        });
-	        this.email.html = "\n    <!doctype html>\n    <html>\n    <body>\n    \t<p><strong>Organization:</strong> " + newOrg.name + "</p>\n    \t<p><strong>Submitted by:</strong> " + this.email.fromName + "</p>\n    \t<p><strong>Role:</strong> " + this.roleDescription + "</p>\n    \t<p><strong>Description of organization:</strong> " + newOrg.description + "</p>\n    \t<p><strong>Categories:</strong> " + categories + "</p>\n    \t<p><strong>Website:</strong> " + newOrg.website + "</p>\n    \t<p><strong>Donate link:</strong> " + newOrg.donateLink + "</p>\n    </body>\n    </html>";
-	        this.http.post('/org', newOrg).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            console.log("New org: ", res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
-	                return;
-	            }
-	            _this.org = res;
-	            console.log(res);
-	            _this.http.post('/contact-form', _this.email)
-	                .map(function (res) { return res.json(); })
-	                .subscribe(function (data) {
-	                if (data.errmsg) {
-	                    console.error(data.errmsg);
-	                    return _this.ui.flash("Couldn't send your message", "error");
-	                }
-	                _this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
-	                console.log(data);
-	                _this.router.navigate(['/']);
-	            }, function (err) {
-	                console.log(err);
-	                _this.ui.flash("Couldn't send your message", "error");
-	            });
-	        }, function (error) {
-	            _this.ui.flash("Submission failed", "error");
-	            return console.error(error);
-	        });
-	    };
-	    CreateOrgComponent = __decorate([
-	        core_1.Component({
-	            selector: 'create-org',
-	            templateUrl: 'app/create-org.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, http_1.Http, router_1.Router, categories_service_1.Categories])
-	    ], CreateOrgComponent);
-	    return CreateOrgComponent;
-	}());
-	exports.CreateOrgComponent = CreateOrgComponent;
-
-
-/***/ },
-/* 90 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var router_1 = __webpack_require__(25);
-	var http_1 = __webpack_require__(55);
-	var org_service_1 = __webpack_require__(76);
-	var user_service_1 = __webpack_require__(68);
-	var app_service_1 = __webpack_require__(70);
-	function Post() {
-	    this.authorId = null;
-	    this.title = null;
-	    this.content = null;
-	    this.org = null;
-	    this.featuredImage = null;
-	    this.imageBucket = Date.now().toString();
-	    return this;
-	}
-	;
-	var CreatePostComponent = (function () {
-	    function CreatePostComponent(router, route, orgService, userService, ui, utilities, zone, http) {
-	        this.router = router;
-	        this.route = route;
-	        this.orgService = orgService;
-	        this.userService = userService;
-	        this.ui = ui;
-	        this.utilities = utilities;
-	        this.zone = zone;
-	        this.http = http;
-	        this.postAdd = new core_1.EventEmitter();
-	        this.cancel = new core_1.EventEmitter();
-	        this.stillWorking = false;
-	        this.progress = 0;
-	        this.savingPost = false;
-	        this.post = new Post();
-	    }
-	    CreatePostComponent.prototype.ngOnInit = function () {
-	        this.post = {
-	            authorId: null,
-	            title: null,
-	            content: null,
-	            org: null,
-	            featuredImage: null,
-	            imageBucket: Date.now().toString()
-	        };
-	        // for ng-upload
-	        this.uploadOptions = {
-	            url: '/post/upload/featuredImage/' + this.post.imageBucket,
-	            filterExtensions: true,
-	            calculateSpeed: true,
-	            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	        };
-	    };
-	    CreatePostComponent.prototype.ngAfterViewChecked = function () {
-	        if (this.org && this.user && !this.post.org) {
-	            this.post.authorId = this.user._id;
-	            this.post.org = this.org._id;
-	            console.log(this.post);
-	        }
-	    };
-	    CreatePostComponent.prototype.handleUpload = function (data) {
-	        var _this = this;
-	        this.zone.run(function () {
-	            console.log(data);
-	            _this.progress = data.progress.percent;
-	            _this.stillWorking = true;
-	            if (data.response && data.status !== 404) {
-	                if (data.response.indexOf("errmsg") > -1)
-	                    return console.error(data.response);
-	                _this.post.featuredImage = data.response;
-	                _this.stillWorking = false;
-	                console.log(_this.post);
-	            }
-	        });
-	    };
-	    CreatePostComponent.prototype.createPost = function (newPost) {
-	        var _this = this;
-	        var required = ["title", "content"];
-	        var invalid = false;
-	        required.forEach(function (field) {
-	            if (!newPost[field] || !newPost[field].length) {
-	                invalid = true;
-	                _this.ui.flash("Oops! You need to fill out the " + field + " of your post", "error");
-	            }
-	        });
-	        if (invalid)
-	            return;
-	        this.postAdd.emit(newPost);
-	        if (!this.editing)
-	            this.post = new Post();
-	    };
-	    CreatePostComponent.prototype.cancelPost = function () {
-	        this.cancel.emit(false);
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "org", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "user", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "editing", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "postAdd", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], CreatePostComponent.prototype, "cancel", void 0);
-	    CreatePostComponent = __decorate([
-	        core_1.Component({
-	            selector: 'create-post',
-	            templateUrl: 'app/create-post.component.html',
-	            styleUrls: ['app/form-field.component.css', 'app/create-post.component.css']
-	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http])
-	    ], CreatePostComponent);
-	    return CreatePostComponent;
-	}());
-	exports.CreatePostComponent = CreatePostComponent;
-
-
-/***/ },
-/* 91 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var SearchBox = (function () {
-	    function SearchBox(el) {
-	        this.el = el;
-	        this.update = new core_1.EventEmitter();
-	        this.focusChange = new core_1.EventEmitter();
-	    }
-	    SearchBox.prototype.submitSearch = function ($event) {
-	        var search = this.search;
-	        var keyCode = $event.keyCode;
-	        if (!search || typeof search === "undefined")
-	            return;
-	        if (search.length <= 1 && keyCode === 8) {
-	            this.update.emit("");
-	        }
-	        if (keyCode === 13 || $event.target.className.indexOf("search-button") > -1) {
-	            this.update.emit(search);
-	            this.el.nativeElement.querySelectorAll(".search-box input")[0].blur();
-	        }
-	    };
-	    SearchBox.prototype.updateSearch = function ($event) {
-	        this.search = $event.target.value;
-	    };
-	    SearchBox.prototype.checkEmpty = function ($event) {
-	        var search = $event.target.value;
-	        if (!search || search === "") {
-	            this.update.emit("");
-	        }
-	    };
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], SearchBox.prototype, "update", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], SearchBox.prototype, "focusChange", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', String)
-	    ], SearchBox.prototype, "collection", void 0);
-	    SearchBox = __decorate([
-	        core_1.Component({
-	            selector: 'search-box',
-	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event); updateSearch($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t\t<div class=\"search-button\" (click)=\"submitSearch($event)\"></div>\n\t\t</div>",
-	            styleUrls: ['app/search-box.component.css']
-	        }), 
-	        __metadata('design:paramtypes', [core_1.ElementRef])
-	    ], SearchBox);
-	    return SearchBox;
-	}());
-	exports.SearchBox = SearchBox;
-
-
-/***/ },
-/* 92 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var http_1 = __webpack_require__(55);
-	var router_1 = __webpack_require__(25);
-	var email_service_1 = __webpack_require__(87);
-	var app_service_1 = __webpack_require__(70);
-	var ContactComponent = (function () {
-	    function ContactComponent(http, router, ui) {
-	        this.http = http;
-	        this.router = router;
-	        this.ui = ui;
-	        this.inputs = {};
-	        if (this.options && this.options.html && typeof this.options.html !== "undefined")
-	            this.inputs = new email_service_1.HtmlEmailModel();
-	        else
-	            this.inputs = new email_service_1.EmailModel();
-	    }
-	    ContactComponent.prototype.submitForm = function () {
-	        var _this = this;
-	        this.inputs.subject = (this.options && this.options.subject) || 'Contact Form | GIV';
-	        this.inputs.redirectTo = '/';
-	        this.inputs.toName = this.inputs.toName || (this.options && this.options.toName) || 'Support';
-	        this.inputs.toAddr = this.inputs.toAddr || (this.options && this.options.toAddr) || 'd.a.mayer92@gmail.com';
-	        if (!this.inputs.fromName || typeof this.inputs.fromName === "undefined")
-	            this.inputs.fromName = this.options && this.options.fromName;
-	        if (!this.inputs.fromAddr || typeof this.inputs.fromAddr === "undefined")
-	            this.inputs.fromAddr = this.options && this.options.fromAddr;
-	        console.log(this.inputs);
-	        this.http.post((this.options && this.options.url) || '/contact-form', this.inputs).map(function (res) { return res.json(); })
-	            .subscribe(function (data) {
-	            if (_this.options && _this.options.callback) {
-	                return _this.options.callback(null, data);
-	            }
-	            if (data.errmsg) {
-	                console.error(data.errmsg);
-	                return _this.ui.flash("Couldn't send your message", "error");
-	            }
-	            _this.ui.flash("Sent!", "success");
-	            console.log(data);
-	            _this.router.navigate(['/']);
-	        }, function (err) {
-	            console.log(err);
-	            if (_this.options.callback) {
-	                return _this.options.callback(err);
-	            }
-	            _this.ui.flash("Couldn't send your message", "error");
-	        });
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], ContactComponent.prototype, "options", void 0);
-	    ContactComponent = __decorate([
-	        core_1.Component({
-	            selector: 'contact',
-	            templateUrl: 'app/contact.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, app_service_1.UIHelper])
-	    ], ContactComponent);
-	    return ContactComponent;
-	}());
-	exports.ContactComponent = ContactComponent;
-
-
-/***/ },
-/* 93 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var categories_service_1 = __webpack_require__(80);
-	var app_service_1 = __webpack_require__(70);
-	var FormFieldComponent = (function () {
-	    function FormFieldComponent(ui, utilities, categoryService, zone) {
-	        this.ui = ui;
-	        this.utilities = utilities;
-	        this.categoryService = categoryService;
-	        this.zone = zone;
-	        this.onUpload = new core_1.EventEmitter();
-	        this.onSave = new core_1.EventEmitter();
-	        this.onChange = new core_1.EventEmitter();
-	        this.changed = false;
-	        this.uploading = false;
-	        this.progress = 0;
-	    }
-	    FormFieldComponent.prototype.ngOnInit = function () {
-	    };
-	    FormFieldComponent.prototype.ngAfterViewInit = function () {
-	        if (!this.type)
-	            this.type = "text";
-	        if (this.initial) {
-	            this.value = this.initial;
-	        }
-	    };
-	    FormFieldComponent.prototype.handleUpload = function (data) {
-	        var _this = this;
-	        this.zone.run(function () {
-	            console.log(data);
-	            _this.progress = data.progress.percent;
-	            _this.saving = true;
-	            _this.uploading = true;
-	            if (data.response && data.status !== 404) {
-	                _this.onUpload.emit(JSON.parse(data.response));
-	                _this.saving = false;
-	                _this.uploading = false;
-	                console.log(data.response);
-	            }
-	        });
-	    };
-	    FormFieldComponent.prototype.save = function (value) {
-	        var _this = this;
-	        this.onSave.emit(value || this.value);
-	        this.value = null;
-	        this.zone.run(function () {
-	            if (!_this.saving)
-	                _this.changed = false;
-	        });
-	    };
-	    FormFieldComponent.prototype.changeHandler = function () {
-	        this.onChange.emit(this.value);
-	        if (this.value && this.value.length)
-	            this.changed = true;
-	        else
-	            this.changed = false;
-	    };
-	    FormFieldComponent.prototype.isSelected = function (option) {
-	        if (option === this.initial)
-	            return "selected";
-	        return null;
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "initial", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "title", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "name", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "placeholder", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "type", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "saving", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "upload", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "selectOptions", void 0);
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "noSave", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "onUpload", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "onSave", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', Object)
-	    ], FormFieldComponent.prototype, "onChange", void 0);
-	    FormFieldComponent = __decorate([
-	        core_1.Component({
-	            selector: 'form-field',
-	            templateUrl: 'app/form-field.component.html',
-	            styleUrls: ['app/form-field.component.css']
-	        }), 
-	        __metadata('design:paramtypes', [app_service_1.UIHelper, app_service_1.Utilities, categories_service_1.Categories, core_1.NgZone])
-	    ], FormFieldComponent);
-	    return FormFieldComponent;
-	}());
-	exports.FormFieldComponent = FormFieldComponent;
-
-
-/***/ },
-/* 94 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var click_outside_directive_1 = __webpack_require__(95);
-	exports.ClickOutsideDirective = click_outside_directive_1.default;
-	var ClickOutsideModule = (function () {
-	    function ClickOutsideModule() {
-	    }
-	    ClickOutsideModule = __decorate([
-	        core_1.NgModule({
-	            declarations: [click_outside_directive_1.default],
-	            exports: [click_outside_directive_1.default]
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], ClickOutsideModule);
-	    return ClickOutsideModule;
-	}());
-	exports.ClickOutsideModule = ClickOutsideModule;
-
-
-/***/ },
-/* 95 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var __param = (this && this.__param) || function (paramIndex, decorator) {
-	    return function (target, key) { decorator(target, key, paramIndex); }
-	};
-	var core_1 = __webpack_require__(3);
-	var platform_browser_1 = __webpack_require__(22);
-	var ClickOutsideDirective = (function () {
-	    function ClickOutsideDirective(_document, _el) {
-	        this._document = _document;
-	        this._el = _el;
-	        this.attachOutsideOnClick = false;
-	        this.clickOutside = new core_1.EventEmitter();
-	        this._initOnClickBody = this._initOnClickBody.bind(this);
-	        this._onClickBody = this._onClickBody.bind(this);
-	    }
-	    ClickOutsideDirective.prototype.ngOnInit = function () {
-	        this._init();
-	    };
-	    ClickOutsideDirective.prototype.ngOnDestroy = function () {
-	        if (this.attachOutsideOnClick) {
-	            this._el.nativeElement.removeEventListener('click', this._initOnClickBody);
-	        }
-	        this._document.body.removeEventListener('click', this._onClickBody);
-	    };
-	    ClickOutsideDirective.prototype.ngOnChanges = function (changes) {
-	        if (changes['attachOutsideOnClick'] &&
-	            changes['attachOutsideOnClick'].previousValue !== changes['attachOutsideOnClick'].currentValue) {
-	            this._init();
-	        }
-	    };
-	    ClickOutsideDirective.prototype._init = function () {
-	        if (this.attachOutsideOnClick) {
-	            this._el.nativeElement.addEventListener('click', this._initOnClickBody);
-	        }
-	        else {
-	            this._initOnClickBody();
-	        }
-	    };
-	    ClickOutsideDirective.prototype._initOnClickBody = function () {
-	        this._document.body.addEventListener('click', this._onClickBody);
-	    };
-	    ClickOutsideDirective.prototype._onClickBody = function (e) {
-	        if (!this._el.nativeElement.contains(e.target)) {
-	            this.clickOutside.emit(e);
-	            if (this.attachOutsideOnClick) {
-	                this._document.body.removeEventListener('click', this._onClickBody);
-	            }
-	        }
-	    };
-	    __decorate([
-	        core_1.Input(), 
-	        __metadata('design:type', Boolean)
-	    ], ClickOutsideDirective.prototype, "attachOutsideOnClick", void 0);
-	    __decorate([
-	        core_1.Output(), 
-	        __metadata('design:type', core_1.EventEmitter)
-	    ], ClickOutsideDirective.prototype, "clickOutside", void 0);
-	    ClickOutsideDirective = __decorate([
-	        core_1.Directive({ selector: '[clickOutside]' }),
-	        __param(0, core_1.Inject(platform_browser_1.DOCUMENT)), 
-	        __metadata('design:paramtypes', [HTMLDocument, core_1.ElementRef])
-	    ], ClickOutsideDirective);
-	    return ClickOutsideDirective;
-	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ClickOutsideDirective;
-
-
-/***/ },
-/* 96 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var TruncatePipe = (function () {
-	    function TruncatePipe() {
-	    }
-	    TruncatePipe.prototype.transform = function (value, arg1, arg2) {
-	        if (value && arg1 !== 0) {
-	            var limit = arg1 ? parseInt(arg1, 10) : 200;
-	            var trail = arg2 || '...';
-	            return value.length > limit ? value.substring(0, limit) + trail : value;
-	        }
-	        else
-	            return value;
-	    };
-	    TruncatePipe = __decorate([
-	        core_1.Pipe({
-	            name: 'truncate'
-	        }), 
-	        __metadata('design:paramtypes', [])
-	    ], TruncatePipe);
-	    return TruncatePipe;
-	}());
-	exports.TruncatePipe = TruncatePipe;
-
-
-/***/ },
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */,
-/* 101 */,
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */,
-/* 110 */,
-/* 111 */,
-/* 112 */,
-/* 113 */,
-/* 114 */,
-/* 115 */,
-/* 116 */,
-/* 117 */,
-/* 118 */,
-/* 119 */,
-/* 120 */,
-/* 121 */,
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */,
-/* 140 */,
-/* 141 */,
-/* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */,
-/* 224 */,
-/* 225 */,
-/* 226 */,
-/* 227 */,
-/* 228 */,
-/* 229 */,
-/* 230 */,
-/* 231 */,
-/* 232 */,
-/* 233 */,
-/* 234 */,
-/* 235 */,
-/* 236 */,
-/* 237 */,
-/* 238 */,
-/* 239 */,
-/* 240 */,
-/* 241 */,
-/* 242 */,
-/* 243 */,
-/* 244 */,
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */,
-/* 249 */,
-/* 250 */,
-/* 251 */,
-/* 252 */,
-/* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */,
-/* 260 */,
-/* 261 */,
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */,
-/* 290 */,
-/* 291 */,
-/* 292 */,
-/* 293 */,
-/* 294 */,
-/* 295 */,
-/* 296 */,
-/* 297 */,
-/* 298 */,
-/* 299 */,
-/* 300 */,
-/* 301 */,
-/* 302 */,
-/* 303 */,
-/* 304 */,
-/* 305 */,
-/* 306 */,
-/* 307 */,
-/* 308 */,
-/* 309 */,
-/* 310 */,
-/* 311 */,
-/* 312 */,
-/* 313 */,
-/* 314 */,
-/* 315 */,
-/* 316 */,
-/* 317 */,
-/* 318 */,
-/* 319 */,
-/* 320 */,
-/* 321 */,
-/* 322 */,
-/* 323 */,
-/* 324 */,
-/* 325 */,
-/* 326 */,
-/* 327 */,
-/* 328 */,
-/* 329 */,
-/* 330 */,
-/* 331 */,
-/* 332 */,
-/* 333 */,
-/* 334 */,
-/* 335 */,
-/* 336 */,
-/* 337 */,
-/* 338 */,
-/* 339 */,
-/* 340 */,
-/* 341 */,
-/* 342 */,
-/* 343 */,
-/* 344 */,
-/* 345 */,
-/* 346 */,
-/* 347 */,
-/* 348 */,
-/* 349 */,
-/* 350 */,
-/* 351 */,
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
-/* 357 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
 	var user_service_1 = __webpack_require__(68);
@@ -55174,7 +53878,7 @@
 
 
 /***/ },
-/* 358 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55253,6 +53957,1054 @@
 	    return ResetPasswordComponent;
 	}());
 	exports.ResetPasswordComponent = ResetPasswordComponent;
+
+
+/***/ },
+/* 88 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var router_1 = __webpack_require__(25);
+	var app_service_1 = __webpack_require__(70);
+	var email_service_1 = __webpack_require__(89);
+	var org_service_1 = __webpack_require__(76);
+	var user_service_1 = __webpack_require__(68);
+	var ClaimOrgComponent = (function () {
+	    function ClaimOrgComponent(http, router, route, ui, orgService, userService) {
+	        this.http = http;
+	        this.router = router;
+	        this.route = route;
+	        this.ui = ui;
+	        this.orgService = orgService;
+	        this.userService = userService;
+	        this.isLoaded = false;
+	        this.inputs = new email_service_1.HtmlEmailModel();
+	    }
+	    ClaimOrgComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.ui.setTitle("Claim an organization");
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                console.error(err);
+	            if (!user || err) {
+	                _this.ui.flash("You have to be logged in to do that!", "error");
+	                return _this.router.navigate(['/']);
+	            }
+	            _this.user = user;
+	            if (_this.route.params) {
+	                _this.sub = _this.route.params.subscribe(function (params) {
+	                    var id = params['id'];
+	                    if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+	                        _this.ui.flash("This page doesn't exist", "error");
+	                        return _this.router.navigate([''], { queryParams: { "404": true } });
+	                    }
+	                    _this.orgService.loadOrg(id).subscribe(function (data) {
+	                        _this.org = data;
+	                        _this.isLoaded = true;
+	                    }, function (err) {
+	                        _this.router.navigate([''], { queryParams: { "404": true } });
+	                        console.log("Error: ");
+	                        console.log(err);
+	                        return console.error(err);
+	                    });
+	                });
+	            }
+	            else {
+	                _this.router.navigate(['../']);
+	            }
+	        });
+	    };
+	    ClaimOrgComponent.prototype.ngOnDestroy = function () {
+	        this.sub.unsubscribe();
+	    };
+	    ClaimOrgComponent.prototype.submitForm = function () {
+	        var _this = this;
+	        if (!this.org) {
+	            this.router.navigate(['/']);
+	            return this.ui.flash("There was an error finding the organization", "error");
+	        }
+	        this.inputs.subject = this.org.name + ' has been claimed by ' + this.inputs.fromName;
+	        this.inputs.redirectTo = '/';
+	        this.inputs.toName = 'Support';
+	        this.inputs.toAddr = 'd.a.mayer92@gmail.com';
+	        this.inputs.html = "\n\t\t<doctype html>\n\t\t<html>\n\t\t<body>\n\t\t\t<p><strong>User:</strong><br><pre>" + this.user._id + "</pre></p>\n\t\t\t<p><strong>Org:</strong><br><pre>" + JSON.stringify(this.org) + "</pre></p>\n\t\t\t<p><strong>Message:</strong><br>" + this.message + "</p>\n\t\t</body>\n\t\t</html>";
+	        console.log(this.inputs);
+	        this.http.post('/contact-form', this.inputs)
+	            .map(function (res) { return res.json(); })
+	            .subscribe(function (data) {
+	            if (data.errmsg) {
+	                console.error(data.errmsg);
+	                return _this.ui.flash("Sorry, your message couldn't be sent.", "error");
+	            }
+	            _this.ui.flash("Sent!", "success");
+	            console.log(data);
+	            if (_this.org.slug)
+	                _this.router.navigate(['/organization', _this.org.slug]);
+	            else
+	                _this.router.navigate(['/organization', 'i', _this.org._id]);
+	        }, function (err) {
+	            console.log(err);
+	            _this.ui.flash("Sorry, your message couldn't be sent.", "error");
+	        });
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], ClaimOrgComponent.prototype, "org", void 0);
+	    ClaimOrgComponent = __decorate([
+	        core_1.Component({
+	            selector: 'claim-org',
+	            templateUrl: 'app/claim-org.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, app_service_1.UIHelper, org_service_1.OrgService, user_service_1.UserService])
+	    ], ClaimOrgComponent);
+	    return ClaimOrgComponent;
+	}());
+	exports.ClaimOrgComponent = ClaimOrgComponent;
+
+
+/***/ },
+/* 89 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var EmailModel = (function () {
+	    function EmailModel() {
+	    }
+	    return EmailModel;
+	}());
+	exports.EmailModel = EmailModel;
+	var HtmlEmailModel = (function () {
+	    function HtmlEmailModel() {
+	    }
+	    return HtmlEmailModel;
+	}());
+	exports.HtmlEmailModel = HtmlEmailModel;
+
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var router_1 = __webpack_require__(25);
+	var user_service_1 = __webpack_require__(68);
+	var org_service_1 = __webpack_require__(76);
+	var app_service_1 = __webpack_require__(70);
+	var VerifyOrgsComponent = (function () {
+	    function VerifyOrgsComponent(http, orgService, ui, utilities, route, router, userService) {
+	        this.http = http;
+	        this.orgService = orgService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.route = route;
+	        this.router = router;
+	        this.userService = userService;
+	        this.orgs = [];
+	        this.searchBoxIsFocused = false;
+	        this.viewingOrg = false;
+	        this.isLoading = true;
+	        this.loadingOrgSearch = false;
+	        this.loadingShowMoreOrgs = false;
+	        this.singleDetailsAreLoaded = false;
+	    }
+	    VerifyOrgsComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.ui.setTitle("Verify organizations");
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err)
+	                return console.error(err);
+	            _this.user = user;
+	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
+	                _this.adminToken = data;
+	                if (!_this.userIsAdmin()) {
+	                    _this.router.navigate(['/']);
+	                    _this.ui.flash("You don't have permission to do that!", "error");
+	                }
+	            }, function (err) {
+	                console.error(err);
+	            });
+	            console.log("User: ", user);
+	        });
+	        this.orgService.loadUnverifiedOrgs({ limit: 100 }).subscribe(function (data) {
+	            _this.isLoading = false;
+	            _this.orgs = data;
+	        }, function (error) { return console.log(error); });
+	    };
+	    VerifyOrgsComponent.prototype.isAscending = function (order) {
+	        if (order.indexOf("+") > -1) {
+	            return true;
+	        }
+	        else {
+	            return false;
+	        }
+	    };
+	    VerifyOrgsComponent.prototype.searchOrgs = function (search) {
+	        var _this = this;
+	        var query = { search: search, field: "name", bodyField: "description", limit: 100 };
+	        this.loadingOrgSearch = true;
+	        this.orgService.loadUnverifiedOrgs(query)
+	            .subscribe(function (results) {
+	            _this.orgs = results;
+	            _this.loadingOrgSearch = false;
+	            _this.searchText = search;
+	        }, function (error) { return console.error(error); });
+	    };
+	    VerifyOrgsComponent.prototype.clearOrgSearch = function () {
+	        this.searchOrgs('');
+	        var searchInput = document.querySelector(".org-search-box input");
+	        searchInput.value = "";
+	    };
+	    VerifyOrgsComponent.prototype.showMore = function (increase, offset) {
+	        var _this = this;
+	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
+	        var query = { limit: increase, offset: offset };
+	        if (search && search.length) {
+	            query['search'] = search;
+	            query['field'] = "name";
+	            query['bodyField'] = "description";
+	        }
+	        this.loadingShowMoreOrgs = true;
+	        this.orgService.loadUnverifiedOrgs(query).subscribe(function (res) {
+	            _this.loadingShowMoreOrgs = false;
+	            console.log(res);
+	            _this.orgs = _this.orgs.concat(res);
+	        }, function (error) { return console.log(error); });
+	    };
+	    VerifyOrgsComponent.prototype.toggleSearchBoxFocus = function (event) {
+	        if (event == 'focus') {
+	            this.searchBoxIsFocused = true;
+	        }
+	        if (event == 'blur') {
+	            this.searchBoxIsFocused = false;
+	        }
+	    };
+	    VerifyOrgsComponent.prototype.viewOrg = function (e, id) {
+	        var findOrg = function (org) {
+	            return org._id === id;
+	        };
+	        this.selectedOrg = this.orgs.find(findOrg);
+	        this.viewingOrg = true;
+	        console.log(this.selectedOrg);
+	    };
+	    VerifyOrgsComponent.prototype.deselectOrg = function (e, id) {
+	        console.log(e.target.className);
+	        if (e.target.className.indexOf("inside-org") > -1)
+	            return;
+	        if (this.viewingOrg && this.selectedOrg._id === id) {
+	            console.log(this.selectedOrg);
+	            this.selectedOrg = null;
+	            this.viewingOrg = false;
+	            this.singleDetailsAreLoaded = false;
+	        }
+	    };
+	    VerifyOrgsComponent.prototype.revealOrgDetails = function (event) {
+	        if (event == "init") {
+	            this.singleDetailsAreLoaded = true;
+	        }
+	    };
+	    VerifyOrgsComponent.prototype.userHasPermission = function (org) {
+	        if (this.user && this.userIsAdmin())
+	            return true;
+	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
+	            return true;
+	        else
+	            return false;
+	    };
+	    VerifyOrgsComponent.prototype.userIsAdmin = function () {
+	        return this.user.adminToken === this.adminToken;
+	    };
+	    VerifyOrgsComponent.prototype.verifyOrg = function (org) {
+	        var _this = this;
+	        var orgIndex = this.orgs.indexOf(org);
+	        this.orgService.editOrg({
+	            id: org._id,
+	            key: "verified",
+	            value: true
+	        }).subscribe(function (res) {
+	            console.log(res);
+	            if (res.errmsg) {
+	                _this.ui.flash("Verification failed", "error");
+	                return;
+	            }
+	            _this.orgs.splice(orgIndex, 1);
+	            _this.ui.flash("Verified", "success");
+	            console.log(res);
+	        });
+	    };
+	    VerifyOrgsComponent = __decorate([
+	        core_1.Component({
+	            selector: 'verify-orgs',
+	            templateUrl: 'app/verify-orgs.component.html',
+	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, router_1.Router, user_service_1.UserService])
+	    ], VerifyOrgsComponent);
+	    return VerifyOrgsComponent;
+	}());
+	exports.VerifyOrgsComponent = VerifyOrgsComponent;
+
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var router_1 = __webpack_require__(25);
+	var org_service_1 = __webpack_require__(76);
+	var user_service_1 = __webpack_require__(68);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var email_service_1 = __webpack_require__(89);
+	function Org() {
+	    this.name = null;
+	    this.description = null;
+	    return this;
+	}
+	;
+	var CreateOrgComponent = (function () {
+	    function CreateOrgComponent(orgService, userService, ui, http, router, categoryService) {
+	        this.orgService = orgService;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.http = http;
+	        this.router = router;
+	        this.categoryService = categoryService;
+	        this.org = new Org();
+	        this.email = new email_service_1.HtmlEmailModel();
+	        this.categories = this.categoryService.list();
+	        this.requiredOrgFields = [
+	            {
+	                id: "name",
+	                name: "name"
+	            },
+	            {
+	                id: "description",
+	                name: "description"
+	            },
+	            {
+	                id: "donateLink",
+	                name: "donate link"
+	            },
+	            {
+	                id: "website",
+	                name: "website"
+	            }
+	        ];
+	    }
+	    CreateOrgComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        this.ui.setTitle("Add your organization");
+	        this.userService.getLoggedInUser(function (err, user) {
+	            if (err) {
+	                console.error(err);
+	                _this.router.navigate(['/']);
+	                return _this.ui.flash("Sorry--an error occurred", "error");
+	            }
+	            if (user) {
+	                _this.user = user;
+	                _this.email = {
+	                    subject: "A new organization was submitted!",
+	                    html: null,
+	                    toAddr: "d.a.mayer92@gmail.com",
+	                    toName: "Danny at GIV",
+	                    fromAddr: _this.user.email,
+	                    fromName: _this.user.name || _this.user.email,
+	                    redirectTo: null
+	                };
+	            }
+	            else {
+	                _this.router.navigate(['/']);
+	                _this.ui.flash("Sorry! You need to be logged in to create an organization", "error");
+	            }
+	        });
+	        this.org.verified = false;
+	    };
+	    CreateOrgComponent.prototype.orgHasCategory = function (category) {
+	        if (this.org.categories) {
+	            var categoryInOrg = this.org.categories.filter(function (orgCategory) {
+	                return orgCategory.id === category.id;
+	            });
+	            if (categoryInOrg.length)
+	                return true;
+	            else
+	                return false;
+	        }
+	        else
+	            return false;
+	    };
+	    CreateOrgComponent.prototype.changeSelectedCategories = function (category, add) {
+	        if (!this.org.categories)
+	            this.org['categories'] = []; // for old orgs without categories array already
+	        if (add) {
+	            this.org.categories.push(category);
+	        }
+	        else {
+	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
+	        }
+	    };
+	    CreateOrgComponent.prototype.submitOrg = function (newOrg) {
+	        var _this = this;
+	        var ok = true;
+	        this.requiredOrgFields.forEach(function (field, index, arr) {
+	            if (!newOrg[field.id]) {
+	                _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+	                ok = false;
+	            }
+	        });
+	        if (!ok)
+	            return;
+	        if (!this.roleDescription)
+	            return this.ui.flash("Oops! You need to describe your role in the organization", "error");
+	        var categories = "";
+	        newOrg.categories.forEach(function (category, index, arr) {
+	            if (category.name !== "undefined")
+	                categories += category.name;
+	            if (index !== (arr.length - 1))
+	                categories += ", ";
+	        });
+	        this.email.html = "\n    <!doctype html>\n    <html>\n    <body>\n    \t<p><strong>Organization:</strong> " + newOrg.name + "</p>\n    \t<p><strong>Submitted by:</strong> " + this.email.fromName + "</p>\n    \t<p><strong>Role:</strong> " + this.roleDescription + "</p>\n    \t<p><strong>Description of organization:</strong> " + newOrg.description + "</p>\n    \t<p><strong>Categories:</strong> " + categories + "</p>\n    \t<p><strong>Website:</strong> " + newOrg.website + "</p>\n    \t<p><strong>Donate link:</strong> " + newOrg.donateLink + "</p>\n    </body>\n    </html>";
+	        this.http.post('/org', newOrg).map(function (res) { return res.json(); }).subscribe(function (res) {
+	            console.log("New org: ", res);
+	            if (res.errmsg) {
+	                _this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
+	                return;
+	            }
+	            _this.org = res;
+	            console.log(res);
+	            _this.http.post('/contact-form', _this.email)
+	                .map(function (res) { return res.json(); })
+	                .subscribe(function (data) {
+	                if (data.errmsg) {
+	                    console.error(data.errmsg);
+	                    return _this.ui.flash("Couldn't send your message", "error");
+	                }
+	                _this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
+	                console.log(data);
+	                _this.router.navigate(['/']);
+	            }, function (err) {
+	                console.log(err);
+	                _this.ui.flash("Couldn't send your message", "error");
+	            });
+	        }, function (error) {
+	            _this.ui.flash("Submission failed", "error");
+	            return console.error(error);
+	        });
+	    };
+	    CreateOrgComponent = __decorate([
+	        core_1.Component({
+	            selector: 'create-org',
+	            templateUrl: 'app/create-org.component.html',
+	            styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css', 'app/create-org.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, http_1.Http, router_1.Router, categories_service_1.Categories])
+	    ], CreateOrgComponent);
+	    return CreateOrgComponent;
+	}());
+	exports.CreateOrgComponent = CreateOrgComponent;
+
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var router_1 = __webpack_require__(25);
+	var http_1 = __webpack_require__(55);
+	var org_service_1 = __webpack_require__(76);
+	var user_service_1 = __webpack_require__(68);
+	var app_service_1 = __webpack_require__(70);
+	function Post() {
+	    this.authorId = null;
+	    this.title = null;
+	    this.content = null;
+	    this.org = null;
+	    this.featuredImage = null;
+	    this.imageBucket = Date.now().toString();
+	    return this;
+	}
+	;
+	var CreatePostComponent = (function () {
+	    function CreatePostComponent(router, route, orgService, userService, ui, utilities, zone, http) {
+	        this.router = router;
+	        this.route = route;
+	        this.orgService = orgService;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.http = http;
+	        this.postAdd = new core_1.EventEmitter();
+	        this.cancel = new core_1.EventEmitter();
+	        this.stillWorking = false;
+	        this.progress = 0;
+	        this.savingPost = false;
+	        this.post = new Post();
+	    }
+	    CreatePostComponent.prototype.ngOnInit = function () {
+	        this.post = {
+	            authorId: null,
+	            title: null,
+	            content: null,
+	            org: null,
+	            featuredImage: null,
+	            imageBucket: Date.now().toString()
+	        };
+	        // for ng-upload
+	        this.uploadOptions = {
+	            url: '/post/upload/featuredImage/' + this.post.imageBucket,
+	            filterExtensions: true,
+	            calculateSpeed: true,
+	            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	        };
+	    };
+	    CreatePostComponent.prototype.ngAfterViewChecked = function () {
+	        if (this.org && this.user && !this.post.org) {
+	            this.post.authorId = this.user._id;
+	            this.post.org = this.org._id;
+	            console.log(this.post);
+	        }
+	    };
+	    CreatePostComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.stillWorking = true;
+	            if (data.response && data.status !== 404) {
+	                if (data.response.indexOf("errmsg") > -1)
+	                    return console.error(data.response);
+	                _this.post.featuredImage = data.response;
+	                _this.stillWorking = false;
+	                console.log(_this.post);
+	            }
+	        });
+	    };
+	    CreatePostComponent.prototype.createPost = function (newPost) {
+	        var _this = this;
+	        var required = ["title", "content"];
+	        var invalid = false;
+	        required.forEach(function (field) {
+	            if (!newPost[field] || !newPost[field].length) {
+	                invalid = true;
+	                _this.ui.flash("Oops! You need to fill out the " + field + " of your post", "error");
+	            }
+	        });
+	        if (invalid)
+	            return;
+	        this.postAdd.emit(newPost);
+	        if (!this.editing)
+	            this.post = new Post();
+	    };
+	    CreatePostComponent.prototype.cancelPost = function () {
+	        this.cancel.emit(false);
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "org", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "user", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "editing", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "postAdd", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], CreatePostComponent.prototype, "cancel", void 0);
+	    CreatePostComponent = __decorate([
+	        core_1.Component({
+	            selector: 'create-post',
+	            templateUrl: 'app/create-post.component.html',
+	            styleUrls: ['app/form-field.component.css', 'app/create-post.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http])
+	    ], CreatePostComponent);
+	    return CreatePostComponent;
+	}());
+	exports.CreatePostComponent = CreatePostComponent;
+
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var SearchBox = (function () {
+	    function SearchBox(el) {
+	        this.el = el;
+	        this.update = new core_1.EventEmitter();
+	        this.focusChange = new core_1.EventEmitter();
+	    }
+	    SearchBox.prototype.submitSearch = function ($event) {
+	        var search = this.search;
+	        var keyCode = $event.keyCode;
+	        if (!search || typeof search === "undefined")
+	            return;
+	        if (search.length <= 1 && keyCode === 8) {
+	            this.update.emit("");
+	        }
+	        if (keyCode === 13 || $event.target.className.indexOf("search-button") > -1) {
+	            this.update.emit(search);
+	            this.el.nativeElement.querySelectorAll(".search-box input")[0].blur();
+	        }
+	    };
+	    SearchBox.prototype.updateSearch = function ($event) {
+	        this.search = $event.target.value;
+	    };
+	    SearchBox.prototype.checkEmpty = function ($event) {
+	        var search = $event.target.value;
+	        if (!search || search === "") {
+	            this.update.emit("");
+	        }
+	    };
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], SearchBox.prototype, "update", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], SearchBox.prototype, "focusChange", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', String)
+	    ], SearchBox.prototype, "collection", void 0);
+	    SearchBox = __decorate([
+	        core_1.Component({
+	            selector: 'search-box',
+	            template: "\n\t\t<div class=\"search-box\">\n\t\t\t<input type=\"text\"\n\t\t\t\t\t(keydown)=\"submitSearch($event)\"\n\t\t\t\t\t(keyup)=\"checkEmpty($event); updateSearch($event)\"\n\t\t\t\t\t(focus)=\"focusChange.emit('focus')\"\n\t\t\t\t\t(blur)=\"focusChange.emit('blur')\"\n\t\t\t\t\tplaceholder='Search {{collection}}'>\n\t\t\t<div class=\"search-button\" (click)=\"submitSearch($event)\"></div>\n\t\t</div>",
+	            styleUrls: ['app/search-box.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [core_1.ElementRef])
+	    ], SearchBox);
+	    return SearchBox;
+	}());
+	exports.SearchBox = SearchBox;
+
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var http_1 = __webpack_require__(55);
+	var router_1 = __webpack_require__(25);
+	var email_service_1 = __webpack_require__(89);
+	var app_service_1 = __webpack_require__(70);
+	var ContactComponent = (function () {
+	    function ContactComponent(http, router, ui) {
+	        this.http = http;
+	        this.router = router;
+	        this.ui = ui;
+	        this.inputs = {};
+	        if (this.options && this.options.html && typeof this.options.html !== "undefined")
+	            this.inputs = new email_service_1.HtmlEmailModel();
+	        else
+	            this.inputs = new email_service_1.EmailModel();
+	    }
+	    ContactComponent.prototype.submitForm = function () {
+	        var _this = this;
+	        this.inputs.subject = (this.options && this.options.subject) || 'Contact Form | GIV';
+	        this.inputs.redirectTo = '/';
+	        this.inputs.toName = this.inputs.toName || (this.options && this.options.toName) || 'Support';
+	        this.inputs.toAddr = this.inputs.toAddr || (this.options && this.options.toAddr) || 'd.a.mayer92@gmail.com';
+	        if (!this.inputs.fromName || typeof this.inputs.fromName === "undefined")
+	            this.inputs.fromName = this.options && this.options.fromName;
+	        if (!this.inputs.fromAddr || typeof this.inputs.fromAddr === "undefined")
+	            this.inputs.fromAddr = this.options && this.options.fromAddr;
+	        console.log(this.inputs);
+	        this.http.post((this.options && this.options.url) || '/contact-form', this.inputs).map(function (res) { return res.json(); })
+	            .subscribe(function (data) {
+	            if (_this.options && _this.options.callback) {
+	                return _this.options.callback(null, data);
+	            }
+	            if (data.errmsg) {
+	                console.error(data.errmsg);
+	                return _this.ui.flash("Couldn't send your message", "error");
+	            }
+	            _this.ui.flash("Sent!", "success");
+	            console.log(data);
+	            _this.router.navigate(['/']);
+	        }, function (err) {
+	            console.log(err);
+	            if (_this.options.callback) {
+	                return _this.options.callback(err);
+	            }
+	            _this.ui.flash("Couldn't send your message", "error");
+	        });
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], ContactComponent.prototype, "options", void 0);
+	    ContactComponent = __decorate([
+	        core_1.Component({
+	            selector: 'contact',
+	            templateUrl: 'app/contact.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, app_service_1.UIHelper])
+	    ], ContactComponent);
+	    return ContactComponent;
+	}());
+	exports.ContactComponent = ContactComponent;
+
+
+/***/ },
+/* 95 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var FormFieldComponent = (function () {
+	    function FormFieldComponent(ui, utilities, categoryService, zone) {
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.categoryService = categoryService;
+	        this.zone = zone;
+	        this.onUpload = new core_1.EventEmitter();
+	        this.onSave = new core_1.EventEmitter();
+	        this.onChange = new core_1.EventEmitter();
+	        this.changed = false;
+	        this.uploading = false;
+	        this.progress = 0;
+	    }
+	    FormFieldComponent.prototype.ngOnInit = function () {
+	    };
+	    FormFieldComponent.prototype.ngAfterViewInit = function () {
+	        if (!this.type)
+	            this.type = "text";
+	        if (this.initial) {
+	            this.value = this.initial;
+	        }
+	    };
+	    FormFieldComponent.prototype.handleUpload = function (data) {
+	        var _this = this;
+	        this.zone.run(function () {
+	            console.log(data);
+	            _this.progress = data.progress.percent;
+	            _this.saving = true;
+	            _this.uploading = true;
+	            if (data.response && data.status !== 404) {
+	                _this.onUpload.emit(JSON.parse(data.response));
+	                _this.saving = false;
+	                _this.uploading = false;
+	                console.log(data.response);
+	            }
+	        });
+	    };
+	    FormFieldComponent.prototype.save = function (value) {
+	        var _this = this;
+	        this.onSave.emit(value || this.value);
+	        this.value = null;
+	        this.zone.run(function () {
+	            if (!_this.saving)
+	                _this.changed = false;
+	        });
+	    };
+	    FormFieldComponent.prototype.changeHandler = function () {
+	        this.onChange.emit(this.value);
+	        if (this.value && this.value.length)
+	            this.changed = true;
+	        else
+	            this.changed = false;
+	    };
+	    FormFieldComponent.prototype.isSelected = function (option) {
+	        if (option === this.initial)
+	            return "selected";
+	        return null;
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "initial", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "title", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "name", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "placeholder", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "type", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "saving", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "upload", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "selectOptions", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "noSave", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onUpload", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onSave", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "onChange", void 0);
+	    FormFieldComponent = __decorate([
+	        core_1.Component({
+	            selector: 'form-field',
+	            templateUrl: 'app/form-field.component.html',
+	            styleUrls: ['app/form-field.component.css']
+	        }), 
+	        __metadata('design:paramtypes', [app_service_1.UIHelper, app_service_1.Utilities, categories_service_1.Categories, core_1.NgZone])
+	    ], FormFieldComponent);
+	    return FormFieldComponent;
+	}());
+	exports.FormFieldComponent = FormFieldComponent;
+
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var click_outside_directive_1 = __webpack_require__(97);
+	exports.ClickOutsideDirective = click_outside_directive_1.default;
+	var ClickOutsideModule = (function () {
+	    function ClickOutsideModule() {
+	    }
+	    ClickOutsideModule = __decorate([
+	        core_1.NgModule({
+	            declarations: [click_outside_directive_1.default],
+	            exports: [click_outside_directive_1.default]
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], ClickOutsideModule);
+	    return ClickOutsideModule;
+	}());
+	exports.ClickOutsideModule = ClickOutsideModule;
+
+
+/***/ },
+/* 97 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var __param = (this && this.__param) || function (paramIndex, decorator) {
+	    return function (target, key) { decorator(target, key, paramIndex); }
+	};
+	var core_1 = __webpack_require__(3);
+	var platform_browser_1 = __webpack_require__(22);
+	var ClickOutsideDirective = (function () {
+	    function ClickOutsideDirective(_document, _el) {
+	        this._document = _document;
+	        this._el = _el;
+	        this.attachOutsideOnClick = false;
+	        this.clickOutside = new core_1.EventEmitter();
+	        this._initOnClickBody = this._initOnClickBody.bind(this);
+	        this._onClickBody = this._onClickBody.bind(this);
+	    }
+	    ClickOutsideDirective.prototype.ngOnInit = function () {
+	        this._init();
+	    };
+	    ClickOutsideDirective.prototype.ngOnDestroy = function () {
+	        if (this.attachOutsideOnClick) {
+	            this._el.nativeElement.removeEventListener('click', this._initOnClickBody);
+	        }
+	        this._document.body.removeEventListener('click', this._onClickBody);
+	    };
+	    ClickOutsideDirective.prototype.ngOnChanges = function (changes) {
+	        if (changes['attachOutsideOnClick'] &&
+	            changes['attachOutsideOnClick'].previousValue !== changes['attachOutsideOnClick'].currentValue) {
+	            this._init();
+	        }
+	    };
+	    ClickOutsideDirective.prototype._init = function () {
+	        if (this.attachOutsideOnClick) {
+	            this._el.nativeElement.addEventListener('click', this._initOnClickBody);
+	        }
+	        else {
+	            this._initOnClickBody();
+	        }
+	    };
+	    ClickOutsideDirective.prototype._initOnClickBody = function () {
+	        this._document.body.addEventListener('click', this._onClickBody);
+	    };
+	    ClickOutsideDirective.prototype._onClickBody = function (e) {
+	        if (!this._el.nativeElement.contains(e.target)) {
+	            this.clickOutside.emit(e);
+	            if (this.attachOutsideOnClick) {
+	                this._document.body.removeEventListener('click', this._onClickBody);
+	            }
+	        }
+	    };
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Boolean)
+	    ], ClickOutsideDirective.prototype, "attachOutsideOnClick", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', core_1.EventEmitter)
+	    ], ClickOutsideDirective.prototype, "clickOutside", void 0);
+	    ClickOutsideDirective = __decorate([
+	        core_1.Directive({ selector: '[clickOutside]' }),
+	        __param(0, core_1.Inject(platform_browser_1.DOCUMENT)), 
+	        __metadata('design:paramtypes', [HTMLDocument, core_1.ElementRef])
+	    ], ClickOutsideDirective);
+	    return ClickOutsideDirective;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ClickOutsideDirective;
+
+
+/***/ },
+/* 98 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var TruncatePipe = (function () {
+	    function TruncatePipe() {
+	    }
+	    TruncatePipe.prototype.transform = function (value, arg1, arg2) {
+	        if (value && arg1 !== 0) {
+	            var limit = arg1 ? parseInt(arg1, 10) : 200;
+	            var trail = arg2 || '...';
+	            return value.length > limit ? value.substring(0, limit) + trail : value;
+	        }
+	        else
+	            return value;
+	    };
+	    TruncatePipe = __decorate([
+	        core_1.Pipe({
+	            name: 'truncate'
+	        }), 
+	        __metadata('design:paramtypes', [])
+	    ], TruncatePipe);
+	    return TruncatePipe;
+	}());
+	exports.TruncatePipe = TruncatePipe;
 
 
 /***/ }

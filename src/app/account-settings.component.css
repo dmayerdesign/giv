@@ -10,3 +10,8 @@ h3 {
 	margin-bottom: 0.8em;
 	padding-top: 0.5em;
 }
+
+.delete-account {
+	margin-left: 0;
+	float: right;
+}

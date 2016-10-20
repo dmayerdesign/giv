@@ -1,18 +1,16 @@
 <div *ngIf="(user || org) && recommendedOrgsAreLoaded"
 		class="recommended-orgs col-md-8"
 		[ngClass]="{'in-single': org, 'in-starred': inStarred}">
-	<header class="row col-md-12">
-		<div class="row">
-			<h2>Recommended <span *ngIf="inStarred" class="desktop-tab-button" (click)="showStarred()">Starred</span></h2>
-			<p class="subtitle">We think you might like these orgs</p>
-		</div>
+	<header>
+		<h2>Recommended <span *ngIf="inStarred" class="desktop-tab-button" (click)="showStarred()">Starred</span></h2>
+		<p class="subtitle">We think you might like these orgs</p>
 	</header>
 
-	<section class="row col-md-12 null-search" *ngIf="!recommended.length">
+	<section class="null-search" *ngIf="!recommended.length">
 			<p>No organizations to show. Star some, and watch recommendations appear here!</p>
 	</section>
 
-	<div *ngIf="recommended?.length" class="row items-list orgs-list col-md-12">
+	<div *ngIf="recommended?.length" class="items-list orgs-list col-md-12">
 
 	<!--*******
 		Orgs Loop

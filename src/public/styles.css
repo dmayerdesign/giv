@@ -96,7 +96,7 @@ button, button:active, button:focus, button:hover {
   text-shadow: 0px -1px 0px rgba(80,80,80,0.2);
 }
 
-button.mini, button.mini:active, button.mini:hover {
+button.mini, button.mini:active, button.mini:hover, button.mini:focus {
   font-size: 0.8em;
 }
 
@@ -132,7 +132,8 @@ button i {
 
 .add, .add:hover, .add:active, .add:focus,
 .cancel, .cancel:hover, .cancel:active, .cancel:focus,
-.submit, .submit:hover, .submit:active, .submit:focus {
+.submit, .submit:hover, .submit:active, .submit:focus,
+.mini, .mini:hover, .mini:active, .mini:focus {
   font-size: 0.7rem;
   background-image: none;
   background-color: #6895A5;
@@ -504,7 +505,7 @@ button.nav-item:hover {
 }
 
 .user-default-avatar {
-  position:relative; left:4px;
+  position:relative; padding-left:8px; top: 1px;
 }
 
 /* SEARCH BOX CONTAINER */

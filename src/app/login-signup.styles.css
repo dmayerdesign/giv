@@ -1,8 +1,8 @@
-.login {
-	margin-top: 1.8em;
+h2 {
+	margin-top: 0.6em;
 }
 
-.login-form {
+.login-form, .signup-form {
 	margin-top: 1em;
 }
 
@@ -14,7 +14,8 @@
 	margin-top: 0.4em;
 }
 
-.login-btn {
+.login-btn,
+.signup-btn {
 	margin-top: 1em;
 }
 

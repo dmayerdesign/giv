@@ -23,7 +23,8 @@ function Org():void {
 
 @Component({
 	selector: 'create-org',
-	templateUrl: 'app/create-org.component.html'
+	templateUrl: 'app/create-org.component.html',
+	styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css', 'app/create-org.component.css']
 })
 
 export class CreateOrgComponent implements OnInit {
