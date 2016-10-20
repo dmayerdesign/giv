@@ -24,10 +24,8 @@
 			</div>
 		</div>
 
-		<div *ngIf="isSingle && org?.facebook" class="fb-page col-md-6 pull-right" [attr.data-href]="org.facebook" [attr.data-small-header]="true" [attr.data-adapt-container-width]="true" [attr.data-hide-cover]="true" [attr.data-show-facepile]="true">
-			<blockquote [attr.cite]="org.facebook" class="fb-xfbml-parse-ignore">
-				<a [href]="org.facebook"></a>
-			</blockquote>
+		<div *ngIf="isSingle && org?.facebook?.length" class="fb-page col-md-6 pull-right">
+			<iframe [attr.src]="facebookLink" [attr.width]="'340'" [attr.height]="'260'" [attr.style]="'border:none;overflow:hidden'" [attr.scrolling]="'no'" [attr.frameborder]="'0'" [attr.allowTransparency]="'true'"></iframe>
 		</div>
 	</div>
 </div>

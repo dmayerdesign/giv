@@ -2,6 +2,7 @@ import { Component, OnInit, AfterContentInit, OnDestroy, Input, Output, EventEmi
 import { Http, Headers, RequestOptions } from '@angular/http';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 @Component({
 	selector: 'org-details',
@@ -17,12 +18,14 @@ export class OrgDetailsComponent implements OnInit {
 	private shortDescriptionLength = 450;
 	private truncateDescription:number = this.shortDescriptionLength;
 	private originalDescriptionLength:number;
+	private facebookLink:SafeResourceUrl;
 
 	constructor(
 				private http: Http,
 				private orgService: OrgService,
 				private helper: UIHelper,
-				private utilities: Utilities) { }
+				private utilities: Utilities,
+				private sanitizer: DomSanitizer) { }
 
 	ngOnInit() {
 		
@@ -33,6 +36,8 @@ export class OrgDetailsComponent implements OnInit {
 		if (this.org.description) {
 			this.originalDescriptionLength = this.org.description.length;
 			this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+			this.org.facebook = encodeURI(this.org.facebook);
+			this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
 		}
 	}
 
