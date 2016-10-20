@@ -52893,6 +52893,7 @@
 	    OrgDetailsComponent.prototype.ngAfterContentInit = function () {
 	        this.update.emit("init");
 	        if (this.org.description) {
+	            this.originalDescriptionLength = this.org.description.length;
 	            this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
 	        }
 	    };
@@ -52916,7 +52917,7 @@
 	        }
 	    };
 	    OrgDetailsComponent.prototype.descriptionIsLong = function () {
-	        if (this.org.description && this.org.description.length > 300)
+	        if (this.org.description && (this.originalDescriptionLength > this.truncateDescription))
 	            return true;
 	        else
 	            return false;
@@ -52926,6 +52927,12 @@
 	    };
 	    OrgDetailsComponent.prototype.readLess = function () {
 	        this.truncateDescription = this.shortDescriptionLength;
+	    };
+	    OrgDetailsComponent.prototype.showReadMore = function () {
+	        return this.truncateDescription !== 0 && this.originalDescriptionLength > this.truncateDescription;
+	    };
+	    OrgDetailsComponent.prototype.showReadLess = function () {
+	        return this.truncateDescription == 0 && this.originalDescriptionLength > this.truncateDescription;
 	    };
 	    __decorate([
 	        core_1.Input(), 

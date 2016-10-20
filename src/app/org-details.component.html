@@ -6,8 +6,8 @@
 			<p *ngIf="isSingle && org?.type" class="org-type">Type: {{org.type}}</p>
 			<p class="org-description" [innerHTML]="org.description | truncate: truncateDescription"></p>
 			<p class="read-more" *ngIf="isSingle && descriptionIsLong()">
-				<span *ngIf="truncateDescription !== 0 && org.description > truncateDescription" (click)="readMore()">Show more</span>
-				<span *ngIf="truncateDescription == 0 && org.description > truncateDescription" (click)="readLess()">Show less</span>
+				<span *ngIf="showReadMore()" (click)="readMore()">Show more</span>
+				<span *ngIf="showReadLess()" (click)="readLess()">Show less</span>
 			</p>
 		</div>
 		<div class="org-details-ctas" [ngClass]="{'col-md-6': isSingle}">
@@ -22,6 +22,12 @@
 					</li>
 				</ul>
 			</div>
+		</div>
+
+		<div *ngIf="isSingle && org?.facebook" class="fb-page col-md-6 pull-right" [attr.data-href]="org.facebook" [attr.data-small-header]="true" [attr.data-adapt-container-width]="true" [attr.data-hide-cover]="true" [attr.data-show-facepile]="true">
+			<blockquote [attr.cite]="org.facebook" class="fb-xfbml-parse-ignore">
+				<a [href]="org.facebook"></a>
+			</blockquote>
 		</div>
 	</div>
 </div>

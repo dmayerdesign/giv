@@ -8,6 +8,7 @@
 				  [src]="videoLink">
 				</iframe>
 			</div>
+
 			<div *ngIf="org?.videoLink" class="expand-video" [ngClass]="{'is-expanded': videoIsExpanded}">
 				<button *ngIf="!videoIsExpanded" (click)="expandVideo()" class="mini"><i class="fa fa-play"></i> Play the video</button>
 				<button *ngIf="videoIsExpanded" (click)="minimizeVideo()" class="mini"><i class="fa fa-angle-up"></i> Minimize the video</button>
