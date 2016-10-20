@@ -52877,12 +52877,14 @@
 	var http_1 = __webpack_require__(55);
 	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
+	var platform_browser_1 = __webpack_require__(22);
 	var OrgDetailsComponent = (function () {
-	    function OrgDetailsComponent(http, orgService, helper, utilities) {
+	    function OrgDetailsComponent(http, orgService, helper, utilities, sanitizer) {
 	        this.http = http;
 	        this.orgService = orgService;
 	        this.helper = helper;
 	        this.utilities = utilities;
+	        this.sanitizer = sanitizer;
 	        this.update = new core_1.EventEmitter();
 	        this.coverImageLinkBroken = false;
 	        this.shortDescriptionLength = 450;
@@ -52895,6 +52897,8 @@
 	        if (this.org.description) {
 	            this.originalDescriptionLength = this.org.description.length;
 	            this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	            this.org.facebook = encodeURI(this.org.facebook);
+	            this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
 	        }
 	    };
 	    OrgDetailsComponent.prototype.ngOnDestroy = function () {
@@ -52952,7 +52956,7 @@
 	            templateUrl: 'app/org-details.component.html',
 	            styleUrls: ['app/org-details.component.css', 'app/org.styles.css']
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities])
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, platform_browser_1.DomSanitizer])
 	    ], OrgDetailsComponent);
 	    return OrgDetailsComponent;
 	}());
