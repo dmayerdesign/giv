@@ -129,6 +129,7 @@
           [name]="'facebook'"
           [type]="'url'"
           [saving]="saving_facebook"
+          [allowNullValue]="true"
           [placeholder]="org.facebook || 'e.g. https://facebook.com/myorganization'"
           (onSave)="save('facebook', $event)"></form-field>
       </div>
@@ -177,7 +178,7 @@
     </div>
 
     <div class="preview-pane col-md-6 pull-right">
-      <div class="preview-section visuals">
+      <div class="preview-section visuals clearfix">
         <div class="header-preview"
             [ngClass]="{'has-cover-image': org.coverImage}"
             [ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}">
@@ -186,7 +187,7 @@
         </div>
       </div>
 
-      <div class="preview-section basics">
+      <div class="preview-section basics clearfix">
         <h4 class="name-preview">{{org.name}}</h4>
         <p class="slug-preview" *ngIf="org.slug">
           <a href="http://giv.community/organization/{{org.slug}}" target="_blank"><span>giv.community/organization/</span>{{org.slug}}</a>
@@ -194,7 +195,7 @@
         <p class="description-preview" [innerHTML]="org.description"></p>
       </div>
 
-      <div class="preview-section calls-to-action">
+      <div class="preview-section calls-to-action clearfix">
         <a class="donate-link donate-link-preview" [href]="org.donateLink" target="_blank">
           <button class="donate-button">{{org.donateLinkCopy || 'Donate'}}</button>
         </a>
@@ -208,6 +209,10 @@
             </li>
           </ul>
         </div>
+      </div>
+
+      <div class="preview-section facebook clearfix">
+        <iframe [attr.src]="facebookLink" [attr.width]="'340'" [attr.height]="'148'" [attr.style]="'border:none;overflow:hidden'" [attr.scrolling]="'no'" [attr.frameborder]="'0'" [attr.allowTransparency]="'true'"></iframe>
       </div>
     </div>
   </div>

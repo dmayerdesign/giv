@@ -53462,12 +53462,13 @@
 	var core_1 = __webpack_require__(3);
 	var router_1 = __webpack_require__(25);
 	var http_1 = __webpack_require__(55);
+	var platform_browser_1 = __webpack_require__(22);
 	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var categories_service_1 = __webpack_require__(80);
 	var app_service_1 = __webpack_require__(70);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService, sanitizer) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -53477,6 +53478,7 @@
 	        this.zone = zone;
 	        this.http = http;
 	        this.categoryService = categoryService;
+	        this.sanitizer = sanitizer;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
 	        this.progress = 0;
@@ -53521,6 +53523,8 @@
 	                        _this.isLoaded = true;
 	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
 	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	                        _this.org.facebook = encodeURI(_this.org.facebook);
+	                        _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
 	                        _this.ui.setTitle("Manage " + _this.org.name);
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
@@ -53607,6 +53611,9 @@
 	            _this.org = res;
 	            _this['saving_' + key] = false;
 	            _this['changed_' + key] = false;
+	            _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	            _this.org.facebook = encodeURI(_this.org.facebook);
+	            _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
@@ -53689,7 +53696,7 @@
 	            templateUrl: 'app/manage-org-page.component.html',
 	            styleUrls: ['app/org.styles.css', 'app/org-details.component.css', 'app/form-field.component.css', 'app/manage-org-page.component.css']
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories, platform_browser_1.DomSanitizer])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());
@@ -54796,10 +54803,15 @@
 	    };
 	    FormFieldComponent.prototype.changeHandler = function () {
 	        this.onChange.emit(this.value);
-	        if (this.value && this.value.length)
+	        if (this.allowNullValue) {
 	            this.changed = true;
-	        else
-	            this.changed = false;
+	        }
+	        else {
+	            if (this.value)
+	                this.changed = true;
+	            else
+	                this.changed = false;
+	        }
 	    };
 	    FormFieldComponent.prototype.isSelected = function (option) {
 	        if (option === this.initial)
@@ -54842,6 +54854,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], FormFieldComponent.prototype, "noSave", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], FormFieldComponent.prototype, "allowNullValue", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)

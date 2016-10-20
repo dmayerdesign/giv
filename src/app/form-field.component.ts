@@ -18,6 +18,7 @@ export class FormFieldComponent implements OnInit {
 	@Input() upload;
 	@Input() selectOptions;
 	@Input() noSave;
+	@Input() allowNullValue;
 
 	@Output() onUpload = new EventEmitter();
 	@Output() onSave = new EventEmitter();
@@ -71,9 +72,12 @@ export class FormFieldComponent implements OnInit {
 
   changeHandler() {
   	this.onChange.emit(this.value);
-
-  	if (this.value && this.value.length) this.changed = true;
-  	else this.changed = false;
+  	if (this.allowNullValue) {
+  		this.changed = true;
+  	} else {
+	  	if (this.value) this.changed = true;
+	  	else this.changed = false;
+	  }
   }
 
   isSelected(option):any {
