@@ -1,0 +1,134 @@
+<div class="your-giving col-md-12" *ngIf="user && isLoaded">
+
+  <div class="dashboard row">
+    <div class="col-md-6">
+      <section>
+        <h3>Total given</h3>
+        <div class="circle dollars">
+          <h2>{{totalDollars}}</h2>
+          <span>dollars</span>
+        </div>
+        <div class="circle hours">
+          <h2>{{totalHours}}</h2>
+          <span>hours</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-md-6">
+      <section>
+        <h3>Breakdown</h3>
+        <div class="graphs clearfix">
+          <div class="org-breakdown pull-left" *ngFor="let data of donationsByOrg">
+            <div class="subtotals">
+              <span class="dollars">{{data.dollars}}</span>
+              <span class="divider">|</span>
+              <span class="hours">{{data.hours}}</span>
+            </div>
+            <div
+              class="graph"
+              [ngStyle]="{'height': ((data.total / largest) * 100) + '%'}">
+              
+              <div
+                class="dollars"
+                [ngStyle]="{'height': ((data.dollars / data.total) * 100) + '%'}"></div>
+
+              <div
+                class="hours"
+                [ngStyle]="{'height': ((data.hours / data.total) * 100) + '%'}"></div>
+
+            </div>
+            <div class="org-name">
+              <span>{{data.orgName}}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <button class="add" *ngIf="!isLogging" (click)="logNew()">+ Log a new donation</button>
+  <div class="giv-form inline col-md-12 row" *ngIf="isLogging">
+  	<div class="form-section clearfix">
+      <h3>Log a new donation</h3>
+
+      <div class="row">
+        <div class="form-field clearfix col-md-5">
+          <label class="title">Organization</label>
+          <ng2-completer
+            [dataService]="dataService"
+            [minSearchLength]="0"
+            [(ngModel)]="model.orgName"></ng2-completer>
+        </div>
+
+        <div class="form-field clearfix col-md-2">
+          <label class="title">Amount</label>
+          <input
+            class="grey-bg no-shadow"
+            *ngIf="donationType === 'dollars'"
+            [attr.type]="'number'"
+            [attr.name]="'dollars'"
+            [attr.id]="'dollars'"
+            [(ngModel)]="model.dollars">
+
+          <input
+            class="grey-bg no-shadow"
+            *ngIf="donationType === 'hours'"
+            [attr.type]="'number'"
+            [attr.name]="'hours'"
+            [attr.id]="'hours'"
+            [(ngModel)]="model.hours">
+
+          <select [(ngModel)]="donationType">
+            <option [attr.value]="'dollars'">Dollars</option>
+            <option [attr.value]="'hours'">Hours</option>
+          </select>
+        </div>
+
+        <div class="form-field clearfix col-md-5">
+          <label class="title">Memo</label>
+          <input
+            class="grey-bg no-shadow"
+            [attr.name]="'memo'"
+            [attr.id]="'memo'"
+            [(ngModel)]="model.memo">
+        </div>
+      </div>
+    </div>
+    <button class="submit" (click)="save()">Submit</button>
+    <button class="cancel" (click)="cancel()">Cancel</button>
+  </div>
+
+  <table class="donations col-md-12">
+    <tbody>
+      <tr>
+        <th>Organization</th>
+        <th>Amount</th>
+        <th>Memo</th>
+      </tr>
+      <tr *ngFor="let donation of user.donations">
+        <td>{{donation.orgName}}</td>
+        <td>
+          <span *ngIf="donation.dollars">$</span>{{donation.dollars || donation.hours}}
+          <span *ngIf="donation.hours">hrs</span>
+        </td>
+        <td>{{donation.memo}}</td>
+        <td>
+          <button class="icon-btn" (clickOutside)="toggleOffOptionsMenu(donation.id)" (click)="toggleOptionsMenu(donation.id)">
+            <img src="app/images/options-dark.svg" alt="options">
+          </button>
+          <ul *ngIf="optionsMenus[donation.id]" class="submenu">
+            <li><a (click)="deleteLog(donation.id, donation.org)">Delete</a></li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div *ngIf="!user">
+  <section class="null-search col-md-12 row">
+    <p>Log in or create an account to keep track of your giving!</p>
+  </section>
+</div>

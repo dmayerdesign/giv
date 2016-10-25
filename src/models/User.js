@@ -22,11 +22,20 @@ const userSchema = new mongoose.Schema({
   profile: {
     gender: String,
     location: String,
-    website: String,
-    picture: String
+    website: String
   },
 
-  interests: {}
+  interests: {},
+
+  donations: [{
+    id: String,
+    org: String,
+    orgName: String,
+    dollars: Number,
+    hours: Number,
+    memo: String,
+    verified: Boolean
+  }],
 }, { timestamps: true });
 
 /**

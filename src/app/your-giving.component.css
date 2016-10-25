@@ -1,0 +1,77 @@
+.your-giving {
+	margin-top: 1.4em;
+}
+
+.donations td {
+	position: relative;
+}
+
+.donations .submenu {
+	bottom: -4em;
+}
+
+/** Graphs **/
+
+.graphs {
+	font-family: 'Hind', 'Roboto', Helvetica, sans-serif;
+	overflow-x: scroll;
+	height: 16.8rem;
+}
+
+.org-breakdown {
+	position: relative;
+		top: 3rem;
+	height: 10rem;
+	width: 7rem;
+	overflow: visible;
+	text-align: center;
+}
+
+.graph {
+	position: absolute;
+		bottom: 0;
+		left: 50%;
+	width: 4rem;
+	margin-left: -2rem;
+}
+
+.graph .dollars, .graph .hours {
+	position: relative;
+	width: 100%;
+}
+
+.graph .dollars {
+  background: linear-gradient(20deg, #1AE3EF, #0DED9C);
+}
+
+.graph .hours {
+	background: #6895A5;
+}
+
+.subtotals {
+	margin-top: -2rem;
+}
+
+.org-name {
+	position: absolute;
+		bottom: -0.6rem;
+		left: 0;
+	width: 100%;
+	overflow: visible;
+
+	font-size: 0.72rem;
+	font-weight: 600;
+}
+
+.org-name span {
+	display: inline-block;
+	position: absolute;
+		top: 0;
+		left: 0;
+	width: 100%;
+	line-height: 0.75rem;
+	height: 1.5rem;
+	overflow: hidden;
+}
+
+

@@ -41,7 +41,7 @@ export class AccountSettingsComponent implements OnInit {
 	private saving:boolean = false;
 	private checked = {};
 
-	/** Slug validation **/
+	/** Username validation **/
 	private usernameIsValid:boolean = true;
 
 	/** Upload options **/
@@ -148,8 +148,6 @@ export class AccountSettingsComponent implements OnInit {
   			this.model.username = this.model.username.toLowerCase();
   		}
   	}
-
-    this.model._id = this.user._id;
 
   	this.saving = true;
   	this.http.post("/account/profile", this.model).map(res => res.json()).subscribe(res => {

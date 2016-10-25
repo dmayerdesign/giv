@@ -449,3 +449,107 @@ exports.adminToken = (req, res) => {
   else
     res.sendStatus(500);
 };
+
+exports.logDonation = (req, res) => {
+  let orgId = req.body.orgId;
+  let orgName = req.body.orgName;
+  let userId = req.body.userId;
+  let dollars = req.body.dollars || 0;
+  let hours = req.body.hours || 0;
+  let memo = req.body.memo || '';
+  let verified = req.body.verified || false;
+
+  if (!orgId || !userId) {
+    console.log("User ID or org ID was not provided");
+    res.json({errmsg: "User ID or org ID was not provided"});
+    return;
+  }
+
+  let updateQuery = {
+    $push: {
+      donations: {
+        dollars: dollars,
+        hours: hours,
+        memo: memo,
+        verified: verified
+      }
+    }
+  };
+
+  let updateUser = updateQuery;
+  let updateOrg = updateQuery;
+
+  updateUser.$push.donations.org = orgId;
+  updateUser.$push.donations.orgName = orgName;
+  updateOrg.$push.donations.user = userId;
+  
+  Org.findOneAndUpdate({_id: orgId}, updateOrg, {new: true}, function(err, org) {
+    if(err) {
+      res.json({errmsg: err});
+      return console.log(err);
+    }
+    if (!org) return res.json({errmsg: "Org lookup failed"});
+
+    updateUser.$push.donations.id = org.donations[org.donations.length - 1]._id;
+
+    User.findOneAndUpdate({_id: userId}, updateUser, {new: true}, function(err, user) {
+      if(err) {
+        res.json({errmsg: err});
+        return console.log(err);
+      }
+      if (!user) return res.json({errmsg: "User lookup failed"});
+      console.log(user);
+      res.json(user);
+    });
+  });
+};
+
+exports.deleteDonation = (req, res) => {
+  let donationId = req.params.id;
+  let orgId = req.body.orgId;
+  let userId = req.body.userId;
+
+  if (!donationId || !orgId || !userId) {
+    console.log("The correct data was not provided");
+    console.log(req.body.orgId);
+    console.log(req.body.userId);
+    console.log(req.params.id);
+    res.json({errmsg: "The correct data was not provided"});
+    return;
+  }
+
+  let deleteFromUser = {
+    $pull: {
+      donations: {
+        id: donationId
+      }
+    }
+  };
+
+  let deleteFromOrg = {
+    $pull: {
+      donations: {
+        _id: donationId
+      }
+    }
+  };
+  
+  Org.findOneAndUpdate({_id: orgId}, deleteFromOrg, {new: true}, function(err, org) {
+    if(err) {
+      res.json({errmsg: err});
+      return console.log(err);
+    }
+    if (!org) return res.json({errmsg: "Org lookup failed"});
+    console.log(org);
+
+    User.findOneAndUpdate({_id: userId}, deleteFromUser, {new: true}, function(err, user) {
+      if(err) {
+        res.json({errmsg: err});
+        return console.log(err);
+      }
+      if (!user) return res.json({errmsg: "User lookup failed"});
+      console.log(user);
+      res.json(user);
+    });
+  });
+};

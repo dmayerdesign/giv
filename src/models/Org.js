@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const orgSchema = new mongoose.Schema({
-	name: {type: String, index: true},
+	name: {type: String, index: true, unique: true},
 	slug: {type: String, trim: true, unique: true},
 	description: String,
 	type: String,
@@ -9,9 +9,10 @@ const orgSchema = new mongoose.Schema({
 	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,
 	donateLinkCopy: {type: String, default: "Donate"},
-	otherLinks: [
-		{copy: String, href: String}
-	],
+	otherLinks: [{
+		copy: String,
+		href: String
+	}],
 	website: String,
 	facebook: String,
 	stars: Number,
@@ -23,6 +24,14 @@ const orgSchema = new mongoose.Schema({
 
 	globalPermission: String, // for manager permission
 	managers: [String],
+
+	donations: [{
+		user: String,
+		dollars: Number,
+		hours: Number,
+		memo: String,
+		verified: Boolean
+	}],
 	
 	coverImage: String,
 	avatar: String,

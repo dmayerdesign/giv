@@ -19,6 +19,7 @@ import { OrgPostsComponent } from './org-posts.component';
 import { SingleOrgComponent } from './single-org.component';
 import { ManageOrgPageComponent } from './manage-org-page.component';
 import { AccountSettingsComponent } from './account-settings.component';
+import { YourGivingComponent } from './your-giving.component';
 import { ResetPasswordComponent } from './reset-password.component';
 import { ClaimOrgComponent } from './claim-org.component';
 import { VerifyOrgsComponent } from './verify-orgs.component';
@@ -35,6 +36,7 @@ import { Categories } from './services/categories.service';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { TruncatePipe } from './pipes/truncate.pipe';
+import { Ng2CompleterModule } from "ng2-completer";
 
 import { enableProdMode } from '@angular/core';
 enableProdMode();
@@ -54,6 +56,7 @@ const routing = RouterModule.forRoot([
   , { path: 'organization/i/:id', component: SingleOrgComponent }
   , { path: 'organization/:slug', component: SingleOrgComponent }
   , { path: 'organization/manage/:id', component: ManageOrgPageComponent }
+  , { path: 'your-giving', component: YourGivingComponent }
   , { path: 'organization/claim/:id', component: ClaimOrgComponent }
   , { path: 'verify-organizations', component: VerifyOrgsComponent }
   , { path: '', component: BrowseOrgsComponent }
@@ -69,6 +72,7 @@ const routing = RouterModule.forRoot([
       ,	ReactiveFormsModule
       , ClickOutsideModule
       , ToastyModule.forRoot()
+      , Ng2CompleterModule
     ],
     declarations: [
         AppComponent
@@ -82,6 +86,7 @@ const routing = RouterModule.forRoot([
       , SingleOrgComponent
       , ManageOrgPageComponent
       , AccountSettingsComponent
+      , YourGivingComponent
       , ResetPasswordComponent
       , ClaimOrgComponent
       , VerifyOrgsComponent

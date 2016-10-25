@@ -158,13 +158,16 @@ app.post('/contact-form', contactController.postContact);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/upload/avatar/:userId', passportConfig.isAuthenticated, userAvatarUpload.any(), userController.uploadUserAvatar);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
-app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
+app.delete('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.post('/interests', passportConfig.isAuthenticated, userController.showInterest);
 app.get('/adminToken', passportConfig.isAuthenticated, userController.adminToken);
 app.get('/user/:id', userController.getUser);
 app.get('/user/u/:username', userController.getUserByUsername);
 app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
+app.put('/donation/log', passportConfig.isAuthenticated, userController.logDonation);
+app.post('/donation/delete/:id', passportConfig.isAuthenticated, userController.deleteDonation);
+
 
 /**
  * Error Handler.

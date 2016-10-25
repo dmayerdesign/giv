@@ -61,8 +61,9 @@ export class ManageOrgPageComponent implements OnInit {
 	private changed_categories:boolean;
 	private checked = {};
 
-	/** Slug validation **/
+	/** Slug and name validation **/
 	private slugIsValid:boolean = true;
+	private nameIsValid:boolean = true;
 
 	/** Upload options **/
   coverImageUploadOptions:Object;
@@ -157,14 +158,24 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   checkForUniqueSlug($event) {
-  	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
+  	this.http.get("/org/s/" + $event).map(res => res.json()).subscribe(data => {
   		if (data) {
   			this.slugIsValid = false;
   			this.ui.flash("Sorry, that identifier is taken", "error");
   		}
   		else this.slugIsValid = true;
   	});
-  } 
+  }
+
+  checkForUniqueName($event) {
+  	this.http.get("/org/name/" + $event).map(res => res.json()).subscribe(data => {
+  		if (data) {
+  			this.nameIsValid = false;
+  			this.ui.flash("Sorry, that name is taken", "error");
+  		}
+  		else this.nameIsValid = true;
+  	});
+  }
 
   save(key:string, value?:any):void {
   	if (typeof value === "undefined") {
@@ -192,6 +203,9 @@ export class ManageOrgPageComponent implements OnInit {
   			}
   		});
   	}
+
+    if (!this.nameIsValid) return this.ui.flash("Oops! That name is taken", "error");
+    if (!this.slugIsValid) return this.ui.flash("Oops! That slug is taken", "error");
 
   	this['saving_' + key] = true;
   	this.orgService.editOrg({

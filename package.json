@@ -70,6 +70,7 @@
     "multer": "^1.2.0",
     "multer-s3": "^2.3.2",
     "ng2-click-outside": "^0.5.1",
+    "ng2-completer": "^0.2.2",
     "ng2-facebook-sdk": "^0.1.5",
     "ng2-toasty": "^2.1.0",
     "ng2-uploader": "^1.1.0",

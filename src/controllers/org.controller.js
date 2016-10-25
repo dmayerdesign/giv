@@ -195,6 +195,18 @@ exports.routes = [
     }
   },
 
+  // GET SINGLE
+  {
+    method: "get",
+    uri: "/org/name/:name",
+    process: function(req, res) {
+      Org.findOne({name: req.params.name, verified: true}, function (err, obj) {
+        if(err) return console.log(err);
+        res.json(obj);
+      });
+    }
+  },
+
   {
     method: "put",
     uri: "/org/:id",
