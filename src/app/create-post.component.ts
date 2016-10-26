@@ -59,7 +59,7 @@ export class CreatePostComponent implements OnInit {
 				private http:Http) { }
 
 	ngOnInit() {
-		this.post = {
+		this.post = this.editing || {
 			authorId: null,
 			title: null,
 			content: null,
@@ -67,6 +67,7 @@ export class CreatePostComponent implements OnInit {
 			featuredImage: null,
 			imageBucket: Date.now().toString()
 		};
+
 		// for ng-upload
 		this.uploadOptions = {
 		  url: '/post/upload/featuredImage/' + this.post.imageBucket,

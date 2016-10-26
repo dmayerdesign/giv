@@ -53531,8 +53531,14 @@
 	                        _this.isLoaded = true;
 	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
 	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	                        _this.org.facebook = encodeURI(_this.org.facebook);
-	                        _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
+	                        if (_this.org.facebook) {
+	                            _this.org.facebook = encodeURI(_this.org.facebook);
+	                            _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
+	                        }
+	                        else {
+	                            _this.org.facebook = null;
+	                            _this.facebookLink = null;
+	                        }
 	                        _this.ui.setTitle("Manage " + _this.org.name);
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
@@ -53635,8 +53641,10 @@
 	            _this['saving_' + key] = false;
 	            _this['changed_' + key] = false;
 	            _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	            _this.org.facebook = encodeURI(_this.org.facebook);
-	            _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
+	            if (_this.org.facebook) {
+	                _this.org.facebook = encodeURI(_this.org.facebook);
+	                _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
+	            }
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
@@ -56295,7 +56303,7 @@
 	        this.post = new Post();
 	    }
 	    CreatePostComponent.prototype.ngOnInit = function () {
-	        this.post = {
+	        this.post = this.editing || {
 	            authorId: null,
 	            title: null,
 	            content: null,

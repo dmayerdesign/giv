@@ -114,8 +114,14 @@ export class ManageOrgPageComponent implements OnInit {
 							this.isLoaded = true;
 							this.org.categories.forEach(category => this.checked[category.id] = true);
 							this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-							this.org.facebook = encodeURI(this.org.facebook);
-							this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
+							if (this.org.facebook) {
+								this.org.facebook = encodeURI(this.org.facebook);
+								this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
+							}
+							else {
+								this.org.facebook = null;
+								this.facebookLink = null;
+							}
 							this.ui.setTitle("Manage " + this.org.name);
 							
 							// for ng-upload
@@ -223,9 +229,11 @@ export class ManageOrgPageComponent implements OnInit {
   		this['saving_' + key] = false;
   		this['changed_' + key] = false;
   		this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-			this.org.facebook = encodeURI(this.org.facebook);
-			this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
-  		this.ui.flash("Saved", "success");
+			if (this.org.facebook) {
+				this.org.facebook = encodeURI(this.org.facebook);
+				this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
+			}
+			this.ui.flash("Saved", "success");
   		console.log(res);
   	});
   }
