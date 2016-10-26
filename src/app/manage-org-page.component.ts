@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, NgZone, Input } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
+import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
@@ -53,13 +54,16 @@ export class ManageOrgPageComponent implements OnInit {
 	private saving_otherLinks:boolean;
 	private saving_facebook:boolean;
 
+	private facebookLink:SafeResourceUrl;
+
 	/** Changed **/
 	private changed_otherLinks:boolean;
 	private changed_categories:boolean;
 	private checked = {};
 
-	/** Slug validation **/
+	/** Slug and name validation **/
 	private slugIsValid:boolean = true;
+	private nameIsValid:boolean = true;
 
 	/** Upload options **/
   coverImageUploadOptions:Object;
@@ -74,7 +78,8 @@ export class ManageOrgPageComponent implements OnInit {
 				private utilities:Utilities,
 				private zone:NgZone,
 				private http:Http,
-				private categoryService:Categories) { }
+				private categoryService:Categories,
+        private sanitizer: DomSanitizer) { }
 
 	ngOnInit() {
 		this.userService.getLoggedInUser((err, user) => {
@@ -109,6 +114,8 @@ export class ManageOrgPageComponent implements OnInit {
 							this.isLoaded = true;
 							this.org.categories.forEach(category => this.checked[category.id] = true);
 							this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+							this.org.facebook = encodeURI(this.org.facebook);
+							this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
 							this.ui.setTitle("Manage " + this.org.name);
 							
 							// for ng-upload
@@ -151,14 +158,24 @@ export class ManageOrgPageComponent implements OnInit {
   }
 
   checkForUniqueSlug($event) {
-  	this.http.get("/org/s/" + this.slug).map(res => res.json()).subscribe(data => {
+  	this.http.get("/org/s/" + $event).map(res => res.json()).subscribe(data => {
   		if (data) {
   			this.slugIsValid = false;
   			this.ui.flash("Sorry, that identifier is taken", "error");
   		}
   		else this.slugIsValid = true;
   	});
-  } 
+  }
+
+  checkForUniqueName($event) {
+  	this.http.get("/org/name/" + $event).map(res => res.json()).subscribe(data => {
+  		if (data) {
+  			this.nameIsValid = false;
+  			this.ui.flash("Sorry, that name is taken", "error");
+  		}
+  		else this.nameIsValid = true;
+  	});
+  }
 
   save(key:string, value?:any):void {
   	if (typeof value === "undefined") {
@@ -187,6 +204,9 @@ export class ManageOrgPageComponent implements OnInit {
   		});
   	}
 
+    if (!this.nameIsValid) return this.ui.flash("Oops! That name is taken", "error");
+    if (!this.slugIsValid) return this.ui.flash("Oops! That slug is taken", "error");
+
   	this['saving_' + key] = true;
   	this.orgService.editOrg({
   		id: this.org._id,
@@ -202,6 +222,9 @@ export class ManageOrgPageComponent implements OnInit {
   		this.org = res;
   		this['saving_' + key] = false;
   		this['changed_' + key] = false;
+  		this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+			this.org.facebook = encodeURI(this.org.facebook);
+			this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
   		this.ui.flash("Saved", "success");
   		console.log(res);
   	});

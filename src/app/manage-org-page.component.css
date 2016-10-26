@@ -60,7 +60,7 @@ h2 span {
 
 /* Visuals */
 .preview-section.visuals {
-	margin-bottom: 5.3em;
+	margin-bottom: 9em;
 }
 
 .org-avatar {
@@ -89,11 +89,16 @@ h2 span {
 
 /* Calls to action */
 .preview-section.calls-to-action {
-
+	margin-bottom: 5em;
 }
 
 .preview-section.calls-to-action p {
 	float: left;
 	width: 100%;
 	margin-top: 0.6em;
+}
+
+/* Facebook */
+.preview-section.facebook {
+
 }

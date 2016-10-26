@@ -6,7 +6,7 @@ export class SearchService {
   constructor (private http:Http) { }
 
   loadSearchableData(uri:string, options) { //search?:string, field?:string, org?:string, limit?:number, offset?:number) {
-    let params: URLSearchParams = new URLSearchParams();
+    let params:URLSearchParams = new URLSearchParams();
 
     if (this.stringIsSet(options.search)) {
       params.set("search", options.search);

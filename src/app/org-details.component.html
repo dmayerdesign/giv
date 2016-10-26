@@ -24,8 +24,8 @@
 			</div>
 		</div>
 
-		<div *ngIf="isSingle && org?.facebook?.length" class="fb-page col-md-6 pull-right">
-			<iframe [attr.src]="facebookLink" [attr.width]="'340'" [attr.height]="'260'" [attr.style]="'border:none;overflow:hidden'" [attr.scrolling]="'no'" [attr.frameborder]="'0'" [attr.allowTransparency]="'true'"></iframe>
+		<div *ngIf="isSingle && org?.facebook?.length && org?.facebook !== 'undefined'" class="fb-page col-md-6 pull-right">
+			<iframe [attr.src]="facebookLink" [attr.width]="'340'" [attr.height]="'148'" [attr.style]="'border:none;overflow:hidden'" [attr.scrolling]="'no'" [attr.frameborder]="'0'" [attr.allowTransparency]="'true'"></iframe>
 		</div>
 	</div>
 </div>

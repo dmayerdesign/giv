@@ -7,7 +7,8 @@
       <input [(ngModel)]="org.name"
             class="form-control"
             name="name"
-            placeholder="What is your organization called?">
+            placeholder="What is your organization called?"
+            (keyup)="checkForUniqueName($event.target.value)">
     </div>
     <div class="form-field clearfix">
       <label class="title">Description</label>

@@ -52,6 +52,9 @@ export class CreateOrgComponent implements OnInit {
 		}
 	];
 
+	/** Name validation **/
+	private nameIsValid:boolean = true;
+
 	constructor(
 				private orgService:OrgService,
 				private userService:UserService,
@@ -109,6 +112,16 @@ export class CreateOrgComponent implements OnInit {
 	  }
   }
 
+  checkForUniqueName(name) {
+  	this.http.get("/org/name/" + name).map(res => res.json()).subscribe(data => {
+  		if (data) {
+  			this.nameIsValid = false;
+  			this.ui.flash("Sorry, that name is taken", "error");
+  		}
+  		else this.nameIsValid = true;
+  	});
+  }
+
   submitOrg(newOrg:org):void {
   	let ok:boolean = true;
     this.requiredOrgFields.forEach((field, index, arr) => {
@@ -119,6 +132,7 @@ export class CreateOrgComponent implements OnInit {
     });
     if (!ok) return;
     if (!this.roleDescription) return this.ui.flash("Oops! You need to describe your role in the organization", "error");
+    if (!this.nameIsValid) return this.ui.flash("Oops! That name is taken", "error");
 
     let categories:string = "";
     newOrg.categories.forEach((category, index, arr) => {
