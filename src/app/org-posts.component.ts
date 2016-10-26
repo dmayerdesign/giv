@@ -122,15 +122,18 @@ export class OrgPostsComponent implements OnInit {
 	selectPost(id:any) {
 		console.log(id);
 		console.log(this.isBrowsing);
-		if (!this.isBrowsing) {
+
+		if (!this.posts.length) return;
+
+		if (this.isBrowsing) {
+			this.router.navigate(['/organization', 'i', this.posts.find(post => {
+				return post._id === id;
+			}).org], {queryParams: { viewpost: id } });
+		}
+		else {
 			this.viewingOne = true;
 			this.selectedPost = this.posts.find(post => post._id === id);
 			this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
-		}
-		else {
-			this.router.navigate(['/organization/i', this.posts.find(post => {
-				return post._id === id;
-			}).org], {queryParams: { viewpost: id } });
 		}
 	}
 
