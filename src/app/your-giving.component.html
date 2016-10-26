@@ -9,10 +9,10 @@
   </div>
 
   <div [hidden]="!user?.donations?.length" class="dashboard row">
-    <div class="col-md-6">
+    <div class="totals-container col-md-6">
       <section class="totals">
         <h3>Total given</h3>
-        <div class="col-md-6">
+        <div class="circle-container col-md-6">
           <div #circle
               class="circle dollars"
               (window:resize)="resizeCircles()"
@@ -24,7 +24,7 @@
           </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="circle-container col-md-6">
           <div #circle2
               class="circle hours"
               (window:resize)="resizeCircles()"
@@ -130,13 +130,13 @@
         <th colspan="2">Memo</th>
       </tr>
       <tr *ngFor="let donation of user.donations">
-        <td>{{donation.orgName}}</td>
-        <td>
+        <td [ngStyle]="{'width': '40%'}"><a [routerLink]="['/organization', 'i', donation.org]">{{donation.orgName}}</a></td>
+        <td [ngStyle]="{'width': '15%'}">
           <span *ngIf="donation.dollars">$</span>{{donation.dollars || donation.hours}}
           <span *ngIf="donation.hours">hrs</span>
         </td>
-        <td>{{donation.memo}}</td>
-        <td>
+        <td [ngStyle]="{'width': '30%'}">{{donation.memo}}</td>
+        <td [ngStyle]="{'width': '5%'}">
           <button class="icon-btn" (clickOutside)="toggleOffOptionsMenu(donation.id)" (click)="toggleOptionsMenu(donation.id)">
             <img src="app/images/options-dark.svg" alt="options">
           </button>

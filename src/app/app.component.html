@@ -4,13 +4,23 @@
       <h1 class="masthead-logo" routerLink="/"><img src="images/logo-2x.png" alt="Giv"></h1>
       <ul class="nav nav-left pull-left">
         <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']"><img src="app/images/home-icon.svg" height="18"><span>Browse</span></a>
+          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/']">
+            <img src="app/images/home-icon.svg" height="18">
+            <span>Browse</span>
+          </a>
         </li>
         <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
           <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/starred']"><img src="app/images/star-icon.svg" height="18"><span>Your starred</span></a>
         </li>
       </ul>
       <ul class="nav nav-right pull-right">
+        <li *ngIf="isLoggedIn" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" [routerLink]="['/your-giving']">
+            <span>Your giving</span>
+            <img src="app/images/dashboard-icon.svg" height="18">
+          </a>
+        </li>
+      
         <li *ngIf="isLoggedIn" class="nav-item" [ngClass]="{'has-avatar': user?.avatar?.length}" (clickOutside)="exitAccountMenu()">
       		<a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="toggleAccountMenu()">
             <span>{{user?.name || 'Your account'}}</span>
@@ -22,6 +32,7 @@
             <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
           </ul>
         </li>
+
         <li *ngIf="!isLoggedIn" class="nav-item">
           <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()">
             <span>Log in</span>

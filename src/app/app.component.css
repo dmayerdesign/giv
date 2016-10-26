@@ -5,7 +5,8 @@
 		z-index: 1;
 	width: 100%;
 	min-height: 100%;
-	padding-bottom: 5em;
+  min-width: 300px;
+	padding-bottom: 7em;
 }
 
 /* Footer */

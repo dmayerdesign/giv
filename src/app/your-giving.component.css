@@ -8,7 +8,7 @@
 }
 
 .no-donations {
-	margin-bottom: 2em;
+	margin-bottom: 1.4em;
 }
 
 .dashboard section {
@@ -16,9 +16,14 @@
 	height: 22rem;
 }
 
-
 .totals > h3 {
 	margin-bottom: 1em;
+}
+
+.circle-container.col-md-6 {
+	float: left !important;
+	width: 50% !important;
+	clear: none !important;
 }
 
 .circle {
@@ -49,6 +54,30 @@
 	margin-bottom: 0;
 	line-height: 1.05;
 	font-weight: lighter;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+	.circle {
+		font-size: 0.7em;
+	}
+}
+
+@media only screen and (max-width: 767px) {
+	.totals {
+		margin-bottom: 1em;
+	}
+
+	.dashboard section {
+		height: auto;
+	}
+}
+
+@media only screen and (max-width: 579px) {
+	.circle-container.col-md-6 {
+		width: 100% !important;
+		padding: 0 10% !important;
+		margin-bottom: 1.5em;
+	}
 }
 
 /** Graphs **/
@@ -130,6 +159,10 @@
 
 
 /* TABLE */
+
+.your-giving > .add {
+	float: none;
+}
 
 table {
 	margin-top: 0.6rem;

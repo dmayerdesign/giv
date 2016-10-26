@@ -373,12 +373,12 @@ ul.nav {
   content: " ";
   display: block;
   width: 100%;
-  height: 6px;
+  height: 8px;
   background: url("app/images/triangle.svg") 50% bottom no-repeat;
-  background-size: 20px 6px;
+  background-size: 22px 8px;
   position: absolute;
     left: 0;
-    bottom: -1px;
+    bottom: -2px;
 }
 
 .no-backgroundsize .nav-item.active::after {
@@ -438,25 +438,23 @@ button.nav-item:hover {
 }
 
 
-.nav-left .nav-link img,
-.nav-left .nav-link i,
-.subnav img,
-.subnav i {
-  margin-right: 0.8em;
+.nav-left .nav-link span,
+.subnav span {
+  padding-left: 0.8em;
+  left: -0.2em;
 }
 
-.nav-right .nav-link img,
-.nav-right .nav-link i,
-.nav-link .user-avatar {
-  margin-left: 0.8em;
+.nav-right .nav-link span {
+  padding-right: 0.8em;
+  right: -0.2em;
 }
 
 .nav-link > span {
   position: relative;
-    top: 0.15em;
+    top: 0.1em;
 }
 
-.has-avatar .nav-link > span {
+/*.has-avatar .nav-link > span {
   top: -0.2em;
   right: -0.2em;
 }
@@ -464,7 +462,7 @@ button.nav-item:hover {
 .has-avatar .nav-link > div {
   display: inline-block;
   top: -0.35em;
-}
+}*/
 
 /* subnav */
 
@@ -530,8 +528,8 @@ button.nav-item:hover {
   background-repeat: no-repeat;
   background-size: 100%;
   background-size: cover;
-  width: 1.9em;
-  height: 1.9em;
+  width: 18px;
+  height: 18px;
   border-radius: 2px;
   border: 1px solid #F1F6F5;
 }
