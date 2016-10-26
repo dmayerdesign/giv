@@ -29,9 +29,9 @@ export class LoginComponent implements OnInit {
 							private ui:UIHelper
               ) {
 
-		if (localStorage['profile']) {
-			this.router.navigate(['/']);
-		}
+    // if (localStorage['profile']) {
+		// 	this.router.navigate(['/']);
+		// }
 
     // FOR DEMO MODE
     // else this.router.navigate(['/']);
@@ -60,6 +60,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    localStorage.removeItem("profile"); // In case someone's already logged in
     for (let field in this.formModel) {
     	if (this.formModel.hasOwnProperty(field) && !this.formModel[field]) return this.ui.flash("Oops! You need to enter your " + field, "error");
     }
@@ -72,7 +73,7 @@ export class LoginComponent implements OnInit {
         this.userService.confirmLogin(data);
       	console.log(data);
         this.getQueryParams(params => {
-          if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1) {
+          if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1 && decodeURI(params['redirect']).indexOf("signup") === -1) {
             window.location.href = decodeURI(params['redirect']);
           } else {
             this.router.navigate(['/']);
@@ -80,7 +81,7 @@ export class LoginComponent implements OnInit {
         }); 
       }, error => {
         console.log(error);
-        this.ui.flash("That account doesn't exist", "error");
+        this.ui.flash("Your login info was incorrect. Try again!", "error");
       });
     } else {
     	console.error("The form model was undefined.");

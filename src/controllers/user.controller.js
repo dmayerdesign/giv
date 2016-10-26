@@ -29,9 +29,33 @@ exports.postLogin = (req, res, next) => {
       if (err) { return next(err); }
       console.log(user);
       user.password = null;
-      res.json(user);
+
+      if (!user.emailIsVerified)
+        res.json({errmsg: "You haven't verified this email address yet. Check your email!"});
+      else
+        res.json(user);
     });
   })(req, res, next);
+};
+
+/**
+ * POST /verify-email
+ */
+exports.verifyEmail = (req, res, next) => {
+  User.findOne({ emailVerificationToken: req.params.token }, (err, user) => {
+    if (err) { 
+      console.error(err);
+      return res.json({ errmsg: 'Something went wrong' });
+    }
+    if (!user) {
+      return res.json({ errmsg: 'Password reset token is invalid or has expired' });
+    }
+    user.emailIsVerified = true;
+    user.save((err, user) => {
+      if (err) { return res.json({ errmsg: 'Something went wrong' }); }
+      res.json(user);
+    });
+  });
 };
 
 /**
@@ -51,20 +75,51 @@ exports.postSignup = (req, res, next) => {
     return console.log(errors);
   }
 
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
+  let token;
+  crypto.randomBytes(16, (err, buf) => {
+    token = buf.toString('hex');
 
-  User.findOne({ email: req.body.email }, (err, existingUser) => {
-    if (err) { return next(err); }
-    if (existingUser) {
-      return res.json({errmsg: 'An account with that email address already exists.' });
-    }
-    user.save((err) => {
-      if (err) { return next(err); }
-      user.password = null;
-      res.json(user);
+    const user = new User({
+      email: req.body.email,
+      password: req.body.password,
+      emailIsVerified: false,
+      emailVerificationToken: token
+    });
+
+    User.findOne({ email: req.body.email }, (err, existingUser) => {
+      if (err) { return res.json({errmsg: err}); }
+      if (existingUser) {
+        return res.json({errmsg: 'An account with that email address already exists.' });
+      }
+      user.save((err) => {
+        if (err) { return res.json({errmsg: err}); }
+        user.password = null;
+        
+        const transporter = nodemailer.createTransport({
+          service: 'SendGrid',
+          auth: {
+            user: process.env.SENDGRID_USER,
+            pass: process.env.SENDGRID_PASSWORD
+          }
+        });
+        const mailOptions = {
+          to: user.email,
+          from: 'Giv Support <d.a.mayer92@gmail.com>',
+          subject: 'Welcome to Giv!',
+          html: `
+            <!doctype html>
+            <html><body>
+              <h4>Thanks for joining Giv!</h4>
+              <p>Click on the link below (or paste it into your browser) to finish the signup process:</p>
+              <p><strong><a href='http://${req.headers.host}/verify-email/${token}' target='_blank'>Click here to verify your email</a></strong></p>
+            </body></html>
+          `
+        };
+        transporter.sendMail(mailOptions, (err) => {
+          if (err) { return res.json({errmsg: err}); }
+          res.status(200).json(user);
+        });
+      });
     });
   });
 };
@@ -233,8 +288,8 @@ exports.postForgot = (req, res, next) => {
       });
       const mailOptions = {
         to: user.email,
-        from: 'GIV Support <d.a.mayer92@gmail.com>',
-        subject: 'Reset your password on GIV',
+        from: 'Giv Support <d.a.mayer92@gmail.com>',
+        subject: 'Reset your password on Giv',
         text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
           http://${req.headers.host}/reset/${token}\n\n
@@ -296,7 +351,7 @@ exports.postReset = (req, res, next) => {
       const mailOptions = {
         to: user.email,
         from: 'd.a.mayer92@gmail.com',
-        subject: 'Your GIV password has been changed',
+        subject: 'Your Giv password has been changed',
         text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`
       };
       transporter.sendMail(mailOptions, (err) => {

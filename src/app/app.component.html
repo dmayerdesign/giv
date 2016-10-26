@@ -29,6 +29,7 @@
           </a>
           <ul *ngIf="showAccountMenu" class="subnav">
             <li class="subnav-item"><a [routerLink]="['/account']"><i class="fa fa-cog"></i><span>Settings</span></a></li>
+            <li class="subnav-item"><a [routerLink]="['/organization', 'create']"><i class="fa fa-user-plus"></i><span>Submit your org</span></a></li>
             <li class="subnav-item"><a (click)="logOut()"><i class="fa fa-unlock-alt"></i><span>Log out</span></a></li>
           </ul>
         </li>

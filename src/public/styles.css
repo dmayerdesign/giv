@@ -381,6 +381,10 @@ ul.nav {
     bottom: -2px;
 }
 
+.nav-right .nav-item.active::after {
+  bottom: -1px;
+}
+
 .no-backgroundsize .nav-item.active::after {
   background: #fff;
   height: 3px;
@@ -521,8 +525,6 @@ button.nav-item:hover {
 /* USER */
 
 .user-avatar {
-  position: relative;
-    top: 0.1em;
   background-color: #fff;
   background-position: 50% 50%;
   background-repeat: no-repeat;

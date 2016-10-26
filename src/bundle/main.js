@@ -37899,6 +37899,7 @@
 	var account_settings_component_1 = __webpack_require__(86);
 	var your_giving_component_1 = __webpack_require__(87);
 	var reset_password_component_1 = __webpack_require__(90);
+	var verify_email_component_1 = __webpack_require__(362);
 	var claim_org_component_1 = __webpack_require__(91);
 	var verify_orgs_component_1 = __webpack_require__(93);
 	var create_org_component_1 = __webpack_require__(94);
@@ -37934,6 +37935,7 @@
 	    { path: 'your-giving', component: your_giving_component_1.YourGivingComponent },
 	    { path: 'organization/claim/:id', component: claim_org_component_1.ClaimOrgComponent },
 	    { path: 'verify-organizations', component: verify_orgs_component_1.VerifyOrgsComponent },
+	    { path: 'verify-email/:token', component: verify_email_component_1.VerifyEmailComponent },
 	    { path: '', component: browse_orgs_component_1.BrowseOrgsComponent },
 	    { path: '*', component: browse_orgs_component_1.BrowseOrgsComponent }
 	]); // the order of this array matters
@@ -37977,7 +37979,8 @@
 	                create_org_component_1.CreateOrgComponent,
 	                create_post_component_1.CreatePostComponent,
 	                truncate_pipe_1.TruncatePipe,
-	                form_field_component_1.FormFieldComponent
+	                form_field_component_1.FormFieldComponent,
+	                verify_email_component_1.VerifyEmailComponent
 	            ],
 	            providers: [
 	                platform_browser_1.Title,
@@ -51516,7 +51519,7 @@
 	        this.toastyConfig = toastyConfig;
 	    }
 	    UIHelper.prototype.setTitle = function (newTitle) {
-	        this.title.setTitle("GIV ♦ " + newTitle);
+	        this.title.setTitle("GIV • " + newTitle);
 	    };
 	    UIHelper.prototype.takeCount = function (children) {
 	        var counter = function () {
@@ -51531,12 +51534,12 @@
 	        var counterFunc = window.setInterval(counter, 100);
 	        return counter();
 	    };
-	    UIHelper.prototype.flash = function (message, type) {
+	    UIHelper.prototype.flash = function (message, type, timeout) {
 	        var toastOptions = {
 	            title: "",
 	            msg: message,
 	            showClose: true,
-	            timeout: 4000
+	            timeout: timeout || 4000
 	        };
 	        type = type || "info";
 	        this.toastyService[type](toastOptions);
@@ -51604,15 +51607,15 @@
 	var LoginComponent = (function () {
 	    function LoginComponent(//private fb:FacebookService,
 	        http, router, route, userService, ui) {
+	        // if (localStorage['profile']) {
+	        // 	this.router.navigate(['/']);
+	        // }
 	        this.http = http;
 	        this.router = router;
 	        this.route = route;
 	        this.userService = userService;
 	        this.ui = ui;
 	        this.formModel = { email: null, password: null };
-	        if (localStorage['profile']) {
-	            this.router.navigate(['/']);
-	        }
 	        // FOR DEMO MODE
 	        // else this.router.navigate(['/']);
 	        // this.ui.flash("Sorry—user accounts aren't available in the demo");
@@ -51636,6 +51639,7 @@
 	    };
 	    LoginComponent.prototype.login = function () {
 	        var _this = this;
+	        localStorage.removeItem("profile"); // In case someone's already logged in
 	        for (var field in this.formModel) {
 	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
 	                return this.ui.flash("Oops! You need to enter your " + field, "error");
@@ -51650,7 +51654,7 @@
 	                _this.userService.confirmLogin(data);
 	                console.log(data);
 	                _this.getQueryParams(function (params) {
-	                    if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1) {
+	                    if (params['redirect'] && decodeURI(params['redirect']).indexOf("reset") === -1 && decodeURI(params['redirect']).indexOf("signup") === -1) {
 	                        window.location.href = decodeURI(params['redirect']);
 	                    }
 	                    else {
@@ -51659,7 +51663,7 @@
 	                });
 	            }, function (error) {
 	                console.log(error);
-	                _this.ui.flash("That account doesn't exist", "error");
+	                _this.ui.flash("Your login info was incorrect. Try again!", "error");
 	            });
 	        }
 	        else {
@@ -51722,20 +51726,22 @@
 	        this.userService = userService;
 	        this.ui = ui;
 	        this.formModel = { email: null, password: null, confirmPassword: null };
-	        if (localStorage['profile']) {
-	            this.router.navigate(['/']);
-	            this.ui.flash("You're already logged in!", "info");
-	        }
-	        else {
-	            this.router.navigate(['/']);
-	            this.ui.flash("Sorry—user accounts aren't available in the demo");
-	        }
+	        // if (localStorage['profile']) {
+	        // 	this.router.navigate(['/']);
+	        // 	this.ui.flash("You're already logged in!", "info");
+	        // }
+	        // FOR DEMO MODE
+	        // else {
+	        //   this.router.navigate(['/']);
+	        //   this.ui.flash("Sorry—user accounts aren't available in the demo");
+	        // }
 	    }
 	    SignupComponent.prototype.ngOnInit = function () {
 	        this.ui.setTitle("Sign up");
 	    };
 	    SignupComponent.prototype.signup = function () {
 	        var _this = this;
+	        localStorage.removeItem("profile"); // In case someone's already logged in
 	        for (var field in this.formModel) {
 	            if (this.formModel.hasOwnProperty(field) && !this.formModel[field])
 	                return this.ui.flash("Oops! You need to fill out your " + field, "error");
@@ -51746,20 +51752,21 @@
 	            this.http.post('/signup', this.formModel).map(function (res) { return res.json(); }).subscribe(function (data) {
 	                if (data.errmsg) {
 	                    _this.ui.flash(data.errmsg);
-	                    return _this.router.navigate(["/login"]);
+	                    return _this.router.navigate(['/login']);
 	                }
-	                _this.http.post('/login', { email: _this.formModel.email, password: _this.formModel.password }).map(function (res) { return res.json(); }).subscribe(function (data) {
-	                    if (data.errmsg) {
-	                        _this.ui.flash(data.errmsg);
-	                        return _this.router.navigate(["/"]);
-	                    }
-	                    localStorage.setItem('profile', JSON.stringify(data));
-	                    _this.isLoggedIn = true;
-	                    _this.userService.confirmLogin(data);
-	                    _this.ui.flash("Welcome!", "success");
-	                    console.log(data);
-	                    _this.router.navigate(['/']);
-	                });
+	                _this.ui.flash("Success! To finish, click on the link in the email we just sent you", "success", 6000);
+	                // this.http.post('/login', {email: this.formModel.email, password: this.formModel.password}).map(res => res.json()).subscribe(data => {
+	                // if (data.errmsg) {
+	                //     this.ui.flash(data.errmsg);
+	                //     return this.router.navigate(["/"]);
+	                //   }
+	                //   localStorage.setItem('profile', JSON.stringify(data));
+	                //   this.isLoggedIn = true;
+	                //   this.userService.confirmLogin(data);
+	                //   this.ui.flash("Welcome!", "success");
+	                // 	console.log(data);
+	                //   this.router.navigate(['/']);
+	                // });
 	            });
 	        }
 	        else {
@@ -56837,6 +56844,332 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
+
+
+/***/ },
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */,
+/* 357 */,
+/* 358 */,
+/* 359 */,
+/* 360 */,
+/* 361 */,
+/* 362 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var router_1 = __webpack_require__(25);
+	var http_1 = __webpack_require__(55);
+	var user_service_1 = __webpack_require__(68);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var VerifyEmailComponent = (function () {
+	    function VerifyEmailComponent(router, route, userService, ui, utilities, zone, http, categoryService) {
+	        this.router = router;
+	        this.route = route;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.http = http;
+	        this.categoryService = categoryService;
+	        this.passwords = {
+	            password: null,
+	            confirm: null
+	        };
+	    }
+	    VerifyEmailComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        if (this.route.params) {
+	            this.sub = this.route.params.subscribe(function (params) {
+	                _this.token = params['token'];
+	                _this.http.post("/verify-email/" + _this.token, {}).map(function (res) { return res.json(); }).subscribe(function (user) {
+	                    if (user.errmsg) {
+	                        _this.ui.flash("We couldn't verify your email", "error");
+	                        return console.error(user.errmsg);
+	                    }
+	                    _this.ui.flash("Thank you for verifying your email! Log in and enjoy", "success");
+	                    _this.router.navigate(['/login']);
+	                }, function (err) {
+	                    _this.ui.flash("Oops! Something went wrong", "error");
+	                    console.error(err);
+	                });
+	            });
+	        }
+	    };
+	    VerifyEmailComponent = __decorate([
+	        core_1.Component({
+	            selector: 'verify-email',
+	            templateUrl: 'app/verify-email.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	    ], VerifyEmailComponent);
+	    return VerifyEmailComponent;
+	}());
+	exports.VerifyEmailComponent = VerifyEmailComponent;
 
 
 /***/ }
