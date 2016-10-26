@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
+  emailIsVerified: Boolean,
+  emailVerificationToken: String,
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -36,7 +38,7 @@ const userSchema = new mongoose.Schema({
     hours: Number,
     memo: String,
     verified: Boolean
-  }],
+  }]
 }, { timestamps: true });
 
 /**

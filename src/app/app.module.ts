@@ -21,6 +21,7 @@ import { ManageOrgPageComponent } from './manage-org-page.component';
 import { AccountSettingsComponent } from './account-settings.component';
 import { YourGivingComponent } from './your-giving.component';
 import { ResetPasswordComponent } from './reset-password.component';
+import { VerifyEmailComponent } from './verify-email.component';
 import { ClaimOrgComponent } from './claim-org.component';
 import { VerifyOrgsComponent } from './verify-orgs.component';
 import { CreateOrgComponent } from './create-org.component';
@@ -59,6 +60,7 @@ const routing = RouterModule.forRoot([
   , { path: 'your-giving', component: YourGivingComponent }
   , { path: 'organization/claim/:id', component: ClaimOrgComponent }
   , { path: 'verify-organizations', component: VerifyOrgsComponent }
+  , { path: 'verify-email/:token', component: VerifyEmailComponent }
   , { path: '', component: BrowseOrgsComponent }
   , { path: '*', component: BrowseOrgsComponent }
 ]); // the order of this array matters
@@ -99,6 +101,7 @@ const routing = RouterModule.forRoot([
       , CreatePostComponent
       , TruncatePipe
       , FormFieldComponent
+      , VerifyEmailComponent
     ],
     providers: [
         Title

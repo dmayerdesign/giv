@@ -10,7 +10,7 @@ export class UIHelper {
         private toastyConfig:ToastyConfig) { }
 
   setTitle(newTitle: string) {
-    this.title.setTitle( "GIV ♦ " + newTitle );
+    this.title.setTitle( "GIV • " + newTitle );
   }
 
   takeCount(children):number {
@@ -28,12 +28,12 @@ export class UIHelper {
     return counter();
   }
 
-  flash(message:string, type?:string) {
+  flash(message:string, type?:string, timeout?:number) {
     var toastOptions:ToastOptions = {
       title: "",
       msg: message,
       showClose: true,
-      timeout: 4000
+      timeout: timeout || 4000
     };
     type = type || "info";
     this.toastyService[type](toastOptions);
