@@ -49,3 +49,12 @@
 	<org-posts [org]="org" [user]="user"></org-posts>
 	<recommended-orgs (tabChange)="showStarred($event)" [org]="org"></recommended-orgs>
 </div>
+
+<div class="loader app-loader" *ngIf="!isLoaded">
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="50"></p>
+  <p class="loader_dots">
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+  </p>
+</div>
