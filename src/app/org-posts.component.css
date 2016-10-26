@@ -14,10 +14,10 @@
 	background-color: #fff;
 }
 
-.single section {
+/*.single section {
 	padding-right: 30px;
 	padding-left: 30px;
-}
+}*/
 
 .posts-container header {
 	margin-bottom: 0.7em;
@@ -49,13 +49,17 @@
 }
 
 .post {
-	padding: 1em 0 0.7em;
+	padding-top: 1em;
+	padding-bottom: 0.7em;
 }
 .single-post {
+	padding-right: 30px;
+	padding-left: 30px;
 	padding-bottom: 2em;
 }
 .single .post {
-	padding: 1.3em 0;
+	padding-top: 1.3em;
+	padding-bottom: 1.3em;
 	border-bottom: 0;
 }
 .post:not(:last-child) {
