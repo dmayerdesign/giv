@@ -23,6 +23,7 @@
     [attr.placeholder]="placeholder"
     (keyup)="changeHandler()"
     (blur)="changeHandler()"
+    (change)="changeHandler()"
     [(ngModel)]="value">
 
   <textarea
@@ -33,6 +34,7 @@
     [attr.placeholder]="placeholder" 
     (keyup)="changeHandler()"
     (blur)="changeHandler()"
+    (change)="changeHandler()"
     [(ngModel)]="value"></textarea>
 
   <select
@@ -58,7 +60,7 @@
         *ngIf="upload?.url"
         [attr.id]="name + '-upload'"
         type="file"
-    		ngFileSelect
+        ngFileSelect
         [options]="upload"
         (onUpload)="handleUpload($event)">
     </label>
