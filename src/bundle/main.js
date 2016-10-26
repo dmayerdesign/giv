@@ -53074,15 +53074,17 @@
 	    OrgPostsComponent.prototype.selectPost = function (id) {
 	        console.log(id);
 	        console.log(this.isBrowsing);
-	        if (!this.isBrowsing) {
+	        if (!this.posts.length)
+	            return;
+	        if (this.isBrowsing) {
+	            this.router.navigate(['/organization', 'i', this.posts.find(function (post) {
+	                    return post._id === id;
+	                }).org], { queryParams: { viewpost: id } });
+	        }
+	        else {
 	            this.viewingOne = true;
 	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
 	            this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
-	        }
-	        else {
-	            this.router.navigate(['/organization/i', this.posts.find(function (post) {
-	                    return post._id === id;
-	                }).org], { queryParams: { viewpost: id } });
 	        }
 	    };
 	    OrgPostsComponent.prototype.deselectPost = function () {
