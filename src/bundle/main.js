@@ -53954,6 +53954,7 @@
 	        this.progress = 0;
 	        this.donationType = "dollars";
 	        this.optionsMenus = {};
+	        this.circleHeight = 0;
 	        this.totalDollars = 0;
 	        this.totalHours = 0;
 	        this.donationsByOrg = [];
@@ -53971,8 +53972,10 @@
 	        this.dataService = completerService.local(this.orgService.loadOrgs({}), 'name', 'name');
 	    }
 	    YourGivingComponent.prototype.ngOnInit = function () {
-	        var _this = this;
 	        this.ui.setTitle("Your giving");
+	    };
+	    YourGivingComponent.prototype.ngAfterViewInit = function () {
+	        var _this = this;
 	        this.userService.getLoggedInUser(function (err, user) {
 	            if (err)
 	                return console.error(err);
@@ -53980,6 +53983,11 @@
 	            _this.isLoaded = true;
 	            _this.model.userId = _this.user._id;
 	            _this.updateData();
+	            var circlesInt = window.setInterval(function () {
+	                var size = _this.resizeCircles();
+	                if (size > 0)
+	                    clearInterval(circlesInt);
+	            }, 100);
 	        });
 	    };
 	    YourGivingComponent.prototype.updateData = function () {
@@ -54095,9 +54103,11 @@
 	                    return 1;
 	            }
 	        });
-	        this.largest = this.donationsByOrg[0].dollars || 0;
-	        if (this.donationsByOrg[0].hours)
-	            this.largest += this.donationsByOrg[0].hours;
+	        if (this.donationsByOrg && this.donationsByOrg.length) {
+	            this.largest = this.donationsByOrg[0].dollars || 0;
+	            if (this.donationsByOrg[0].hours)
+	                this.largest += this.donationsByOrg[0].hours;
+	        }
 	    };
 	    YourGivingComponent.prototype.updateModel = function (key, value) {
 	        this.model[key] = value;
@@ -54158,6 +54168,20 @@
 	    YourGivingComponent.prototype.toggleOffOptionsMenu = function (id) {
 	        delete this.optionsMenus[id];
 	    };
+	    YourGivingComponent.prototype.resizeCircles = function () {
+	        if (!this.circle)
+	            return 0;
+	        this.circleHeight = this.circle.nativeElement.offsetWidth;
+	        return this.circleHeight;
+	    };
+	    __decorate([
+	        core_1.ViewChild('circle'), 
+	        __metadata('design:type', core_1.ElementRef)
+	    ], YourGivingComponent.prototype, "circle", void 0);
+	    __decorate([
+	        core_1.ViewChild('circle2'), 
+	        __metadata('design:type', core_1.ElementRef)
+	    ], YourGivingComponent.prototype, "circle2", void 0);
 	    YourGivingComponent = __decorate([
 	        core_1.Component({
 	            selector: 'your-giving',

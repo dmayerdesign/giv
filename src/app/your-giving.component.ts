@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Http } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
@@ -16,6 +16,9 @@ import { CompleterService, CompleterData } from 'ng2-completer';
 })
 
 export class YourGivingComponent implements OnInit {
+	@ViewChild('circle') circle:ElementRef;
+	@ViewChild('circle2') circle2:ElementRef;
+
 	private user:any;
 	private isLoaded:boolean = false;
 	private stillWorking:boolean = false;
@@ -24,6 +27,8 @@ export class YourGivingComponent implements OnInit {
 	private dataService:CompleterData;
 	private isLogging:boolean;
 	private optionsMenus = {};
+
+	private circleHeight:number = 0;
 
 	private totalDollars:number = 0;
 	private totalHours:number = 0;
@@ -60,6 +65,9 @@ export class YourGivingComponent implements OnInit {
 
 	ngOnInit() {
 		this.ui.setTitle("Your giving");
+	}
+
+	ngAfterViewInit() {
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
@@ -67,6 +75,11 @@ export class YourGivingComponent implements OnInit {
       this.model.userId = this.user._id;
 
       this.updateData();
+
+      let circlesInt = window.setInterval(() => {
+      	let size = this.resizeCircles();
+      	if (size > 0) clearInterval(circlesInt);
+      }, 100);
 		});
 	}
 
@@ -176,8 +189,10 @@ export class YourGivingComponent implements OnInit {
     	}
     });
 
-    this.largest = this.donationsByOrg[0].dollars || 0;
-    if (this.donationsByOrg[0].hours) this.largest += this.donationsByOrg[0].hours;
+    if (this.donationsByOrg && this.donationsByOrg.length) {
+	    this.largest = this.donationsByOrg[0].dollars || 0;
+	    if (this.donationsByOrg[0].hours) this.largest += this.donationsByOrg[0].hours;
+	  }
 	}
 
   updateModel(key:string, value:any) {
@@ -247,6 +262,12 @@ export class YourGivingComponent implements OnInit {
 
   toggleOffOptionsMenu(id) {
   	delete this.optionsMenus[id];
+  }
+
+  resizeCircles():number {
+  	if (!this.circle) return 0;
+  	this.circleHeight = this.circle.nativeElement.offsetWidth;
+  	return this.circleHeight;
   }
 
 }

@@ -26,6 +26,7 @@ const orgSchema = new mongoose.Schema({
 	managers: [String],
 
 	donations: [{
+		dateCreated: {type: Date, default: Date.now()},
 		user: String,
 		dollars: Number,
 		hours: Number,

@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema({
   interests: {},
 
   donations: [{
+    dateCreated: {type: Date, default: Date.now()},
     id: String,
     org: String,
     orgName: String,

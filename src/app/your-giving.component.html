@@ -1,29 +1,52 @@
-<div class="your-giving col-md-12" *ngIf="user && isLoaded">
+<div class="your-giving col-md-12" [hidden]="!user || !isLoaded">
 
-  <div class="dashboard row">
+  <div class="no-donations row" *ngIf="user && !user?.donations?.length">
+    <div class="col-md-12">
+      <section class="null-search">
+        <p>Log your first donation and start tracking your giving!</p>
+      </section>
+    </div>
+  </div>
+
+  <div [hidden]="!user?.donations?.length" class="dashboard row">
     <div class="col-md-6">
-      <section>
+      <section class="totals">
         <h3>Total given</h3>
-        <div class="circle dollars">
-          <h2>{{totalDollars}}</h2>
-          <span>dollars</span>
+        <div class="col-md-6">
+          <div #circle
+              class="circle dollars"
+              (window:resize)="resizeCircles()"
+              [ngStyle]="{'height': circleHeight + 'px', 'line-height': circleHeight + 'px'}">
+            <div class="circle-inner">
+              <h2>{{totalDollars}}</h2>
+              <span>dollars</span>
+            </div>
+          </div>
         </div>
-        <div class="circle hours">
-          <h2>{{totalHours}}</h2>
-          <span>hours</span>
+
+        <div class="col-md-6">
+          <div #circle2
+              class="circle hours"
+              (window:resize)="resizeCircles()"
+              [ngStyle]="{'height': circleHeight + 'px', 'line-height': circleHeight + 'px'}">
+            <div class="circle-inner">
+              <h2>{{totalHours}}</h2>
+              <span>hours</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>
 
     <div class="col-md-6">
-      <section>
+      <section class="breakdown">
         <h3>Breakdown</h3>
         <div class="graphs clearfix">
           <div class="org-breakdown pull-left" *ngFor="let data of donationsByOrg">
             <div class="subtotals">
-              <span class="dollars">{{data.dollars}}</span>
-              <span class="divider">|</span>
-              <span class="hours">{{data.hours}}</span>
+              <span class="dollars" *ngIf="data.dollars">${{data.dollars}}</span>
+              <span class="divider" *ngIf="data.dollars && data.hours">|</span>
+              <span class="hours" *ngIf="data.hours">{{data.hours}} hrs</span>
             </div>
             <div
               class="graph"
@@ -48,7 +71,7 @@
   </div>
 
   <button class="add" *ngIf="!isLogging" (click)="logNew()">+ Log a new donation</button>
-  <div class="giv-form inline col-md-12 row" *ngIf="isLogging">
+  <div class="giv-form inline col-md-12 row" *ngIf="user && isLogging">
   	<div class="form-section clearfix">
       <h3>Log a new donation</h3>
 
@@ -99,12 +122,12 @@
     <button class="cancel" (click)="cancel()">Cancel</button>
   </div>
 
-  <table class="donations col-md-12">
+  <table class="donations col-md-12" *ngIf="user">
     <tbody>
-      <tr>
+      <tr class="header-row">
         <th>Organization</th>
         <th>Amount</th>
-        <th>Memo</th>
+        <th colspan="2">Memo</th>
       </tr>
       <tr *ngFor="let donation of user.donations">
         <td>{{donation.orgName}}</td>
@@ -128,7 +151,7 @@
 </div>
 
 <div *ngIf="!user">
-  <section class="null-search col-md-12 row">
+  <section class="null-search">
     <p>Log in or create an account to keep track of your giving!</p>
   </section>
 </div>
