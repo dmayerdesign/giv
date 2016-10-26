@@ -55861,6 +55861,9 @@
 	            _this.ui.flash("Sorry, your message couldn't be sent.", "error");
 	        });
 	    };
+	    ClaimOrgComponent.prototype.updateModel = function (key, value) {
+	        this.inputs[key] = value;
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -55868,7 +55871,8 @@
 	    ClaimOrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'claim-org',
-	            templateUrl: 'app/claim-org.component.html'
+	            templateUrl: 'app/claim-org.component.html',
+	            styleUrls: ['app/form-field.component.css', 'app/claim-org.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, router_1.ActivatedRoute, app_service_1.UIHelper, org_service_1.OrgService, user_service_1.UserService])
 	    ], ClaimOrgComponent);

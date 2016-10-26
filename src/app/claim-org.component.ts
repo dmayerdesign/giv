@@ -9,7 +9,8 @@ import { UserService } from './services/user.service';
 
 @Component({
 	selector: 'claim-org',
-	templateUrl: 'app/claim-org.component.html'
+	templateUrl: 'app/claim-org.component.html',
+	styleUrls: ['app/form-field.component.css', 'app/claim-org.component.css']
 })
 
 export class ClaimOrgComponent implements OnInit {
@@ -108,5 +109,9 @@ export class ClaimOrgComponent implements OnInit {
 					this.ui.flash("Sorry, your message couldn't be sent.", "error");
 				});
 	}
+
+	updateModel(key:string, value:any) {
+  	this.inputs[key] = value;
+  }
 
 }

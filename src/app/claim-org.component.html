@@ -1,8 +1,34 @@
-<h3>Claim {{org?.name}}</h3>
-<p>Let us know you're a representative for this organization so we can let you manage its Giv page</p>
-<form (submit)="submitForm()" #contactForm="ngForm">
-	<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">
-	<input [(ngModel)]="inputs.fromAddr" type="email" name="email" placeholder="your email address">
-	<textarea [(ngModel)]="message" name="message" placeholder="your message"></textarea>
-	<button>Submit</button>
-</form>
+<div class="claim-org" *ngIf="user && isLoaded">
+
+  <div class="giv-form col-md-7">
+    <h2>Claim {{org?.name}}</h2>
+		<p>Let us know you're a representative for this organization so we can let you manage its Giv page</p>
+    <div class="form-section clearfix">
+
+      <form-field
+        [title]="'Your name'"
+        [name]="'name'"
+        [noSave]="true"
+        (onChange)="updateModel('fromName', $event)"></form-field>
+
+      <form-field
+        [title]="'Your email'"
+        [name]="'email'"
+        [type]="'email'"
+        [noSave]="true"
+        (onChange)="updateModel('fromAddr', $event)"></form-field>
+
+      <div class="form-field clearfix" [ngClass]="name">
+			  <label class="title" [attr.for]="'message'">Your message</label>
+			  <textarea
+			    class="grey-bg no-shadow"
+			    [attr.name]="'message'"
+			    [attr.id]="'message'"
+			    [(ngModel)]="message"></textarea>
+			</div>
+
+    	<button (click)="submitForm()">Submit</button>
+
+    </div>
+  </div>
+</div>
