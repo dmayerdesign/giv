@@ -52532,12 +52532,13 @@
 	var app_service_1 = __webpack_require__(70);
 	var categories_service_1 = __webpack_require__(80);
 	var BrowseOrgsComponent = (function () {
-	    function BrowseOrgsComponent(http, orgService, ui, utilities, route, userService, categories) {
+	    function BrowseOrgsComponent(http, orgService, ui, utilities, route, router, userService, categories) {
 	        this.http = http;
 	        this.orgService = orgService;
 	        this.ui = ui;
 	        this.utilities = utilities;
 	        this.route = route;
+	        this.router = router;
 	        this.userService = userService;
 	        this.categories = categories;
 	        this.selectedOrg = null;
@@ -52679,7 +52680,7 @@
 	        this.categoryFilter = { id: null };
 	        this.searchOrgs(this.searchText);
 	        if (window.location.href.indexOf("category") > -1) {
-	            window.location.href = "";
+	            this.router.navigate(['/']);
 	        }
 	    };
 	    BrowseOrgsComponent.prototype.showMore = function (increase, offset) {
@@ -52813,7 +52814,7 @@
 	            templateUrl: 'app/browse-orgs.component.html',
 	            styleUrls: ['app/org.styles.css', 'app/browse-orgs.component.css']
 	        }), 
-	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, user_service_1.UserService, categories_service_1.Categories])
+	        __metadata('design:paramtypes', [http_1.Http, org_service_1.OrgService, app_service_1.UIHelper, app_service_1.Utilities, router_1.ActivatedRoute, router_1.Router, user_service_1.UserService, categories_service_1.Categories])
 	    ], BrowseOrgsComponent);
 	    return BrowseOrgsComponent;
 	}());

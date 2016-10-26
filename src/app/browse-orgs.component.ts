@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChildren, ViewChild, Output, ElementRef, HostListener } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -54,6 +54,7 @@ export class BrowseOrgsComponent implements OnInit {
 				private ui:UIHelper,
 				private utilities:Utilities,
 				private route:ActivatedRoute,
+				private router:Router,
 				private userService:UserService,
 				private categories:Categories) { }
 
@@ -202,7 +203,7 @@ export class BrowseOrgsComponent implements OnInit {
 		this.categoryFilter = {id: null};
 		this.searchOrgs(this.searchText);
 		if (window.location.href.indexOf("category") > -1) {
-			window.location.href = "";
+			this.router.navigate(['/']);
 		}
 	}
 
