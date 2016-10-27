@@ -7,6 +7,10 @@
 	min-height: 100%;
   min-width: 300px;
 	padding-bottom: 7em;
+
+  background-image: url(app/images/bg-icons-overlay.png);
+  background-repeat: repeat;
+  background-size: 12rem auto;
 }
 
 /* Footer */
