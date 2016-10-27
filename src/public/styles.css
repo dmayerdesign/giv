@@ -529,6 +529,7 @@ button.nav-item:hover {
   position: absolute;
     right: 0;
     top: -3px;
+    z-index: 101;
 
   box-sizing: border-box;
   background-color: #fff;
@@ -568,7 +569,7 @@ search-box + select {
   margin-bottom: 0.5em;
   color: #aba4a9;
 
-  background: url("app/images/see-no-evil-monkey.png") no-repeat 1.7em 50%;
+  background: #fdfeff url("app/images/see-no-evil-monkey.png") no-repeat 1.7em 50%;
   background-size: 2em auto;
 }
 

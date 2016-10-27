@@ -15,6 +15,22 @@
 			</section>
 		</div>
 
+		<div class="row">
+			<search-box
+			class="org-search-box search-box-container clearfix"
+			*ngIf="!isLoading"
+			(update)="searchOrgs($event)"
+			(focusChange)="toggleSearchBoxFocus($event)"
+			[ngClass]="{focused: searchBoxIsFocused}"
+			[collection]="'organizations'"></search-box>
+
+			<select *ngIf="!isLoading"
+					[value]="categoryFilter?.id || 'all'"
+					(change)="filterByCategory(getCategoryById($event.target.value))">
+				<option [value]="'all'" selected>All categories</option>
+				<option *ngFor="let category of categoriesList" [value]="category?.id">{{category?.name}}</option>
+			</select>
+		</div>
 	<!--*******
 		Orgs Loop
 		*********-->
@@ -23,10 +39,12 @@
 			[org]="org"
 			[user]="user"
 			[selected]="selectedOrg"
+			[verify]="true"
 			(onSelect)="viewOrg($event)"
 			(onDeselect)="deselectOrg($event)"
 			(onStar)="starOrg($event)"
 			(onUnstar)="unstarOrg($event)"
+			(onVerify)="verifyOrg(org)"
 			#singleItem></org>
 		
 		<button id="show-more"
@@ -35,6 +53,7 @@
 				[ngClass]="{'loading': loadingShowMoreOrgs}"
 				[ngStyle]="{'margin-top': '2em'}"
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>
+
 	</div>
 
 </div>
