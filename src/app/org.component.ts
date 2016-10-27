@@ -17,10 +17,12 @@ export class OrgComponent implements OnInit {
 	@Input() user;
 	@Input() org;
 	@Input() selected;
+	@Input() verify;
 	@Output() onSelect = new EventEmitter();
 	@Output() onDeselect = new EventEmitter();
 	@Output() onStar = new EventEmitter();
 	@Output() onUnstar = new EventEmitter();
+	@Output() onVerify = new EventEmitter();
 
 	private singleDetailsAreLoaded:boolean = false;
 	private singlePostsAreLoaded:boolean = false;
@@ -116,6 +118,10 @@ export class OrgComponent implements OnInit {
   	if (!this.selected) return false;
   	if (this.selected._id === orgId) return true;
   	else return false;
+  }
+
+  verifyOrg(org) {
+  	this.onVerify.emit("");
   }
 
 }

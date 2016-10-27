@@ -24,6 +24,8 @@ export class VerifyOrgsComponent implements OnInit {
 	private user:any;
 	private searchText:string;
 	private searchBoxIsFocused:boolean = false;
+	private categoriesList:any;
+	private categoryFilter:any = {id: null};
 	private viewingOrg:boolean = false;
 	private adminToken:string;
 
@@ -72,20 +74,16 @@ export class VerifyOrgsComponent implements OnInit {
 		);
 	}
 
-	isAscending(order:string) {
-		if (order.indexOf("+") > -1) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	searchOrgs(search:string) {
-		let query = {search: search, field: "name", bodyField: "description", limit: 100};
+		let query = {search: search, field: "name", bodyField: "description", limit: this.initialLimit};
 
+		if (this.categoryFilter && this.categoryFilter.id) {
+			query['filterField'] = "categories.id";
+			query['filterValue'] = this.categoryFilter.id;
+		}
 		this.loadingOrgSearch = true;
 
-		this.orgService.loadUnverifiedOrgs(query)
+		this.orgService.loadOrgs(query)
 			.subscribe(
 				results => {
 					this.orgs = results;
@@ -102,6 +100,27 @@ export class VerifyOrgsComponent implements OnInit {
 		searchInput.value = "";
 	}
 
+	getCategoryById(id) {
+		return this.categoriesList.find((category) => {
+			if (category) return category.id === id;
+			else return false;
+		});
+	}
+
+	filterByCategory(category) {
+		this.categoryFilter = category || {id: null};
+		if (category == 'all') this.categoryFilter = {id: null}; 
+		this.searchOrgs(this.searchText);
+	}
+
+	clearCategoryFilter() {
+		this.categoryFilter = {id: null};
+		this.searchOrgs(this.searchText);
+		if (window.location.href.indexOf("category") > -1) {
+			this.router.navigate(['/']);
+		}
+	}
+
 	showMore(increase:number, offset:number):void {
 		let search = (localStorage["searching"] == "true") ? this.searchText : "";
 		let query = {limit: increase, offset: offset};
@@ -110,9 +129,13 @@ export class VerifyOrgsComponent implements OnInit {
 			query['field'] = "name";
 			query['bodyField'] = "description";
 		}
+		if (this.categoryFilter.id) {
+			query['filterField'] = "categories.id";
+			query['filterValue'] = this.categoryFilter.id;
+		}
 		this.loadingShowMoreOrgs = true;
 
-		this.orgService.loadUnverifiedOrgs(query).subscribe(
+		this.orgService.loadOrgs(query).subscribe(
 			res => {
 				this.loadingShowMoreOrgs = false;
 				console.log(res);
@@ -131,35 +154,24 @@ export class VerifyOrgsComponent implements OnInit {
 		}
 	}
 
-	viewOrg(e:any, id:string):void {
-		let findOrg = function(org) {
+	viewOrg(id:string):void {
+		this.selectedOrg = null;
+		this.selectedOrg = this.orgs.find(function(org) {
 			return org._id === id;
-		}
-		this.selectedOrg = this.orgs.find(findOrg);
-		this.viewingOrg = true;
-		console.log(this.selectedOrg);
+		});
 	}
 
-	deselectOrg(e:any, id:string):void {
-		console.log(e.target.className);
-		if (e.target.className.indexOf("inside-org") > -1) return;
-
-		if (this.viewingOrg && this.selectedOrg._id === id) {
-			console.log(this.selectedOrg);
-			this.selectedOrg = null;
-			this.viewingOrg = false;
-			this.singleDetailsAreLoaded = false;
-		}
+	deselectOrg(id:string):void {
+		this.selectedOrg = null;
 	}
 
-	revealOrgDetails(event) {
-		if (event == "init") {
-			this.singleDetailsAreLoaded = true;
-		}
+	orgIsStarred(org) {
+		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
+		else return true;
 	}
 
 	userHasPermission(org) {
-		if (this.user && this.userIsAdmin()) return true;
+		if (this.userIsAdmin()) return true;
 		if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1) return true;
 		else return false;
 	}
@@ -167,6 +179,11 @@ export class VerifyOrgsComponent implements OnInit {
 	userIsAdmin() {
   	return this.user.adminToken === this.adminToken;
   }
+
+	showShowMore() {
+		if (this.orgs.length >= this.initialLimit && this.orgs.length < this.totalOrgs) return true;
+		else return false;
+	}
 
 	verifyOrg(org) {
 		let orgIndex = this.orgs.indexOf(org);

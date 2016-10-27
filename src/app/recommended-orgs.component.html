@@ -1,6 +1,6 @@
 <div *ngIf="(user || org) && recommendedOrgsAreLoaded"
 		class="recommended-orgs col-md-8"
-		[ngClass]="{'in-single': org, 'in-starred': inStarred}">
+		[ngClass]="{'in-single row': org, 'in-starred': inStarred}">
 	<header>
 		<h2>Recommended <span *ngIf="inStarred" class="desktop-tab-button" (click)="showStarred()">Starred</span></h2>
 		<p class="subtitle">We think you might like these orgs</p>

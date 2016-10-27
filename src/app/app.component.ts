@@ -40,6 +40,15 @@ export class AppComponent implements OnInit {
 			else {
 				this.user = data;
 				this.isLoggedIn = true;
+
+				this.http.get("/adminToken").map(res => res.json()).subscribe(
+					token => {
+						if (this.user.adminToken === token) {
+							this.user.isAdmin = true;
+						}
+					},
+					err => console.error(err)
+				);
 			}
 		});
 
@@ -59,6 +68,7 @@ export class AppComponent implements OnInit {
 
 	logOut() {
 		localStorage.removeItem('profile');
+		this.user = null;
 		this.isLoggedIn = false;
 		this.ui.flash("Bye!", "success");
 		this.router.navigate(['/']);

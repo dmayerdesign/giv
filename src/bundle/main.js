@@ -51213,6 +51213,11 @@
 	            else {
 	                _this.user = data;
 	                _this.isLoggedIn = true;
+	                _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (token) {
+	                    if (_this.user.adminToken === token) {
+	                        _this.user.isAdmin = true;
+	                    }
+	                }, function (err) { return console.error(err); });
 	            }
 	        });
 	        console.log(this.route);
@@ -51228,6 +51233,7 @@
 	    };
 	    AppComponent.prototype.logOut = function () {
 	        localStorage.removeItem('profile');
+	        this.user = null;
 	        this.isLoggedIn = false;
 	        this.ui.flash("Bye!", "success");
 	        this.router.navigate(['/']);
@@ -51844,6 +51850,7 @@
 	        this.onDeselect = new core_1.EventEmitter();
 	        this.onStar = new core_1.EventEmitter();
 	        this.onUnstar = new core_1.EventEmitter();
+	        this.onVerify = new core_1.EventEmitter();
 	        this.singleDetailsAreLoaded = false;
 	        this.singlePostsAreLoaded = false;
 	    }
@@ -51929,6 +51936,9 @@
 	        else
 	            return false;
 	    };
+	    OrgComponent.prototype.verifyOrg = function (org) {
+	        this.onVerify.emit("");
+	    };
 	    __decorate([
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
@@ -51941,6 +51951,10 @@
 	        core_1.Input(), 
 	        __metadata('design:type', Object)
 	    ], OrgComponent.prototype, "selected", void 0);
+	    __decorate([
+	        core_1.Input(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "verify", void 0);
 	    __decorate([
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
@@ -51957,6 +51971,10 @@
 	        core_1.Output(), 
 	        __metadata('design:type', Object)
 	    ], OrgComponent.prototype, "onUnstar", void 0);
+	    __decorate([
+	        core_1.Output(), 
+	        __metadata('design:type', Object)
+	    ], OrgComponent.prototype, "onVerify", void 0);
 	    OrgComponent = __decorate([
 	        core_1.Component({
 	            selector: 'org',
@@ -53536,18 +53554,8 @@
 	                                return _this.router.navigate([''], { queryParams: { "404": true } });
 	                            }
 	                        }
-	                        _this.org = data;
+	                        _this.displayOrg(data);
 	                        _this.isLoaded = true;
-	                        _this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
-	                        _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	                        if (_this.org.facebook) {
-	                            _this.org.facebook = encodeURI(_this.org.facebook);
-	                            _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
-	                        }
-	                        else {
-	                            _this.org.facebook = null;
-	                            _this.facebookLink = null;
-	                        }
 	                        _this.ui.setTitle("Manage " + _this.org.name);
 	                        // for ng-upload
 	                        _this.coverImageUploadOptions = {
@@ -53579,9 +53587,8 @@
 	        this.sub.unsubscribe();
 	    };
 	    ManageOrgPageComponent.prototype.handleUpload = function (org) {
-	        this.org = org;
+	        this.displayOrg(org);
 	        this.stillWorking = false;
-	        console.log(org);
 	    };
 	    ManageOrgPageComponent.prototype.checkForUniqueSlug = function ($event) {
 	        var _this = this;
@@ -53646,14 +53653,9 @@
 	                _this['saving_' + key] = false;
 	                return;
 	            }
-	            _this.org = res;
 	            _this['saving_' + key] = false;
 	            _this['changed_' + key] = false;
-	            _this.org.description = _this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	            if (_this.org.facebook) {
-	                _this.org.facebook = encodeURI(_this.org.facebook);
-	                _this.facebookLink = _this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + _this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
-	            }
+	            _this.displayOrg(res);
 	            _this.ui.flash("Saved", "success");
 	            console.log(res);
 	        });
@@ -53720,6 +53722,20 @@
 	    };
 	    ManageOrgPageComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
+	    };
+	    ManageOrgPageComponent.prototype.displayOrg = function (data) {
+	        var _this = this;
+	        this.org = data;
+	        this.org.categories.forEach(function (category) { return _this.checked[category.id] = true; });
+	        this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	        if (this.org.facebook) {
+	            this.org.facebook = encodeURI(this.org.facebook);
+	            this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
+	        }
+	        else {
+	            this.org.facebook = null;
+	            this.facebookLink = null;
+	        }
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -56006,6 +56022,7 @@
 	        this.userService = userService;
 	        this.orgs = [];
 	        this.searchBoxIsFocused = false;
+	        this.categoryFilter = { id: null };
 	        this.viewingOrg = false;
 	        this.isLoading = true;
 	        this.loadingOrgSearch = false;
@@ -56035,19 +56052,15 @@
 	            _this.orgs = data;
 	        }, function (error) { return console.log(error); });
 	    };
-	    VerifyOrgsComponent.prototype.isAscending = function (order) {
-	        if (order.indexOf("+") > -1) {
-	            return true;
-	        }
-	        else {
-	            return false;
-	        }
-	    };
 	    VerifyOrgsComponent.prototype.searchOrgs = function (search) {
 	        var _this = this;
-	        var query = { search: search, field: "name", bodyField: "description", limit: 100 };
+	        var query = { search: search, field: "name", bodyField: "description", limit: this.initialLimit };
+	        if (this.categoryFilter && this.categoryFilter.id) {
+	            query['filterField'] = "categories.id";
+	            query['filterValue'] = this.categoryFilter.id;
+	        }
 	        this.loadingOrgSearch = true;
-	        this.orgService.loadUnverifiedOrgs(query)
+	        this.orgService.loadOrgs(query)
 	            .subscribe(function (results) {
 	            _this.orgs = results;
 	            _this.loadingOrgSearch = false;
@@ -56059,6 +56072,27 @@
 	        var searchInput = document.querySelector(".org-search-box input");
 	        searchInput.value = "";
 	    };
+	    VerifyOrgsComponent.prototype.getCategoryById = function (id) {
+	        return this.categoriesList.find(function (category) {
+	            if (category)
+	                return category.id === id;
+	            else
+	                return false;
+	        });
+	    };
+	    VerifyOrgsComponent.prototype.filterByCategory = function (category) {
+	        this.categoryFilter = category || { id: null };
+	        if (category == 'all')
+	            this.categoryFilter = { id: null };
+	        this.searchOrgs(this.searchText);
+	    };
+	    VerifyOrgsComponent.prototype.clearCategoryFilter = function () {
+	        this.categoryFilter = { id: null };
+	        this.searchOrgs(this.searchText);
+	        if (window.location.href.indexOf("category") > -1) {
+	            this.router.navigate(['/']);
+	        }
+	    };
 	    VerifyOrgsComponent.prototype.showMore = function (increase, offset) {
 	        var _this = this;
 	        var search = (localStorage["searching"] == "true") ? this.searchText : "";
@@ -56068,8 +56102,12 @@
 	            query['field'] = "name";
 	            query['bodyField'] = "description";
 	        }
+	        if (this.categoryFilter.id) {
+	            query['filterField'] = "categories.id";
+	            query['filterValue'] = this.categoryFilter.id;
+	        }
 	        this.loadingShowMoreOrgs = true;
-	        this.orgService.loadUnverifiedOrgs(query).subscribe(function (res) {
+	        this.orgService.loadOrgs(query).subscribe(function (res) {
 	            _this.loadingShowMoreOrgs = false;
 	            console.log(res);
 	            _this.orgs = _this.orgs.concat(res);
@@ -56083,32 +56121,23 @@
 	            this.searchBoxIsFocused = false;
 	        }
 	    };
-	    VerifyOrgsComponent.prototype.viewOrg = function (e, id) {
-	        var findOrg = function (org) {
+	    VerifyOrgsComponent.prototype.viewOrg = function (id) {
+	        this.selectedOrg = null;
+	        this.selectedOrg = this.orgs.find(function (org) {
 	            return org._id === id;
-	        };
-	        this.selectedOrg = this.orgs.find(findOrg);
-	        this.viewingOrg = true;
-	        console.log(this.selectedOrg);
+	        });
 	    };
-	    VerifyOrgsComponent.prototype.deselectOrg = function (e, id) {
-	        console.log(e.target.className);
-	        if (e.target.className.indexOf("inside-org") > -1)
-	            return;
-	        if (this.viewingOrg && this.selectedOrg._id === id) {
-	            console.log(this.selectedOrg);
-	            this.selectedOrg = null;
-	            this.viewingOrg = false;
-	            this.singleDetailsAreLoaded = false;
-	        }
+	    VerifyOrgsComponent.prototype.deselectOrg = function (id) {
+	        this.selectedOrg = null;
 	    };
-	    VerifyOrgsComponent.prototype.revealOrgDetails = function (event) {
-	        if (event == "init") {
-	            this.singleDetailsAreLoaded = true;
-	        }
+	    VerifyOrgsComponent.prototype.orgIsStarred = function (org) {
+	        if (!this.user || this.user.starred.indexOf(org._id) === -1)
+	            return false;
+	        else
+	            return true;
 	    };
 	    VerifyOrgsComponent.prototype.userHasPermission = function (org) {
-	        if (this.user && this.userIsAdmin())
+	        if (this.userIsAdmin())
 	            return true;
 	        if (this.user && this.user.permissions.indexOf(org.globalPermission) > -1)
 	            return true;
@@ -56117,6 +56146,12 @@
 	    };
 	    VerifyOrgsComponent.prototype.userIsAdmin = function () {
 	        return this.user.adminToken === this.adminToken;
+	    };
+	    VerifyOrgsComponent.prototype.showShowMore = function () {
+	        if (this.orgs.length >= this.initialLimit && this.orgs.length < this.totalOrgs)
+	            return true;
+	        else
+	            return false;
 	    };
 	    VerifyOrgsComponent.prototype.verifyOrg = function (org) {
 	        var _this = this;

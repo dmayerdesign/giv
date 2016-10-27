@@ -10,7 +10,38 @@
 
   background-image: url(app/images/bg-icons-overlay.png);
   background-repeat: repeat;
-  background-size: 12rem auto;
+  background-size: 22rem auto;
+}
+
+/* admin bar */
+.admin-bar {
+  background: #48757b;
+}
+
+.admin-bar ul {
+  text-align: center;
+}
+
+.admin-bar .nav-item {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+  text-transform: uppercase;
+  font-size: 0.8em;
+}
+
+.admin-bar .nav-link {
+  font-weight: bold;
+}
+
+.greeting {
+  position: absolute;
+    z-index: 100;
+    right: 2em;
+    top: 0.8em;
+  font-size: 0.7em;
+  color: #fff;
+  opacity: 0.7;
+  font-family: Hind, Helvetica, sans-serif;
 }
 
 /* Footer */
