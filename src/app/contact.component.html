@@ -1,4 +1,4 @@
-<form (submit)="submitForm()" #contactForm="ngForm">
+<form class="giv-form" (submit)="submitForm()" #contactForm="ngForm">
 
 	<div *ngIf="!options">
 		<input [(ngModel)]="inputs.fromName" type="text" name="name" placeholder="your name">

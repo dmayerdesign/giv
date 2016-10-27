@@ -34,6 +34,7 @@ import { UserService } from './services/user.service';
 import { SearchService } from './services/search.service';
 import { ClickOutsideModule } from 'ng2-click-outside';
 import { Categories } from './services/categories.service';
+import { OrgTypes } from './services/org-types.service';
 import { OrgService } from './services/org.service';
 import { UIHelper, Utilities } from './services/app.service';
 import { TruncatePipe } from './pipes/truncate.pipe';
@@ -108,6 +109,7 @@ const routing = RouterModule.forRoot([
       , UserService
       , SearchService
       , Categories
+      , OrgTypes
       , OrgService
       , UIHelper
       , Utilities

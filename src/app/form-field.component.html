@@ -39,7 +39,7 @@
 
   <select
     class="grey-bg no-shadow"
-    *ngIf="type === 'select'"
+    *ngIf="type === 'select' && !optionsAreObjects"
     [attr.name]="name"
     [attr.id]="name"
     [attr.placeholder]="placeholder" 
@@ -50,6 +50,22 @@
       *ngFor="let option of selectOptions; let index = i"
       [value]="option"
       [attr.selected]="isSelected(option)">{{option}}</option>
+
+  </select>
+
+  <select
+    class="grey-bg no-shadow"
+    *ngIf="type === 'select' && optionsAreObjects"
+    [attr.name]="name"
+    [attr.id]="name"
+    [attr.placeholder]="placeholder" 
+    (change)="save($event.target.value)"
+    [(ngModel)]="value">
+
+    <option
+      *ngFor="let option of selectOptions; let index = i"
+      [value]="option.id"
+      [attr.selected]="isSelected(option)">{{option.name}}</option>
 
   </select>  
 

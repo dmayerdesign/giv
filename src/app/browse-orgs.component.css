@@ -38,7 +38,8 @@
 /* Featured orgs in browse */
 
 .featured-orgs {
-	margin-bottom: 1.8em;
+  margin-top: 0.2rem;
+	margin-bottom: 1.8rem;
 }
 
 .featured-header {

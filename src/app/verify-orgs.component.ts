@@ -29,6 +29,9 @@ export class VerifyOrgsComponent implements OnInit {
 	private viewingOrg:boolean = false;
 	private adminToken:string;
 
+	private initialLimit = 100;
+	private totalOrgs = this.initialLimit;
+
 	private isLoading = true;
 	private loadingOrgSearch = false;
 	private loadingShowMoreOrgs = false;

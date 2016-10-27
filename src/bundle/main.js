@@ -37911,6 +37911,7 @@
 	var search_service_1 = __webpack_require__(77);
 	var ng2_click_outside_1 = __webpack_require__(100);
 	var categories_service_1 = __webpack_require__(80);
+	var org_types_service_1 = __webpack_require__(363);
 	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
 	var truncate_pipe_1 = __webpack_require__(102);
@@ -37987,6 +37988,7 @@
 	                user_service_1.UserService,
 	                search_service_1.SearchService,
 	                categories_service_1.Categories,
+	                org_types_service_1.OrgTypes,
 	                org_service_1.OrgService,
 	                app_service_1.UIHelper,
 	                app_service_1.Utilities
@@ -52929,9 +52931,9 @@
 	        if (this.org.description) {
 	            this.originalDescriptionLength = this.org.description.length;
 	            this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	            this.org.facebook = encodeURI(this.org.facebook);
-	            this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
 	        }
+	        this.org.facebook = encodeURI(this.org.facebook);
+	        this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl("https://www.facebook.com/plugins/page.php?href=" + this.org.facebook + "&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993");
 	    };
 	    OrgDetailsComponent.prototype.ngOnDestroy = function () {
 	        this.update.emit("destroy");
@@ -53500,9 +53502,10 @@
 	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var categories_service_1 = __webpack_require__(80);
+	var org_types_service_1 = __webpack_require__(363);
 	var app_service_1 = __webpack_require__(70);
 	var ManageOrgPageComponent = (function () {
-	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService, sanitizer) {
+	    function ManageOrgPageComponent(router, route, orgService, userService, ui, utilities, zone, http, categoryService, orgTypeService, sanitizer) {
 	        this.router = router;
 	        this.route = route;
 	        this.orgService = orgService;
@@ -53512,6 +53515,7 @@
 	        this.zone = zone;
 	        this.http = http;
 	        this.categoryService = categoryService;
+	        this.orgTypeService = orgTypeService;
 	        this.sanitizer = sanitizer;
 	        this.isLoaded = false;
 	        this.stillWorking = false;
@@ -53524,6 +53528,7 @@
 	            "Volunteer"
 	        ];
 	        this.categories = this.categoryService.list();
+	        this.orgTypes = this.orgTypeService.list();
 	        this.checked = {};
 	        /** Slug and name validation **/
 	        this.slugIsValid = true;
@@ -53537,50 +53542,57 @@
 	            _this.user = user;
 	            _this.http.get("/adminToken").map(function (res) { return res.json(); }).subscribe(function (data) {
 	                _this.adminToken = data;
+	                if (_this.user.adminToken === _this.adminToken) {
+	                    _this.user.isAdmin = true;
+	                }
+	                if (_this.route.params) {
+	                    _this.sub = _this.route.params.subscribe(function (params) {
+	                        var id = params['id'];
+	                        if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+	                            _this.ui.flash("This page doesn't exist", "error");
+	                            return _this.router.navigate([''], { queryParams: { "404": true } });
+	                        }
+	                        _this.orgService.loadOrg(id).subscribe(function (data) {
+	                            if (!_this.user.isAdmin) {
+	                                if (user.permissions.indexOf(data.globalPermission) === -1) {
+	                                    _this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
+	                                    return _this.router.navigate([''], { queryParams: { "404": true } });
+	                                }
+	                            }
+	                            if (data.errmsg) {
+	                                console.error(data.errmsg);
+	                                return _this.ui.flash("Oops! Something went wrong", "error");
+	                            }
+	                            _this.displayOrg(data);
+	                            _this.isLoaded = true;
+	                            _this.ui.setTitle("Manage " + _this.org.name);
+	                            // for ng-upload
+	                            _this.coverImageUploadOptions = {
+	                                url: '/edit-org/upload/cover-image/' + _this.org._id,
+	                                filterExtensions: true,
+	                                calculateSpeed: true,
+	                                allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                            };
+	                            _this.avatarUploadOptions = {
+	                                url: '/edit-org/upload/avatar/' + _this.org._id,
+	                                filterExtensions: true,
+	                                calculateSpeed: true,
+	                                allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+	                            };
+	                        }, function (err) {
+	                            _this.router.navigate([''], { queryParams: { "404": true } });
+	                            console.log("Error: ");
+	                            console.log(err);
+	                            return console.error(err);
+	                        });
+	                    });
+	                }
+	                else {
+	                    _this.router.navigate(['../']);
+	                }
 	            }, function (err) {
 	                console.error(err);
 	            });
-	            if (_this.route.params) {
-	                _this.sub = _this.route.params.subscribe(function (params) {
-	                    var id = params['id'];
-	                    if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-	                        _this.ui.flash("This page doesn't exist", "error");
-	                        return _this.router.navigate([''], { queryParams: { "404": true } });
-	                    }
-	                    _this.orgService.loadOrg(id).subscribe(function (data) {
-	                        if (!_this.userIsAdmin()) {
-	                            if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-	                                _this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
-	                                return _this.router.navigate([''], { queryParams: { "404": true } });
-	                            }
-	                        }
-	                        _this.displayOrg(data);
-	                        _this.isLoaded = true;
-	                        _this.ui.setTitle("Manage " + _this.org.name);
-	                        // for ng-upload
-	                        _this.coverImageUploadOptions = {
-	                            url: '/edit-org/upload/cover-image/' + _this.org._id,
-	                            filterExtensions: true,
-	                            calculateSpeed: true,
-	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	                        };
-	                        _this.avatarUploadOptions = {
-	                            url: '/edit-org/upload/avatar/' + _this.org._id,
-	                            filterExtensions: true,
-	                            calculateSpeed: true,
-	                            allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-	                        };
-	                    }, function (err) {
-	                        _this.router.navigate([''], { queryParams: { "404": true } });
-	                        console.log("Error: ");
-	                        console.log(err);
-	                        return console.error(err);
-	                    });
-	                });
-	            }
-	            else {
-	                _this.router.navigate(['../']);
-	            }
 	        });
 	    };
 	    ManageOrgPageComponent.prototype.ngOnDestroy = function () {
@@ -53752,7 +53764,7 @@
 	            templateUrl: 'app/manage-org-page.component.html',
 	            styleUrls: ['app/org.styles.css', 'app/org-details.component.css', 'app/form-field.component.css', 'app/manage-org-page.component.css']
 	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories, platform_browser_1.DomSanitizer])
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories, org_types_service_1.OrgTypes, platform_browser_1.DomSanitizer])
 	    ], ManageOrgPageComponent);
 	    return ManageOrgPageComponent;
 	}());
@@ -56024,6 +56036,8 @@
 	        this.searchBoxIsFocused = false;
 	        this.categoryFilter = { id: null };
 	        this.viewingOrg = false;
+	        this.initialLimit = 100;
+	        this.totalOrgs = this.initialLimit;
 	        this.isLoading = true;
 	        this.loadingOrgSearch = false;
 	        this.loadingShowMoreOrgs = false;
@@ -56204,6 +56218,7 @@
 	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var categories_service_1 = __webpack_require__(80);
+	var org_types_service_1 = __webpack_require__(363);
 	var app_service_1 = __webpack_require__(70);
 	var email_service_1 = __webpack_require__(93);
 	function Org() {
@@ -56213,16 +56228,18 @@
 	}
 	;
 	var CreateOrgComponent = (function () {
-	    function CreateOrgComponent(orgService, userService, ui, http, router, categoryService) {
+	    function CreateOrgComponent(orgService, userService, ui, http, router, categoryService, orgTypeService) {
 	        this.orgService = orgService;
 	        this.userService = userService;
 	        this.ui = ui;
 	        this.http = http;
 	        this.router = router;
 	        this.categoryService = categoryService;
+	        this.orgTypeService = orgTypeService;
 	        this.org = new Org();
 	        this.email = new email_service_1.HtmlEmailModel();
 	        this.categories = this.categoryService.list();
+	        this.orgTypes = this.orgTypeService.list();
 	        this.requiredOrgFields = [
 	            {
 	                id: "name",
@@ -56310,7 +56327,7 @@
 	        var _this = this;
 	        var ok = true;
 	        this.requiredOrgFields.forEach(function (field, index, arr) {
-	            if (!newOrg[field.id]) {
+	            if (!newOrg[field.id] && field.id !== 'type') {
 	                _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
 	                ok = false;
 	            }
@@ -56362,7 +56379,7 @@
 	            templateUrl: 'app/create-org.component.html',
 	            styleUrls: ['app/manage-org-page.component.css', 'app/form-field.component.css', 'app/account-settings.component.css', 'app/create-org.component.css']
 	        }), 
-	        __metadata('design:paramtypes', [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, http_1.Http, router_1.Router, categories_service_1.Categories])
+	        __metadata('design:paramtypes', [org_service_1.OrgService, user_service_1.UserService, app_service_1.UIHelper, http_1.Http, router_1.Router, categories_service_1.Categories, org_types_service_1.OrgTypes])
 	    ], CreateOrgComponent);
 	    return CreateOrgComponent;
 	}());
@@ -56681,6 +56698,8 @@
 	        this.changed = false;
 	        this.uploading = false;
 	        this.progress = 0;
+	        this.optionsAreObjects = false;
+	        this.selectValues = [];
 	    }
 	    FormFieldComponent.prototype.ngOnInit = function () {
 	    };
@@ -56689,6 +56708,9 @@
 	            this.type = "text";
 	        if (this.initial) {
 	            this.value = this.initial;
+	        }
+	        if (this.selectOptions && typeof this.selectOptions[0] === "object") {
+	            this.optionsAreObjects = true;
 	        }
 	    };
 	    FormFieldComponent.prototype.handleUpload = function (data) {
@@ -56946,6 +56968,301 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
+
+
+/***/ },
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */,
+/* 109 */,
+/* 110 */,
+/* 111 */,
+/* 112 */,
+/* 113 */,
+/* 114 */,
+/* 115 */,
+/* 116 */,
+/* 117 */,
+/* 118 */,
+/* 119 */,
+/* 120 */,
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */,
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
+/* 169 */,
+/* 170 */,
+/* 171 */,
+/* 172 */,
+/* 173 */,
+/* 174 */,
+/* 175 */,
+/* 176 */,
+/* 177 */,
+/* 178 */,
+/* 179 */,
+/* 180 */,
+/* 181 */,
+/* 182 */,
+/* 183 */,
+/* 184 */,
+/* 185 */,
+/* 186 */,
+/* 187 */,
+/* 188 */,
+/* 189 */,
+/* 190 */,
+/* 191 */,
+/* 192 */,
+/* 193 */,
+/* 194 */,
+/* 195 */,
+/* 196 */,
+/* 197 */,
+/* 198 */,
+/* 199 */,
+/* 200 */,
+/* 201 */,
+/* 202 */,
+/* 203 */,
+/* 204 */,
+/* 205 */,
+/* 206 */,
+/* 207 */,
+/* 208 */,
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */,
+/* 217 */,
+/* 218 */,
+/* 219 */,
+/* 220 */,
+/* 221 */,
+/* 222 */,
+/* 223 */,
+/* 224 */,
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */,
+/* 229 */,
+/* 230 */,
+/* 231 */,
+/* 232 */,
+/* 233 */,
+/* 234 */,
+/* 235 */,
+/* 236 */,
+/* 237 */,
+/* 238 */,
+/* 239 */,
+/* 240 */,
+/* 241 */,
+/* 242 */,
+/* 243 */,
+/* 244 */,
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */,
+/* 251 */,
+/* 252 */,
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */,
+/* 285 */,
+/* 286 */,
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */,
+/* 293 */,
+/* 294 */,
+/* 295 */,
+/* 296 */,
+/* 297 */,
+/* 298 */,
+/* 299 */,
+/* 300 */,
+/* 301 */,
+/* 302 */,
+/* 303 */,
+/* 304 */,
+/* 305 */,
+/* 306 */,
+/* 307 */,
+/* 308 */,
+/* 309 */,
+/* 310 */,
+/* 311 */,
+/* 312 */,
+/* 313 */,
+/* 314 */,
+/* 315 */,
+/* 316 */,
+/* 317 */,
+/* 318 */,
+/* 319 */,
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */,
+/* 357 */,
+/* 358 */,
+/* 359 */,
+/* 360 */,
+/* 361 */,
+/* 362 */,
+/* 363 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
+	var OrgTypes = (function () {
+	    function OrgTypes() {
+	    }
+	    OrgTypes.prototype.list = function () {
+	        return [
+	            "501(c)(3)",
+	            "501(c)(4)",
+	            "Co-operative",
+	            "Other"
+	        ];
+	    };
+	    OrgTypes = __decorate([
+	        core_1.Injectable(), 
+	        __metadata('design:paramtypes', [])
+	    ], OrgTypes);
+	    return OrgTypes;
+	}());
+	exports.OrgTypes = OrgTypes;
 
 
 /***/ }

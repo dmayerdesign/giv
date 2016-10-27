@@ -36,9 +36,9 @@ export class OrgDetailsComponent implements OnInit {
 		if (this.org.description) {
 			this.originalDescriptionLength = this.org.description.length;
 			this.org.description = this.org.description.replace(/(?:\r\n|\r|\n)/g, '<br />');
-			this.org.facebook = encodeURI(this.org.facebook);
-			this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
 		}
+		this.org.facebook = encodeURI(this.org.facebook);
+		this.facebookLink = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.facebook.com/plugins/page.php?href=${this.org.facebook}&tabs=timeline&width=340&height=290&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=true&appId=146608639126993`);
 	}
 
 	ngOnDestroy() {

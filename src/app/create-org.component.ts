@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { Categories } from './services/categories.service';
+import { OrgTypes } from './services/org-types.service';
 import { UIHelper } from './services/app.service';
 import { HtmlEmailModel } from './services/email.service';
 
@@ -32,6 +33,7 @@ export class CreateOrgComponent implements OnInit {
 	private org = new Org();
 	private email = new HtmlEmailModel();
 	private categories = this.categoryService.list();
+	private orgTypes = this.orgTypeService.list();
 	private roleDescription:string;
 	private requiredOrgFields = [
 		{
@@ -61,7 +63,8 @@ export class CreateOrgComponent implements OnInit {
 				private ui:UIHelper,
 				private http:Http,
 				private router:Router,
-				private categoryService:Categories) { }
+				private categoryService:Categories,
+				private orgTypeService:OrgTypes) { }
 
 	ngOnInit() {
 		this.ui.setTitle("Add your organization");
@@ -125,7 +128,7 @@ export class CreateOrgComponent implements OnInit {
   submitOrg(newOrg:org):void {
   	let ok:boolean = true;
     this.requiredOrgFields.forEach((field, index, arr) => {
-    	if (!newOrg[field.id]) {
+    	if (!newOrg[field.id] && field.id !== 'type') {
     		this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
     		ok = false;
     	}
