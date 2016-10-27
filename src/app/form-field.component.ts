@@ -28,12 +28,15 @@ export class FormFieldComponent implements OnInit {
 	private changed:boolean = false;
 	private uploading:boolean = false;
 	private progress:number = 0;
+	private optionsAreObjects:boolean = false;
+	private selectValues = [];
 
 	constructor(
 				private ui:UIHelper,
 				private utilities:Utilities,
 				private categoryService:Categories,
-				private zone:NgZone) { }
+				private zone:NgZone) {
+	}
 
 	ngOnInit() {
 
@@ -43,6 +46,9 @@ export class FormFieldComponent implements OnInit {
 		if (!this.type) this.type = "text";
 		if (this.initial) {
 			this.value = this.initial;
+		}
+		if (this.selectOptions && typeof this.selectOptions[0] === "object") {
+			this.optionsAreObjects = true;
 		}
 	}
 

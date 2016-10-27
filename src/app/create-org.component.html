@@ -18,6 +18,14 @@
             placeholder="Describe your organization in a few sentences"></textarea>
     </div>
     <div class="form-field clearfix">
+      <label class="title">Type (optional but recommended)</label>
+      <select [(ngModel)]="org.type"
+            class="form-control"
+            name="description">
+        <option *ngFor="let type of orgTypes" [value]="type">{{type}}</option>
+      </select>
+    </div>
+    <div class="form-field clearfix">
       <label class="title">Website</label>
       <input [(ngModel)]="org.website"
             class="form-control"

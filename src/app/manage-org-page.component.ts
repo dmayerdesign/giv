@@ -7,6 +7,7 @@ import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser
 import { OrgService } from './services/org.service';
 import { UserService } from './services/user.service';
 import { Categories } from './services/categories.service';
+import { OrgTypes } from './services/org-types.service';
 import { UIHelper, Utilities } from './services/app.service';
 
 @Component({
@@ -44,6 +45,7 @@ export class ManageOrgPageComponent implements OnInit {
 		"Volunteer"
 	];
 	private categories = this.categoryService.list(); 
+	private orgTypes = this.orgTypeService.list();
 
 	/** Saving (most are unused in template but must exist or else save() will break) **/
 	private saving_coverImage:boolean;
@@ -53,6 +55,7 @@ export class ManageOrgPageComponent implements OnInit {
 	private saving_categories:boolean;
 	private saving_otherLinks:boolean;
 	private saving_facebook:boolean;
+	private saving_type:boolean;
 
 	private facebookLink:SafeResourceUrl;
 
@@ -79,6 +82,7 @@ export class ManageOrgPageComponent implements OnInit {
 				private zone:NgZone,
 				private http:Http,
 				private categoryService:Categories,
+				private orgTypeService:OrgTypes,
         private sanitizer: DomSanitizer) { }
 
 	ngOnInit() {
@@ -88,58 +92,67 @@ export class ManageOrgPageComponent implements OnInit {
 			this.http.get("/adminToken").map(res => res.json()).subscribe(
 				data => {
 					this.adminToken = data;
+					if (this.user.adminToken === this.adminToken) {
+						this.user.isAdmin = true;
+					}
+
+					if (this.route.params) {
+						this.sub = this.route.params.subscribe(params => {
+							let id = params['id'];
+							if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
+								this.ui.flash("This page doesn't exist", "error");
+								return this.router.navigate([''], { queryParams: {"404": true}});
+							}
+
+							this.orgService.loadOrg(id).subscribe(
+								data => {
+									if (!this.user.isAdmin) {
+										if (user.permissions.indexOf(data.globalPermission) === -1) {
+											this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
+											return this.router.navigate([''], { queryParams: {"404": true}});
+										}
+									}
+
+									if (data.errmsg) {
+										console.error(data.errmsg);
+										return this.ui.flash("Oops! Something went wrong", "error");
+									}
+									this.displayOrg(data);
+									this.isLoaded = true;
+									this.ui.setTitle("Manage " + this.org.name);
+									
+									// for ng-upload
+									this.coverImageUploadOptions = {
+									  url: '/edit-org/upload/cover-image/' + this.org._id,
+									  filterExtensions: true,
+									  calculateSpeed: true,
+									  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+									};
+									this.avatarUploadOptions = {
+									  url: '/edit-org/upload/avatar/' + this.org._id,
+									  filterExtensions: true,
+									  calculateSpeed: true,
+									  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
+									};
+								},
+								err => {
+									this.router.navigate([''], { queryParams: {"404": true}});
+									console.log("Error: ");
+									console.log(err);
+									return console.error(err);
+								}
+							);					
+						});
+					}
+					else {
+						this.router.navigate(['../']);
+					}
 				},
 				err => {
 					console.error(err);
 				}
 			);
-			if (this.route.params) {
-				this.sub = this.route.params.subscribe(params => {
-					let id = params['id'];
-					if (id.length !== 24 || id.match(/[^a-z0-9]/)) {
-						this.ui.flash("This page doesn't exist", "error");
-						return this.router.navigate([''], { queryParams: {"404": true}});
-					}
-
-					this.orgService.loadOrg(id).subscribe(
-						data => {
-							if (!this.userIsAdmin()) {
-								if (!data || !data._id || user.permissions.indexOf(data.globalPermission) === -1) {
-									this.ui.flash("Either the page doesn't exist or you don't have permission to manage it", "error");
-									return this.router.navigate([''], { queryParams: {"404": true}});
-								}
-							}
-
-							this.displayOrg(data);
-							this.isLoaded = true;
-							this.ui.setTitle("Manage " + this.org.name);
-							
-							// for ng-upload
-							this.coverImageUploadOptions = {
-							  url: '/edit-org/upload/cover-image/' + this.org._id,
-							  filterExtensions: true,
-							  calculateSpeed: true,
-							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-							};
-							this.avatarUploadOptions = {
-							  url: '/edit-org/upload/avatar/' + this.org._id,
-							  filterExtensions: true,
-							  calculateSpeed: true,
-							  allowedExtensions: ['image/png', 'image/jpeg', 'image/gif']
-							};
-						},
-						err => {
-							this.router.navigate([''], { queryParams: {"404": true}});
-							console.log("Error: ");
-							console.log(err);
-							return console.error(err);
-						}
-					);					
-				});
-			}
-			else {
-				this.router.navigate(['../']);
-			}
+			
 		});
 	}
 

@@ -2,7 +2,7 @@
 	<div class="col-md-12">
 		<div class="org-details-content item-details" [ngClass]="{'col-md-6': isSingle}">
 
-			<p class="org-categories">Categories: <span *ngFor="let category of org.categories; let i = index;"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;<span *ngIf="(i+1) < org?.categories.length">|&nbsp;</span></span></p>
+			<p class="org-categories">Categories: <span *ngFor="let category of org.categories; let i = index;"><a [routerLink]="['', 'category', category.id]">{{category.name}}</a>&nbsp;<span *ngIf="(i+1) < org?.categories.length">|</span>&nbsp;</span></p>
 			<p *ngIf="isSingle && org?.type" class="org-type">Type: {{org.type}}</p>
 			<p class="org-description" [innerHTML]="org.description | truncate: truncateDescription"></p>
 			<p class="read-more" *ngIf="descriptionIsLong()">

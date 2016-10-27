@@ -321,6 +321,7 @@ let editableInOrg = [
   "otherLinks",
   "slug",
   "name",
+  "type",
   "description",
   "verified",
   "featured",

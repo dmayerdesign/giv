@@ -66,6 +66,15 @@
           [type]="'textarea'"
           [saving]="saving_description"
           (onSave)="save('description', $event)"></form-field>
+
+        <form-field
+          [title]="'Type'"
+          [name]="'type'"
+          [type]="'select'"
+          [saving]="saving_type"
+          [selectOptions]="orgTypes"
+          (onSave)="save('type', $event)"></form-field>
+
       </div>
       <div class="form-section calls-to-action clearfix">
         <form-field
@@ -99,10 +108,9 @@
           </button>
           <div class="other-link clearfix" *ngFor="let otherLink of org?.otherLinks; let i = index">
             <button
-              class="remove icon-btn"
-              *ngIf="org?.otherLinks.length < 3 && org?.otherLinks.length"
-              (click)="removeOtherLink(otherLink)">
-
+                class="remove icon-btn"
+                *ngIf="org?.otherLinks.length"
+                (click)="removeOtherLink(otherLink)">
               <img src="app/images/trash-btn.svg" alt="remove">
             </button>
             <input
