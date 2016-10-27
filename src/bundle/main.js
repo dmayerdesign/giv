@@ -37899,21 +37899,21 @@
 	var account_settings_component_1 = __webpack_require__(86);
 	var your_giving_component_1 = __webpack_require__(87);
 	var reset_password_component_1 = __webpack_require__(90);
-	var verify_email_component_1 = __webpack_require__(362);
-	var claim_org_component_1 = __webpack_require__(91);
-	var verify_orgs_component_1 = __webpack_require__(93);
-	var create_org_component_1 = __webpack_require__(94);
-	var create_post_component_1 = __webpack_require__(95);
-	var search_box_component_1 = __webpack_require__(96);
-	var contact_component_1 = __webpack_require__(97);
-	var form_field_component_1 = __webpack_require__(98);
+	var verify_email_component_1 = __webpack_require__(91);
+	var claim_org_component_1 = __webpack_require__(92);
+	var verify_orgs_component_1 = __webpack_require__(94);
+	var create_org_component_1 = __webpack_require__(95);
+	var create_post_component_1 = __webpack_require__(96);
+	var search_box_component_1 = __webpack_require__(97);
+	var contact_component_1 = __webpack_require__(98);
+	var form_field_component_1 = __webpack_require__(99);
 	var user_service_1 = __webpack_require__(68);
 	var search_service_1 = __webpack_require__(77);
-	var ng2_click_outside_1 = __webpack_require__(99);
+	var ng2_click_outside_1 = __webpack_require__(100);
 	var categories_service_1 = __webpack_require__(80);
 	var org_service_1 = __webpack_require__(76);
 	var app_service_1 = __webpack_require__(70);
-	var truncate_pipe_1 = __webpack_require__(101);
+	var truncate_pipe_1 = __webpack_require__(102);
 	var ng2_completer_1 = __webpack_require__(88);
 	var core_2 = __webpack_require__(3);
 	core_2.enableProdMode();
@@ -52855,11 +52855,12 @@
 	            { name: "Disability rights", id: "disability" },
 	            { name: "Neurodiversity", id: "neurodiversity" },
 	            { name: "Environmental justice", id: "environmental" },
-	            { name: "Women's issues", id: "women" },
+	            { name: "Feminism", id: "feminism" },
 	            { name: "Reproductive rights", id: "reproductive" },
 	            { name: "Immigration and refugee rights", id: "immigration" },
 	            { name: "Healthcare", id: "healthcare" },
 	            { name: "Economic justice", id: "economic" },
+	            { name: "Anti-colonialism", id: "anticolonialism" },
 	            { name: "Other", id: "other" }
 	        ];
 	    };
@@ -55785,10 +55786,76 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
+	var router_1 = __webpack_require__(25);
+	var http_1 = __webpack_require__(55);
+	var user_service_1 = __webpack_require__(68);
+	var categories_service_1 = __webpack_require__(80);
+	var app_service_1 = __webpack_require__(70);
+	var VerifyEmailComponent = (function () {
+	    function VerifyEmailComponent(router, route, userService, ui, utilities, zone, http, categoryService) {
+	        this.router = router;
+	        this.route = route;
+	        this.userService = userService;
+	        this.ui = ui;
+	        this.utilities = utilities;
+	        this.zone = zone;
+	        this.http = http;
+	        this.categoryService = categoryService;
+	        this.passwords = {
+	            password: null,
+	            confirm: null
+	        };
+	    }
+	    VerifyEmailComponent.prototype.ngOnInit = function () {
+	        var _this = this;
+	        if (this.route.params) {
+	            this.sub = this.route.params.subscribe(function (params) {
+	                _this.token = params['token'];
+	                _this.http.post("/verify-email/" + _this.token, {}).map(function (res) { return res.json(); }).subscribe(function (user) {
+	                    if (user.errmsg) {
+	                        _this.ui.flash("We couldn't verify your email", "error");
+	                        return console.error(user.errmsg);
+	                    }
+	                    _this.ui.flash("Thank you for verifying your email! Log in and enjoy", "success");
+	                    _this.router.navigate(['/login']);
+	                }, function (err) {
+	                    _this.ui.flash("Oops! Something went wrong", "error");
+	                    console.error(err);
+	                });
+	            });
+	        }
+	    };
+	    VerifyEmailComponent = __decorate([
+	        core_1.Component({
+	            selector: 'verify-email',
+	            templateUrl: 'app/verify-email.component.html'
+	        }), 
+	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
+	    ], VerifyEmailComponent);
+	    return VerifyEmailComponent;
+	}());
+	exports.VerifyEmailComponent = VerifyEmailComponent;
+
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
 	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(92);
+	var email_service_1 = __webpack_require__(93);
 	var org_service_1 = __webpack_require__(76);
 	var user_service_1 = __webpack_require__(68);
 	var ClaimOrgComponent = (function () {
@@ -55890,7 +55957,7 @@
 
 
 /***/ },
-/* 92 */
+/* 93 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -55909,7 +55976,7 @@
 
 
 /***/ },
-/* 93 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56083,7 +56150,7 @@
 
 
 /***/ },
-/* 94 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56103,7 +56170,7 @@
 	var user_service_1 = __webpack_require__(68);
 	var categories_service_1 = __webpack_require__(80);
 	var app_service_1 = __webpack_require__(70);
-	var email_service_1 = __webpack_require__(92);
+	var email_service_1 = __webpack_require__(93);
 	function Org() {
 	    this.name = null;
 	    this.description = null;
@@ -56268,7 +56335,7 @@
 
 
 /***/ },
-/* 95 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56406,7 +56473,7 @@
 
 
 /***/ },
-/* 96 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56474,7 +56541,7 @@
 
 
 /***/ },
-/* 97 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56490,7 +56557,7 @@
 	var core_1 = __webpack_require__(3);
 	var http_1 = __webpack_require__(55);
 	var router_1 = __webpack_require__(25);
-	var email_service_1 = __webpack_require__(92);
+	var email_service_1 = __webpack_require__(93);
 	var app_service_1 = __webpack_require__(70);
 	var ContactComponent = (function () {
 	    function ContactComponent(http, router, ui) {
@@ -56551,7 +56618,7 @@
 
 
 /***/ },
-/* 98 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56696,7 +56763,7 @@
 
 
 /***/ },
-/* 99 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56710,7 +56777,7 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(3);
-	var click_outside_directive_1 = __webpack_require__(100);
+	var click_outside_directive_1 = __webpack_require__(101);
 	exports.ClickOutsideDirective = click_outside_directive_1.default;
 	var ClickOutsideModule = (function () {
 	    function ClickOutsideModule() {
@@ -56728,7 +56795,7 @@
 
 
 /***/ },
-/* 100 */
+/* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56809,7 +56876,7 @@
 
 
 /***/ },
-/* 101 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56844,332 +56911,6 @@
 	    return TruncatePipe;
 	}());
 	exports.TruncatePipe = TruncatePipe;
-
-
-/***/ },
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */,
-/* 110 */,
-/* 111 */,
-/* 112 */,
-/* 113 */,
-/* 114 */,
-/* 115 */,
-/* 116 */,
-/* 117 */,
-/* 118 */,
-/* 119 */,
-/* 120 */,
-/* 121 */,
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */,
-/* 140 */,
-/* 141 */,
-/* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */,
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */,
-/* 159 */,
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
-/* 169 */,
-/* 170 */,
-/* 171 */,
-/* 172 */,
-/* 173 */,
-/* 174 */,
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */,
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */,
-/* 201 */,
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */,
-/* 207 */,
-/* 208 */,
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */,
-/* 222 */,
-/* 223 */,
-/* 224 */,
-/* 225 */,
-/* 226 */,
-/* 227 */,
-/* 228 */,
-/* 229 */,
-/* 230 */,
-/* 231 */,
-/* 232 */,
-/* 233 */,
-/* 234 */,
-/* 235 */,
-/* 236 */,
-/* 237 */,
-/* 238 */,
-/* 239 */,
-/* 240 */,
-/* 241 */,
-/* 242 */,
-/* 243 */,
-/* 244 */,
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */,
-/* 249 */,
-/* 250 */,
-/* 251 */,
-/* 252 */,
-/* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */,
-/* 260 */,
-/* 261 */,
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */,
-/* 268 */,
-/* 269 */,
-/* 270 */,
-/* 271 */,
-/* 272 */,
-/* 273 */,
-/* 274 */,
-/* 275 */,
-/* 276 */,
-/* 277 */,
-/* 278 */,
-/* 279 */,
-/* 280 */,
-/* 281 */,
-/* 282 */,
-/* 283 */,
-/* 284 */,
-/* 285 */,
-/* 286 */,
-/* 287 */,
-/* 288 */,
-/* 289 */,
-/* 290 */,
-/* 291 */,
-/* 292 */,
-/* 293 */,
-/* 294 */,
-/* 295 */,
-/* 296 */,
-/* 297 */,
-/* 298 */,
-/* 299 */,
-/* 300 */,
-/* 301 */,
-/* 302 */,
-/* 303 */,
-/* 304 */,
-/* 305 */,
-/* 306 */,
-/* 307 */,
-/* 308 */,
-/* 309 */,
-/* 310 */,
-/* 311 */,
-/* 312 */,
-/* 313 */,
-/* 314 */,
-/* 315 */,
-/* 316 */,
-/* 317 */,
-/* 318 */,
-/* 319 */,
-/* 320 */,
-/* 321 */,
-/* 322 */,
-/* 323 */,
-/* 324 */,
-/* 325 */,
-/* 326 */,
-/* 327 */,
-/* 328 */,
-/* 329 */,
-/* 330 */,
-/* 331 */,
-/* 332 */,
-/* 333 */,
-/* 334 */,
-/* 335 */,
-/* 336 */,
-/* 337 */,
-/* 338 */,
-/* 339 */,
-/* 340 */,
-/* 341 */,
-/* 342 */,
-/* 343 */,
-/* 344 */,
-/* 345 */,
-/* 346 */,
-/* 347 */,
-/* 348 */,
-/* 349 */,
-/* 350 */,
-/* 351 */,
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
-/* 357 */,
-/* 358 */,
-/* 359 */,
-/* 360 */,
-/* 361 */,
-/* 362 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var core_1 = __webpack_require__(3);
-	var router_1 = __webpack_require__(25);
-	var http_1 = __webpack_require__(55);
-	var user_service_1 = __webpack_require__(68);
-	var categories_service_1 = __webpack_require__(80);
-	var app_service_1 = __webpack_require__(70);
-	var VerifyEmailComponent = (function () {
-	    function VerifyEmailComponent(router, route, userService, ui, utilities, zone, http, categoryService) {
-	        this.router = router;
-	        this.route = route;
-	        this.userService = userService;
-	        this.ui = ui;
-	        this.utilities = utilities;
-	        this.zone = zone;
-	        this.http = http;
-	        this.categoryService = categoryService;
-	        this.passwords = {
-	            password: null,
-	            confirm: null
-	        };
-	    }
-	    VerifyEmailComponent.prototype.ngOnInit = function () {
-	        var _this = this;
-	        if (this.route.params) {
-	            this.sub = this.route.params.subscribe(function (params) {
-	                _this.token = params['token'];
-	                _this.http.post("/verify-email/" + _this.token, {}).map(function (res) { return res.json(); }).subscribe(function (user) {
-	                    if (user.errmsg) {
-	                        _this.ui.flash("We couldn't verify your email", "error");
-	                        return console.error(user.errmsg);
-	                    }
-	                    _this.ui.flash("Thank you for verifying your email! Log in and enjoy", "success");
-	                    _this.router.navigate(['/login']);
-	                }, function (err) {
-	                    _this.ui.flash("Oops! Something went wrong", "error");
-	                    console.error(err);
-	                });
-	            });
-	        }
-	    };
-	    VerifyEmailComponent = __decorate([
-	        core_1.Component({
-	            selector: 'verify-email',
-	            templateUrl: 'app/verify-email.component.html'
-	        }), 
-	        __metadata('design:paramtypes', [router_1.Router, router_1.ActivatedRoute, user_service_1.UserService, app_service_1.UIHelper, app_service_1.Utilities, core_1.NgZone, http_1.Http, categories_service_1.Categories])
-	    ], VerifyEmailComponent);
-	    return VerifyEmailComponent;
-	}());
-	exports.VerifyEmailComponent = VerifyEmailComponent;
 
 
 /***/ }

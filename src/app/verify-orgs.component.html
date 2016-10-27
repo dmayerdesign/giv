@@ -18,54 +18,22 @@
 	<!--*******
 		Orgs Loop
 		*********-->
-		<section class="org single-item row"
-				#singleItem
-				*ngFor="let org of orgs"
-				(clickOutside)="deselectOrg($event, org._id)"
-				[ngClass]="{'selected': viewingOrg && org._id === selectedOrg?._id, 'has-cover-image': org.coverImage, 'has-video': org.videoLink}">
-
-			<header
-					[ngStyle]="{'background-image': org.coverImage ? 'url(' + org.coverImage + ')' : 'url(app/images/cover-icons-overlay.png)'}"
-					(click)="viewOrg($event, org._id)">
-				<div class="header-inner">
-					<div *ngIf="viewingOrg" class="inside-org header-left">
-						<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">
-							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-						</a>
-						<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">
-							<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-						</a>
-					</div>
-					<div *ngIf="!viewingOrg" class="inside-org header-left">
-						<div class="org-avatar inside-org" *ngIf="org.avatar" [ngStyle]="{'background-image': 'url(' + org.avatar + ')'}"></div>
-					</div>
-					<div class="inside-org header-right">
-						<h4 class="inside-org org-name" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.name}}</h4>
-
-						<p class="description preview inside-org" *ngIf="!selectedOrg || org._id !== selectedOrg._id">{{org.description | truncate:170}}</p>
-
-						<h4 class="org-name" *ngIf="viewingOrg && org._id === selectedOrg._id">
-							<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">{{org.name}}</a>
-							<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">{{org.name}}</a>
-							<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
-						</h4>
-					</div>
-				</div>
-			</header>
-			<span class="exit" (click)="deselectOrg($event, org._id)" *ngIf="viewingOrg && org._id === selectedOrg._id">
-				<img src="app/images/x.svg" width="16" height="16" alt="exit">
-			</span>
-
-			<div class="org-expanded clearfix" *ngIf="viewingOrg && org._id === selectedOrg._id" [ngClass]="{'expanded': singleDetailsAreLoaded}">
-				<org-details (update)="revealOrgDetails($event)" [org]="selectedOrg"></org-details>
-				<button (click)="verifyOrg(org)">Verify this org</button>
-			</div>
-		</section>
+		<org
+			*ngFor="let org of orgs"
+			[org]="org"
+			[user]="user"
+			[selected]="selectedOrg"
+			(onSelect)="viewOrg($event)"
+			(onDeselect)="deselectOrg($event)"
+			(onStar)="starOrg($event)"
+			(onUnstar)="unstarOrg($event)"
+			#singleItem></org>
 		
 		<button id="show-more"
 				*ngIf="orgs?.length"
 				(click)="showMore(10, orgs.length)"
 				[ngClass]="{'loading': loadingShowMoreOrgs}"
+				[ngStyle]="{'margin-top': '2em'}"
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>
 	</div>
 

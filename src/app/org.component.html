@@ -57,8 +57,12 @@
 		<org-details (update)="revealOrgDetails($event)" [org]="org"></org-details>
 		<org-posts (update)="revealOrgPosts($event)" [org]="org" [isBrowsing]="true"></org-posts>
 		<p class="read-more more-posts col-md-12">
-			<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">Learn more about {{org.name}}</a>
-			<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">Learn more about {{org.name}}</a>
+			<a *ngIf="org.slug" [routerLink]="['/organization', org.slug]">
+				<button class="add">Learn more about {{org.name}}</button>
+			</a>
+			<a *ngIf="!org.slug" [routerLink]="['/organization', 'i', org._id]">
+				<button class="add">Learn more about {{org.name}}</button>
+			</a>
 		</p>
 	</div>
 </section>
