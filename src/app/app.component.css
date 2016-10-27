@@ -7,9 +7,20 @@
 	min-height: 100%;
   min-width: 300px;
 	padding-bottom: 7em;
+  background: transparent;
+}
 
-  background-image: url(app/images/bg-icons-overlay.png);
-  background-repeat: repeat;
+.app-container::before {
+  display: block;
+  content: "";
+  position: fixed;
+  will-change: transform;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: #fff url(app/images/bg-icons-overlay.png) repeat left top;
   background-size: 22rem auto;
 }
 
