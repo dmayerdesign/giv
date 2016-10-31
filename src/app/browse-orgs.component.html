@@ -116,11 +116,15 @@
 				[disabled]="loadingOrgSearch || isLoading">Show more</button>
 	</div>
 
-	<!-- LOADING SEARCH -->
-	<div class="loader loading-org-search"
-			[ngClass]="{'org-search-loader': loadingOrgSearch, 'show-more-loader': loadingShowMoreOrgs}"
-			*ngIf="loadingOrgSearch || loadingShowMoreOrgs">
-	  <div class="loader__figure"></div>
+	<div class="loader"
+			*ngIf="loadingOrgSearch || loadingShowMoreOrgs"
+			[ngClass]="{'org-search-loader': loadingOrgSearch, 'show-more-loader': loadingShowMoreOrgs}">
+<!-- 	  <p class="loader__label"><img src="images/logo-color-2x.png" width="50"></p>-->
+		<p class="loader_dots">
+	    <i class="fa fa-circle"></i>
+	    <i class="fa fa-circle"></i>
+	    <i class="fa fa-circle"></i>
+	  </p>
 	</div>
 </div>
 
