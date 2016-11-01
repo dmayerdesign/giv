@@ -258,6 +258,39 @@ section, .section, .search-box, .grey-bg, .gray-bg {
 }
 
 
+main {
+  perspective: 200px;
+  perspective-origin: 50% 0;
+}
+
+.featured-orgs, .browse-orgs, .browse-posts, .starred-orgs,
+.dashboard > *,
+.your-giving > button, .your-giving > table,
+.giv-form {
+  animation: fadeIn 2s cubic-bezier(0,1,0.5,1);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    /*transform: translateY(20px);*/
+    transform: translateZ(4px);
+  }
+  20% {
+    opacity: 0;
+    /*transform: translateY(20px);*/
+    transform: translateZ(4px);
+  }
+  100% {
+    opacity: 1;
+    /*transform: translateY(0px);*/
+    transform: translateZ(0px);
+  }
+}
+
+
+
+
 
 
 ng2-completer input {
@@ -644,17 +677,18 @@ search-box + select {
   transform: translate(-50%, -50%);
 }
 
-.loading-org-search,
-.loading-org-search.loader__figure {
-  bottom: -1em;
-  top: auto;
-}
-
 .loader {
   overflow: visible;
   padding-top: 2em;
   height: 0;
-  width: 2em;
+  width: 100%;
+}
+
+main .app-loader {
+  top: 17em;
+  -webkit-transform: none;
+  transform: none;
+  margin-left: -50%;
 }
 
 .loader__figure {

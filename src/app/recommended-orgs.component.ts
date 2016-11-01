@@ -33,7 +33,7 @@ function shuffleArray(array) {
 export class RecommendedOrgsComponent implements OnInit {
 	@Input() orgs = [];
 	@Input() org:any;
-	@Input() inStarred:boolean;
+	@Input() inFavorites:boolean;
 	@Output() tabChange = new EventEmitter();
 	private user:any;
 	private recommended = [];
@@ -41,7 +41,7 @@ export class RecommendedOrgsComponent implements OnInit {
 	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
 	private singlePostsAreLoaded:boolean;
-	private showStarredMobileTab:boolean = true;
+	private showFavoritesMobileTab:boolean = true;
 	private showRecommendedMobileTab:boolean = false;
 	private adminToken:string;
 	private orgWas:any;
@@ -79,7 +79,7 @@ export class RecommendedOrgsComponent implements OnInit {
 					console.error(err);
 				}
 			);
-			console.log(this.user.starred);
+			console.log(this.user.favorites);
 			if (this.user) {
 				this.loadRecommendations();
 			}
@@ -97,8 +97,8 @@ export class RecommendedOrgsComponent implements OnInit {
 		this.selectedOrg = null;
 	}
 
-	orgIsStarred(org) {
-		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
+	orgIsFavorited(org) {
+		if (!this.user || this.user.favorites.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
@@ -130,7 +130,7 @@ export class RecommendedOrgsComponent implements OnInit {
     query['filterField'] = "categories.id";
     query['filterValue'] = this.org.categories[0].id;
     query['limit'] = 4;
-    query['sort'] = "-stars";
+    query['sort'] = "-favorites";
     query['not'] = [this.org._id];
 
     this.recommended = [];
@@ -179,12 +179,12 @@ export class RecommendedOrgsComponent implements OnInit {
     query['filterField'] = "categories.id";
     query['filterValue'] = interests[0] && interests[0][0];
     query['limit'] = 4;
-    query['sort'] = "-stars";
+    query['sort'] = "-favorites";
     query['not'] = [];
     this.orgs.forEach(org => {
     	query['not'].push(org._id);
     });
-    this.user.starred.forEach(orgId => {
+    this.user.favorites.forEach(orgId => {
     	query['not'].push(orgId);
     });
     if (this.org) {
@@ -221,7 +221,7 @@ export class RecommendedOrgsComponent implements OnInit {
     });
 	}
 
-	showStarred() {
+	showFavorites() {
 		this.tabChange.emit("");
 	}
 

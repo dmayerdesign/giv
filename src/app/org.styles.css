@@ -1,9 +1,9 @@
-.starred-orgs header,
+.favorite-orgs header,
 .recommended-orgs header {
   margin-bottom: 0.2em;
 }
 
-.starred-orgs h2,
+.favorite-orgs h2,
 .recommended-orgs h2 {
   margin-top: 0.6em;
 }
@@ -12,7 +12,7 @@ section.org {
   border: 0 none;
 }
 
-.recommended-orgs:not(.in-starred) .org {
+.recommended-orgs:not(.in-favorites) .org {
   font-size: 0.9em;
 }
 
@@ -100,6 +100,7 @@ section.org {
   padding: 1em 1.2em;
 }
 
+.org .heart i,
 .org .star i {
   font-size: 1.4em;
   position: relative;
@@ -127,13 +128,18 @@ header h4 > a, header h4 > a:hover {
   white-space: nowrap;
 }
 
+.org .rating {
+  padding-left: 0.6rem;
+}
+
 .org .preview {
   opacity: 1;
   -webkit-transition: all 0.7s cubic-bezier(0.5,0,0.2,1);
   transition: all 0.7s cubic-bezier(0,0.5,0.2,1);
 }
 
-.org .stars-preview {
+.org .favorites-preview,
+.org .ratings-preview {
   position: absolute;
   z-index: 100;
   top: 8.1em;
@@ -149,7 +155,8 @@ header h4 > a, header h4 > a:hover {
   transition: opacity 0.7s;
 }
 
-.org.selected .stars-preview {
+.org.selected .favorites-preview,
+.org.selected .ratings-preview {
   top: 18em;
 }
 
@@ -186,7 +193,7 @@ header h4 > a, header h4 > a:hover {
 
 .browse-posts,
 .recommended-orgs,
-.starred-orgs {
+.favorite-orgs {
   padding-right: 0;
 }
 
@@ -263,7 +270,7 @@ header h4 > a, header h4 > a:hover {
     padding-right: 30px;
     padding-left: 30px;
   }
-  .starred-orgs > header,
+  .favorite-orgs > header,
   .recommended-orgs > header {
     padding-right: 15px;
     padding-left: 15px;

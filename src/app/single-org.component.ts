@@ -11,7 +11,7 @@ import { UIHelper, Utilities } from './services/app.service';
 @Component({
 	selector: 'single-org',
 	templateUrl: 'app/single-org.component.html',
-	styleUrls: [ 'app/org.styles.css', 'app/single-org.component.css' ]
+	styleUrls: [ 'app/org.styles.css', 'app/single-org.component.css', 'app/form-field.component.css' ]
 })
 
 // Tell users to go to compressjpeg.com if their images exceed 2 MB
@@ -26,6 +26,12 @@ export class SingleOrgComponent implements OnInit {
   private videoBg:string;
   private showOptionsMenu:boolean;
   private adminToken:string;
+  private ratingOrg:boolean;
+  private orgRating:any = null;
+  private ratings = [0,1,2,3,4,5,6,7,8,9,10];
+  private lowRatings = [1,2,3,4,5];
+  private highRatings = [6,7,8,9,10];
+  private selected = {};
 
 	constructor(
 				private router: Router,
@@ -98,27 +104,27 @@ export class SingleOrgComponent implements OnInit {
 		this.videoIsExpanded = false;
 	}
 
-	orgIsStarred(org) {
-		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
+	orgIsFavorited(org) {
+		if (!this.user || this.user.favorites.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(org):void {
+	favoriteOrg(org):void {
 		if (!this.user) return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+		this.http.put("/user/favorite/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars = this.org.stars ? this.org.stars+1 : 1;
+				this.org.favorites = this.org.favorites ? this.org.favorites+1 : 1;
 			}
 		);
 	}
 
-	unstarOrg(org):void {
+	unfavoriteOrg(org):void {
 		if (!this.user) return this.ui.flash("Sign up for free or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+		this.http.put("/user/favorite/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars = this.org.stars ? this.org.stars-1 : 0;
+				this.org.favorites = this.org.favorites ? this.org.favorites-1 : 0;
 			}
 		);
 	}
@@ -159,6 +165,40 @@ export class SingleOrgComponent implements OnInit {
  			this.ui.flash("Saved", "success");
   		console.log(res);
   	});
+  }
+
+  rateOrg() {
+  	this.ratingOrg = true;
+  }
+
+  cancelRating() {
+  	this.ratingOrg = false;
+  }
+
+  submitRating() {
+  	if (this.orgRating === null) return this.ui.flash("Select a rating between 0 and 10", "info");
+  	this.http.post("/org/rate/" + this.org._id, {rating: this.orgRating, userId: this.user._id}).map(res => res.json()).subscribe(
+  		data => {
+  			this.ratingOrg = false;
+  			if (data.errmsg) {
+  				this.ui.flash(data.errmsg, "error");
+  				return console.error(data.errmsg);
+  			}
+  			this.org = data;
+  			this.ui.flash("Thanks for rating!", "success");
+  		},
+  		err => {
+  			this.ratingOrg = false;
+  			this.ui.flash("Oops! Something went wrong and we couldn't process your rating", "error");
+  			console.error(err);
+  		}
+  	);
+  }
+
+  updateRating(rating) {
+  	this.orgRating = rating;
+  	this.selected = {};
+  	this.selected[rating] = true;
   }
 
 }

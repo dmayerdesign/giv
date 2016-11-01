@@ -1,4 +1,32 @@
 <div id="single-org" class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink, 'has-cover-image': org.coverImage }">
+
+	<section *ngIf="ratingOrg" class="rate-org giv-form clearfix">
+		<div class="col-md-12">
+			<div class="col-md-12">
+				<h3>Rate {{org.name}}</h3>
+				<div class="form-field clearfix">
+					<!-- <select [(ngModel)]="orgRating">
+						<option *ngFor="let rating of ratings" [value]="rating" [attr.selected]="rating === 7 && 'selected'">{{rating}}</option>
+					</select> -->
+					<div class="col-md-6 row low">
+						<label [attr.for]="'rating'+rating" *ngFor="let rating of lowRatings" [ngClass]="{'selected': selected[rating]}">
+							<span class="bubble">{{rating}}</span>
+							<input (change)="updateRating(rating)" [value]="rating" [attr.type]="'radio'" [attr.name]="'rating'" [attr.id]="'rating'+rating">
+						</label>
+					</div>
+					<div class="col-md-6 row high">
+						<label [attr.for]="'rating'+rating" *ngFor="let rating of highRatings" [ngClass]="{'selected': selected[rating]}">
+							<span class="bubble">{{rating}}</span>
+							<input (change)="updateRating(rating)" [value]="rating" [attr.type]="'radio'" [attr.name]="'rating'" [attr.id]="'rating'+rating">
+						</label>
+					</div>
+				</div>
+				<button class="submit" (click)="submitRating()">Submit</button>
+				<button class="cancel" (click)="cancelRating()">Cancel</button>
+			</div>
+		</div>
+	</section>
+
 	<section>
 		<div class="banner-container clearfix">
 			<div class="featured-video" *ngIf="org?.videoLink"
@@ -27,10 +55,16 @@
 					{{org.name}}
 					<span *ngIf="org.official" class="official-badge"></span>
 				</h1>
-				<p class="info stars">
-					<span class="star unstarred" *ngIf="!orgIsStarred(org)" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
-					<span class="star starred" *ngIf="user && orgIsStarred(org)" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-					&nbsp;{{org.stars || '0'}} starred this
+				<p class="info favorites">
+					<span class="heart unfavorited" *ngIf="!orgIsFavorited(org)" (click)="favoriteOrg(org)"><i class="fa fa-heart-o"></i></span>
+					<span class="heart favorited" *ngIf="user && orgIsFavorited(org)" (click)="unfavoriteOrg(org)"><i class="fa fa-heart"></i></span>
+					&nbsp;{{org.favorites || '0'}} favorited this
+					
+					<span *ngIf="org?.ratings?.length" class="rating">
+						<span class="star" *ngIf="org.rating > 70"><i class="fa fa-star"></i></span>
+						<span class="star" *ngIf="org.rating <= 70"><i class="fa fa-star-o"></i></span>
+						&nbsp;{{org.rating || '0'}}%
+					</span>
 				</p>
 			</div>
 
@@ -40,6 +74,7 @@
 				</button>
 				<ul *ngIf="showOptionsMenu" class="submenu">
 					<li *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></li>
+					<li *ngIf="user"><a (click)="rateOrg()">Rate this organization</a></li>
 					<li><a (click)="claimOrg()">Is this your organization?</a></li>
 				</ul>
 			</div>
@@ -47,7 +82,7 @@
 		<org-details [org]="org" [isSingle]="true"></org-details>
 	</section>
 	<org-posts [org]="org" [user]="user"></org-posts>
-	<recommended-orgs (tabChange)="showStarred($event)" [org]="org"></recommended-orgs>
+	<recommended-orgs (tabChange)="showFavorited($event)" [org]="org"></recommended-orgs>
 </div>
 
 <div class="loader app-loader" *ngIf="!isLoaded">

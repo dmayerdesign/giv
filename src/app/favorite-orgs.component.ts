@@ -6,12 +6,12 @@ import { UIHelper } from './services/app.service';
 import { SearchService } from './services/search.service';
 
 @Component({
-	selector: 'starred-orgs',
-	templateUrl: 'app/starred-orgs.component.html',
+	selector: 'favorite-orgs',
+	templateUrl: 'app/favorite-orgs.component.html',
 	styleUrls: ['app/browse-orgs.component.css', 'app/org.styles.css']
 })
 
-export class StarredOrgsComponent implements OnInit {
+export class FavoriteOrgsComponent implements OnInit {
 	private user:any;
 	private orgs = [];
 	private recommended = [];
@@ -21,7 +21,7 @@ export class StarredOrgsComponent implements OnInit {
 	private selectedOrg:any = null;
 	private singleDetailsAreLoaded:boolean;
 	private singlePostsAreLoaded:boolean;
-	private showStarredMobileTab:boolean = true;
+	private showFavoritesMobileTab:boolean = true;
 	private showRecommendedMobileTab:boolean = false;
 	private adminToken:string;
 
@@ -32,7 +32,7 @@ export class StarredOrgsComponent implements OnInit {
 							private http:Http) { }
 
 	ngOnInit() {
-		this.ui.setTitle("Your starred");
+		this.ui.setTitle("Your favorites");
 		this.userService.getLoggedInUser((err, user) => {
 			if (err) return console.error(err);
 			this.user = user;
@@ -44,17 +44,17 @@ export class StarredOrgsComponent implements OnInit {
 					console.error(err);
 				}
 			);
-			console.log(this.user.starred);
-			this.loadOrgs(this.user.starred);
+			console.log(this.user.favorites);
+			this.loadOrgs(this.user.favorites);
 		});
 	}
 
-	loadOrgs(starred:any, cb?:any) {
-		this.orgService.loadStarredOrgs(starred)
+	loadOrgs(favorited:any, cb?:any) {
+		this.orgService.loadFavoriteOrgs(favorited)
 			.subscribe(
 				results => {
 					this.orgs = results;
-					console.log("Starred orgs: ", this.orgs);
+					console.log("Favorite orgs: ", this.orgs);
 					this.loadRecommendations();
 				},
 				error => console.error(error)
@@ -72,8 +72,8 @@ export class StarredOrgsComponent implements OnInit {
 		this.selectedOrg = null;
 	}
 
-	orgIsStarred(org) {
-		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
+	orgIsFavorited(org) {
+		if (!this.user || this.user.favorites.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
@@ -118,7 +118,7 @@ export class StarredOrgsComponent implements OnInit {
     query['filterField'] = "categories.id";
     query['filterValue'] = interests[0] && interests[0][0];
     query['limit'] = 4;
-    query['sort'] = "-stars";
+    query['sort'] = "-favorites";
     query['not'] = [];
     this.orgs.forEach(org => {
     	query['not'].push(org._id);
@@ -156,20 +156,20 @@ export class StarredOrgsComponent implements OnInit {
     });
 	}
 
-	showStarred(e) {
+	showFavorites(e) {
 		this.showRecommendedMobileTab = false;
-		this.showStarredMobileTab = true;
+		this.showFavoritesMobileTab = true;
 	}
 
 	showRecommended() {
 		this.showRecommendedMobileTab = true;
-		this.showStarredMobileTab = false;
+		this.showFavoritesMobileTab = false;
 	}
 
-	unstar(orgToUnstar) {
+	unfavorite(orgToUnfavorite) {
 		let i;
 		this.orgs.forEach((org, index, arr) => {
-			if (org._id === orgToUnstar._id) {
+			if (org._id === orgToUnfavorite._id) {
 				i = index;
 			}
 		});

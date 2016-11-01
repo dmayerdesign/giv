@@ -1,16 +1,14 @@
 /* Loading animation */
 
 .org-search-loader {
-	top: 12em;
+	top: auto;
+  bottom: 0;
 }
 
 .show-more-loader {
+  top: auto;
 	bottom: -0.65em;
   margin-left: -0.9em;
-}
-
-.show-more-loader .loader__figure {
-  top: 48%;
 }
 
 .orgs-list.loading-orgs {
@@ -93,7 +91,7 @@
   text-shadow: 0px 1px 2px rgba(0,0,0,0.4);
 }
 
-.featured-org .stars-preview {
+.featured-org .favorites-preview {
   display: none;
 }
 
@@ -151,6 +149,7 @@
 .featured-carousel-nav-dots span.selected {
   opacity: 1;
   color: #fff !important;
+  transform: scale(1.1);
 }
 
 .featured-org .description {

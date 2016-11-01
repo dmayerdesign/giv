@@ -1,14 +1,14 @@
-<div class="starred-orgs mobile-tab desktop-tab col-md-8"
-		[ngClass]="{'active': showStarredMobileTab}">
+<div class="favorite-orgs mobile-tab desktop-tab col-md-8"
+		[ngClass]="{'active': showFavoritesMobileTab}">
 	<header>
-		<h2>Starred <span class="desktop-tab-button" *ngIf="user" (click)="showRecommended()">Recommended</span></h2>
+		<h2>Favorited <span class="desktop-tab-button" *ngIf="user" (click)="showRecommended()">Recommended</span></h2>
 		<p class="subtitle">Here you can keep track of organizations you like</p>
 	</header>
 
 	<div *ngIf="!user">
 		<div class="row">
 			<section class="null-search">
-				<p>Log in to begin starring your favorite organizations, and watch them appear here.</p>
+				<p>Log in to begin saving your favorite organizations, and watch them appear here.</p>
 			</section>
 			<button class="big-button" [routerLink]="['/login']">Log in</button>
 		</div>
@@ -19,7 +19,7 @@
 			[ngClass]="{'loading-more-orgs': loadingShowMoreOrgs}">
 
 		<section class="null-search row" *ngIf="orgs.length === 0">
-			<p>No organizations to show. Star some, and watch them appear here!</p>
+			<p>No organizations to show. Save some to your favorites, and watch them appear here!</p>
 		</section>
 
 	<!--*******
@@ -32,7 +32,7 @@
 			[selected]="selectedOrg"
 			(onSelect)="viewOrg($event)"
 			(onDeselect)="deselectOrg($event)"
-			(onUnstar)="unstar($event)"
+			(onUnfavorite)="unfavorite($event)"
 			#singleItem></org>
 	</div>
 </div>
@@ -40,6 +40,6 @@
 <div class="mobile-tab desktop-tab"
 		*ngIf="user"
 		[ngClass]="{'active': showRecommendedMobileTab}">
-	<recommended-orgs (tabChange)="showStarred($event)" [orgs]="orgs" [inStarred]="true"></recommended-orgs>
+	<recommended-orgs (tabChange)="showFavorites($event)" [orgs]="orgs" [inFavorites]="true"></recommended-orgs>
 </div>
 
