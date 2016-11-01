@@ -1,14 +1,29 @@
 <div id="single-org" class="org single-org" *ngIf="org && isLoaded" [ngClass]="{'has-video': org.videoLink, 'has-cover-image': org.coverImage }">
 
-	<section *ngIf="ratingOrg" class="rate-org" style="height: 100px">
-		<div class="giv-form" >
-			<div class="form-field">
-				<select [(ngModel)]="orgRating">
-					<option *ngFor="let rating of ratings" [value]="rating">{{rating}}</option>
-				</select>
+	<section *ngIf="ratingOrg" class="rate-org giv-form clearfix">
+		<div class="col-md-12">
+			<div class="col-md-12">
+				<h3>Rate {{org.name}}</h3>
+				<div class="form-field clearfix">
+					<!-- <select [(ngModel)]="orgRating">
+						<option *ngFor="let rating of ratings" [value]="rating" [attr.selected]="rating === 7 && 'selected'">{{rating}}</option>
+					</select> -->
+					<div class="col-md-6 row low">
+						<label [attr.for]="'rating'+rating" *ngFor="let rating of lowRatings" [ngClass]="{'selected': selected[rating]}">
+							<span class="bubble">{{rating}}</span>
+							<input (change)="updateRating(rating)" [value]="rating" [attr.type]="'radio'" [attr.name]="'rating'" [attr.id]="'rating'+rating">
+						</label>
+					</div>
+					<div class="col-md-6 row high">
+						<label [attr.for]="'rating'+rating" *ngFor="let rating of highRatings" [ngClass]="{'selected': selected[rating]}">
+							<span class="bubble">{{rating}}</span>
+							<input (change)="updateRating(rating)" [value]="rating" [attr.type]="'radio'" [attr.name]="'rating'" [attr.id]="'rating'+rating">
+						</label>
+					</div>
+				</div>
+				<button class="submit" (click)="submitRating()">Submit</button>
+				<button class="cancel" (click)="cancelRating()">Cancel</button>
 			</div>
-			<button class="submit" (click)="submitRating()">Submit</button>
-			<button class="cancel" (click)="cancelRating()">Cancel</button>
 		</div>
 	</section>
 

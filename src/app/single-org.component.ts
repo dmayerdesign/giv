@@ -29,6 +29,9 @@ export class SingleOrgComponent implements OnInit {
   private ratingOrg:boolean;
   private orgRating:any = null;
   private ratings = [0,1,2,3,4,5,6,7,8,9,10];
+  private lowRatings = [1,2,3,4,5];
+  private highRatings = [6,7,8,9,10];
+  private selected = {};
 
 	constructor(
 				private router: Router,
@@ -190,6 +193,12 @@ export class SingleOrgComponent implements OnInit {
   			console.error(err);
   		}
   	);
+  }
+
+  updateRating(rating) {
+  	this.orgRating = rating;
+  	this.selected = {};
+  	this.selected[rating] = true;
   }
 
 }

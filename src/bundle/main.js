@@ -53358,6 +53358,9 @@
 	        this.isLoaded = false;
 	        this.orgRating = null;
 	        this.ratings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+	        this.lowRatings = [1, 2, 3, 4, 5];
+	        this.highRatings = [6, 7, 8, 9, 10];
+	        this.selected = {};
 	    }
 	    SingleOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53493,6 +53496,11 @@
 	            _this.ui.flash("Oops! Something went wrong and we couldn't process your rating", "error");
 	            console.error(err);
 	        });
+	    };
+	    SingleOrgComponent.prototype.updateRating = function (rating) {
+	        this.orgRating = rating;
+	        this.selected = {};
+	        this.selected[rating] = true;
 	    };
 	    SingleOrgComponent = __decorate([
 	        core_1.Component({
