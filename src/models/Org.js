@@ -17,6 +17,11 @@ const orgSchema = new mongoose.Schema({
 	facebook: String,
 	stars: Number,
 	starredBy: [String],
+	favorites: Number,
+	favoritedBy: [String],
+	rating: Number,
+	ratings: [{user: String, rating: Number}],
+
 	featured: Boolean,
 
 	verified: Boolean,

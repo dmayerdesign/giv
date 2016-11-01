@@ -431,7 +431,7 @@ exports.showInterest = (req, res) => {
   });
 };
 
-exports.star = (req, res) => {
+exports.favorite = (req, res) => {
   let orgId = req.body.orgId;
   let userId = req.body.userId;
   let operator = function(action) {
@@ -440,9 +440,9 @@ exports.star = (req, res) => {
     else return 0;
   }(req.params.action);
 
-  let updateQuery = {$inc:{"stars": operator}};
-  if (req.params.action === "add") updateQuery.$push = {"starredBy": req.body.userId};
-  if (req.params.action === "subtract") updateQuery.$pull = {"starredBy": req.body.userId};
+  let updateQuery = {$inc:{"favorites": operator}};
+  if (req.params.action === "add") updateQuery.$push = {"favoritedBy": req.body.userId};
+  if (req.params.action === "subtract") updateQuery.$pull = {"favoritedBy": req.body.userId};
   
   Org.findOneAndUpdate({_id: orgId}, updateQuery, {new: true}, function(err, org) {
     if(err) {
@@ -457,9 +457,9 @@ exports.star = (req, res) => {
         res.json({errmsg: err});
         return console.log(err);
       }
-      if (user.starred.indexOf(orgId) > -1) {
+      if (user.favorites.indexOf(orgId) > -1) {
         if (operator == -1) {
-          user.starred.splice(user.starred.indexOf(orgId), 1);
+          user.favorites.splice(user.favorites.indexOf(orgId), 1);
           org.categories.forEach((category, index, arr) => {
             if (!user.interests) {
               user.interests = {};
@@ -473,7 +473,7 @@ exports.star = (req, res) => {
         }
       }
       else if (operator == 1) {
-        user.starred.push(orgId);
+        user.favorites.push(orgId);
         org.categories.forEach((category, index, arr) => {
           if (!user.interests) user.interests = {};
           if (user.interests[category.id]) {

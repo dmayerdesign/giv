@@ -251,25 +251,25 @@ export class BrowseOrgsComponent implements OnInit {
 		this.selectedOrg = null;
 	}
 
-	orgIsStarred(org) {
-		if (!this.user || this.user.starred.indexOf(org._id) === -1) return false;
+	orgIsFavorited(org) {
+		if (!this.user || this.user.favorites.indexOf(org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(id):void {				
-		let featuredOrgToStar = this.featuredOrgs.find(thisOrg => {
+	favoriteOrg(id):void {				
+		let featuredOrgToFavorite = this.featuredOrgs.find(thisOrg => {
 			return thisOrg._id === id;
 		});
-		if (featuredOrgToStar)
-			featuredOrgToStar.stars = featuredOrgToStar.stars ? featuredOrgToStar.stars+1 : 1;
+		if (featuredOrgToFavorite)
+			featuredOrgToFavorite.favorites = featuredOrgToFavorite.favorites ? featuredOrgToFavorite.favorites+1 : 1;
 	}
 
-	unstarOrg(id):void {				
-		let featuredOrgToUnStar = this.featuredOrgs.find(thisOrg => {
+	unfavoriteOrg(id):void {				
+		let featuredOrgToUnfavorite = this.featuredOrgs.find(thisOrg => {
 			return thisOrg._id === id;
 		});
-		if (featuredOrgToUnStar)
-			featuredOrgToUnStar.stars = featuredOrgToUnStar.stars ? featuredOrgToUnStar.stars-1 : 0;
+		if (featuredOrgToUnfavorite)
+			featuredOrgToUnfavorite.favorites = featuredOrgToUnfavorite.favorites ? featuredOrgToUnfavorite.favorites-1 : 0;
 	}
 
 	// starFeaturedOrg(org):void {

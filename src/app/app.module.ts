@@ -11,7 +11,7 @@ import { LoginComponent } from './login.component';
 import { SignupComponent } from './signup.component';
 import { AboutComponent } from './about.component';
 import { OrgComponent } from './org.component';
-import { StarredOrgsComponent } from './starred-orgs.component';
+import { FavoriteOrgsComponent } from './favorite-orgs.component';
 import { RecommendedOrgsComponent } from './recommended-orgs.component';
 import { BrowseOrgsComponent } from './browse-orgs.component';
 import { OrgDetailsComponent } from './org-details.component';
@@ -50,7 +50,7 @@ const routing = RouterModule.forRoot([
   , { path: 'login', component: LoginComponent }
   , { path: 'signup', component: SignupComponent }
   , { path: 'about', component: AboutComponent }
-  , { path: 'starred', component: StarredOrgsComponent }
+  , { path: 'favorites', component: FavoriteOrgsComponent }
   , { path: 'contact', component: ContactComponent }
   , { path: 'account', component: AccountSettingsComponent }
   , { path: 'reset/:token', component: ResetPasswordComponent }
@@ -94,7 +94,7 @@ const routing = RouterModule.forRoot([
       , ClaimOrgComponent
       , VerifyOrgsComponent
     	, AboutComponent
-      , StarredOrgsComponent
+      , FavoriteOrgsComponent
       , RecommendedOrgsComponent
       , ContactComponent
       , UPLOAD_DIRECTIVES

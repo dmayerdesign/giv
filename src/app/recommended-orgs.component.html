@@ -1,13 +1,13 @@
 <div *ngIf="(user || org) && recommendedOrgsAreLoaded"
 		class="recommended-orgs col-md-8"
-		[ngClass]="{'in-single row': org, 'in-starred': inStarred}">
+		[ngClass]="{'in-single row': org, 'in-favorites': inFavorites}">
 	<header>
-		<h2>Recommended <span *ngIf="inStarred" class="desktop-tab-button" (click)="showStarred()">Starred</span></h2>
+		<h2>Recommended <span *ngIf="inFavorites" class="desktop-tab-button" (click)="showFavorites()">Favorites</span></h2>
 		<p class="subtitle">We think you might like these orgs</p>
 	</header>
 
 	<section class="null-search" *ngIf="!recommended.length">
-			<p>No organizations to show. Star some, and watch recommendations appear here!</p>
+			<p>No organizations to show. Save some to your favorites, and watch recommendations appear here!</p>
 	</section>
 
 	<div *ngIf="recommended?.length" class="items-list orgs-list col-md-12">

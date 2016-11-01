@@ -96,11 +96,11 @@
 	font-weight: 500;
 }
 
-header h1, header .stars {
+header h1, header .favorites {
 	padding-left: 3.2rem;
 }
 
-header .stars {
+header .favorites {
 	margin-top: 0;
 }
 

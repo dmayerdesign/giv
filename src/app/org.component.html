@@ -30,10 +30,11 @@
 				</h4>
 
 				<p class="description preview inside-org" *ngIf="!isSelected(org._id)">{{shortDescription | truncate:170}}</p>
-				<p class="stars-preview preview info inside-org">
-					<i *ngIf="user && orgIsStarred()" class="fa fa-star inside-org"></i>
-					<i *ngIf="!org.stars || !orgIsStarred()" class="fa fa-star-o inside-org"></i>
-					<strong class="inside-org">{{org.stars || '0'}}</strong>
+
+				<p *ngIf="org?.ratings?.length" class="ratings-preview preview info inside-org">
+					<i *ngIf="org.rating > 70" class="fa fa-star inside-org"></i>
+					<i *ngIf="org.rating <= 70" class="fa fa-star-o inside-org"></i>
+					<strong class="inside-org">{{org.rating || '0'}}%</strong>
 				</p>
 
 				<h4 class="org-name" *ngIf="isSelected(org._id)">
@@ -42,9 +43,15 @@
 					<span class="manage-org" *ngIf="userHasPermission(org)"><a [routerLink]="['/organization', 'manage', org?._id]">Manage</a></span>
 				</h4>
 				<p class="info" *ngIf="isSelected(org._id)">
-					<span class="star unstarred" *ngIf="!orgIsStarred()" (click)="starOrg(org)"><i class="fa fa-star-o"></i></span>
-					<span class="star starred" *ngIf="user && orgIsStarred()" (click)="unstarOrg(org)"><i class="fa fa-star"></i></span>
-					&nbsp;{{org.stars || '0'}} starred this
+					<span class="heart unfavorited" *ngIf="!orgIsFavorited()" (click)="favoriteOrg(org)"><i class="fa fa-heart-o"></i></span>
+					<span class="heart unfavorited" *ngIf="user && orgIsFavorited()" (click)="unfavoriteOrg(org)"><i class="fa fa-heart"></i></span>
+					&nbsp;{{org.favorites || '0'}} favorited this
+
+					<span *ngIf="org?.ratings?.length" class="rating">
+						<span class="star" *ngIf="org.rating > 70"><i class="fa fa-star"></i></span>
+						<span class="star" *ngIf="org.rating <= 70"><i class="fa fa-star-o"></i></span>
+						&nbsp;{{org.rating || '0'}}%
+					</span>
 				</p>
 			</div>
 		</div>

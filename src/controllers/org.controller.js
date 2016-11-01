@@ -68,7 +68,7 @@ exports.routes = [
 
       if (dbQuery2 && typeof dbQuery2 !== "undefined") {
         Org.find().or([dbQuery, dbQuery2])
-        .sort(req.query.sort || "-stars")
+        .sort(req.query.sort || "-favorites")
         .skip(+req.query.offset)
         .limit(+req.query.limit)
         .exec((err, docs) => {
@@ -81,7 +81,7 @@ exports.routes = [
           if(err) return console.log(err);
           res.json(docs);
         })
-        .sort("-stars")
+        .sort("-favorites")
         .skip(+req.query.offset)
         .limit(+req.query.limit);
       }
@@ -134,17 +134,17 @@ exports.routes = [
     }
   },
 
-  { // GET STARRED
+  { // GET FAVORITES
     method: "get",
-    uri: "/orgs/get/starred",
+    uri: "/orgs/get/favorites",
     process: function(req, res) {
       var dbQuery = {};
       dbQuery._id = {
-        $in: req.query.starred.split(",")
+        $in: req.query.favorites.split(",")
       }
       dbQuery.verified = true;
 
-      console.log("Query starred: ", dbQuery);
+      console.log("Query favorites: ", dbQuery);
       Org.find(dbQuery, (err, docs) => {
         if(err) return console.log(err);
         res.json(docs);
@@ -265,6 +265,48 @@ exports.routes = [
     }
   },
 
+  {
+    method: "post",
+    uri: "/org/rate/:id",
+    process: function(req, res) {
+      let rating = +req.body.rating;
+      let rater = req.body.userId;
+      Org.findById(req.params.id, function(err, org) {
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
+        if (!org.ratings) org.ratings = [];
+        if (org.ratings.filter(rating => {
+          return rating.user == rater;
+        }).length) {
+          return res.json({errmsg: "Sorry—you can't rate an organization more than once"});
+        }
+
+        console.log("RATING:");
+        console.log(rating);
+
+        const oldRating = org.rating;
+        const ratingsLen = org.ratings.length;
+        let newRating = ((oldRating*ratingsLen/10 + rating) / (ratingsLen+1))*10;
+
+        org.rating = newRating;
+        org.ratings.push({user: rater, rating: rating * 10});
+        let updateQuery = { $set: { rating: org.rating, ratings: org.ratings } };
+
+        Org.findOneAndUpdate({_id: req.params.id}, updateQuery, {new: true}, function(err, newOrg) {
+          if(err) {
+            console.log(err);
+            res.status(400).json({errmsg: err});
+          }
+          else {
+            res.json(newOrg);
+          }
+        });
+      });
+    }
+  },
+
   // file uploads with multer-s3
   {
     method: "post",
@@ -277,7 +319,7 @@ exports.routes = [
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {
           console.log(err);
-          res.send(400).json(err);
+          res.status(400).json({errmsg: err});
         }
         else {
           console.log(obj.coverImage);
@@ -298,7 +340,7 @@ exports.routes = [
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, obj) {
         if(err) {
           console.log(err);
-          res.send(400).json({errmsg: err});
+          res.status(400).json({errmsg: err});
         }
         else {
           console.log(obj.avatar);
@@ -371,7 +413,7 @@ exports.sample = function(next) {
     "description": make('desc'),
     "categories": addCategories(),
     "verified": true,
-    "stars": Math.floor(Math.random()*20)
+    "favorites": Math.floor(Math.random()*20)
   });
 
   newOrg.save(function(err, obj) {

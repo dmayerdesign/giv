@@ -20,8 +20,8 @@ export class OrgComponent implements OnInit {
 	@Input() verify;
 	@Output() onSelect = new EventEmitter();
 	@Output() onDeselect = new EventEmitter();
-	@Output() onStar = new EventEmitter();
-	@Output() onUnstar = new EventEmitter();
+	@Output() onFavorite = new EventEmitter();
+	@Output() onUnfavorite = new EventEmitter();
 	@Output() onVerify = new EventEmitter();
 
 	private singleDetailsAreLoaded:boolean = false;
@@ -65,29 +65,29 @@ export class OrgComponent implements OnInit {
 		}
 	}
 
-	orgIsStarred() {
-		if (!this.user || this.user.starred.indexOf(this.org._id) === -1) return false;
+	orgIsFavorited() {
+		if (!this.user || this.user.favorites.indexOf(this.org._id) === -1) return false;
 		else return true;
 	}
 
-	starOrg(org):void {
+	favoriteOrg(org):void {
 		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+		this.http.put("/user/favorite/add", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars = this.org.stars ? this.org.stars+1 : 1;
-				this.onStar.emit(org._id);
+				this.org.favorites = this.org.favorites ? this.org.favorites+1 : 1;
+				this.onFavorite.emit(org._id);
 			}
 		);
 	}
 
-	unstarOrg(org):void {
+	unfavoriteOrg(org):void {
 		if (!this.user) return this.ui.flash("Sign up or log in to save your favorite organizations", "info");
-		this.http.put("/user/star/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
+		this.http.put("/user/favorite/subtract", {orgId: org._id, userId: this.user._id}).map(res => res.json()).subscribe(
 			data => {
 				this.user = data.user;
-				this.org.stars = this.org.stars ? this.org.stars-1 : 0;
-				this.onUnstar.emit(org._id);
+				this.org.favorites = this.org.favorites ? this.org.favorites-1 : 0;
+				this.onUnfavorite.emit(org._id);
 			}
 		);
 	}

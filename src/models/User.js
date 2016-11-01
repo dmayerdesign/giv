@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   permissions: [String],
   uniqueClicks: [String],
   starred: [String],
+  favorites: [String],
 
   name: String,
   username: String,

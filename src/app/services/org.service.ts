@@ -23,10 +23,10 @@ export class OrgService {
 		return this.search.loadSearchableData("/orgs/unverified/get", options);
 	}
 
-	loadStarredOrgs(starred) {
+	loadFavoriteOrgs(favorited) {
 		let params: URLSearchParams = new URLSearchParams();
-		params.set("starred", starred.join(","));
-		return this.http.get("/orgs/get/starred", { search: params }).map(res => res.json());
+		params.set("favorites", favorited.join(","));
+		return this.http.get("/orgs/get/favorites", { search: params }).map(res => res.json());
 	}
 
 	loadPosts(options) {

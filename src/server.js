@@ -165,7 +165,7 @@ app.post('/interests', passportConfig.isAuthenticated, userController.showIntere
 app.get('/adminToken', passportConfig.isAuthenticated, userController.adminToken);
 app.get('/user/:id', userController.getUser);
 app.get('/user/u/:username', userController.getUserByUsername);
-app.put('/user/star/:action', passportConfig.isAuthenticated, userController.star);
+app.put('/user/favorite/:action', passportConfig.isAuthenticated, userController.favorite);
 app.put('/donation/log', passportConfig.isAuthenticated, userController.logDonation);
 app.post('/donation/delete/:id', passportConfig.isAuthenticated, userController.deleteDonation);
 
@@ -254,22 +254,33 @@ mongoose.connection.on('connected', () => {
     }
   }
 
-  // User.find({}, function(err, users) {
-  //   console.log(users[0].password);
-  //   bcrypt.compare('sohcahtoa', users[0].password, function(err, res) {
-  //     console.log(res);
-  //   });
-  // });
+  
 
-  // var testdata = new User({
-  //   name: "Danny",
-  //   email: "d.a.mayer92@gmail.com",
-  //   password: "sohcahtoa"
-  // });
-  // testdata.save(function(err, data){
-  //     if(err) console.log(err);
-  //     else console.log ('Sucess:' , data);
-  // });
+
+
+
+  var switchToFavorites = false;
+
+  if (switchToFavorites) {
+
+    const Org = require('./models/Org');
+
+    Org.find({stars: {$gt: 0}}, function(err, orgs) {
+      if (err) return console.log(err);
+      for (let i = 0; i < orgs.length; i++) {
+
+        Org.findOneAndUpdate(
+          {_id: orgs[i]._id}, {$set: { favoritedBy: orgs[i].starredBy }},
+          function(err) {
+            if (err) console.log(err);
+          }
+        );
+
+      }
+    });
+
+  }
+
 });
 
 
