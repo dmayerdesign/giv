@@ -47,7 +47,6 @@
           [placeholder]="org.name"
           [type]="'text'"
           [saving]="saving_name"
-          (onChange)="checkForUniqueName($event)"
           (onSave)="save('name', $event)"></form-field>
 
         <form-field

@@ -54,9 +54,6 @@ export class CreateOrgComponent implements OnInit {
 		}
 	];
 
-	/** Name validation **/
-	private nameIsValid:boolean = true;
-
 	constructor(
 				private orgService:OrgService,
 				private userService:UserService,
@@ -115,76 +112,72 @@ export class CreateOrgComponent implements OnInit {
 	  }
   }
 
-  checkForUniqueName(name) {
-  	this.http.get("/org/name/" + name).map(res => res.json()).subscribe(data => {
-  		if (data) {
-  			this.nameIsValid = false;
-  			this.ui.flash("Sorry, that name is taken", "error");
-  		}
-  		else this.nameIsValid = true;
-  	});
-  }
-
   submitOrg(newOrg:org):void {
-  	let ok:boolean = true;
-    this.requiredOrgFields.forEach((field, index, arr) => {
-    	if (!newOrg[field.id] && field.id !== 'type') {
-    		this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
-    		ok = false;
-    	}
-    });
-    if (!ok) return;
-    if (!this.roleDescription) return this.ui.flash("Oops! You need to describe your role in the organization", "error");
-    if (!this.nameIsValid) return this.ui.flash("Oops! That name is taken", "error");
+  	this.http.get("/org-name/" + newOrg.name).map(res => res.json()).subscribe(data => { /* First, check that the name isn't taken */
+  		if (data) return this.ui.flash("Sorry, that name is taken", "error");
 
-    let categories:string = "";
-    newOrg.categories.forEach((category, index, arr) => {
-    	if (category.name !== "undefined") categories += category.name;
-    	if (index !== (arr.length - 1)) categories += ", ";
-    });
-    this.email.html = `
-    <!doctype html>
-    <html>
-    <body>
-    	<p><strong>Organization:</strong> ${newOrg.name}</p>
-    	<p><strong>Submitted by:</strong> ${this.email.fromName}</p>
-    	<p><strong>Role:</strong> ${this.roleDescription}</p>
-    	<p><strong>Description of organization:</strong> ${newOrg.description}</p>
-    	<p><strong>Categories:</strong> ${categories}</p>
-    	<p><strong>Website:</strong> ${newOrg.website}</p>
-    	<p><strong>Donate link:</strong> ${newOrg.donateLink}</p>
-    </body>
-    </html>`;
+	  	let ok:boolean = true;
+	    this.requiredOrgFields.forEach((field, index, arr) => {
+	    	if (!newOrg[field.id] && field.id !== 'type') {
+	    		this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+	    		ok = false;
+	    	}
+	    });
+	    if (!ok) return;
+	    if (!this.roleDescription) return this.ui.flash("Oops! You need to describe your role in the organization", "error");
 
-  	this.http.post('/org', newOrg).map(res => res.json()).subscribe(res => {
-  		console.log("New org: ", res);
-  		if (res.errmsg) {
-  			this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
-  			return;
-  		}
-  		this.org = res;
-  		console.log(res);
+	    let categories:string = "";
+	    newOrg.categories.forEach((category, index, arr) => {
+	    	if (category.name !== "undefined") categories += category.name;
+	    	if (index !== (arr.length - 1)) categories += ", ";
+	    });
+	    this.email.html = `
+	    <!doctype html>
+	    <html>
+	    <body>
+	    	<p><strong>Organization:</strong> ${newOrg.name}</p>
+	    	<p><strong>Submitted by:</strong> ${this.email.fromName}</p>
+	    	<p><strong>Role:</strong> ${this.roleDescription}</p>
+	    	<p><strong>Description of organization:</strong> ${newOrg.description}</p>
+	    	<p><strong>Categories:</strong> ${categories}</p>
+	    	<p><strong>Website:</strong> ${newOrg.website}</p>
+	    	<p><strong>Donate link:</strong> ${newOrg.donateLink}</p>
+	    </body>
+	    </html>`;
 
-  		this.http.post('/contact-form', this.email)
-  			.map((res) => res.json())
-				.subscribe(
-					data => {
-						if (data.errmsg) {
-							console.error(data.errmsg);
-							return this.ui.flash("Couldn't send your message", "error");
-						}
-						this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
-						console.log(data);
-						this.router.navigate(['/']);
-					},
-					err => {
-						console.log(err);
-						this.ui.flash("Couldn't send your message", "error");
-					});
-  	}, error => {
-  		this.ui.flash("Submission failed", "error");
-  		return console.error(error);
-  	});
+	  	this.http.post('/org', newOrg).map(res => res.json()).subscribe(res => {
+	  		console.log("New org: ", res);
+	  		if (res.errmsg) {
+	  			this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
+	  			return;
+	  		}
+	  		this.org = res;
+	  		console.log(res);
+
+	  		this.http.post('/contact-form', this.email)
+	  			.map((res) => res.json())
+					.subscribe(
+						data => {
+							if (data.errmsg) {
+								console.error(data.errmsg);
+								return this.ui.flash("Couldn't send your message", "error");
+							}
+							this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
+							console.log(data);
+							this.router.navigate(['/']);
+						},
+						err => {
+							console.log(err);
+							this.ui.flash("Couldn't send your message", "error");
+						});
+	  	}, error => {
+	  		this.ui.flash("Submission failed", "error");
+	  		return console.error(error);
+	  	});
+	  },
+	  err => {
+	  	this.ui.flash("Oops—something went wrong. Reload the page and try again", "error");
+	  });
   }
 
 }

@@ -15,8 +15,7 @@ const orgSchema = new mongoose.Schema({
 	}],
 	website: String,
 	facebook: String,
-	stars: Number,
-	starredBy: [String],
+
 	favorites: Number,
 	favoritedBy: [String],
 	rating: Number,

@@ -64,9 +64,8 @@ export class ManageOrgPageComponent implements OnInit {
 	private changed_categories:boolean;
 	private checked = {};
 
-	/** Slug and name validation **/
+	/** Slug validation **/
 	private slugIsValid:boolean = true;
-	private nameIsValid:boolean = true;
 
 	/** Upload options **/
   coverImageUploadOptions:Object;
@@ -175,16 +174,6 @@ export class ManageOrgPageComponent implements OnInit {
   	});
   }
 
-  checkForUniqueName($event) {
-  	this.http.get("/org/name/" + $event).map(res => res.json()).subscribe(data => {
-  		if (data) {
-  			this.nameIsValid = false;
-  			this.ui.flash("Sorry, that name is taken", "error");
-  		}
-  		else this.nameIsValid = true;
-  	});
-  }
-
   save(key:string, value?:any):void {
   	if (typeof value === "undefined") {
   		value = this[key] || this.org[key];
@@ -212,29 +201,35 @@ export class ManageOrgPageComponent implements OnInit {
   		});
   	}
 
-    if (!this.nameIsValid) return this.ui.flash("Oops! That name is taken", "error");
     if (!this.slugIsValid) return this.ui.flash("Oops! That slug is taken", "error");
 
-  	this['saving_' + key] = true;
-  	this.orgService.editOrg({
-  		id: this.org._id,
-  		key: key,
-  		value: value
-  	}).subscribe(res => {
-  		console.log(res);
-  		if (res.errmsg) {
-  			this.ui.flash("Save failed", "error");
-  			this['saving_' + key] = false;
-  			return;
-  		}
-  		this['saving_' + key] = false;
-  		this['changed_' + key] = false;
+    this.http.get("/org-name/" + (this.name || this.org.name)).map(res => res.json()).subscribe(data => { /* First, check that the name isn't taken */
+  		if (data.length > 1) return this.ui.flash("Sorry, that name is taken", "error");
 
-  		this.displayOrg(res);
-  		
-			this.ui.flash("Saved", "success");
-  		console.log(res);
-  	});
+	  	this['saving_' + key] = true;
+	  	this.orgService.editOrg({
+	  		id: this.org._id,
+	  		key: key,
+	  		value: value
+	  	}).subscribe(res => {
+	  		console.log(res);
+	  		if (res.errmsg) {
+	  			this.ui.flash("Save failed", "error");
+	  			this['saving_' + key] = false;
+	  			return;
+	  		}
+	  		this['saving_' + key] = false;
+	  		this['changed_' + key] = false;
+
+	  		this.displayOrg(res);
+	  		
+				this.ui.flash("Saved", "success");
+	  		console.log(res);
+	  	});
+	  },
+	  err => {
+	  	this.ui.flash("Something went wrong—try again", "error");
+	  });
   }
 
   orgHasCategory(category) {

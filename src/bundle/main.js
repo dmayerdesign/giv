@@ -52881,6 +52881,8 @@
 	            { name: "Healthcare", id: "healthcare" },
 	            { name: "Economic justice", id: "economic" },
 	            { name: "Anti-colonialism", id: "anticolonialism" },
+	            { name: "Human rights", id: "human" },
+	            { name: "Education", id: "education" },
 	            { name: "Other", id: "other" }
 	        ];
 	    };
@@ -53564,9 +53566,8 @@
 	        this.categories = this.categoryService.list();
 	        this.orgTypes = this.orgTypeService.list();
 	        this.checked = {};
-	        /** Slug and name validation **/
+	        /** Slug validation **/
 	        this.slugIsValid = true;
-	        this.nameIsValid = true;
 	    }
 	    ManageOrgPageComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -53647,17 +53648,6 @@
 	                _this.slugIsValid = true;
 	        });
 	    };
-	    ManageOrgPageComponent.prototype.checkForUniqueName = function ($event) {
-	        var _this = this;
-	        this.http.get("/org/name/" + $event).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data) {
-	                _this.nameIsValid = false;
-	                _this.ui.flash("Sorry, that name is taken", "error");
-	            }
-	            else
-	                _this.nameIsValid = true;
-	        });
-	    };
 	    ManageOrgPageComponent.prototype.save = function (key, value) {
 	        var _this = this;
 	        if (typeof value === "undefined") {
@@ -53683,27 +53673,31 @@
 	                }
 	            });
 	        }
-	        if (!this.nameIsValid)
-	            return this.ui.flash("Oops! That name is taken", "error");
 	        if (!this.slugIsValid)
 	            return this.ui.flash("Oops! That slug is taken", "error");
-	        this['saving_' + key] = true;
-	        this.orgService.editOrg({
-	            id: this.org._id,
-	            key: key,
-	            value: value
-	        }).subscribe(function (res) {
-	            console.log(res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Save failed", "error");
+	        this.http.get("/org-name/" + (this.name || this.org.name)).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data.length > 1)
+	                return _this.ui.flash("Sorry, that name is taken", "error");
+	            _this['saving_' + key] = true;
+	            _this.orgService.editOrg({
+	                id: _this.org._id,
+	                key: key,
+	                value: value
+	            }).subscribe(function (res) {
+	                console.log(res);
+	                if (res.errmsg) {
+	                    _this.ui.flash("Save failed", "error");
+	                    _this['saving_' + key] = false;
+	                    return;
+	                }
 	                _this['saving_' + key] = false;
-	                return;
-	            }
-	            _this['saving_' + key] = false;
-	            _this['changed_' + key] = false;
-	            _this.displayOrg(res);
-	            _this.ui.flash("Saved", "success");
-	            console.log(res);
+	                _this['changed_' + key] = false;
+	                _this.displayOrg(res);
+	                _this.ui.flash("Saved", "success");
+	                console.log(res);
+	            });
+	        }, function (err) {
+	            _this.ui.flash("Something went wrong—try again", "error");
 	        });
 	    };
 	    ManageOrgPageComponent.prototype.orgHasCategory = function (category) {
@@ -56327,8 +56321,6 @@
 	                name: "website"
 	            }
 	        ];
-	        /** Name validation **/
-	        this.nameIsValid = true;
 	    }
 	    CreateOrgComponent.prototype.ngOnInit = function () {
 	        var _this = this;
@@ -56381,65 +56373,58 @@
 	            this.org.categories.splice(this.org.categories.indexOf(category), 1);
 	        }
 	    };
-	    CreateOrgComponent.prototype.checkForUniqueName = function (name) {
-	        var _this = this;
-	        this.http.get("/org/name/" + name).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data) {
-	                _this.nameIsValid = false;
-	                _this.ui.flash("Sorry, that name is taken", "error");
-	            }
-	            else
-	                _this.nameIsValid = true;
-	        });
-	    };
 	    CreateOrgComponent.prototype.submitOrg = function (newOrg) {
 	        var _this = this;
-	        var ok = true;
-	        this.requiredOrgFields.forEach(function (field, index, arr) {
-	            if (!newOrg[field.id] && field.id !== 'type') {
-	                _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
-	                ok = false;
-	            }
-	        });
-	        if (!ok)
-	            return;
-	        if (!this.roleDescription)
-	            return this.ui.flash("Oops! You need to describe your role in the organization", "error");
-	        if (!this.nameIsValid)
-	            return this.ui.flash("Oops! That name is taken", "error");
-	        var categories = "";
-	        newOrg.categories.forEach(function (category, index, arr) {
-	            if (category.name !== "undefined")
-	                categories += category.name;
-	            if (index !== (arr.length - 1))
-	                categories += ", ";
-	        });
-	        this.email.html = "\n    <!doctype html>\n    <html>\n    <body>\n    \t<p><strong>Organization:</strong> " + newOrg.name + "</p>\n    \t<p><strong>Submitted by:</strong> " + this.email.fromName + "</p>\n    \t<p><strong>Role:</strong> " + this.roleDescription + "</p>\n    \t<p><strong>Description of organization:</strong> " + newOrg.description + "</p>\n    \t<p><strong>Categories:</strong> " + categories + "</p>\n    \t<p><strong>Website:</strong> " + newOrg.website + "</p>\n    \t<p><strong>Donate link:</strong> " + newOrg.donateLink + "</p>\n    </body>\n    </html>";
-	        this.http.post('/org', newOrg).map(function (res) { return res.json(); }).subscribe(function (res) {
-	            console.log("New org: ", res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
-	                return;
-	            }
-	            _this.org = res;
-	            console.log(res);
-	            _this.http.post('/contact-form', _this.email)
-	                .map(function (res) { return res.json(); })
-	                .subscribe(function (data) {
-	                if (data.errmsg) {
-	                    console.error(data.errmsg);
-	                    return _this.ui.flash("Couldn't send your message", "error");
+	        this.http.get("/org-name/" + newOrg.name).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data)
+	                return _this.ui.flash("Sorry, that name is taken", "error");
+	            var ok = true;
+	            _this.requiredOrgFields.forEach(function (field, index, arr) {
+	                if (!newOrg[field.id] && field.id !== 'type') {
+	                    _this.ui.flash("Oops! You need to fill out your org's " + field.name, "error");
+	                    ok = false;
 	                }
-	                _this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
-	                console.log(data);
-	                _this.router.navigate(['/']);
-	            }, function (err) {
-	                console.log(err);
-	                _this.ui.flash("Couldn't send your message", "error");
 	            });
-	        }, function (error) {
-	            _this.ui.flash("Submission failed", "error");
-	            return console.error(error);
+	            if (!ok)
+	                return;
+	            if (!_this.roleDescription)
+	                return _this.ui.flash("Oops! You need to describe your role in the organization", "error");
+	            var categories = "";
+	            newOrg.categories.forEach(function (category, index, arr) {
+	                if (category.name !== "undefined")
+	                    categories += category.name;
+	                if (index !== (arr.length - 1))
+	                    categories += ", ";
+	            });
+	            _this.email.html = "\n\t    <!doctype html>\n\t    <html>\n\t    <body>\n\t    \t<p><strong>Organization:</strong> " + newOrg.name + "</p>\n\t    \t<p><strong>Submitted by:</strong> " + _this.email.fromName + "</p>\n\t    \t<p><strong>Role:</strong> " + _this.roleDescription + "</p>\n\t    \t<p><strong>Description of organization:</strong> " + newOrg.description + "</p>\n\t    \t<p><strong>Categories:</strong> " + categories + "</p>\n\t    \t<p><strong>Website:</strong> " + newOrg.website + "</p>\n\t    \t<p><strong>Donate link:</strong> " + newOrg.donateLink + "</p>\n\t    </body>\n\t    </html>";
+	            _this.http.post('/org', newOrg).map(function (res) { return res.json(); }).subscribe(function (res) {
+	                console.log("New org: ", res);
+	                if (res.errmsg) {
+	                    _this.ui.flash("Submission failed. It's possible that an org with the same name already exists.", "error");
+	                    return;
+	                }
+	                _this.org = res;
+	                console.log(res);
+	                _this.http.post('/contact-form', _this.email)
+	                    .map(function (res) { return res.json(); })
+	                    .subscribe(function (data) {
+	                    if (data.errmsg) {
+	                        console.error(data.errmsg);
+	                        return _this.ui.flash("Couldn't send your message", "error");
+	                    }
+	                    _this.ui.flash("Submitted! We'll be in touch with you soon. Thanks!", "success");
+	                    console.log(data);
+	                    _this.router.navigate(['/']);
+	                }, function (err) {
+	                    console.log(err);
+	                    _this.ui.flash("Couldn't send your message", "error");
+	                });
+	            }, function (error) {
+	                _this.ui.flash("Submission failed", "error");
+	                return console.error(error);
+	            });
+	        }, function (err) {
+	            _this.ui.flash("Oops—something went wrong. Reload the page and try again", "error");
 	        });
 	    };
 	    CreateOrgComponent = __decorate([
