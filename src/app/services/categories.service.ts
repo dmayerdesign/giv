@@ -20,6 +20,8 @@ export class Categories {
 	    { name: "Healthcare", id: "healthcare" },
 	    { name: "Economic justice", id: "economic" },
 	    { name: "Anti-colonialism", id: "anticolonialism" },
+	    { name: "Human rights", id: "human" },
+	    { name: "Education", id: "education" },
 	    { name: "Other", id: "other" }
 	  ];
 	}

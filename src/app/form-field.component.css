@@ -144,6 +144,7 @@ button.remove:hover {
 	margin-right: 1%;
 	margin-bottom: 0.3em;
 	border: 1px solid #DFE8E6;
+	background: #fff;
 
 	font-family: 'Hind', Helvetica, 'Roboto', sans-serif;
   font-weight: 500;

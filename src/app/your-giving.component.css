@@ -41,6 +41,10 @@
   background: linear-gradient(45deg, #1AE3EF, #0DED9C);
 }
 
+.circle.hours {
+	background: linear-gradient(45deg, #68B4F3, #9B84F5);
+}
+
 .circle-inner {
 	display: inline-block;
 	vertical-align: middle;
@@ -120,7 +124,7 @@
 }
 
 .graph .hours {
-	background: #6895A5;
+	background: linear-gradient(45deg, #68B4F3, #9B84F5);
 }
 
 .subtotals {
@@ -138,7 +142,7 @@
 }
 
 .subtotals .hours {
-	color: #6895A5;
+	color: #68A5D5;
 }
 
 .org-name {

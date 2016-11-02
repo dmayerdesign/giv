@@ -198,9 +198,9 @@ exports.routes = [
   // GET SINGLE
   {
     method: "get",
-    uri: "/org/name/:name",
+    uri: "/org-name/:name",
     process: function(req, res) {
-      Org.findOne({name: req.params.name, verified: true}, function (err, obj) {
+      Org.findOne({name: decodeURIComponent((req.params.name+'').replace(/\+/g, '%20')), verified: true}, function (err, obj) {
         if(err) return console.log(err);
         res.json(obj);
       });
