@@ -279,42 +279,42 @@ mongoose.connection.on('connected', () => {
 
   // }
 
-  User.find({}, function(err, users) {
-    if (err) return console.log(err);
-    for (let i = 0; i < users.length; i++) {
+  // User.find({}, function(err, users) {
+  //   if (err) return console.log(err);
+  //   for (let i = 0; i < users.length; i++) {
 
-      User.findOneAndUpdate(
-        {_id: users[i]._id}, {$set: { 
-          favorites: [],
-          interests: {}
-        }},
-        function(err) {
-          if (err) console.log(err);
-        }
-      );
+  //     User.findOneAndUpdate(
+  //       {_id: users[i]._id}, {$set: { 
+  //         favorites: [],
+  //         interests: {}
+  //       }},
+  //       function(err) {
+  //         if (err) console.log(err);
+  //       }
+  //     );
 
-    }
-  });
+  //   }
+  // });
 
-  const Org = require('./models/Org');
+  // const Org = require('./models/Org');
 
-  Org.find({}, function(err, orgs) {
-    if (err) return console.log(err);
-    for (let i = 0; i < orgs.length; i++) {
-      Org.findOneAndUpdate(
-        {_id: orgs[i]._id}, {$set: {
-          favoritedBy: [],
-          favorites: 0,
-          ratings: [],
-          rating: 0,
-          donations: []
-        }},
-        function(err) {
-          if (err) console.log(err);
-        }
-      );
-    }
-  });
+  // Org.find({}, function(err, orgs) {
+  //   if (err) return console.log(err);
+  //   for (let i = 0; i < orgs.length; i++) {
+  //     Org.findOneAndUpdate(
+  //       {_id: orgs[i]._id}, {$set: {
+  //         favoritedBy: [],
+  //         favorites: 0,
+  //         ratings: [],
+  //         rating: 0,
+  //         donations: []
+  //       }},
+  //       function(err) {
+  //         if (err) console.log(err);
+  //       }
+  //     );
+  //   }
+  // });
 
 
 });
