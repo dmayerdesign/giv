@@ -56714,7 +56714,8 @@
 	    ContactComponent = __decorate([
 	        core_1.Component({
 	            selector: 'contact',
-	            templateUrl: 'app/contact.component.html'
+	            templateUrl: 'app/contact.component.html',
+	            styleUrls: ['app/form-field.component.css']
 	        }), 
 	        __metadata('design:paramtypes', [http_1.Http, router_1.Router, app_service_1.UIHelper])
 	    ], ContactComponent);

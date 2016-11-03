@@ -26,7 +26,8 @@ interface EmailForm {
 
 @Component({
 	selector: 'contact',
-	templateUrl: 'app/contact.component.html'
+	templateUrl: 'app/contact.component.html',
+	styleUrls: ['app/form-field.component.css']
 })
 
 export class ContactComponent {

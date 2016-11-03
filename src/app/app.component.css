@@ -77,3 +77,41 @@ footer, footer a {
 footer a:hover {
   color: #b8b3b5;
 }
+
+/* Feedback */
+
+.leave-feedback {
+  cursor: pointer;
+  background: #7DADD7;
+  color: #fff;
+  position: fixed;
+  right: -2rem;
+  bottom: -2rem;
+  z-index: 110;
+  width: 4rem;
+  height: 4rem;
+  transform: rotate(45deg);
+  opacity: 0.6;
+}
+
+.leave-feedback:hover {
+  opacity: 1;
+}
+
+.leave-feedback i {
+  position: absolute;
+  top: 1.6rem;
+  left: 0.4rem;
+  font-size: 0.85rem;
+  transform: rotate(-45deg);
+}
+
+.leave-feedback span {
+  color: #7DADD7;
+  position: absolute;
+  transform: rotate(-90deg);
+  padding-bottom: 0.2rem;
+  font-size: 0.6rem;
+  top: 1.35rem;
+  left: -2.55rem;
+}

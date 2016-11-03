@@ -42,7 +42,7 @@ const orgSchema = new mongoose.Schema({
 	avatar: String,
 	videoLink: String,
 	gallery: [String],
-	posts: [String],
+
 	categories: Array
 });
 
