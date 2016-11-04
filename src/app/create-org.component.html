@@ -1,9 +1,10 @@
 <div class="create-org">
 
   <div class="giv-form col-md-6">
-    <h2>Submit your organization</h2>
+    <h2>Submit an organization</h2>
+    <p class="subtitle">If you're part of an organization, or know of one that you think belongs on Giv, submit it by filling out the form below. As long as it's not blatantly fake or hateful, we'll add it to the database.</p>
     <div class="form-field clearfix">
-      <label class="title">Name of your organization</label>
+      <label class="title">Name of the organization</label>
       <input [(ngModel)]="org.name"
             class="form-control"
             name="name"
@@ -60,7 +61,7 @@
       <textarea [(ngModel)]="roleDescription"
             class="form-control"
             name="message"
-            placeholder="Describe your role in this organization"></textarea>
+            placeholder="Describe your role or interest in this organization"></textarea>
     </div>
     
     <button class="full-width submit-org" (click)="submitOrg(org)">Submit organization</button>

@@ -75,13 +75,7 @@ exports.routes = [
       Post.create(newPost, function(err, post) {
         if(err) return console.log(err);
         console.log(post);
-        Org.findOneAndUpdate(post.org, { $push: { "posts": post._id } }, {new: true}, function(err, org) {
-          if(err) {
-            console.log(err);
-            return res.status(500).json({errmsg: err});
-          }
-          res.status(200).json(post);
-        });
+        res.status(200).json(post);
       });
     }
   },

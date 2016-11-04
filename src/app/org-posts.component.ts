@@ -87,8 +87,8 @@ export class OrgPostsComponent implements OnInit {
 		if (increase) query['limit'] = increase;
 		if (offset) query['offset'] = offset;
 
-		if (!this.org) query = {limit: this.initialPostLimit, sort: "-dateCreated"}
-		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-dateCreated"};
+		if (!this.org) query = {limit: this.initialPostLimit, sort: "-createdAt"}
+		if (this.org) query = {filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-createdAt"};
 		if (this.org && this.isBrowsing) query['limit'] = 4;
 
 		if (search) {
@@ -133,6 +133,7 @@ export class OrgPostsComponent implements OnInit {
 		else {
 			this.viewingOne = true;
 			this.selectedPost = this.posts.find(post => post._id === id);
+			if (!this.selectedPost) return this.ui.flash("Sorry, that post no longer exists :(", "error");
 			this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 		}
 	}
@@ -260,7 +261,7 @@ export class OrgPostsComponent implements OnInit {
   			this.savingPost = false;
   			return;
   		}
-  		this.posts.push(res);
+  		this.posts.unshift(res);
   		this.org.posts.push(res._id);
   		this.update.emit(this.org);
   		this.savingPost = false;
