@@ -120,8 +120,11 @@ export class OrgComponent implements OnInit {
   	else return false;
   }
 
-  verifyOrg(org) {
-  	this.onVerify.emit("");
+  verifyOrg(org, creator) {
+  	this.onVerify.emit({
+  		org: org,
+  		creator: creator
+  	});
   }
 
 }

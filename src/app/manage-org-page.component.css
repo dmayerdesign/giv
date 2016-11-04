@@ -58,6 +58,12 @@ h2 span {
 
 /* PREVIEW PANE */
 
+@media screen and (min-width: 768px) {
+	.preview-pane {
+		float: right !important;
+	}
+}
+
 /* Visuals */
 .preview-section.visuals {
 	margin-bottom: 9em;

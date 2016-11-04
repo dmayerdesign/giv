@@ -38,7 +38,7 @@
 				<div class="post-inner">
 					<p class="post-meta">
 						<strong *ngIf="!org" class="post-org">{{orgsByPost[post._id]?.name}}<span> &middot; </span></strong>
-						<span class="post-date">{{post?.dateCreated | date: MMMEEEEd}}</span>
+						<span class="post-date">{{post?.createdAt | date: MMMEEEEd}}</span>
 					</p>
 					<h5 class="post-title" (click)="selectPost(post._id)">{{post.title}}</h5>
 					<p class="post-content">{{post.content | truncate:100}}</p>
@@ -65,7 +65,7 @@
 				<h3 class="post-title single-post-title">{{selectedPost.title}}</h3>
 				<p class="post-meta">
 					<strong *ngIf="!org" class="post-org">{{orgsByPost[selectedPost._id]?.name}}<span> &middot; </span></strong>
-					<span class="post-date">{{selectedPost?.dateCreated | date: MMMEEEEd}}</span>
+					<span class="post-date">{{selectedPost?.createdAt | date: MMMEEEEd}}</span>
 				</p>
 				<p *ngIf="!selectedPost.treatedContent" class="post-content single-post-content">{{selectedPost.content}}</p>
 				<p *ngIf="selectedPost.treatedContent" [innerHTML]="selectedPost.treatedContent" class="post-content single-post-content"></p>

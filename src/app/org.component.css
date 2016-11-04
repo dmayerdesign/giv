@@ -40,3 +40,10 @@
 .more-posts {
   padding: 0.7em 0;
 }
+
+.verify-org {
+  float: left;
+  margin-top: 1rem;
+  width: 48%;
+  margin-right: 2%;
+}

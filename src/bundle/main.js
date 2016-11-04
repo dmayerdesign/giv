@@ -51938,8 +51938,11 @@
 	        else
 	            return false;
 	    };
-	    OrgComponent.prototype.verifyOrg = function (org) {
-	        this.onVerify.emit("");
+	    OrgComponent.prototype.verifyOrg = function (org, creator) {
+	        this.onVerify.emit({
+	            org: org,
+	            creator: creator
+	        });
 	    };
 	    __decorate([
 	        core_1.Input(), 
@@ -52883,6 +52886,7 @@
 	            { name: "Anti-colonialism", id: "anticolonialism" },
 	            { name: "Human rights", id: "human" },
 	            { name: "Education", id: "education" },
+	            { name: "Philanthropy & Community", id: "philanthropy" },
 	            { name: "Other", id: "other" }
 	        ];
 	    };
@@ -53077,9 +53081,9 @@
 	        if (offset)
 	            query['offset'] = offset;
 	        if (!this.org)
-	            query = { limit: this.initialPostLimit, sort: "-dateCreated" };
+	            query = { limit: this.initialPostLimit, sort: "-createdAt" };
 	        if (this.org)
-	            query = { filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-dateCreated" };
+	            query = { filterField: "org", filterValue: this.org._id, limit: this.initialPostLimit, sort: "-createdAt" };
 	        if (this.org && this.isBrowsing)
 	            query['limit'] = 4;
 	        if (search) {
@@ -53115,6 +53119,8 @@
 	        else {
 	            this.viewingOne = true;
 	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
+	            if (!this.selectedPost)
+	                return this.ui.flash("Sorry, that post no longer exists :(", "error");
 	            this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
 	        }
 	    };
@@ -53236,7 +53242,7 @@
 	                _this.savingPost = false;
 	                return;
 	            }
-	            _this.posts.push(res);
+	            _this.posts.unshift(res);
 	            _this.org.posts.push(res._id);
 	            _this.update.emit(_this.org);
 	            _this.savingPost = false;
@@ -53560,8 +53566,12 @@
 	        this.callsToAction = [
 	            "Donate",
 	            "Support",
+	            "Volunteer",
 	            "Help out",
-	            "Volunteer"
+	            "Become an accomplice",
+	            "Join the movement",
+	            "Help our cause",
+	            "Stand with us"
 	        ];
 	        this.categories = this.categoryService.list();
 	        this.orgTypes = this.orgTypeService.list();
@@ -53675,8 +53685,8 @@
 	        }
 	        if (!this.slugIsValid)
 	            return this.ui.flash("Oops! That slug is taken", "error");
-	        this.http.get("/org-name/" + (this.name || this.org.name)).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data.length > 1)
+	        this.http.get("/org-name/" + (this.name && encodeURIComponent(this.name)) || (this.org.name && encodeURIComponent(this.org.name))).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data && data.length > 1)
 	                return _this.ui.flash("Sorry, that name is taken", "error");
 	            _this['saving_' + key] = true;
 	            _this.orgService.editOrg({
@@ -53686,7 +53696,7 @@
 	            }).subscribe(function (res) {
 	                console.log(res);
 	                if (res.errmsg) {
-	                    _this.ui.flash("Save failed", "error");
+	                    _this.ui.flash("Save failed. " + res.errmsg, "error");
 	                    _this['saving_' + key] = false;
 	                    return;
 	                }
@@ -53697,6 +53707,7 @@
 	                console.log(res);
 	            });
 	        }, function (err) {
+	            console.error(err);
 	            _this.ui.flash("Something went wrong—try again", "error");
 	        });
 	    };
@@ -56230,22 +56241,25 @@
 	        else
 	            return false;
 	    };
-	    VerifyOrgsComponent.prototype.verifyOrg = function (org) {
+	    VerifyOrgsComponent.prototype.verifyOrg = function (org, creator) {
 	        var _this = this;
 	        var orgIndex = this.orgs.indexOf(org);
-	        this.orgService.editOrg({
-	            id: org._id,
-	            key: "verified",
-	            value: true
-	        }).subscribe(function (res) {
-	            console.log(res);
-	            if (res.errmsg) {
-	                _this.ui.flash("Verification failed", "error");
-	                return;
+	        var body = creator ? { managerId: creator._id } : {};
+	        this.http.post("/verify-org/" + org._id, body).map(function (res) { return res.json(); }).subscribe(function (data) {
+	            if (data.errmsg) {
+	                return _this.ui.flash("Verification failed", "error");
 	            }
 	            _this.orgs.splice(orgIndex, 1);
-	            _this.ui.flash("Verified", "success");
-	            console.log(res);
+	            if (data.managers && data.managers.length) {
+	                _this.ui.flash("Success! The organization and its creator are now verified", "success");
+	            }
+	            else {
+	                _this.ui.flash("Success! The organization is now verified", "success");
+	            }
+	            console.log(data);
+	        }, function (err) {
+	            console.log(err);
+	            _this.ui.flash("Something went wrong. Try again", "error");
 	        });
 	    };
 	    VerifyOrgsComponent = __decorate([
@@ -56376,7 +56390,7 @@
 	    CreateOrgComponent.prototype.submitOrg = function (newOrg) {
 	        var _this = this;
 	        this.http.get("/org-name/" + newOrg.name).map(function (res) { return res.json(); }).subscribe(function (data) {
-	            if (data)
+	            if (data && data.length)
 	                return _this.ui.flash("Sorry, that name is taken", "error");
 	            var ok = true;
 	            _this.requiredOrgFields.forEach(function (field, index, arr) {

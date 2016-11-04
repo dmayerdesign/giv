@@ -188,22 +188,28 @@ export class VerifyOrgsComponent implements OnInit {
 		else return false;
 	}
 
-	verifyOrg(org) {
+	verifyOrg(org, creator) {
 		let orgIndex = this.orgs.indexOf(org);
-		this.orgService.editOrg({
-  		id: org._id,
-  		key: "verified",
-  		value: true
-  	}).subscribe(res => {
-  		console.log(res);
-  		if (res.errmsg) {
-  			this.ui.flash("Verification failed", "error");
-  			return;
-  		}
-  		this.orgs.splice(orgIndex, 1);
-  		this.ui.flash("Verified", "success");
-  		console.log(res);
-  	});
+		let body = creator ? {managerId: creator._id} : {};
+
+		this.http.post("/verify-org/" + org._id, body).map(res => res.json()).subscribe(
+			data => {
+				if (data.errmsg) {
+	  			return this.ui.flash("Verification failed", "error");
+	  		}
+	  		this.orgs.splice(orgIndex, 1);
+	  		if (data.managers && data.managers.length) {
+	  			this.ui.flash("Success! The organization and its creator are now verified", "success");
+	  		} else {
+	  			this.ui.flash("Success! The organization is now verified", "success");
+	  		}
+	  		console.log(data);
+			},
+			err => {
+				console.log(err);
+				this.ui.flash("Something went wrong. Try again", "error");
+			}
+		);
 	}
 
 }

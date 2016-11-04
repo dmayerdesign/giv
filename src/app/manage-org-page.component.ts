@@ -41,8 +41,12 @@ export class ManageOrgPageComponent implements OnInit {
 	private callsToAction:Array<string> = [
 		"Donate",
 		"Support",
+		"Volunteer",
 		"Help out",
-		"Volunteer"
+		"Become an accomplice",
+		"Join the movement",
+		"Help our cause",
+		"Stand with us"
 	];
 	private categories = this.categoryService.list(); 
 	private orgTypes = this.orgTypeService.list();
@@ -203,8 +207,8 @@ export class ManageOrgPageComponent implements OnInit {
 
     if (!this.slugIsValid) return this.ui.flash("Oops! That slug is taken", "error");
 
-    this.http.get("/org-name/" + (this.name || this.org.name)).map(res => res.json()).subscribe(data => { /* First, check that the name isn't taken */
-  		if (data.length > 1) return this.ui.flash("Sorry, that name is taken", "error");
+    this.http.get("/org-name/" + (this.name && encodeURIComponent(this.name)) || (this.org.name && encodeURIComponent(this.org.name))).map(res => res.json()).subscribe(data => { /* First, check that the name isn't taken */
+  		if (data && data.length > 1) return this.ui.flash("Sorry, that name is taken", "error");
 
 	  	this['saving_' + key] = true;
 	  	this.orgService.editOrg({
@@ -214,7 +218,7 @@ export class ManageOrgPageComponent implements OnInit {
 	  	}).subscribe(res => {
 	  		console.log(res);
 	  		if (res.errmsg) {
-	  			this.ui.flash("Save failed", "error");
+	  			this.ui.flash("Save failed. " + res.errmsg, "error");
 	  			this['saving_' + key] = false;
 	  			return;
 	  		}
@@ -228,6 +232,7 @@ export class ManageOrgPageComponent implements OnInit {
 	  	});
 	  },
 	  err => {
+	  	console.error(err);
 	  	this.ui.flash("Something went wrong—try again", "error");
 	  });
   }

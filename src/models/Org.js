@@ -6,7 +6,6 @@ const orgSchema = new mongoose.Schema({
 	description: String,
 	type: String,
 	creator: String,
-	dateCreated: {type: Date, default: Date.now()},
 	donateLink: String,
 	donateLinkCopy: {type: String, default: "Donate"},
 	otherLinks: [{
@@ -44,6 +43,9 @@ const orgSchema = new mongoose.Schema({
 	gallery: [String],
 
 	categories: Array
+},
+{
+	timestamps: true
 });
 
 orgSchema.pre('save', function(next) {

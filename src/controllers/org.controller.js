@@ -72,13 +72,19 @@ exports.routes = [
         .skip(+req.query.offset)
         .limit(+req.query.limit)
         .exec((err, docs) => {
-          if(err) return console.log(err);
+          if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
           res.json(docs);
         })
       }
       else {
         Org.find(dbQuery, (err, docs) => {
-          if(err) return console.log(err);
+          if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
           res.json(docs);
         })
         .sort("-favorites")
@@ -118,13 +124,19 @@ exports.routes = [
         .skip(+req.query.offset)
         .limit(+req.query.limit)
         .exec((err, docs) => {
-          if(err) return console.log(err);
+          if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
           res.json(docs);
         })
       }
       else {
         Org.find(dbQuery, (err, docs) => {
-          if(err) return console.log(err);
+          if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
           res.json(docs);
         })
         .sort("-dateCreated")
@@ -146,7 +158,10 @@ exports.routes = [
 
       console.log("Query favorites: ", dbQuery);
       Org.find(dbQuery, (err, docs) => {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.json(docs);
       });
     }
@@ -189,20 +204,32 @@ exports.routes = [
     uri: "/org/:id",
     process: function(req, res) {
       Org.findOne({_id: req.params.id, verified: true}, function (err, obj) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.json(obj);
       });
     }
   },
 
-  // GET SINGLE
+  // GET BY NAME
   {
     method: "get",
     uri: "/org-name/:name",
     process: function(req, res) {
-      Org.findOne({name: decodeURIComponent((req.params.name+'').replace(/\+/g, '%20')), verified: true}, function (err, obj) {
-        if(err) return console.log(err);
-        res.json(obj);
+      console.log("GETTING NAME:", req.params.name);
+      Org.findOne({name: decodeURIComponent((req.params.name+'').replace(/\+/g, '%20')), verified: true}, function (err, org) {
+        console.log(err);
+        console.log(org);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
+        if (!org) {
+          return res.json([]);
+        }
+        res.json(org);
       });
     }
   },
@@ -213,7 +240,10 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({_id: req.params.id}, req.body, function (err) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.sendStatus(200);
       });
     }
@@ -225,7 +255,10 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndRemove({_id: req.params.id}, function(err) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.status(200).json({success: true});
       });
     }
@@ -236,7 +269,10 @@ exports.routes = [
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOne({slug: req.params.slug, verified: true}, function (err, obj) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.json(obj);
       });
     }
@@ -248,7 +284,10 @@ exports.routes = [
     middleware: "passport",
     process: function(req, res) {
       Org.findOneAndUpdate({slug: req.params.slug}, req.body, function (err) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.sendStatus(200);
       });
     }
@@ -259,7 +298,10 @@ exports.routes = [
     uri: "/org/s/:slug",
     process: function(req, res) {
       Org.findOneAndRemove({slug: req.params.slug}, function(err) {
-        if(err) return console.log(err);
+        if(err) {
+          console.log(err);
+          return res.status(400).json({errmsg: err});
+        }
         res.sendStatus(200);
       });
     }
@@ -348,6 +390,51 @@ exports.routes = [
         } 
       });
     }
+  },
+
+  {
+    method: "post",
+    uri: "/verify-org/:orgId",
+    process: function(req, res) {
+      let updateQuery = {$set: { verified: true }};
+      if (req.body.managerId) {
+        updateQuery.$set.managers = [req.body.managerId];
+      }
+      Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
+        if(err) {
+          console.log(err);
+          res.status(400).json({errmsg: err});
+        }
+        else {
+          if (req.body.managerId) {
+            User.findById(req.body.managerId, function(err, user) {
+              if(err) {
+                console.log(err);
+                res.status(400).json({errmsg: err});
+              }
+              else {
+                if (!user.permissions) {
+                  user.permissions = [];
+                }
+                user.permissions.push(org.globalPermission);
+                user.save(function(err, newUser) {
+                  if(err) {
+                    console.log(err);
+                    res.status(400).json({errmsg: err});
+                  }
+                  else {
+                    res.json(org);
+                  }
+                });
+              }
+            });
+          }
+          else {
+            res.json(org);
+          }
+        }
+      });
+    }
   }
 
 ];
@@ -386,7 +473,7 @@ function editOrg(key) {
       Org.findOneAndUpdate({_id: req.params.orgId}, updateQuery, {new: true}, function(err, org) {
         if(err) {
           res.json({errmsg: err});
-          console.log(err);
+          return console.log(err);
         }
         if(org) {
           console.log("key: ", key);
@@ -417,7 +504,10 @@ exports.sample = function(next) {
   });
 
   newOrg.save(function(err, obj) {
-    if(err) return console.log(err);
+    if(err) {
+      console.log(err);
+      return res.status(400).json({errmsg: err});
+    }
     console.log(obj);
     next(err, obj);
   });
@@ -466,7 +556,10 @@ exports.insert = function(orgs, next) {
     delete newOrg.category;
 
     newOrg.save(function(err, obj) {
-      if(err) return console.log(err);
+      if(err) {
+      console.log(err);
+      return res.status(400).json({errmsg: err});
+    }
       console.log(obj);
       User.find({}, function(err, users) { // Give all users globalPermission
         users.forEach(function(user) {

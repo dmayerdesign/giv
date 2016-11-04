@@ -22,6 +22,7 @@ export class Categories {
 	    { name: "Anti-colonialism", id: "anticolonialism" },
 	    { name: "Human rights", id: "human" },
 	    { name: "Education", id: "education" },
+	    { name: "Philanthropy & Community", id: "philanthropy" },
 	    { name: "Other", id: "other" }
 	  ];
 	}

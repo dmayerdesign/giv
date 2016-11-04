@@ -52,7 +52,13 @@
   font-size: 0.7em;
   color: #fff;
   opacity: 0.7;
-  font-family: Hind, Helvetica, sans-serif;
+  font-family: 'Hind', Helvetica, sans-serif;
+}
+
+@media screen and (max-width: 939px) {
+  .greeting {
+    display: none;
+  }
 }
 
 /* Footer */

@@ -73,5 +73,6 @@
 		</p>
 	</div>
 
-	<button *ngIf="verify" (click)="verifyOrg(org)">Verify this organization</button>
+	<button class="verify-org" *ngIf="verify" (click)="verifyOrg(org)">Verify this organization</button>
+	<button class="verify-org verify-creator" *ngIf="verify" (click)="verifyOrg(org, user)">Verify and add manager</button>
 </section>

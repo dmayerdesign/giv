@@ -44,7 +44,7 @@
 			(onDeselect)="deselectOrg($event)"
 			(onStar)="starOrg($event)"
 			(onUnstar)="unstarOrg($event)"
-			(onVerify)="verifyOrg(org)"
+			(onVerify)="verifyOrg($event.org, $event.creator)"
 			#singleItem></org>
 		
 		<button id="show-more"

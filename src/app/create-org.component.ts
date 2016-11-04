@@ -114,7 +114,7 @@ export class CreateOrgComponent implements OnInit {
 
   submitOrg(newOrg:org):void {
   	this.http.get("/org-name/" + newOrg.name).map(res => res.json()).subscribe(data => { /* First, check that the name isn't taken */
-  		if (data) return this.ui.flash("Sorry, that name is taken", "error");
+  		if (data && data.length) return this.ui.flash("Sorry, that name is taken", "error");
 
 	  	let ok:boolean = true;
 	    this.requiredOrgFields.forEach((field, index, arr) => {
