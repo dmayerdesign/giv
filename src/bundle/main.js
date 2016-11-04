@@ -51552,6 +51552,21 @@
 	        type = type || "info";
 	        this.toastyService[type](toastOptions);
 	    };
+	    UIHelper.prototype.treatContent = function (content) {
+	        if (!content || typeof content === "undefined")
+	            return "";
+	        content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
+	        var urls = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/g);
+	        if (!urls) {
+	            return content;
+	        }
+	        for (var i = 0; i < urls.length; i++) {
+	            var url = urls[i];
+	            var shortenedUrl = (url.length > 80) ? url.slice(0, 80) + "..." : url;
+	            content = content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
+	        }
+	        return content;
+	    };
 	    UIHelper = __decorate([
 	        core_1.Injectable(), 
 	        __metadata('design:paramtypes', [platform_browser_1.Title, ng2_toasty_1.ToastyService, ng2_toasty_1.ToastyConfig])
@@ -53121,7 +53136,7 @@
 	            this.selectedPost = this.posts.find(function (post) { return post._id === id; });
 	            if (!this.selectedPost)
 	                return this.ui.flash("Sorry, that post no longer exists :(", "error");
-	            this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
+	            this.selectedPost.treatedContent = this.ui.treatContent(this.selectedPost.content);
 	        }
 	    };
 	    OrgPostsComponent.prototype.deselectPost = function () {
@@ -53201,7 +53216,7 @@
 	            this.orgService.editPost(post).subscribe(function (post) {
 	                _this.ui.flash("Saved", "success");
 	                _this.selectedPost = post;
-	                _this.selectedPost.treatedContent = _this.treatContent(_this.selectedPost.content);
+	                _this.selectedPost.treatedContent = _this.ui.treatContent(_this.selectedPost.content);
 	                _this.isEditing = false;
 	            }, function (error) {
 	                console.error(error);
@@ -53253,21 +53268,6 @@
 	    };
 	    OrgPostsComponent.prototype.showOrgs = function () {
 	        this.tabChange.emit("");
-	    };
-	    OrgPostsComponent.prototype.treatContent = function (content) {
-	        if (!content || typeof content === "undefined")
-	            return "";
-	        content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
-	        var url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
-	        if (url) {
-	            url = url[0];
-	        }
-	        else {
-	            return content;
-	        }
-	        var shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
-	        console.log("URL:", url);
-	        return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	    };
 	    OrgPostsComponent.prototype.tooFewPosts = function () {
 	        if (this.posts)

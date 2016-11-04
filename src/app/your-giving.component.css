@@ -176,6 +176,7 @@
 
 table {
 	margin-top: 0.6rem;
+	border: 0 none !important;
 }
 
 th, td {

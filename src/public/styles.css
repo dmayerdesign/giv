@@ -265,9 +265,8 @@ main {
 
 @media screen and (min-width: 768px) {
   .featured-orgs, .browse-orgs, .browse-posts, .starred-orgs,
-  .dashboard > *,
-  .your-giving > button, .your-giving > table,
-  .giv-form {
+  .dashboard > *:not(.giv-form),
+  .donations, .your-giving > button {
     animation: fadeIn 2s cubic-bezier(0,1,0.5,1);
   }
 }

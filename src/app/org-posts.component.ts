@@ -134,7 +134,7 @@ export class OrgPostsComponent implements OnInit {
 			this.viewingOne = true;
 			this.selectedPost = this.posts.find(post => post._id === id);
 			if (!this.selectedPost) return this.ui.flash("Sorry, that post no longer exists :(", "error");
-			this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
+			this.selectedPost.treatedContent = this.ui.treatContent(this.selectedPost.content);
 		}
 	}
 
@@ -218,7 +218,7 @@ export class OrgPostsComponent implements OnInit {
 				post => {
 					this.ui.flash("Saved", "success");
 					this.selectedPost = post;
-					this.selectedPost.treatedContent = this.treatContent(this.selectedPost.content);
+					this.selectedPost.treatedContent = this.ui.treatContent(this.selectedPost.content);
 					this.isEditing = false;
 				},
 				error => {
@@ -274,21 +274,6 @@ export class OrgPostsComponent implements OnInit {
 
 	showOrgs() {
 		this.tabChange.emit("");
-	}
-
-	treatContent(content):string {
-		if (!content || typeof content === "undefined") return "";
-
-		content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
-		let url = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/);
-		if (url) {
-    	url = url[0];
-    } else {
-    	return content;
-    }
-    let shortenedUrl = (url.length > 80) ? url.slice(0, 40) + "..." : url;
-    console.log("URL:", url);
-    return content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
 	}
 
 	tooFewPosts() {
