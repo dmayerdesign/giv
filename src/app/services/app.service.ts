@@ -38,6 +38,22 @@ export class UIHelper {
     type = type || "info";
     this.toastyService[type](toastOptions);
   }
+
+  treatContent(content):string {
+    if (!content || typeof content === "undefined") return "";
+
+    content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
+    let urls = content.match(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?/g);
+    if (!urls) {
+      return content;
+    }
+    for (let i = 0; i < urls.length; i++) {
+      let url = urls[i];
+      let shortenedUrl = (url.length > 80) ? url.slice(0, 80) + "..." : url;
+      content = content.replace(url, "<a href='" + url + "' target='_blank'>" + shortenedUrl + "</a>");
+    }
+    return content;
+  }
 }
 
 @Injectable()

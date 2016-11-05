@@ -70,7 +70,7 @@
     </div>
   </div>
 
-  <button class="add" *ngIf="!isLogging" (click)="logNew()">+ Log a new donation</button>
+  <button class="add" [hidden]="isLogging" (click)="logNew()">+ Log a new donation</button>
   <div class="giv-form inline col-md-12 row" *ngIf="user && isLogging">
   	<div class="form-section clearfix">
       <h3>Log a new donation</h3>
@@ -102,7 +102,7 @@
             [attr.id]="'hours'"
             [(ngModel)]="model.hours">
 
-          <select [(ngModel)]="donationType">
+          <select [(ngModel)]="donationType" style="margin-top:0.3rem">
             <option [attr.value]="'dollars'">Dollars</option>
             <option [attr.value]="'hours'">Hours</option>
           </select>
@@ -122,7 +122,7 @@
     <button class="cancel" (click)="cancel()">Cancel</button>
   </div>
 
-  <table class="donations col-md-12" *ngIf="user">
+  <table class="donations section col-md-12" *ngIf="user">
     <tbody>
       <tr class="header-row">
         <th>Organization</th>

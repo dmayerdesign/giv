@@ -88,6 +88,14 @@ export class YourGivingComponent implements OnInit {
 		this.totalDollars = 0;
 		this.totalHours = 0;
 
+    this.user.donations = this.user.donations.sort(function(a, b){
+      if (a.createdAt > b.createdAt) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
 		this.user.donations.forEach(donation => {
     	let donationsToThisOrg = this.donationsByOrg.filter(d => {
     		return d.orgName === donation.orgName;
@@ -107,7 +115,6 @@ export class YourGivingComponent implements OnInit {
     		if (donation.hours && donation.dollars) {
     			this.donationsByOrg[index].total += (donation.hours + donation.dollars);
     		}
-
     	}
     	else {
     		let newDonationToThisOrg = {
@@ -125,7 +132,7 @@ export class YourGivingComponent implements OnInit {
     		if (donation.hours && donation.dollars) {
     			newDonationToThisOrg.total += (donation.hours + donation.dollars);
     		}
-  			this.donationsByOrg.push(newDonationToThisOrg);
+  			this.donationsByOrg.unshift(newDonationToThisOrg);
     	}
 
     	if (donation.dollars) this.totalDollars += donation.dollars;
@@ -209,7 +216,7 @@ export class YourGivingComponent implements OnInit {
 
   	this.saving = true;
 
-  	this.http.get("/org/name/" + this.model.orgName).map(res => res.json()).subscribe(
+  	this.http.get("/org-name/" + encodeURIComponent(this.model.orgName)).map(res => res.json()).subscribe(
   		org => {
 	  		this.model.orgId = org._id;
 		  	this.http.put("/donation/log", this.model).map(res => res.json()).subscribe(data => {
