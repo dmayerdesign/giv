@@ -3,6 +3,16 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 // adminToken: h2u81eg7wr3h9uijk8
 
+const donationSchema = new mongoose.Schema({
+  id: String,
+  org: String,
+  orgName: String,
+  dollars: Number,
+  hours: Number,
+  memo: String,
+  verified: Boolean
+}, { timestamps: true });
+
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   emailIsVerified: Boolean,
@@ -30,16 +40,7 @@ const userSchema = new mongoose.Schema({
 
   interests: {},
 
-  donations: [{
-    dateCreated: {type: Date, default: Date.now()},
-    id: String,
-    org: String,
-    orgName: String,
-    dollars: Number,
-    hours: Number,
-    memo: String,
-    verified: Boolean
-  }]
+  donations: [donationSchema]
 }, { timestamps: true });
 
 /**

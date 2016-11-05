@@ -393,7 +393,7 @@ exports.getUserByUsername = (req, res) => {
 exports.showInterest = (req, res) => {
   let userId = req.body.userId;
   let categories = req.body.categories;
-  let increment = req.body.increment || 0;
+  let increment = +req.body.increment || 0;
 
   console.log("INTEREST REQUEST: ", userId, categories, increment);
 

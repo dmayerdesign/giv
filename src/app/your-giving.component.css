@@ -201,6 +201,10 @@ tr:nth-child(even) {
 	font-size: 1em;
 }
 
+.donations {
+	overflow: visible;
+}
+
 .donations td {
 	position: relative;
 }

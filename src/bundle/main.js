@@ -54116,6 +54116,14 @@
 	        this.donationsByOrg = [];
 	        this.totalDollars = 0;
 	        this.totalHours = 0;
+	        this.user.donations = this.user.donations.sort(function (a, b) {
+	            if (a.createdAt > b.createdAt) {
+	                return -1;
+	            }
+	            else {
+	                return 1;
+	            }
+	        });
 	        this.user.donations.forEach(function (donation) {
 	            var donationsToThisOrg = _this.donationsByOrg.filter(function (d) {
 	                return d.orgName === donation.orgName;
@@ -54152,7 +54160,7 @@
 	                if (donation.hours && donation.dollars) {
 	                    newDonationToThisOrg.total += (donation.hours + donation.dollars);
 	                }
-	                _this.donationsByOrg.push(newDonationToThisOrg);
+	                _this.donationsByOrg.unshift(newDonationToThisOrg);
 	            }
 	            if (donation.dollars)
 	                _this.totalDollars += donation.dollars;
@@ -54243,7 +54251,7 @@
 	        if (this.donationType === "hours")
 	            this.model.dollars = null;
 	        this.saving = true;
-	        this.http.get("/org/name/" + this.model.orgName).map(function (res) { return res.json(); }).subscribe(function (org) {
+	        this.http.get("/org-name/" + encodeURIComponent(this.model.orgName)).map(function (res) { return res.json(); }).subscribe(function (org) {
 	            _this.model.orgId = org._id;
 	            _this.http.put("/donation/log", _this.model).map(function (res) { return res.json(); }).subscribe(function (data) {
 	                console.log(data);
