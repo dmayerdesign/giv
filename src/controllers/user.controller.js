@@ -109,15 +109,28 @@ exports.postSignup = (req, res, next) => {
           html: `
             <!doctype html>
             <html><body>
-              <h4>Thanks for joining Giv!</h4>
+              <h3>Thanks for joining Giv!</h3>
               <p>Click on the link below (or paste it into your browser) to finish the signup process:</p>
               <p><strong><a href='http://${req.headers.host}/verify-email/${token}' target='_blank'>Click here to verify your email</a></strong></p>
             </body></html>
           `
         };
-        transporter.sendMail(mailOptions, (err) => {
+        const alertOptions = {
+          to: 'd.a.mayer92@gmail.com',
+          from: 'Giv Support <d.a.mayer92@gmail.com>',
+          subject: 'A new user joined Giv!',
+          html: `
+            <!doctype html>
+            <html><body>
+              <h3>${user.email} just joined Giv!</h3>
+            </body></html>
+          `
+        };
+        transporter.sendMail(mailOptions, err => {
           if (err) { return res.json({errmsg: err}); }
           res.status(200).json(user);
+
+          transporter.sendMail(alertOptions);
         });
       });
     });
