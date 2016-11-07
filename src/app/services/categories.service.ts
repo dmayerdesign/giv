@@ -23,6 +23,7 @@ export class Categories {
 	    { name: "Human rights", id: "human" },
 	    { name: "Education", id: "education" },
 	    { name: "Philanthropy & Community", id: "philanthropy" },
+	    { name: "Media", id: "media" },
 	    { name: "Other", id: "other" }
 	  ];
 	}
