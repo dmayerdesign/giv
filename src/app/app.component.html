@@ -43,7 +43,7 @@
 
         <li *ngIf="!isLoggedIn" class="nav-item">
           <a class="nav-link" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="logIn()">
-            <span>Log in</span>
+            <span class="login-text">Log in</span>
           </a>
         </li>
         <button *ngIf="!isLoggedIn" class="nav-item" (mouseover)="navOver($event)" (mouseout)="navOut($event)" (click)="signUp()">Join</button>

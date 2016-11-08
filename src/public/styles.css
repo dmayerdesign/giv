@@ -552,7 +552,7 @@ button.nav-item:hover {
 }
 
 @media only screen and (max-width: 599px) {
-  .nav-item > a span {
+  .nav-item > a span:not(.login-text) {
     display: none;
   }
 
