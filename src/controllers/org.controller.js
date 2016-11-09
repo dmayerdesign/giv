@@ -311,6 +311,9 @@ exports.routes = [
     method: "post",
     uri: "/org/rate/:id",
     process: function(req, res) {
+      if (!req.body.rating || req.body.rating == "undefined") {
+        return res.json({errmsg: "Sorry, something went wrong and your rating didn't go through"});
+      }
       let rating = +req.body.rating;
       let rater = req.body.userId;
       Org.findById(req.params.id, function(err, org) {
@@ -328,8 +331,8 @@ exports.routes = [
         console.log("RATING:");
         console.log(rating);
 
-        const oldRating = org.rating;
-        const ratingsLen = org.ratings.length;
+        const oldRating = org.rating || 0;
+        const ratingsLen = org.ratings.length || 0;
         let newRating = ((oldRating*ratingsLen/10 + rating) / (ratingsLen+1))*10;
 
         org.rating = newRating;

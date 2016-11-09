@@ -176,7 +176,7 @@ export class SingleOrgComponent implements OnInit {
   }
 
   submitRating() {
-  	if (this.orgRating === null) return this.ui.flash("Select a rating between 0 and 10", "info");
+  	if (this.orgRating === null || typeof this.orgRating == "undefined") return this.ui.flash("Select a rating between 0 and 10", "info");
   	this.http.post("/org/rate/" + this.org._id, {rating: this.orgRating, userId: this.user._id}).map(res => res.json()).subscribe(
   		data => {
   			this.ratingOrg = false;
