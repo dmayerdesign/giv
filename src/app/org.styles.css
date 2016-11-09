@@ -268,9 +268,18 @@ header h4 > a, header h4 > a:hover {
 @media only screen and (max-width: 579px) {
   .browse-orgs > header,
   .favorite-orgs > header,
-  .recommended-orgs > header {
+  .in-single .recommended-orgs > header {
     padding-right: 30px;
     padding-left: 30px;
+  }
+
+  .in-single .recommended-orgs > header {
+    padding-right: 0;
+  }
+
+  .recommended-orgs > header {
+    padding-right: 15px;
+    padding-left: 15px;
   }
 
   search-box + select {
