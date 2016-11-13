@@ -52067,7 +52067,11 @@
 	            _this.orgs = results;
 	            console.log("Favorite orgs: ", _this.orgs);
 	            _this.loadRecommendations();
-	        }, function (error) { return console.error(error); });
+	            _this.isLoaded = true;
+	        }, function (error) {
+	            console.error(error);
+	            _this.isLoaded = true;
+	        });
 	    };
 	    FavoriteOrgsComponent.prototype.viewOrg = function (id) {
 	        this.selectedOrg = null;
@@ -53490,7 +53494,7 @@
 	    };
 	    SingleOrgComponent.prototype.submitRating = function () {
 	        var _this = this;
-	        if (this.orgRating === null)
+	        if (this.orgRating === null || typeof this.orgRating == "undefined")
 	            return this.ui.flash("Select a rating between 0 and 10", "info");
 	        this.http.post("/org/rate/" + this.org._id, { rating: this.orgRating, userId: this.user._id }).map(function (res) { return res.json(); }).subscribe(function (data) {
 	            _this.ratingOrg = false;

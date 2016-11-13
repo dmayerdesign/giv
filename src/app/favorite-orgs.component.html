@@ -1,4 +1,5 @@
 <div class="favorite-orgs mobile-tab desktop-tab col-md-8"
+		*ngIf="isLoaded"
 		[ngClass]="{'active': showFavoritesMobileTab}">
 	<header>
 		<h2>Favorited <span class="desktop-tab-button" *ngIf="user" (click)="showRecommended()">Recommended</span></h2>
@@ -38,8 +39,17 @@
 </div>
 
 <div class="mobile-tab desktop-tab"
-		*ngIf="user"
+		*ngIf="user && isLoaded"
 		[ngClass]="{'active': showRecommendedMobileTab}">
 	<recommended-orgs (tabChange)="showFavorites($event)" [orgs]="orgs" [inFavorites]="true"></recommended-orgs>
+</div>
+
+<div class="loader app-loader" *ngIf="!isLoaded">
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="50"></p>
+  <p class="loader_dots">
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+  </p>
 </div>
 

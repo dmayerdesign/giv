@@ -24,6 +24,7 @@ export class FavoriteOrgsComponent implements OnInit {
 	private showFavoritesMobileTab:boolean = true;
 	private showRecommendedMobileTab:boolean = false;
 	private adminToken:string;
+	private isLoaded:boolean;
 
 	constructor(private userService:UserService,
 							private orgService:OrgService,
@@ -56,8 +57,12 @@ export class FavoriteOrgsComponent implements OnInit {
 					this.orgs = results;
 					console.log("Favorite orgs: ", this.orgs);
 					this.loadRecommendations();
+					this.isLoaded = true;
 				},
-				error => console.error(error)
+				error => {
+					console.error(error);
+					this.isLoaded = true;
+				}
 		);
 	}
 
