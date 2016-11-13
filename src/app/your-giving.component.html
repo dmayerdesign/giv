@@ -150,8 +150,17 @@
 
 </div>
 
-<div *ngIf="!user">
+<div *ngIf="!user && isLoaded">
   <section class="null-search">
     <p>Log in or create an account to keep track of your giving!</p>
   </section>
+</div>
+
+<div class="loader app-loader" *ngIf="!isLoaded">
+  <p class="loader__label"><img src="images/logo-color-2x.png" width="50"></p>
+  <p class="loader_dots">
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+  </p>
 </div>

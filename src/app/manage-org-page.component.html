@@ -72,6 +72,7 @@
           [type]="'select'"
           [saving]="saving_type"
           [selectOptions]="orgTypes"
+          [initial]="org.type"
           (onSave)="save('type', $event)"></form-field>
 
       </div>
