@@ -113,6 +113,7 @@ exports.routes = [
           dbQuery2[req.query.filterField] = req.query.filterValue;
       }
       dbQuery.verified = false;
+      if (dbQuery2) dbQuery2.verified = false;
 
       console.log(req.query);
       console.log("Query 1", dbQuery);

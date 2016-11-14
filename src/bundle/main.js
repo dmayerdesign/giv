@@ -52893,7 +52893,7 @@
 	            { name: "Civil rights", id: "civil" },
 	            { name: "Racial justice", id: "racial" },
 	            { name: "Criminal justice", id: "criminal" },
-	            { name: "LGBTQIA justice", id: "lgbtqia" },
+	            { name: "LGBTQIA+ justice", id: "lgbtqia" },
 	            { name: "Disability rights", id: "disability" },
 	            { name: "Neurodiversity", id: "neurodiversity" },
 	            { name: "Environmental justice", id: "environmental" },
@@ -56161,7 +56161,7 @@
 	            query['filterValue'] = this.categoryFilter.id;
 	        }
 	        this.loadingOrgSearch = true;
-	        this.orgService.loadOrgs(query)
+	        this.orgService.loadUnverifiedOrgs(query)
 	            .subscribe(function (results) {
 	            _this.orgs = results;
 	            _this.loadingOrgSearch = false;
@@ -56208,7 +56208,7 @@
 	            query['filterValue'] = this.categoryFilter.id;
 	        }
 	        this.loadingShowMoreOrgs = true;
-	        this.orgService.loadOrgs(query).subscribe(function (res) {
+	        this.orgService.loadUnverifiedOrgs(query).subscribe(function (res) {
 	            _this.loadingShowMoreOrgs = false;
 	            console.log(res);
 	            _this.orgs = _this.orgs.concat(res);

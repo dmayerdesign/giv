@@ -10,7 +10,7 @@ export class Categories {
 			{ name: "Civil rights", id: "civil" },
 	    { name: "Racial justice", id: "racial" },
 			{ name: "Criminal justice", id: "criminal" },
-	    { name: "LGBTQIA justice", id: "lgbtqia" },
+	    { name: "LGBTQIA+ justice", id: "lgbtqia" },
 	    { name: "Disability rights", id: "disability" },
 	    { name: "Neurodiversity", id: "neurodiversity" },
 	    { name: "Environmental justice", id: "environmental" },

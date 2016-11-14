@@ -86,7 +86,7 @@ export class VerifyOrgsComponent implements OnInit {
 		}
 		this.loadingOrgSearch = true;
 
-		this.orgService.loadOrgs(query)
+		this.orgService.loadUnverifiedOrgs(query)
 			.subscribe(
 				results => {
 					this.orgs = results;
@@ -138,7 +138,7 @@ export class VerifyOrgsComponent implements OnInit {
 		}
 		this.loadingShowMoreOrgs = true;
 
-		this.orgService.loadOrgs(query).subscribe(
+		this.orgService.loadUnverifiedOrgs(query).subscribe(
 			res => {
 				this.loadingShowMoreOrgs = false;
 				console.log(res);
