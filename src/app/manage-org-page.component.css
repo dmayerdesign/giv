@@ -93,6 +93,11 @@ h2 span {
 	font-weight: normal;
 }
 
+.description-preview {
+	height: 12.4rem;
+	overflow-y: scroll;
+}
+
 /* Calls to action */
 .preview-section.calls-to-action {
 	margin-bottom: 5em;
