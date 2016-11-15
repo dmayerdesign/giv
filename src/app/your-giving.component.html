@@ -122,7 +122,7 @@
     <button class="cancel" (click)="cancel()">Cancel</button>
   </div>
 
-  <table class="donations section col-md-12" *ngIf="user">
+  <table class="donations section col-md-12" *ngIf="user?.donations?.length">
     <tbody>
       <tr class="header-row">
         <th>Organization</th>
